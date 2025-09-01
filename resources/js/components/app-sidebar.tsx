@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Archive, Baby, BookOpen, ClipboardPlus, Folder, LayoutGrid, Megaphone, UserCog } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, UserCog } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -15,29 +15,9 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Reports & Export',
-        href: dashboard(),
-        icon: ClipboardPlus,
-    },
-    {
-        title: 'Children Records',
-        href: dashboard(),
-        icon: Baby,
-    },
-    {
-        title: 'Announcements',
-        href: dashboard(),
-        icon: Megaphone,
-    },
-    {
         title: 'User Management',
-        href: dashboard(),
+        href: 'users/',
         icon: UserCog,
-    },
-    {
-        title: 'Archives',
-        href: dashboard(),
-        icon: Archive,
     },
 ];
 
