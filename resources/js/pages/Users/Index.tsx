@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 type User = {
     id: number;
@@ -21,14 +21,19 @@ interface Props {
 }
 
 export default function Index({ users }: Props) {
+    const { delete: destroy } = useForm({});
+
+    const handleDelete = (id: number) => {
+        if (confirm('Are you sure you want to delete this user?')) {
+            destroy(`/users/${id}`);
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
-                <Link href="/users/create" className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
-                    + Create User
-                </Link>
             </div>
             <table className="min-w-full overflow-hidden rounded border">
                 <thead className="bg-gray-50">
@@ -47,19 +52,23 @@ export default function Index({ users }: Props) {
                             <td className="border px-4 py-2">{user.email}</td>
                             <td className="border px-4 py-2">
                                 <Link
+                                    href={`/users/${user.id}`}
+                                    className="mr-2 rounded bg-gray-500 px-3 py-1 text-white transition hover:bg-gray-600"
+                                >
+                                    View
+                                </Link>
+                                <Link
                                     href={`/users/${user.id}/edit`}
                                     className="mr-2 rounded bg-green-500 px-3 py-1 text-white transition hover:bg-green-600"
                                 >
                                     Edit
                                 </Link>
-                                <Link
-                                    href={`/users/${user.id}/delete`}
+                                <button
+                                    onClick={() => handleDelete(user.id)}
                                     className="rounded bg-red-500 px-3 py-1 text-white transition hover:bg-red-600"
-                                    method="delete"
-                                    as="button"
                                 >
                                     Delete
-                                </Link>
+                                </button>
                             </td>
                         </tr>
                     ))}

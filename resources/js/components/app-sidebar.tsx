@@ -19,6 +19,11 @@ const mainNavItems: NavItem[] = [
         href: 'users/',
         icon: UserCog,
     },
+    {
+        title: 'Roles',
+        href: 'roles/',
+        icon: UserCog,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
