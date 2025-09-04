@@ -10,13 +10,17 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
 
+    Route::middleware(['role:Admin'])->group(function () {
+        Route::get('/users/archived', [UserController::class, 'archived'])->name('users.archived');
+        Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
+        Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
 
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class);
+        Route::resource('users', UserController::class);
+        Route::resource('roles', RoleController::class);
+    });
 });
 
 require __DIR__.'/settings.php';

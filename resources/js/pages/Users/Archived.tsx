@@ -1,18 +1,19 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 type User = {
     id: number;
     name: string;
     email: string;
-    roles: string[];
+    role: string;
+    deleted_at: string | null;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'User Management',
-        href: '/users',
+        title: 'Archived Users',
+        href: '/users/archived',
     },
 ];
 
@@ -20,22 +21,14 @@ interface Props {
     users: User[];
 }
 
-export default function Index({ users }: Props) {
-    const { delete: destroy } = useForm({});
-
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this user?')) {
-            destroy(`/users/${id}`);
-        }
-    };
-
+export default function Archived({ users }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Users" />
+            <Head title="Archived Users" />
             <div className="m-4 mb-4 flex items-center justify-between">
-                <h1 className="text-xl font-bold">User List</h1>
-                <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
-                    View Archived Users
+                <h1 className="text-xl font-bold">Archived User Accounts</h1>
+                <Link href="/users" className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
+                    Back
                 </Link>
             </div>
 
@@ -45,7 +38,6 @@ export default function Index({ users }: Props) {
                         <th className="border px-4 py-2 text-left">ID</th>
                         <th className="border px-4 py-2 text-left">Name</th>
                         <th className="border px-4 py-2 text-left">Email</th>
-                        <th className="border px-4 py-2 text-left">Role</th>
                         <th className="border px-4 py-2 text-left">Actions</th>
                     </tr>
                 </thead>
@@ -55,29 +47,22 @@ export default function Index({ users }: Props) {
                             <td className="border px-4 py-2">{user.id}</td>
                             <td className="border px-4 py-2">{user.name}</td>
                             <td className="border px-4 py-2">{user.email}</td>
-                            <td className="border px-4 py-2">{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</td>
                             <td className="border px-4 py-2">
-                                <Link
-                                    href={`/users/${user.id}`}
-                                    className="mr-2 rounded bg-gray-500 px-3 py-1 text-white transition hover:bg-gray-600"
+                                <button
+                                    onClick={() => router.post(`/users/${user.id}/restore`)}
+                                    className="mr-2 rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600"
                                 >
-                                    View
-                                </Link>
-                                <Link
-                                    href={`/users/${user.id}/edit`}
-                                    className="mr-2 rounded bg-green-500 px-3 py-1 text-white transition hover:bg-green-600"
-                                >
-                                    Edit
-                                </Link>
+                                    Restore
+                                </button>
                                 <button
                                     onClick={() => {
-                                        if (confirm('Archive this user?')) {
-                                            router.delete(`/users/${user.id}`);
+                                        if (confirm('Permanently delete this user?')) {
+                                            router.delete(`/users/${user.id}/force-delete`);
                                         }
                                     }}
                                     className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
                                 >
-                                    Archive
+                                    Delete Permanently
                                 </button>
                             </td>
                         </tr>

@@ -14,6 +14,7 @@ export default function Edit({ user }) {
         name: user.name || '',
         email: user.email || '',
         password: '',
+        role: user.role || 'healthworker', // 👈 default role
     });
 
     function submit(e: React.FormEvent) {
@@ -31,6 +32,7 @@ export default function Edit({ user }) {
                 </Link>
             </div>
             <form onSubmit={submit} className="mx-4 mt-8 max-w-xl">
+                {/* Name */}
                 <div className="mb-4">
                     <label className="mb-1 block font-medium">Name</label>
                     <input
@@ -45,6 +47,7 @@ export default function Edit({ user }) {
                     {errors.name && <div className="mt-1 text-sm text-red-600">{errors.name}</div>}
                 </div>
 
+                {/* Email */}
                 <div className="mb-4">
                     <label className="mb-1 block font-medium">Email</label>
                     <input
@@ -59,6 +62,7 @@ export default function Edit({ user }) {
                     {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
                 </div>
 
+                {/* Password */}
                 <div className="mb-6">
                     <label className="mb-1 block font-medium">Password</label>
                     <input
@@ -72,6 +76,22 @@ export default function Edit({ user }) {
                     {errors.password && <div className="mt-1 text-sm text-red-600">{errors.password}</div>}
                 </div>
 
+                {/* Role Dropdown */}
+                <div className="mb-6">
+                    <label className="mb-1 block font-medium">Role</label>
+                    <select
+                        name="role"
+                        value={data.role}
+                        onChange={(e) => setData('role', e.target.value)}
+                        className="w-full rounded border px-4 py-2"
+                    >
+                        <option value="healthworker">Health Worker</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    {errors.role && <div className="mt-1 text-sm text-red-600">{errors.role}</div>}
+                </div>
+
+                {/* Save Button */}
                 <div className="flex justify-end">
                     <button type="submit" className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700" disabled={processing}>
                         {processing ? 'Saving...' : 'Save User'}
