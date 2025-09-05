@@ -86,6 +86,7 @@ export default function Register() {
                                     required
                                     className="mt-1 block w-full rounded border p-2"
                                 />
+                                {errors.registration_code && <p className="text-sm text-red-500">{errors.registration_code}</p>}
                             </div>
 
                             <Button type="submit" className="mt-2 w-full" tabIndex={5}>
