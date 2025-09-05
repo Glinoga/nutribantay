@@ -1,6 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 
 type User = {
     id: number;
@@ -22,21 +24,42 @@ interface Props {
 
 export default function Index({ users }: Props) {
     const { delete: destroy } = useForm({});
+    const [adminCode, setAdminCode] = useState<string | null>(null);
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this user?')) {
-            destroy(`/users/${id}`);
+    const generateAdminCode = async () => {
+        try {
+            const response = await axios.post('/registration-codes/generate');
+            setAdminCode(response.data.code);
+            alert('New Admin Code generated!');
+        } catch (error) {
+            console.error(error);
+            alert('Failed to generate admin code.');
         }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
+
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
                 <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
                     View Archived Users
                 </Link>
+            </div>
+
+            {/* 🔹 Admin Code Section */}
+            <div className="m-4 mb-6 rounded border p-4">
+                <h2 className="mb-2 text-lg font-semibold">Admin Code</h2>
+                <button onClick={generateAdminCode} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                    Generate Admin Code
+                </button>
+
+                {adminCode && (
+                    <div className="mt-3 rounded bg-gray-100 p-2 font-mono">
+                        Current Code: <span className="font-bold">{adminCode}</span>
+                    </div>
+                )}
             </div>
 
             <table className="min-w-full overflow-hidden rounded border">

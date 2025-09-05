@@ -31,25 +31,42 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        'registration_code' => ['required', 'string'],
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+    // check if code exists and has not expired
+    $isValid = \App\Models\RegistrationCode::where('code', $request->registration_code)
+        ->where(function ($q) {
+            $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+        })
+        ->exists();
 
-        $user->assignRole('Healthworker');
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect()->intended(route('dashboard', absolute: false));
+    if (! $isValid) {
+        return back()->withErrors([
+            'registration_code' => 'The admin code is invalid or expired.',
+        ])->onlyInput('registration_code');
     }
+
+    // create user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+    ]);
+
+    // assign default role
+    $user->assignRole('Healthworker');
+
+    event(new Registered($user));
+    Auth::login($user);
+
+    return redirect()->intended(route('dashboard', absolute: false));
+}
+
+
 }

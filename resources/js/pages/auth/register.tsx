@@ -75,6 +75,19 @@ export default function Register() {
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
+                            <div>
+                                <label htmlFor="registration_code" className="block text-sm font-medium text-gray-700">
+                                    Admin Code
+                                </label>
+                                <input
+                                    id="registration_code"
+                                    name="registration_code"
+                                    type="text"
+                                    required
+                                    className="mt-1 block w-full rounded border p-2"
+                                />
+                            </div>
+
                             <Button type="submit" className="mt-2 w-full" tabIndex={5}>
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 Create account
