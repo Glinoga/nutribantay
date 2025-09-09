@@ -13,18 +13,34 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */ 
-    public function index()
+    public function index(Request $request)
 {
-    $users = User::with('roles')->get(); // eager load roles
+    $query = User::with('roles'); // eager load roles
+
+    if ($search = $request->input('search')) {
+        $query->where(function ($q) use ($search) {
+            $q->where('id', $search) // exact match for ID
+              ->orWhere('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhereHas('roles', function ($roleQuery) use ($search) {
+                  $roleQuery->where('name', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    $users = $query->get();
+
     return Inertia::render('Users/Index', [
         'users' => $users->map(fn($user) => [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'roles' => $user->getRoleNames()->toArray(), // e.g. ["admin"]
+            'roles' => $user->getRoleNames()->toArray(),
         ]),
+        'filters' => $request->only('search'), // 👈 so frontend knows current search
     ]);
 }
+
 
 
     public function archived()
