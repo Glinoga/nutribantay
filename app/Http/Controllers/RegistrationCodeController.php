@@ -10,15 +10,35 @@ class RegistrationCodeController extends Controller
 {
     public function generate()
     {
-        // generate secure random code
+        // Generate secure random code
         $code = strtoupper(Str::random(8));
 
-        // save to database with 1 day expiry
+        // Save to database with 1-day expiry
         $registrationCode = RegistrationCode::create([
-            'code' => $code,
+            'code'       => $code,
             'expires_at' => now()->addDay(),
         ]);
 
-        return response()->json(['code' => $code]);
+        // Keep only the 5 most recent codes
+        $excess = RegistrationCode::count() - 5;
+        if ($excess > 0) {
+            RegistrationCode::orderBy('created_at', 'asc')
+                ->take($excess)
+                ->delete();
+        }
+
+        return response()->json([
+            'code' => $code,
+        ]);
+    }
+
+    public function latest()
+    {
+        $registrationCode = RegistrationCode::latest()->first();
+
+        return response()->json([
+            'code'       => $registrationCode?->code,
+            'expires_at' => $registrationCode?->expires_at,
+        ]);
     }
 }

@@ -127,12 +127,14 @@ class UserController extends Controller
         'email' => 'required',
         'password' => 'nullable|string|min:8',
         'role' => 'required|in:admin,healthworker',
+        'barangay' => 'required|string|max:255'
     ]);
 
     $user = User::findOrFail($id);
 
     $user->name = $request->name;
     $user->email = $request->email;
+    $user->barangay = $request->barangay;
 
     if ($request->filled('password')) {
         $user->password = Hash::make($request->password);
@@ -145,6 +147,7 @@ class UserController extends Controller
 
     return to_route('users.index');
 }
+
 
     /**
      * Remove the specified resource from storage.

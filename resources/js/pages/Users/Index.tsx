@@ -2,13 +2,19 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type User = {
     id: number;
     name: string;
     email: string;
     roles: string[];
+};
+
+type RegistrationCode = {
+    code: string | null;
+    expires_at: string | null;
+    expired: boolean;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -20,18 +26,25 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Props {
     users: User[];
-    filters: { search?: string }; // 👈 added to persist search term
+    filters: { search?: string };
 }
 
 export default function Index({ users, filters }: Props) {
     const { delete: destroy } = useForm({});
-    const [adminCode, setAdminCode] = useState<string | null>(null);
-    const [search, setSearch] = useState(filters.search || ''); // 👈 keep track of search input
+    const [adminCode, setAdminCode] = useState<RegistrationCode | null>(null);
+    const [search, setSearch] = useState(filters.search || '');
+
+    // 🔹 Load latest code on mount
+    useEffect(() => {
+        axios.get('/registration-codes/latest').then((res) => {
+            setAdminCode(res.data);
+        });
+    }, []);
 
     const generateAdminCode = async () => {
         try {
             const response = await axios.post('/registration-codes/generate');
-            setAdminCode(response.data.code);
+            setAdminCode(response.data);
             alert('New Admin Code generated!');
         } catch (error) {
             console.error(error);
@@ -76,10 +89,23 @@ export default function Index({ users, filters }: Props) {
                     Generate Admin Code
                 </button>
 
-                {adminCode && (
-                    <div className="mt-3 rounded bg-gray-100 p-2 font-mono">
-                        Current Code: <span className="font-bold">{adminCode}</span>
+                {adminCode ? (
+                    <div className="mt-3 rounded bg-gray-100 p-2">
+                        {adminCode.expired ? (
+                            <p className="font-medium text-red-600">❌ Code expired</p>
+                        ) : (
+                            <>
+                                <p className="font-mono text-lg text-blue-600">
+                                    Current Code: <span className="font-bold">{adminCode.code}</span>
+                                </p>
+                                {adminCode.expires_at && (
+                                    <p className="text-sm text-gray-600">Expires at: {new Date(adminCode.expires_at).toLocaleString()}</p>
+                                )}
+                            </>
+                        )}
                     </div>
+                ) : (
+                    <div className="mt-3 text-gray-500">No code generated yet.</div>
                 )}
             </div>
 

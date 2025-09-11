@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, UserCog } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 type AuthProps = {
@@ -20,7 +20,10 @@ export function AppSidebar() {
 
     const isAdmin = (auth?.roles ?? []).some((r) => r.toLowerCase() === 'admin');
 
-    const mainNavItems: NavItem[] = [{ title: 'Dashboard', href: dashboard(), icon: LayoutGrid }];
+    const mainNavItems: NavItem[] = [
+        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+        { title: 'Child Profiles', href: '/children', icon: UserPen },
+    ];
 
     if (isAdmin) {
         mainNavItems.push({ title: 'User Management', href: '/users', icon: UserCog });

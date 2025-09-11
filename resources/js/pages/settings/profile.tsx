@@ -95,6 +95,21 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     </div>
                                 )}
 
+                                <div className="grid gap-2">
+                                    <Label htmlFor="barangay">Barangay</Label>
+
+                                    <Input
+                                        id="barangay"
+                                        className="mt-1 block w-full"
+                                        defaultValue={String(auth.user.barangay || '')}
+                                        name="barangay"
+                                        required
+                                        placeholder="Your barangay"
+                                    />
+
+                                    <InputError className="mt-2" message={errors.barangay} />
+                                </div>
+
                                 <div className="flex items-center gap-4">
                                     <Button disabled={processing}>Save</Button>
 

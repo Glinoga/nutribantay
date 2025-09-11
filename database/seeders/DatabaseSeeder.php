@@ -3,21 +3,34 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Run the PermissionSeeder first
+        $this->call(PermissionSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Create admin account
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        $admin->assignRole('Admin');
+
+        // Create healthworker account
+        $healthworker = User::firstOrCreate(
+            ['email' => 'health@example.com'],
+            [
+                'name' => 'Health Worker',
+                'password' => Hash::make('password123'),
+            ]
+        );
+        $healthworker->assignRole('Healthworker');
     }
 }
