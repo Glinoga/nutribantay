@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('age');
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
-            $table->unsignedBigInteger('barangay_id')->nullable(); // no foreign key for now
             $table->unsignedBigInteger('created_by'); // user ID (healthworker/admin)
             $table->timestamps();
         });
