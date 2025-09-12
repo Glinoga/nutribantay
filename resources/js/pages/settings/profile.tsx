@@ -95,20 +95,15 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     </div>
                                 )}
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="barangay">Barangay</Label>
-
-                                    <Input
-                                        id="barangay"
-                                        className="mt-1 block w-full"
-                                        defaultValue={String(auth.user.barangay || '')}
-                                        name="barangay"
-                                        required
-                                        placeholder="Your barangay"
-                                    />
-
-                                    <InputError className="mt-2" message={errors.barangay} />
-                                </div>
+                                <Label htmlFor="barangay">Barangay Number</Label>
+                                <Input
+                                    id="barangay"
+                                    type="text"
+                                    name="barangay"
+                                    defaultValue={String(auth.user.barangay || '')}
+                                    readOnly
+                                    className="mt-1 block w-full cursor-not-allowed bg-gray-100"
+                                />
 
                                 <div className="flex items-center gap-4">
                                     <Button disabled={processing}>Save</Button>

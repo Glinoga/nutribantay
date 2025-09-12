@@ -87,12 +87,6 @@ export default function Create() {
                     {errors.height && <div className="text-red-600">{errors.height}</div>}
                 </div>
 
-                {/* 🔹 Barangay Field (read-only) */}
-                <div>
-                    <label className="block">Barangay</label>
-                    <input type="text" value={data.barangay} readOnly className="w-full cursor-not-allowed rounded border bg-gray-100 p-2" />
-                </div>
-
                 <button type="submit" disabled={processing} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
                     Save
                 </button>
