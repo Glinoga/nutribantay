@@ -127,7 +127,7 @@ class UserController extends Controller
         'email' => 'required',
         'password' => 'nullable|string|min:8',
         'role' => 'required|in:admin,healthworker',
-        'barangay' => 'required|string|max:255'
+        'barangay' => 'required|integer'
     ]);
 
     $user = User::findOrFail($id);

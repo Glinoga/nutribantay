@@ -13,8 +13,8 @@ export default function Edit({ user }) {
     const { data, setData, errors, put, processing } = useForm({
         name: user.name || '',
         email: user.email || '',
-        password: '',
-        role: user.role || 'healthworker', // 👈 default role
+        role: user.role || 'healthworker',
+        barangay: user.barangay || '',
     });
 
     function submit(e: React.FormEvent) {
@@ -62,20 +62,6 @@ export default function Edit({ user }) {
                     {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
                 </div>
 
-                {/* Password */}
-                <div className="mb-6">
-                    <label className="mb-1 block font-medium">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        placeholder="Enter password"
-                        className="w-full rounded border px-4 py-2"
-                    />
-                    {errors.password && <div className="mt-1 text-sm text-red-600">{errors.password}</div>}
-                </div>
-
                 {/* Role Dropdown */}
                 <div className="mb-6">
                     <label className="mb-1 block font-medium">Role</label>
@@ -89,6 +75,19 @@ export default function Edit({ user }) {
                         <option value="admin">Admin</option>
                     </select>
                     {errors.role && <div className="mt-1 text-sm text-red-600">{errors.role}</div>}
+                </div>
+
+                {/* Barangay */}
+                <div className="mb-4">
+                    <label className="mb-1 block font-medium">Barangay</label>
+                    <input
+                        type="text"
+                        name="barangay"
+                        value={data.barangay}
+                        readOnly
+                        className="w-full cursor-not-allowed rounded border bg-gray-100 px-4 py-2"
+                    />
+                    {errors.barangay && <div className="mt-1 text-sm text-red-600">{errors.barangay}</div>}
                 </div>
 
                 {/* Save Button */}
