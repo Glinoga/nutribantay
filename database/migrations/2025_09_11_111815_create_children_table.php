@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('sex', ['Male', 'Female']);
             $table->integer('age');
+            $table->string('barangay')->nullable();
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
             $table->unsignedBigInteger('created_by'); // user ID (healthworker/admin)
