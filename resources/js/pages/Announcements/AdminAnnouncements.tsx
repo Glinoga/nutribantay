@@ -14,7 +14,7 @@ type Props = {
     announcements: Announcement[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: '/dashboard/announcements' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: '/worker/announcements' }];
 
 export default function AdminAnnouncements({ announcements: initialAnnouncements }: Props) {
     const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
@@ -32,14 +32,14 @@ export default function AdminAnnouncements({ announcements: initialAnnouncements
 
     // 🔹 Add new announcement
     const addAnnouncement = () => {
-        post('/announcements', {
-            onSuccess: (page) => {
-                // Get the latest announcements from props returned by Inertia
+        post('/worker/announcements', {
+            onSuccess: (page: any) => {
+                // 👈 type page
                 const latest = page.props.announcements as Announcement[];
                 setAnnouncements(latest);
-                reset(); // clear form
+                reset();
             },
-            onError: (errors) => console.error(errors),
+            onError: (errors: any) => console.error(errors), // 👈 type errors
         });
     };
 
@@ -47,10 +47,9 @@ export default function AdminAnnouncements({ announcements: initialAnnouncements
     const deleteAnnouncement = (id: number) => {
         if (!confirm('Are you sure you want to delete this announcement?')) return;
 
-        destroy(`/announcements/${id}`, {
+        destroy(`/worker/announcements/${id}`, {
             onSuccess: (page) => {
-                const latest = page.props.announcements as Announcement[];
-                setAnnouncements(latest);
+                setAnnouncements(announcements.filter((a) => a.id !== id));
             },
             onError: (errors) => console.error(errors),
         });

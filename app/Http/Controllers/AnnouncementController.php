@@ -13,20 +13,34 @@ class AnnouncementController extends Controller
     public function index()
     {
        $announcements = Announcement::latest()->get();
-    return Inertia::render('Announcements/AdminAnnouncements', [
-        'announcements' => $announcements,
-    ]);
+
+        return Inertia::render('Announcements/GuestAnnouncements', [
+            'announcements' => $announcements,
+        ]);
     }
 
     public function show($id)
     {
-        return response()->json(Announcement::findOrFail($id));
+        $announcement = Announcement::findOrFail($id);
+
+        return Inertia::render('Announcements/ShowAnnouncement', [
+            'announcement' => $announcement,
+        ]);
+    }
+
+    public function adminIndex()
+    {
+        $announcements = Announcement::latest()->get();
+
+        return Inertia::render('Announcements/AdminAnnouncements', [
+            'announcements' => $announcements,
+        ]);
     }
 
     // Protected: only admin/healthworker can create/update/delete
     public function store(Request $request)
-    {
-        $request->validate([
+{
+    $request->validate([
         'title' => 'required|string|max:255',
         'content' => 'required|string',
     ]);
@@ -34,40 +48,47 @@ class AnnouncementController extends Controller
     Announcement::create([
         'title' => $request->title,
         'content' => $request->content,
-        'user_id' => auth()->id(),
+        'user_id' => Auth::id(),
     ]);
 
     $announcements = Announcement::latest()->get();
 
-    return inertia('Announcements/AdminAnnouncements', [
+    return Inertia::render('Announcements/AdminAnnouncements', [
         'announcements' => $announcements,
-    ])->with('success', 'Announcement added!');
-    }
+    ]);
+}
+
+
 
     public function update(Request $request, $id)
     {
         $announcement = Announcement::findOrFail($id);
 
-    if (!auth()->user()->hasRole(['Admin', 'Healthworker'])) {
-        return response()->json(['message' => 'Unauthorized'], 403);
-    }
+        if (!auth()->user()->hasRole(['Admin', 'Healthworker'])) {
+            abort(403);
+        }
 
-    $announcement->update($request->only(['title', 'content']));
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
 
-    return response()->json($announcement);
+        $announcement->update($request->only(['title', 'content']));
+
+        return $this->adminIndex()->with('success', 'Announcement updated!');
     }
 
     public function destroy($id)
     {
         $announcement = Announcement::findOrFail($id);
 
-    if (!auth()->user()->hasRole(['Admin', 'Healthworker'])) {
-        return response()->json(['message' => 'Unauthorized'], 403);
-    }
+        if (!auth()->user()->hasRole(['Admin', 'Healthworker'])) {
+            abort(403);
+        }
 
-    $announcement->delete();
+        $announcement->delete();
 
-    return response()->json(['message' => 'Deleted successfully']);
+        return $this->adminIndex()->with('success', 'Announcement deleted!');
     }
 }
 

@@ -22,10 +22,10 @@ Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
 Route::middleware(['auth', 'verified', 'role:Admin|Healthworker'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::resource('children', ChildController::class);
-    Route::get('/worker/announcements', [AnnouncementController::class, 'index'])->name('dashboard.announcements');
-    Route::post('/announcements', [AnnouncementController::class, 'store']);
-    Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
-    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
+     Route::get('/worker/announcements', [AnnouncementController::class, 'adminIndex'])->name('dashboard.announcements');
+    Route::post('/worker/announcements', [AnnouncementController::class, 'store']);
+    Route::put('/worker/announcements/{id}', [AnnouncementController::class, 'update']);
+    Route::delete('/worker/announcements/{id}', [AnnouncementController::class, 'destroy']);
 
 
 
