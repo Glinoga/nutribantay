@@ -6,17 +6,27 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;    
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\AnnouncementController;
 
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-    //Routes for all
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('/announcements', function () {
+    return Inertia::render('Announcements/GuestAnnouncements');
+});
+Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
+
+    //Routes for all users
+Route::middleware(['auth', 'verified', 'role:Admin|Healthworker'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::resource('children', ChildController::class);
-    
+    Route::get('/worker/announcements', [AnnouncementController::class, 'index'])->name('dashboard.announcements');
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
+
 
 
     //Admin

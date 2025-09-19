@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, UserCog, UserPen } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Megaphone, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 type AuthProps = {
@@ -26,7 +26,10 @@ export function AppSidebar() {
     ];
 
     if (isAdmin) {
-        mainNavItems.push({ title: 'User Management', href: '/users', icon: UserCog });
+        mainNavItems.push(
+            { title: 'User Management', href: '/users', icon: UserCog },
+            { title: 'Announcements', href: '/worker/announcements', icon: Megaphone },
+        );
     }
 
     const footerNavItems: NavItem[] = [

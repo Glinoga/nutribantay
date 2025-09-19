@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
     {
         // Run the PermissionSeeder first
         $this->call(PermissionSeeder::class);
+        $this->call(AnnouncementSeeder::class);
+
 
         // Create admin account
         $admin = User::firstOrCreate(
