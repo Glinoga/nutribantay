@@ -8,11 +8,20 @@ use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 
 
+// Guest Pages
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('home');
 })->name('home');
 
-    //Routes for all
+Route::get('/announcements', function () {
+    return Inertia::render('announcements');
+})->name('announcements');
+
+Route::get('/contact', function () {
+    return Inertia::render('contact');
+})->name('contact');
+
+// Routes for authenticated users
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::resource('children', ChildController::class);
