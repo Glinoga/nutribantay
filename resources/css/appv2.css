@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@plugin 'tailwindcss-animate';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+
+body {
+    font-family: var(--font-sans);
+}
+
+:root {
+    --bg-dark: hsl(178 36% 87%);
+    --bg: hsl(178 61% 92%);
+    --bg-light: hsl(178 100% 98%);
+    --text: hsl(181 100% 2%);
+    --text-muted: hsl(179 40% 22%);
+    --highlight: hsl(178 100% 95%);
+    --border: hsl(179 20% 45%);
+    --border-muted: hsl(178 21% 57%);
+    --primary: hsl(180 100% 8%);
+    --secondary: hsl(351 44% 31%);
+    --danger: hsl(9 21% 41%);
+    --warning: hsl(52 23% 34%);
+    --success: hsl(147 19% 36%);
+    --info: hsl(217 22% 41%);
+
+    /* Fonts */
+    --font-sans: 'Montserrat', 'sans serif';
+
+    /* Font Sizes */
+    --font-logo: 3.5rem;
+    --font-header: 1.5rem;
+    --font-body: 1.125rem;
+    --font-muted: .875rem;
+
+    /* Font Weights */
+    --weight-thin: 100;
+    --weight-extralight: 200;
+    --weight-light: 300;
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    --weight-xbold: 800;
+
+    /* Spacing */
+    --spacing-xxs: .0625rem;
+    --spacing-xs: .125rem;
+    --spacing-sm: .25rem;
+    --spacing-md: .5rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 4rem;
+    --spacing-3xl: 8rem;
+    --spacing-4xl: 16rem;
+    --spacing-5xl: 32rem;
+    --spacing-6xl: 64rem;
+
+    /* Border Radius */
+    --radius-xs: .625rem;
+    --radius-sm: .938rem;
+    --radius-md: 1.25rem;
+    --radius-lg: 100%;
+
+    /* Inner Shadows */
+    --shadows-inner: inset 7px 0 0 0 okclh(var(--highlight)); 
+
+}
+
+.dark {
+    --bg-dark: hsl(180 100% 1%);
+    --bg: hsl(179 96% 3%);
+    --bg-light: hsl(179 58% 6%);
+    --text: hsl(178 93% 90%);
+    --text-muted: hsl(178 26% 64%);
+    --highlight: hsl(179 26% 34%);
+    --border: hsl(179 40% 22%);
+    --border-muted: hsl(180 93% 11%);
+    --primary: hsl(179 49% 56%);
+    --secondary: hsl(355 66% 75%);
+    --danger: hsl(9 26% 64%);
+    --warning: hsl(52 19% 57%);
+    --success: hsl(146 17% 59%);
+    --info: hsl(217 28% 65%);
+}
