@@ -20,7 +20,7 @@ use App\Http\Controllers\AuditLogController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', fn () => Inertia::render('home'))->name('home');
-Route::get('/announcements', fn () => Inertia::render('announcements'))->name('announcements');
+Route::get('/announcements', fn () => Inertia::render('announcements'))->name('guest.announcements');
 Route::get('/contact', fn () => Inertia::render('contact'))->name('contact');
 
 /*
@@ -87,7 +87,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
-        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');        //Announcements
+        Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/admin/announcements/store',  [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
+
 
         Route::resource('users', UserController::class);
     });
