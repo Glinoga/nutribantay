@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('barangay')->nullable();
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
+            $table->timestamp('updated_at')->nullable()->change();
             $table->unsignedBigInteger('created_by'); // user ID (healthworker/admin)
             $table->timestamps();
         });

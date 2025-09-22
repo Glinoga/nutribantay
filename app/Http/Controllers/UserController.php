@@ -15,11 +15,14 @@ class UserController extends Controller
      */ 
     public function index(Request $request)
 {
-    $query = User::with('roles'); // eager load roles
+    $user = auth()->user();
+
+    $query = User::with('roles')
+        ->where('barangay', $user->barangay); // 👈 only same barangay
 
     if ($search = $request->input('search')) {
         $query->where(function ($q) use ($search) {
-            $q->where('id', $search) // exact match for ID
+            $q->where('id', $search)
               ->orWhere('name', 'like', "%{$search}%")
               ->orWhere('email', 'like', "%{$search}%")
               ->orWhereHas('roles', function ($roleQuery) use ($search) {
@@ -31,13 +34,14 @@ class UserController extends Controller
     $users = $query->get();
 
     return Inertia::render('Users/Index', [
-        'users' => $users->map(fn($user) => [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'roles' => $user->getRoleNames()->toArray(),
+        'users' => $users->map(fn($u) => [
+            'id' => $u->id,
+            'name' => $u->name,
+            'email' => $u->email,
+            'roles' => $u->getRoleNames()->toArray(),
+            'barangay' => $u->barangay,
         ]),
-        'filters' => $request->only('search'), // 👈 so frontend knows current search
+        'filters' => $request->only('search'),
     ]);
 }
 

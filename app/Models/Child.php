@@ -10,7 +10,6 @@ class Child extends Model
     use HasFactory;
 
     protected $fillable = [
-    'uid',
     'name',
     'sex',
     'age',
@@ -18,6 +17,7 @@ class Child extends Model
     'height',
     'created_by',
     'barangay',
+    'updated_by',
 ];
 
 
@@ -26,5 +26,22 @@ class Child extends Model
 {
     return $this->belongsTo(User::class, 'created_by');
 }
+
+    public function updater()
+{
+        return $this->belongsTo(User::class, 'updated_by');
+}
+
+public function notes()
+{
+    return $this->hasMany(ChildNote::class);
+}
+
+public function author()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
+
 
 }

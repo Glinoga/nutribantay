@@ -25,6 +25,10 @@ Route::get('/contact', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::resource('children', ChildController::class);
+    Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
+    
+    Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
+
     
 
 

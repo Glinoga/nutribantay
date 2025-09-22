@@ -4,7 +4,6 @@ import { Head, Link, router } from '@inertiajs/react';
 
 type Child = {
     id: number;
-    uid: string;
     name: string;
     sex: string;
     age: number;
@@ -60,6 +59,10 @@ export default function Index({ children }: Props) {
                             <td className="border px-4 py-2">{child.height ?? '-'}</td>
                             <td className="border px-4 py-2">{child.created_by ?? 'N/A'}</td>
                             <td className="border px-4 py-2">
+                                <Link href={`/children/${child.id}`} className="mr-2 rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600">
+                                    View
+                                </Link>
+
                                 <Link
                                     href={`/children/${child.id}/edit`}
                                     className="mr-2 rounded bg-green-500 px-3 py-1 text-white transition hover:bg-green-600"

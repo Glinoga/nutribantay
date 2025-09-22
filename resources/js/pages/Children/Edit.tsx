@@ -1,30 +1,31 @@
 import AppLayout from '@/layouts/app-layout';
-import { SharedData } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react'; // import Link
 
-export default function Create() {
-    const { auth } = usePage<SharedData>().props; // access logged-in user
+interface Child {
+    id: number;
+    name: string;
+    sex: string;
+    age: number;
+    weight?: number;
+    height?: number;
+    barangay?: string;
+    updated_by?: string;
+    updated_at?: string;
+}
 
-    const { data, setData, post, processing, errors } = useForm<{
-        name: string;
-        sex: string;
-        age: string;
-        weight: string;
-        height: string;
-        barangay: string;
-    }>({
-        name: '',
-        sex: 'Male',
-        age: '',
-        weight: '',
-        height: '',
-        barangay: String(auth.user.barangay || ''), // ✅ cast to string
+export default function Edit({ child }: { child: Child }) {
+    const { data, setData, put, processing, errors } = useForm({
+        name: child.name || '',
+        sex: child.sex || 'Male',
+        age: String(child.age || ''),
+        weight: String(child.weight ?? ''),
+        height: String(child.height ?? ''),
+        barangay: child.barangay || '',
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Client-side validation
         if (Number(data.weight) > 200) {
             alert('Weight cannot exceed 200 kg');
             return;
@@ -34,13 +35,15 @@ export default function Create() {
             return;
         }
 
-        post('/children');
+        put(`/children/${child.id}`);
     };
 
     return (
         <AppLayout>
-            <Head title="Add Child" />
-            <h1 className="mb-4 text-xl font-bold">Add Child</h1>
+            <Head title="Edit Child" />
+
+            <h1 className="mb-4 text-xl font-bold">Edit Child</h1>
+            {/* Back Button */}
             <div className="mb-4">
                 <button
                     onClick={() => window.history.back()}
@@ -94,8 +97,21 @@ export default function Create() {
                     {errors.height && <div className="text-red-600">{errors.height}</div>}
                 </div>
 
-                <button type="submit" disabled={processing} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                    Save
+                <div>
+                    {(child.updated_by || child.updated_at) && (
+                        <div className="mt-6 rounded border bg-gray-50 p-3 text-sm text-gray-700">
+                            <p>
+                                <strong>Last Updated By:</strong> {child.updated_by ?? 'N/A'}
+                            </p>
+                            <p>
+                                <strong>Last Updated At:</strong> {child.updated_at ? new Date(child.updated_at).toLocaleString() : 'N/A'}
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                <button type="submit" disabled={processing} className="cursor-pointer rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+                    Update
                 </button>
             </form>
         </AppLayout>
