@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\StockController;
@@ -47,7 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware(['role:Admin|Healthworker']);
     Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
     Route::resource('children', ChildController::class);
-    Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
+    Route::resource('announcements', AnnouncementController::class);
+        Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
 
     /*
@@ -91,6 +93,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
         Route::post('/admin/announcements/store',  [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
+        Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
 
 
         Route::resource('users', UserController::class);
