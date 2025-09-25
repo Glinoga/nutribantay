@@ -10,8 +10,15 @@ class Announcement extends Model
         'title',
         'date',
         'end_date',
+        'author',
+        'category_id',
         'summary',
         'content',
         'image'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

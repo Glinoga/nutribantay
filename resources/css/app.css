@@ -93,6 +93,13 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    --blue: hsl(180 100% 8%);
+    --red: hsl(351 44% 31%);
+    --orange: hsl(9 21% 41%);
+    --yellow: hsl(52 23% 34%);
+    --success: hsl(147 19% 36%);
+    --info: hsl(217 22% 41%);
 }
 
 .dark {
@@ -128,6 +135,13 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+
+    --blue: hsl(179 49% 56%);
+    --red: hsl(355 66% 75%);
+    --orange: hsl(9 26% 64%);
+    --yellow: hsl(52 19% 57%);
+    --success: hsl(146 17% 59%);
+    --info: hsl(217 28% 65%);
 }
 
 @layer base {

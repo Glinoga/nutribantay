@@ -99,13 +99,13 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                         Home
                                     </Link>
                                     <Link
-                                        href="/announcements"
+                                        href="/guest/announcements"
                                         className="relative font-medium text-[var(--text)] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-[var(--primary)] after:transition-all hover:text-[var(--primary)] hover:after:w-full"
                                     >
                                         Announcements
                                     </Link>
                                     <Link
-                                        href="/contact"
+                                        href="/guest/contact"
                                         className="relative font-medium text-[var(--text)] transition-colors after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-[var(--primary)] after:transition-all hover:text-[var(--primary)] hover:after:w-full"
                                     >
                                         Contact

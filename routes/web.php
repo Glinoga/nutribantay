@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,8 +22,8 @@ use App\Http\Controllers\AuditLogController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', fn () => Inertia::render('home'))->name('home');
-Route::get('/announcements', fn () => Inertia::render('announcements'))->name('guest.announcements');
-Route::get('/contact', fn () => Inertia::render('contact'))->name('contact');
+Route::get('/guest/announcements', fn () => Inertia::render('announcements'))->name('guest.announcements');
+Route::get('/guest/contact', fn () => Inertia::render('contact'))->name('guest.contact');
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        Route::resource('categories', CategoryController::class);
 
 
         Route::resource('users', UserController::class);

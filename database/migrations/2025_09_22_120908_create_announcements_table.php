@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->date('date');
             $table->date('end_date')->nullable();
+            $table->string('author')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable();
             $table->text('summary');
             $table->longText('content');
             $table->string('image')->nullable();
