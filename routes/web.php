@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\UserController;
@@ -14,13 +15,13 @@ Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
 
-Route::get('/announcements', function () {
+Route::get('/guest/announcements', function () {
     return Inertia::render('announcements');
 })->name('guest.announcements');
 
-Route::get('/contact', function () {
+Route::get('/guest/contact', function () {
     return Inertia::render('contact');
-})->name('contact');
+})->name('guest.contact');
 
 // Routes for authenticated users
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -46,6 +47,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        Route::resource('categories', CategoryController::class);
 
 
         Route::resource('users', UserController::class);

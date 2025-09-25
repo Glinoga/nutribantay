@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -13,7 +14,7 @@ class AnnouncementController extends Controller
    
     public function index()
     {
-        $announcements = Announcement::latest()->get();
+        $announcements = Announcement::with('category')->latest()->get();
 
         return Inertia::render('Announcements/Index', [
             'announcements' => $announcements,
@@ -30,7 +31,9 @@ class AnnouncementController extends Controller
     
     public function create()
     {
-        return Inertia::render('Announcements/Create');
+        return Inertia::render('Announcements/Create', [
+            'categories' => Category::all(),
+        ]);
     }
 
    
@@ -43,6 +46,8 @@ class AnnouncementController extends Controller
                 'date',
                 'after_or_equal:' . now()->format('Y-m-d'),
             ],
+            'author' => 'nullable|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'end_date' => 'nullable|date|after_or_equal:date',
             'summary' => 'required|string',
             'content' => 'required|string',
@@ -64,6 +69,7 @@ class AnnouncementController extends Controller
     {
         return Inertia::render('Announcements/Edit', [
             'announcement' => $announcement,
+            'categories' => Category::all(),
         ]);
     }
 
@@ -71,15 +77,15 @@ class AnnouncementController extends Controller
     public function update(Request $request, Announcement $announcement)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'string|max:255',
             'date' => [
-                'required',
-                'date',
-                'after_or_equal:' . now()->format('Y-m-d'),
+                'date'
             ],
             'end_date' => 'nullable|date|after_or_equal:date',
-            'summary' => 'required|string',
-            'content' => 'required|string',
+            'author' => 'nullable|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
+            'summary' => 'string',
+            'content' => 'string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 

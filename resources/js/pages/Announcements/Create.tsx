@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { route } from '@/lib/routes';
 import { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,11 +17,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Create() {
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+    description?: string;
+}
+
+interface CreateProps {
+    categories: Category[];
+}
+
+export default function Create({ categories }: CreateProps) {
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         date: '',
         end_date: '',
+        category_id: '', // Default category
+        author: '',
         summary: '',
         content: '',
         image: null as File | null,
@@ -75,11 +90,51 @@ export default function Create() {
                         </Label>
                         <Input
                             type="text"
-                            className="mb-4 w-full"
+                            className="w-full"
                             placeholder="Enter announcement title"
                             value={data.title}
                             onChange={(e) => setData('title', e.target.value)}
                         />
+                    </div>
+
+                    <div className="w-auto mb-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="border rounded-lg p-4">
+                                <Label className="block font-medium text-gray-700">Category</Label>
+                                <p className="mt-1 text-xs text-[var(--muted-foreground)] mb-2">
+                                    Select the category for this announcement
+                                </p>
+                                <Select
+                                    value={data.category_id.toString()}
+                                    onValueChange={(value) => setData('category_id', value)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories && categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id.toString()}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            
+                            <div className="border rounded-lg p-4">
+                                <Label className="block font-medium text-gray-700">Author</Label>
+                                <p className="mt-1 text-xs text-[var(--muted-foreground)] mb-2">
+                                    Who is publishing this announcement
+                                </p>
+                                <Input
+                                    type="text"
+                                    className="w-full"
+                                    placeholder="Enter author name"
+                                    value={data.author}
+                                    onChange={(e) => setData('author', e.target.value)}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Dates */}
@@ -89,7 +144,7 @@ export default function Create() {
                                 <Label className="block font-medium text-gray-700">Date</Label>
                                 <Input
                                     type="date"
-                                    className="w-full"
+                                    className="w-full mt-2"
                                     value={data.date}
                                     onChange={(e) => setData('date', e.target.value)}
                                 />
@@ -98,7 +153,7 @@ export default function Create() {
                                 <Label className="block font-medium text-gray-700">End Date</Label>
                                 <Input
                                     type="date"
-                                    className="w-full"
+                                    className="w-full mt-2"
                                     value={data.end_date}
                                     onChange={(e) => setData('end_date', e.target.value)}
                                 />
