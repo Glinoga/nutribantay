@@ -14,6 +14,7 @@ export default function Create() {
         name: '',
         email: '',
         password: '',
+        role: '',
     });
 
     function submit(e: React.FormEvent) {
@@ -31,6 +32,7 @@ export default function Create() {
                 </Link>
             </div>
             <form onSubmit={submit} className="mx-4 mt-8 max-w-xl">
+                {/* Name */}
                 <div className="mb-4">
                     <label className="mb-1 block font-medium">Name</label>
                     <input
@@ -45,6 +47,7 @@ export default function Create() {
                     {errors.name && <div className="mt-1 text-sm text-red-600">{errors.name}</div>}
                 </div>
 
+                {/* Email */}
                 <div className="mb-4">
                     <label className="mb-1 block font-medium">Email</label>
                     <input
@@ -59,7 +62,8 @@ export default function Create() {
                     {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
                 </div>
 
-                <div className="mb-6">
+                {/* Password */}
+                <div className="mb-4">
                     <label className="mb-1 block font-medium">Password</label>
                     <input
                         type="password"
@@ -71,6 +75,23 @@ export default function Create() {
                         required
                     />
                     {errors.password && <div className="mt-1 text-sm text-red-600">{errors.password}</div>}
+                </div>
+
+                {/* Role Dropdown */}
+                <div className="mb-6">
+                    <label className="mb-1 block font-medium">Role</label>
+                    <select
+                        name="role"
+                        value={data.role}
+                        onChange={(e) => setData('role', e.target.value)}
+                        className="w-full rounded border px-4 py-2"
+                        required
+                    >
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="healthworker">Health Worker</option>
+                    </select>
+                    {errors.role && <div className="mt-1 text-sm text-red-600">{errors.role}</div>}
                 </div>
 
                 <div className="flex justify-end">

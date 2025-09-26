@@ -63,9 +63,14 @@ export default function Index({ users, filters }: Props) {
 
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
-                <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
-                    View Archived Users
-                </Link>
+                <div className="flex space-x-2">
+                    <Link href="/users/create" className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                        Create Account
+                    </Link>
+                    <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
+                        View Archived Users
+                    </Link>
+                </div>
             </div>
 
             {/* 🔹 Search Bar */}

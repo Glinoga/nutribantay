@@ -75,6 +75,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
+            'role' => 'required|string|exists:roles,name',
         ]);
 
         $user = User::create([
@@ -82,6 +83,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        $user->assignRole($request->role);
 
         return redirect()->route('users.index');
     }
