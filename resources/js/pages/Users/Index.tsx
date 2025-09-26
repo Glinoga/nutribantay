@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -30,7 +30,6 @@ interface Props {
 }
 
 export default function Index({ users, filters }: Props) {
-    const { delete: destroy } = useForm({});
     const [adminCode, setAdminCode] = useState<RegistrationCode | null>(null);
     const [search, setSearch] = useState(filters.search || '');
 

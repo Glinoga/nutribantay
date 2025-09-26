@@ -2,12 +2,9 @@ import { store } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionC
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
-import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -18,71 +15,86 @@ interface LoginProps {
 
 export default function Login({ status, canResetPassword }: LoginProps) {
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
             <Head title="Log in" />
 
-            <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+            {/* Blurred Background Layer */}
+            <div
+                className="absolute inset-0 scale-110 bg-cover bg-[center_70%] blur-[4px] filter"
+                style={{ backgroundImage: "url('/images/background.jpg')" }}
+            />
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
+            {/* Content Layer */}
+            <div className="relative z-10 flex w-11/12 max-w-5xl overflow-hidden rounded-2xl shadow-lg">
+                {/* Left Panel */}
+                <div className="flex w-1/2 items-center justify-center bg-black p-10 text-white">
+                    <h1 className="text-3xl leading-snug font-extrabold">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 1 IN CALOOCAN CITY</h1>
+                </div>
+
+                {/* Right Panel */}
+                <div className="flex w-1/2 flex-col justify-center bg-[#E8F8F8] p-12">
+                    <h2 className="mb-6 text-2xl font-bold">Log In</h2>
+
+                    <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
+                        {({ processing, errors }) => (
+                            <>
+                                <div className="grid gap-4">
+                                    {/* Email */}
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            name="email"
+                                            required
+                                            autoFocus
+                                            tabIndex={1}
+                                            autoComplete="email"
+                                            placeholder="Enter your email"
+                                        />
+                                        <InputError message={errors.email} />
+                                    </div>
+
+                                    {/* Password */}
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password">Password</Label>
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            name="password"
+                                            required
+                                            tabIndex={2}
+                                            autoComplete="current-password"
+                                            placeholder="Enter your password"
+                                        />
+                                        <InputError message={errors.password} />
+                                    </div>
+
+                                    {/* Submit */}
+                                    <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" disabled={processing}>
+                                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                        Log in
+                                    </Button>
                                 </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox id="remember" name="remember" tabIndex={3} />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
+                                {/* Footer */}
+                                <div className="mt-4 text-center text-sm text-gray-600">
+                                    Don’t have an account?{' '}
+                                    <TextLink href={register()} className="font-medium">
+                                        Sign Up
+                                    </TextLink>{' '}
+                                    |{' '}
+                                    <a href="#" className="text-sm underline">
+                                        Terms & Conditions
+                                    </a>
+                                </div>
+                            </>
+                        )}
+                    </Form>
 
-                            <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Log in
-                            </Button>
-                        </div>
-
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
-                        </div>
-                    </>
-                )}
-            </Form>
-
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-        </AuthLayout>
+                    {status && <div className="mt-4 text-center text-sm font-medium text-green-600">{status}</div>}
+                </div>
+            </div>
+        </div>
     );
 }

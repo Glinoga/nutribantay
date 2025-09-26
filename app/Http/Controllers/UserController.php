@@ -18,7 +18,7 @@ class UserController extends Controller
     $user = auth()->user();
 
     $query = User::with('roles')
-        ->where('barangay', $user->barangay); // 👈 only same barangay
+        ->where('barangay', $user->barangay); // only same barangay
 
     if ($search = $request->input('search')) {
         $query->where(function ($q) use ($search) {
@@ -48,13 +48,18 @@ class UserController extends Controller
 
 
     public function archived()
-    {
-        $archivedUsers = User::onlyTrashed()->get();
+{
+    $user = auth()->user();
 
-        return Inertia::render('Users/Archived', [
-            'users' => $archivedUsers,
-        ]);
-    }
+    $archivedUsers = User::onlyTrashed()
+        ->where('barangay', $user->barangay) // restrict by barangay
+        ->get();
+
+    return Inertia::render('Users/Archived', [
+        'users' => $archivedUsers,
+    ]);
+}
+
 
 
 
