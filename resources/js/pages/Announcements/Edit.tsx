@@ -1,5 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { router } from "@inertiajs/react";
 import React, { useState } from "react";
 import { Head, useForm } from "@inertiajs/react";
 import { Megaphone, OctagonAlert } from 'lucide-react';
@@ -16,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { route } from '@/lib/routes';
 
-// Define types for Category
+// Types
 interface Category {
     id: number;
     name: string;
@@ -35,6 +36,7 @@ interface Announcement {
     summary: string;
     content: string;
     image?: string | null;
+    image_url?: string | null; // <-- use accessor for display
 }
 
 interface EditProps {
@@ -55,7 +57,7 @@ export default function Edit({ announcement, categories }: EditProps) {
     });
 
     const [preview, setPreview] = useState<string | null>(
-        announcement.image ? `/storage/${announcement.image}` : null
+        announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null)
     );
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,11 +69,31 @@ export default function Edit({ announcement, categories }: EditProps) {
     };
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(route("announcements.update", { announcement: announcement.id }), {
-            forceFormData: true,
-        });
-    };
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("date", data.date);
+    formData.append("end_date", data.end_date || "");
+    formData.append("category_id", data.category_id);
+    formData.append("author", data.author || "");
+    formData.append("summary", data.summary);
+    formData.append("content", data.content);
+
+    if (data.image) {
+        formData.append("image", data.image); // ✅ image file
+    }
+
+    // Important: tell Laravel this is a PUT request
+    formData.append("_method", "PUT");
+
+    // Use router.post instead of put()
+    router.post(route("announcements.update", { announcement: announcement.id }), formData, {
+        forceFormData: true, // ✅ required for files
+        preserveScroll: true,
+    });
+};
+
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Announcements', href: '/admin/announcements' },
@@ -85,14 +107,12 @@ export default function Edit({ announcement, categories }: EditProps) {
                 {/* Display errors */}
                 {Object.keys(errors).length > 0 && (
                     <div className="mb-4 p-4 border border-red-600 bg-red-100 text-red-700 rounded">
-                        <div className="list-none list-inside">
-                            <OctagonAlert className="inline-block mr-2" size={24} />
+                        <OctagonAlert className="inline-block mr-2" size={24} />
+                        <ul className="list-disc pl-5">
                             {Object.entries(errors).map(([field, message]) => (
-                                <li className="inline-block text-md" key={field}>
-                                    {message}
-                                </li>
+                                <li key={field} className="text-sm">{message}</li>
                             ))}
-                        </div>
+                        </ul>
                     </div>
                 )}
 
@@ -116,71 +136,62 @@ export default function Edit({ announcement, categories }: EditProps) {
                         />
                     </div>
 
-                    <div className="w-auto mb-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="border rounded-lg p-4">
-                                <Label className="block font-medium text-gray-700">Category</Label>
-                                <p className="text-xs text-[var(--muted-foreground)] mb-2">
-                                    Select the category for this announcement
-                                </p>
-                                <Select
-                                    value={data.category_id}
-                                    onValueChange={(value) => setData('category_id', value)}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select category" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {categories && categories.length > 0 ? (
-                                            categories.map((category) => (
-                                                <SelectItem key={category.id} value={category.id.toString()}>
-                                                    {category.name}
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="0" disabled>No categories available</SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                    {/* Category + Author */}
+                    <div className="w-auto mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="border rounded-lg p-4">
+                            <Label className="block font-medium text-gray-700">Category</Label>
+                            <Select
+                                value={data.category_id}
+                                onValueChange={(value) => setData('category_id', value)}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.length > 0 ? (
+                                        categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id.toString()}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem value="0" disabled>No categories available</SelectItem>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                            <div className="border rounded-lg p-4">
-                                <Label className="block font-medium text-gray-700">Author</Label>
-                                <p className="text-xs text-[var(--muted-foreground)] mb-2">
-                                    Who is publishing this announcement
-                                </p>
-                                <Input
-                                    type="text"
-                                    className="w-full"
-                                    placeholder="Enter author name"
-                                    value={data.author}
-                                    onChange={(e) => setData('author', e.target.value)}
-                                />
-                            </div>
+                        <div className="border rounded-lg p-4">
+                            <Label className="block font-medium text-gray-700">Author</Label>
+                            <Input
+                                type="text"
+                                className="w-full mt-2"
+                                placeholder="Enter author name"
+                                value={data.author}
+                                onChange={(e) => setData('author', e.target.value)}
+                            />
                         </div>
                     </div>
 
                     {/* Dates */}
-                    <div className="w-auto mb-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="border rounded-lg p-4">
-                                <Label className="block font-medium text-gray-700">Date</Label>
-                                <Input
-                                    type="date"
-                                    className="w-full mt-2"
-                                    value={data.date}
-                                    onChange={(e) => setData('date', e.target.value)}
-                                />
-                            </div>
-                            <div className="border rounded-lg p-4">
-                                <Label className="block font-medium text-gray-700">End Date</Label>
-                                <Input
-                                    type="date"
-                                    className="w-full mt-2"
-                                    value={data.end_date}
-                                    onChange={(e) => setData('end_date', e.target.value)}
-                                />
-                            </div>
+                    <div className="w-auto mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="border rounded-lg p-4">
+                            <Label className="block font-medium text-gray-700">Date</Label>
+                            <Input
+                                type="date"
+                                className="w-full mt-2"
+                                value={data.date}
+                                onChange={(e) => setData('date', e.target.value)}
+                            />
+                        </div>
+                        <div className="border rounded-lg p-4">
+                            <Label className="block font-medium text-gray-700">End Date</Label>
+                            <Input
+                                type="date"
+                                className="w-full mt-2"
+                                value={data.end_date}
+                                onChange={(e) => setData('end_date', e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -188,7 +199,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                     <div className="w-auto p-4 border rounded-lg mb-2">
                         <Label className="mb-2 block font-medium text-gray-700">Summary</Label>
                         <Textarea
-                            className="mb-4 w-full"
+                            className="w-full"
                             placeholder="Enter summary"
                             value={data.summary}
                             onChange={(e) => setData('summary', e.target.value)}
@@ -199,7 +210,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                     <div className="w-auto p-4 border rounded-lg mb-2">
                         <Label className="mb-2 block font-medium text-gray-700">Content</Label>
                         <Textarea
-                            className="mb-4 w-full"
+                            className="w-full"
                             placeholder="Enter content"
                             value={data.content}
                             onChange={(e) => setData('content', e.target.value)}
@@ -216,11 +227,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                                 className="mt-2 mb-4 rounded-lg border max-h-64"
                             />
                         )}
-                        <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
+                        <Input type="file" accept="image/*" onChange={handleImageChange} />
                     </div>
 
                     <Button type="submit" disabled={processing}>
