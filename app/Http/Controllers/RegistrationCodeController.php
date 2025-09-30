@@ -8,21 +8,30 @@ use Illuminate\Support\Str;
 
 class RegistrationCodeController extends Controller
 {
-    public function generate()
-    {
-        // Generate secure random code
+    public function generate(Request $request)
+{
+    $count = $request->input('count', 1); // default to 1 if not provided
+    $codes = [];
+
+    for ($i = 0; $i < $count; $i++) {
         $code = strtoupper(Str::random(8));
 
-        // Save to database with 1-day expiry
         $registrationCode = RegistrationCode::create([
             'code'       => $code,
             'expires_at' => now()->addDay(),
         ]);
 
-        return response()->json([
-            'code' => $code,
-        ]);
+        $codes[] = [
+            'code'       => $registrationCode->code,
+            'expires_at' => $registrationCode->expires_at,
+        ];
     }
+
+    return response()->json([
+        'codes' => $codes,
+    ]);
+}
+
 
     public function latest()
     {

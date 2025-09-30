@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type User = {
     id: number;
@@ -12,9 +12,8 @@ type User = {
 };
 
 type RegistrationCode = {
-    code: string | null;
+    code: string;
     expires_at: string | null;
-    expired: boolean;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -30,24 +29,22 @@ interface Props {
 }
 
 export default function Index({ users, filters }: Props) {
-    const [adminCode, setAdminCode] = useState<RegistrationCode | null>(null);
+    const [codes, setCodes] = useState<RegistrationCode[]>([]);
+    const [count, setCount] = useState(1);
     const [search, setSearch] = useState(filters.search || '');
+    const [loading, setLoading] = useState(false);
 
-    // 🔹 Load latest code on mount
-    useEffect(() => {
-        axios.get('/registration-codes/latest').then((res) => {
-            setAdminCode(res.data);
-        });
-    }, []);
-
-    const generateAdminCode = async () => {
+    const generateAdminCodes = async () => {
         try {
-            const response = await axios.post('/registration-codes/generate');
-            setAdminCode(response.data);
-            alert('New Admin Code generated!');
+            setLoading(true);
+            const response = await axios.post('/registration-codes/generate', { count });
+            setCodes(response.data.codes);
+            alert(`Successfully generated ${response.data.codes.length} code(s)!`);
         } catch (error) {
             console.error(error);
-            alert('Failed to generate admin code.');
+            alert('Failed to generate admin codes.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -86,30 +83,45 @@ export default function Index({ users, filters }: Props) {
                 </button>
             </form>
 
-            {/* 🔹 Admin Code Section */}
+            {/* 🔹 Admin Codes Section */}
             <div className="m-4 mb-6 rounded border p-4">
-                <h2 className="mb-2 text-lg font-semibold">Admin Code</h2>
-                <button onClick={generateAdminCode} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                    Generate Admin Code
-                </button>
+                <h2 className="mb-2 text-lg font-semibold">Admin Codes</h2>
+                <div className="mb-3 flex items-center space-x-2">
+                    <label htmlFor="count" className="text-gray-700">
+                        Number of Codes:
+                    </label>
+                    <input
+                        id="count"
+                        type="number"
+                        min="1"
+                        value={count}
+                        onChange={(e) => setCount(Number(e.target.value))}
+                        className="w-20 rounded border px-2 py-1"
+                    />
+                    <button
+                        onClick={generateAdminCodes}
+                        disabled={loading}
+                        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                        {loading ? 'Generating...' : 'Generate'}
+                    </button>
+                </div>
 
-                {adminCode ? (
-                    <div className="mt-3 rounded bg-gray-100 p-2">
-                        {adminCode.expired ? (
-                            <p className="font-medium text-red-600">❌ Code expired</p>
-                        ) : (
-                            <>
-                                <p className="font-mono text-lg text-blue-600">
-                                    Current Code: <span className="font-bold">{adminCode.code}</span>
-                                </p>
-                                {adminCode.expires_at && (
-                                    <p className="text-sm text-gray-600">Expires at: {new Date(adminCode.expires_at).toLocaleString()}</p>
-                                )}
-                            </>
-                        )}
+                {codes.length > 0 ? (
+                    <div className="mt-3">
+                        <ul className="list-inside list-disc space-y-1">
+                            {codes.map((code, index) => (
+                                <li key={index} className="font-mono text-blue-600">
+                                    {code.code}{' '}
+                                    {code.expires_at && (
+                                        <span className="text-sm text-gray-600">(expires {new Date(code.expires_at).toLocaleString()})</span>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 ) : (
-                    <div className="mt-3 text-gray-500">No code generated yet.</div>
+                    <div className="mt-3 text-gray-500">No codes generated yet.</div>
                 )}
             </div>
 
