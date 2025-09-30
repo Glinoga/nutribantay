@@ -40,16 +40,17 @@ class RegisteredUserController extends Controller
         'registration_code' => ['required', 'string'],
     ]);
 
-    // check if code exists and has not expired
-    $isValid = \App\Models\RegistrationCode::where('code', $request->registration_code)
+    // fetch the code (must exist, not expired, and not used yet)
+    $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
         ->where(function ($q) {
             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
         })
-        ->exists();
+        ->where('is_used', false)
+        ->first();
 
-    if (! $isValid) {
+    if (! $registrationCode) {
         return back()->withErrors([
-            'registration_code' => 'The admin code is invalid or expired.',
+            'registration_code' => 'The admin code is invalid, expired, or already used.',
         ])->onlyInput('registration_code');
     }
 
@@ -63,6 +64,10 @@ class RegisteredUserController extends Controller
 
     // assign default role
     $user->assignRole('Healthworker');
+
+    // consume the code → mark as used + delete it
+    $registrationCode->update(['is_used' => true]);
+    $registrationCode->delete();
 
     event(new Registered($user));
     Auth::login($user);

@@ -19,14 +19,6 @@ class RegistrationCodeController extends Controller
             'expires_at' => now()->addDay(),
         ]);
 
-        // Keep only the 5 most recent codes
-        $excess = RegistrationCode::count() - 5;
-        if ($excess > 0) {
-            RegistrationCode::orderBy('created_at', 'asc')
-                ->take($excess)
-                ->delete();
-        }
-
         return response()->json([
             'code' => $code,
         ]);
