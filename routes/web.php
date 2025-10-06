@@ -15,9 +15,8 @@ Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
 
-Route::get('/guest/announcements', function () {
-    return Inertia::render('announcements');
-})->name('guest.announcements');
+
+Route::get('/guest/announcements', [AnnouncementController::class, 'guestIndex'])->name('guest.announcements');
 
 Route::get('/guest/contact', function () {
     return Inertia::render('contact');
@@ -27,7 +26,7 @@ Route::get('/guest/contact', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
     Route::resource('children', ChildController::class);
-    Route::resource('announcements', AnnouncementController::class);
+    // Route::resource('announcements', AnnouncementController::class);
     
 
 
