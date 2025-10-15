@@ -8,7 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\AnnouncementController;
-
+use App\Http\Controllers\ContactController;
 
 // Guest Pages
 Route::get('/', function () {
@@ -17,10 +17,8 @@ Route::get('/', function () {
 
 
 Route::get('/guest/announcements', [AnnouncementController::class, 'guestIndex'])->name('guest.announcements');
-
-Route::get('/guest/contact', function () {
-    return Inertia::render('contact');
-})->name('guest.contact');
+Route::get('/guest/contact', [ContactController::class, 'showContactForm'])->name('guest.contact');
+Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->name('guest.contact.send');
 
 // Routes for authenticated users
 Route::middleware(['auth', 'verified'])->group(function () {

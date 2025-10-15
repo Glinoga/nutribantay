@@ -203,11 +203,11 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                     </p>
                                     <div className="flex items-center justify-between">
                                         <Link href={`#`}>
-                                            <Button className='rounded-full bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)] hover:text-white' size="sm">Read More</Button>
+                                            <Button className='rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)] hover:text-white hover:border-[var(--bg-light)]' size="sm">Read More</Button>
                                         </Link>
 
                                         <button
-                                            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition-colors hover:border-[var(--primary)] hover:text-[var,--primary)]"
+                                            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition-colors hover:border-[var(--primary)] hover:text-[var(--primary)]"
                                             title="Share"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

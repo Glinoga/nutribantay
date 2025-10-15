@@ -21,7 +21,7 @@ class AnnouncementController extends Controller
 
     public function guestIndex() 
     {
-        $announcements = Announcement::with('category')->whereDate('date', '>=', now())->latest()->get();
+        $announcements = Announcement::with('category')->whereDate('end_date', '>=', now())->latest()->get();
 
         return Inertia::render('Guest/announcements', [
             'announcements' => $announcements,
