@@ -9,7 +9,8 @@ export function route(name: string, params?: Record<string, any>): string {
     'announcements.destroy': '/admin/announcements/{announcement}',
     'dashboard': '/admin/dashboard',
     'home': '/',
-    // Add other routes as needed
+    'guest.contact': '/guest/contact',
+    'guest.contact.send': '/guest/contact',
   };
 
   const path = routes[name];
