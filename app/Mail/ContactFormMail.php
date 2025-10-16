@@ -14,6 +14,7 @@ class ContactFormMail extends Mailable
 {
     use Queueable, SerializesModels;
     public $data;
+    private $emailUsername;
 
     /**
      * Create a new message instance.
@@ -21,6 +22,7 @@ class ContactFormMail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
+        $this->emailUsername = config('mail.mailers.smtp.username');
     }
 
     /**
@@ -30,7 +32,7 @@ class ContactFormMail extends Mailable
     {
         return new Envelope(
             subject: 'Message from NutriBantay',
-            from: new Address('manaloedjerome@gmail.com', 'NutriBantay')
+            from: new Address($this->emailUsername, 'NutriBantay')
         );
     }
 
