@@ -23,7 +23,7 @@ class AnnouncementController extends Controller
     {
         $announcements = Announcement::with('category')->whereDate('end_date', '>=', now())->latest()->get();
 
-        return Inertia::render('Guest/announcements', [
+        return Inertia::render('guest/announcements', [
             'announcements' => $announcements,
         ]);
     }

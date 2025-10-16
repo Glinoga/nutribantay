@@ -9,9 +9,16 @@ use Inertia\Inertia;
 
 class ContactController extends Controller
 {
+    private $emailUsername;
+
+    public function __construct()
+    {
+        $this->emailUsername = config('mail.mailers.smtp.username');
+    }
+
     public function showContactForm()
     {
-        return Inertia::render('Guest/contact');
+        return Inertia::render('guest/contact');
     }
 
     public function sendContactForm(Request $request)
@@ -25,7 +32,7 @@ class ContactController extends Controller
             'message' => 'required|string|min:20',
             'privacy' => 'required|accepted',
         ]);
-        Mail::to('manaloedjerome@gmail.com')->send(new ContactFormMail($data));
+        Mail::to($this->emailUsername)->send(new ContactFormMail($data));
         return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
     }
 }
