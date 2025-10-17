@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm } from '@inertiajs/react'; // import Link
+import { Head, useForm } from '@inertiajs/react';
 
 interface Child {
     id: number;
@@ -11,6 +11,7 @@ interface Child {
     barangay?: string;
     updated_by?: string;
     updated_at?: string;
+    birthdate?: string; // ✅ added
 }
 
 export default function Edit({ child }: { child: Child }) {
@@ -21,6 +22,7 @@ export default function Edit({ child }: { child: Child }) {
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
         barangay: child.barangay || '',
+        birthdate: child.birthdate || '', // ✅ added
     });
 
     const submit = (e: React.FormEvent) => {
@@ -41,9 +43,8 @@ export default function Edit({ child }: { child: Child }) {
     return (
         <AppLayout>
             <Head title="Edit Child" />
-
             <h1 className="mb-4 text-xl font-bold">Edit Child</h1>
-            {/* Back Button */}
+
             <div className="mb-4">
                 <button
                     onClick={() => window.history.back()}
@@ -52,6 +53,7 @@ export default function Edit({ child }: { child: Child }) {
                     Back
                 </button>
             </div>
+
             <form onSubmit={submit} className="max-w-md space-y-4">
                 <div>
                     <label className="block">Name</label>
@@ -71,6 +73,17 @@ export default function Edit({ child }: { child: Child }) {
                     <label className="block">Age</label>
                     <input type="number" value={data.age} onChange={(e) => setData('age', e.target.value)} className="w-full rounded border p-2" />
                     {errors.age && <div className="text-red-600">{errors.age}</div>}
+                </div>
+
+                <div>
+                    <label className="block">Birthdate</label>
+                    <input
+                        type="date"
+                        value={data.birthdate}
+                        onChange={(e) => setData('birthdate', e.target.value)}
+                        className="w-full rounded border p-2"
+                    />
+                    {errors.birthdate && <div className="text-red-600">{errors.birthdate}</div>}
                 </div>
 
                 <div>
@@ -97,18 +110,16 @@ export default function Edit({ child }: { child: Child }) {
                     {errors.height && <div className="text-red-600">{errors.height}</div>}
                 </div>
 
-                <div>
-                    {(child.updated_by || child.updated_at) && (
-                        <div className="mt-6 rounded border bg-gray-50 p-3 text-sm text-gray-700">
-                            <p>
-                                <strong>Last Updated By:</strong> {child.updated_by ?? 'N/A'}
-                            </p>
-                            <p>
-                                <strong>Last Updated At:</strong> {child.updated_at ? new Date(child.updated_at).toLocaleString() : 'N/A'}
-                            </p>
-                        </div>
-                    )}
-                </div>
+                {(child.updated_by || child.updated_at) && (
+                    <div className="mt-6 rounded border bg-gray-50 p-3 text-sm text-gray-700">
+                        <p>
+                            <strong>Last Updated By:</strong> {child.updated_by ?? 'N/A'}
+                        </p>
+                        <p>
+                            <strong>Last Updated At:</strong> {child.updated_at ? new Date(child.updated_at).toLocaleString() : 'N/A'}
+                        </p>
+                    </div>
+                )}
 
                 <button type="submit" disabled={processing} className="cursor-pointer rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
                     Update

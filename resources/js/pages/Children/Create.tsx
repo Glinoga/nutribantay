@@ -3,11 +3,12 @@ import { SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Create() {
-    const { auth } = usePage<SharedData>().props; // access logged-in user
+    const { auth } = usePage<SharedData>().props; 
 
     const { data, setData, post, processing, errors } = useForm<{
         name: string;
         sex: string;
+        birthdate: string;
         age: string;
         weight: string;
         height: string;
@@ -15,16 +16,17 @@ export default function Create() {
     }>({
         name: '',
         sex: 'Male',
+        birthdate: '',
         age: '',
         weight: '',
         height: '',
-        barangay: String(auth.user.barangay || ''), // ✅ cast to string
+        barangay: String(auth.user.barangay || ''),
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Client-side validation
+       
         if (Number(data.weight) > 200) {
             alert('Weight cannot exceed 200 kg');
             return;
@@ -49,29 +51,60 @@ export default function Create() {
                     Back
                 </button>
             </div>
+
             <form onSubmit={submit} className="max-w-md space-y-4">
+         
                 <div>
-                    <label className="block">Name</label>
-                    <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} className="w-full rounded border p-2" />
+                    <label className="block font-medium">Name</label>
+                    <input
+                        type="text"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        className="w-full rounded border p-2"
+                    />
                     {errors.name && <div className="text-red-600">{errors.name}</div>}
                 </div>
 
+            
                 <div>
-                    <label className="block">Sex</label>
-                    <select value={data.sex} onChange={(e) => setData('sex', e.target.value)} className="w-full rounded border p-2">
+                    <label className="block font-medium">Sex</label>
+                    <select
+                        value={data.sex}
+                        onChange={(e) => setData('sex', e.target.value)}
+                        className="w-full rounded border p-2"
+                    >
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
                 </div>
 
+             
                 <div>
-                    <label className="block">Age</label>
-                    <input type="number" value={data.age} onChange={(e) => setData('age', e.target.value)} className="w-full rounded border p-2" />
+                    <label className="block font-medium">Birthdate</label>
+                    <input
+                        type="date"
+                        value={data.birthdate}
+                        onChange={(e) => setData('birthdate', e.target.value)}
+                        className="w-full rounded border p-2"
+                    />
+                    {errors.birthdate && <div className="text-red-600">{errors.birthdate}</div>}
+                </div>
+
+               
+                <div>
+                    <label className="block font-medium">Age (months)</label>
+                    <input
+                        type="number"
+                        value={data.age}
+                        onChange={(e) => setData('age', e.target.value)}
+                        className="w-full rounded border p-2"
+                    />
                     {errors.age && <div className="text-red-600">{errors.age}</div>}
                 </div>
 
+          
                 <div>
-                    <label className="block">Weight (kg)</label>
+                    <label className="block font-medium">Weight (kg)</label>
                     <input
                         type="number"
                         step="0.01"
@@ -82,8 +115,9 @@ export default function Create() {
                     {errors.weight && <div className="text-red-600">{errors.weight}</div>}
                 </div>
 
+     
                 <div>
-                    <label className="block">Height (cm)</label>
+                    <label className="block font-medium">Height (cm)</label>
                     <input
                         type="number"
                         step="0.01"
@@ -94,8 +128,24 @@ export default function Create() {
                     {errors.height && <div className="text-red-600">{errors.height}</div>}
                 </div>
 
-                <button type="submit" disabled={processing} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                    Save
+            
+                <div>
+                    <label className="block font-medium">Barangay</label>
+                    <input
+                        type="text"
+                        value={data.barangay}
+                        onChange={(e) => setData('barangay', e.target.value)}
+                        className="w-full rounded border p-2"
+                        readOnly
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                >
+                    {processing ? 'Saving...' : 'Save'}
                 </button>
             </form>
         </AppLayout>

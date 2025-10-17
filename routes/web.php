@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;    
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\HealthlogController;
+
 
 
 // Guest Pages
@@ -46,6 +48,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
     });
+
+
+Route::middleware(['auth', 'role:Healthworker'])->group(function () {
+    Route::get('/healthlog', [HealthlogController::class, 'index'])->name('healthlog.index');
+    Route::get('/healthlog/create', [HealthlogController::class, 'create'])->name('healthlog.create');
+    Route::post('/healthlog', [HealthlogController::class, 'store'])->name('healthlog.store');
+    Route::get('/healthlog/{id}', [HealthlogController::class, 'show'])->name('healthlog.show');
+    Route::delete('/healthlog/{id}', [HealthlogController::class, 'destroy'])->name('healthlog.destroy');
+
+    Route::resource('healthlogs', HealthlogController::class);
+     Route::resource('roles', RoleController::class);
+     Route::resource('users', UserController::class);
+
+});
+
+
+
 });
 
 require __DIR__.'/settings.php';

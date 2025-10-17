@@ -16,6 +16,8 @@ class Child extends Model
     'weight',
     'height',
     'created_by',
+    'address',
+    'contact number',
     'barangay',
     'updated_by',
 ];

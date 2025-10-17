@@ -12,16 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('children', function (Blueprint $table) {
-            $table->id(); // auto-incrementing ID (1, 2, 3, …)
+            $table->id();
             $table->string('name');
             $table->enum('sex', ['Male', 'Female']);
-            $table->integer('age');
+            $table->integer('age')->nullable(); // optional
+            $table->date('birthdate')->nullable(); // ✅ needed for z-scores
             $table->string('barangay')->nullable();
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
-            $table->timestamp('updated_at')->nullable()->change();
-            $table->unsignedBigInteger('created_by'); // user ID (healthworker/admin)
-            $table->timestamps();
+            $table->string('address')->nullable();
+            $table->string('contact_number')->nullable(); // ✅ fixed
+            $table->unsignedBigInteger('created_by'); // user who created record
+            $table->timestamps(); // ✅ automatically adds created_at and updated_at
         });
     }
 

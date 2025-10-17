@@ -13,12 +13,14 @@ type Note = {
 
 type Child = {
     id: number;
-    name: string;
+    fullname: string;
     sex: string;
     age: number;
     weight: number | null;
     height: number | null;
     barangay: string;
+    address: string;
+    contactnumber: number | null;
     created_by: string | null;
     updated_by: string | null;
     created_at: string;
@@ -44,20 +46,26 @@ export default function Show({ child }: { child: Child }) {
 
     return (
         <AppLayout>
-            <Head title={`Child Details - ${child.name}`} />
+            <Head title={`Child Details - ${child.fullname}`} />
 
             <div className="mx-auto max-w-3xl py-6">
                 <h1 className="mb-6 text-2xl font-bold">Child Details</h1>
 
                 <div className="space-y-4 rounded-lg bg-white p-6 shadow">
                     <p>
-                        <span className="font-semibold">Name:</span> {child.name}
+                        <span className="font-semibold">Full Name:</span> {child.fullname}
                     </p>
                     <p>
                         <span className="font-semibold">Sex:</span> {child.sex}
                     </p>
                     <p>
                         <span className="font-semibold">Age:</span> {child.age}
+                    </p>
+                    <p>
+                        <span className="font-semibold">Address:</span> {child.address}
+                    </p>
+                    <p>
+                        <span className="font-semibold">Contact Number:</span> {child.contactnumber}
                     </p>
                     <p>
                         <span className="font-semibold">Weight:</span> {child.weight ?? 'N/A'} kg
