@@ -13,7 +13,7 @@ type Note = {
 
 type Child = {
     id: number;
-    fullname: string;
+    name: string;
     sex: string;
     age: number;
     weight: number | null;
@@ -46,14 +46,14 @@ export default function Show({ child }: { child: Child }) {
 
     return (
         <AppLayout>
-            <Head title={`Child Details - ${child.fullname}`} />
+            <Head title={`Child Details - ${child.name}`} />
 
             <div className="mx-auto max-w-3xl py-6">
                 <h1 className="mb-6 text-2xl font-bold">Child Details</h1>
 
                 <div className="space-y-4 rounded-lg bg-white p-6 shadow">
                     <p>
-                        <span className="font-semibold">Full Name:</span> {child.fullname}
+                        <span className="font-semibold">Full Name:</span> {child.name}
                     </p>
                     <p>
                         <span className="font-semibold">Sex:</span> {child.sex}
