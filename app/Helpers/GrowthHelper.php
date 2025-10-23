@@ -8,17 +8,17 @@ class GrowthHelper
 {
     public static function calculateBMI($weight, $height)
     {
-        if (!$weight || !$height || $height <= 0) {
+        if (empty($weight) || empty($height) || $height <= 0) {
             return null;
         }
 
         $heightInMeters = $height / 100;
-        return round($weight / ($heightInMeters * $heightInMeters), 2);
+        return round($weight / pow($heightInMeters, 2), 2);
     }
 
     public static function calculateZScores($sex, $birthdate, $weight, $height)
     {
-        if (!$birthdate || !$weight || !$height) {
+        if (empty($birthdate) || empty($weight) || empty($height)) {
             return [
                 'wfa' => null,
                 'lfa' => null,
@@ -29,13 +29,25 @@ class GrowthHelper
 
         $ageMonths = Carbon::parse($birthdate)->diffInMonths(Carbon::now());
         $bmi = self::calculateBMI($weight, $height);
-        $status = 'Normal';
 
-        if ($bmi < 14) {
+        if (is_null($bmi)) {
+            return [
+                'wfa' => null,
+                'lfa' => null,
+                'wfh' => null,
+                'status' => 'Invalid data',
+            ];
+        }
+
+        // Optional: separate thresholds for sex
+        $thresholds = ($sex === 'Female')
+            ? ['under' => 13.5, 'normal' => 17.5]
+            : ['under' => 14.0, 'normal' => 18.0];
+
+        $status = 'Normal';
+        if ($bmi < $thresholds['under']) {
             $status = 'Underweight';
-        } elseif ($bmi >= 14 && $bmi < 18) {
-            $status = 'Normal';
-        } elseif ($bmi >= 18) {
+        } elseif ($bmi >= $thresholds['normal']) {
             $status = 'Overweight';
         }
 

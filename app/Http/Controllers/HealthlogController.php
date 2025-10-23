@@ -45,14 +45,17 @@ class HealthlogController extends Controller
             'ruf' => 'nullable|string|max:255',
             'rusf' => 'nullable|string|max:255',
             'complementary_food' => 'nullable|string|max:255',
-            'vitamin_a' => 'boolean',
-            'deworming' => 'boolean',
+            'vitamin_a' => 'nullable|boolean',
+            'deworming' => 'nullable|boolean',
             'vaccine_name' => 'nullable|string|max:255',
             'dose_number' => 'nullable|integer',
             'date_given' => 'nullable|date',
             'next_due_date' => 'nullable|date',
             'vaccine_status' => 'nullable|string|max:255',
         ]);
+
+        // ✅ Attach logged-in user ID
+        $validated['user_id'] = auth()->id();
 
         $child = Child::find($validated['child_id']);
 
@@ -82,7 +85,7 @@ class HealthlogController extends Controller
         Healthlog::create($validated);
 
         return redirect()->route('healthlogs.index')
-            ->with('success', 'Health log created successfully with BMI and WHO-based evaluation.');
+            ->with('success', '✅ Health log created successfully with BMI and WHO-based evaluation.');
     }
 
     public function show(Healthlog $healthlog)
@@ -120,8 +123,8 @@ class HealthlogController extends Controller
             'ruf' => 'nullable|string|max:255',
             'rusf' => 'nullable|string|max:255',
             'complementary_food' => 'nullable|string|max:255',
-            'vitamin_a' => 'boolean',
-            'deworming' => 'boolean',
+            'vitamin_a' => 'nullable|boolean',
+            'deworming' => 'nullable|boolean',
             'vaccine_name' => 'nullable|string|max:255',
             'dose_number' => 'nullable|integer',
             'date_given' => 'nullable|date',
@@ -131,7 +134,6 @@ class HealthlogController extends Controller
 
         $child = Child::find($validated['child_id']);
 
-        // ✅ Recompute BMI and z-scores
         if ($child && !empty($validated['weight']) && !empty($validated['height'])) {
             $validated['bmi'] = GrowthHelper::calculateBMI(
                 $validated['weight'],
@@ -154,7 +156,7 @@ class HealthlogController extends Controller
         $healthlog->update($validated);
 
         return redirect()->route('healthlogs.index')
-            ->with('success', 'Health log updated successfully with recalculated BMI and nutrition data.');
+            ->with('success', '✅ Health log updated successfully with recalculated BMI and nutrition data.');
     }
 
     public function destroy(Healthlog $healthlog)
@@ -162,6 +164,6 @@ class HealthlogController extends Controller
         $healthlog->delete();
 
         return redirect()->route('healthlogs.index')
-            ->with('success', 'Health log entry deleted.');
+            ->with('success', '🗑️ Health log entry deleted.');
     }
 }

@@ -13,26 +13,33 @@ return new class extends Migration
     {
         Schema::create('health_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('child_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-            $table->float('weight')->nullable();
-            $table->float('height')->nullable();
-            $table->float('bmi')->nullable();
+            // Relations
+            $table->foreignId('child_id')->constrained('children')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
-            $table->float('zscore_wfa')->nullable();
-            $table->float('zscore_lfa')->nullable();
-            $table->float('zscore_wfh')->nullable();
+            // Anthropometric data
+            $table->decimal('weight', 5, 2)->nullable();
+            $table->decimal('height', 5, 2)->nullable();
+            $table->decimal('bmi', 5, 2)->nullable();
 
+            // Z-scores
+            $table->decimal('zscore_wfa', 5, 2)->nullable();
+            $table->decimal('zscore_lfa', 5, 2)->nullable();
+            $table->decimal('zscore_wfh', 5, 2)->nullable();
+
+            // Nutrition & supplements
             $table->string('nutrition_status')->nullable();
             $table->string('micronutrient_powder')->nullable();
             $table->string('ruf')->nullable();
             $table->string('rusf')->nullable();
             $table->string('complementary_food')->nullable();
 
+            // Health interventions
             $table->boolean('vitamin_a')->default(false);
             $table->boolean('deworming')->default(false);
 
+            // Vaccination info
             $table->string('vaccine_name')->nullable();
             $table->integer('dose_number')->nullable();
             $table->date('date_given')->nullable();
@@ -48,6 +55,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('healthlogs');
+        Schema::dropIfExists('health_logs');
     }
 };

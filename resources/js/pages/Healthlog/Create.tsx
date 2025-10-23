@@ -1,5 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, usePage, Link } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { SharedData } from '@/types';
 
 export default function Create() {
@@ -26,6 +27,24 @@ export default function Create() {
     next_due_date: '',
     vaccine_status: '',
   });
+
+  // 🔹 Automatically compute BMI and nutrition status
+  useEffect(() => {
+    if (data.weight && data.height) {
+      const heightM = parseFloat(data.height) / 100;
+      const bmi = parseFloat(data.weight) / (heightM * heightM);
+      const roundedBMI = bmi ? bmi.toFixed(2) : '';
+
+      setData('bmi', roundedBMI);
+
+      // Nutrition status logic (same as GrowthHelper)
+      let status = '';
+      if (bmi < 14) status = 'Underweight';
+      else if (bmi >= 14 && bmi < 18) status = 'Normal';
+      else if (bmi >= 18) status = 'Overweight';
+      setData('nutrition_status', status);
+    }
+  }, [data.weight, data.height]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +91,6 @@ export default function Create() {
                 onChange={(e) => setData('weight', e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
-              {errors.weight && <div className="text-red-600">{errors.weight}</div>}
             </div>
 
             <div>
@@ -85,7 +103,6 @@ export default function Create() {
                 onChange={(e) => setData('height', e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
-              {errors.height && <div className="text-red-600">{errors.height}</div>}
             </div>
 
             <div>
@@ -101,7 +118,7 @@ export default function Create() {
             </div>
           </div>
 
-          {/* Nutrition Fields */}
+          {/* Nutrition Status */}
           <div>
             <label className="block font-medium">Nutrition Status</label>
             <input
@@ -112,7 +129,52 @@ export default function Create() {
             />
           </div>
 
-          {/* Supplements */}
+          {/* Supplementary Programs */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-medium">Micronutrient Powder</label>
+              <input
+                name="micronutrient_powder"
+                value={data.micronutrient_powder}
+                onChange={(e) => setData('micronutrient_powder', e.target.value)}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">Complementary Food</label>
+              <input
+                name="complementary_food"
+                value={data.complementary_food}
+                onChange={(e) => setData('complementary_food', e.target.value)}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block font-medium">RUF (Ready-to-Use Food)</label>
+              <input
+                name="ruf"
+                value={data.ruf}
+                onChange={(e) => setData('ruf', e.target.value)}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+
+            <div>
+              <label className="block font-medium">RUSF (Ready-to-Use Supplementary Food)</label>
+              <input
+                name="rusf"
+                value={data.rusf}
+                onChange={(e) => setData('rusf', e.target.value)}
+                className="w-full border px-3 py-2 rounded"
+              />
+            </div>
+          </div>
+
+          {/* Vitamin A & Deworming */}
           <div className="flex items-center gap-4">
             <label>
               <input
@@ -134,7 +196,7 @@ export default function Create() {
             </label>
           </div>
 
-          {/* Vaccine Info */}
+          {/* Vaccines */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-medium">Vaccine Name</label>
@@ -181,7 +243,7 @@ export default function Create() {
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-4">
             <button
               type="submit"
               disabled={processing}

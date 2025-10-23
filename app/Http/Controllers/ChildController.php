@@ -12,7 +12,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        $children = Child::with('creator', 'updater')
+        $children = Child::with(['creator', 'updater'])
             ->where('barangay', $user->barangay)
             ->get();
 
@@ -24,9 +24,9 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
-                'birthdate' => $child->birthdate, // ✅ added
+                'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'contactnumber' => $child->contactnumber,
+                'contact_number' => $child->contact_number, // ✅ fixed key name
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
@@ -42,39 +42,33 @@ class ChildController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
-            'birthdate' => 'nullable|date', // ✅ added
+            'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
-            'contactnumber' => 'nullable|string|max:50',
+            'contact_number' => 'nullable|string|max:50', // ✅ corrected field name
         ]);
 
         $user = auth()->user();
 
         Child::create([
-            'name' => $request->name,
-            'sex' => $request->sex,
-            'age' => $request->age,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'birthdate' => $request->birthdate, // ✅ added
-            'address' => $request->address,
-            'contactnumber' => $request->contactnumber,
+            ...$validated,
             'created_by' => $user->id,
             'barangay' => $user->barangay,
         ]);
 
-        return redirect()->route('children.index')->with('success', 'Child added successfully!');
+        return redirect()->route('children.index')
+            ->with('success', 'Child added successfully!');
     }
 
     public function show(Child $child)
     {
         $user = auth()->user();
-        $child->load('notes.author');
+        $child->load(['notes.author']);
 
         if ($child->barangay !== $user->barangay) {
             abort(403, 'Unauthorized');
@@ -88,9 +82,9 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
-                'birthdate' => $child->birthdate, // ✅ added
+                'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'contactnumber' => $child->contactnumber,
+                'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
@@ -122,9 +116,9 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
-                'birthdate' => $child->birthdate, // ✅ added
+                'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'contactnumber' => $child->contactnumber,
+                'contact_number' => $child->contact_number, // ✅ fixed
                 'barangay' => $child->barangay,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
@@ -140,30 +134,24 @@ class ChildController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
-            'birthdate' => 'nullable|date', // ✅ added
+            'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
-            'contactnumber' => 'nullable|string|max:50',
+            'contact_number' => 'nullable|string|max:50', // ✅ fixed
         ]);
 
         $child->update([
-            'name' => $request->name,
-            'sex' => $request->sex,
-            'age' => $request->age,
-            'weight' => $request->weight,
-            'height' => $request->height,
-            'birthdate' => $request->birthdate, // ✅ added
-            'address' => $request->address,
-            'contactnumber' => $request->contactnumber,
+            ...$validated,
             'updated_by' => $user->id,
         ]);
 
-        return redirect()->route('children.index')->with('success', 'Child updated successfully!');
+        return redirect()->route('children.index')
+            ->with('success', 'Child updated successfully!');
     }
 
     public function destroy(Child $child)
@@ -176,7 +164,8 @@ class ChildController extends Controller
 
         $child->delete();
 
-        return redirect()->route('children.index')->with('success', 'Child deleted successfully!');
+        return redirect()->route('children.index')
+            ->with('success', 'Child deleted successfully!');
     }
 
     public function storeNote(Request $request, Child $child)
@@ -204,6 +193,7 @@ class ChildController extends Controller
         $note = $child->notes()->findOrFail($noteId);
 
         $user = auth()->user();
+
         if ($note->user_id !== $user->id && !$user->hasRole('admin')) {
             abort(403, 'You are not authorized to delete this note.');
         }
