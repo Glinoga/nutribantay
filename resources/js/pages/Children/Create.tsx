@@ -24,7 +24,7 @@ export default function ChildrenIndex() {
     });
 
     useEffect(() => {
-        // Auto-open modal when page loads
+        // Automatically open modal
         setShowModal(true);
     }, []);
 
@@ -54,12 +54,60 @@ export default function ChildrenIndex() {
 
     return (
         <AppLayout>
-            <Head title="Add Child Record" />
+            <Head title="Children Records" />
+
+            {/* Children Table (Visible in background) */}
+            <div
+                className={`transition-all duration-300 ${
+                    showModal ? "blur-sm brightness-95" : ""
+                }`}
+            >
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-2xl font-semibold text-gray-800">Children Records</h1>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                    >
+                        + Add Child
+                    </button>
+                </div>
+
+                {/* Sample table */}
+                <table className="w-full border-collapse bg-white rounded-lg shadow">
+                    <thead className="bg-gray-100 text-gray-700">
+                        <tr>
+                            <th className="p-3 border">Name</th>
+                            <th className="p-3 border">Sex</th>
+                            <th className="p-3 border">Age</th>
+                            <th className="p-3 border">Weight</th>
+                            <th className="p-3 border">Height</th>
+                            <th className="p-3 border">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr className="hover:bg-gray-50">
+                            <td className="p-3 border">Juan Dela Cruz</td>
+                            <td className="p-3 border">Male</td>
+                            <td className="p-3 border">5</td>
+                            <td className="p-3 border">20 kg</td>
+                            <td className="p-3 border">110 cm</td>
+                            <td className="p-3 border text-center space-x-2">
+                                <button className="px-3 py-1 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                                    Edit
+                                </button>
+                                <button className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             {/* Modal Section */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-80 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 border border-gray-100 relative animate-fadeIn">
+                <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-transparent animate-fadeIn">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 border border-gray-100 relative animate-fadeInUp">
                         <div className="flex items-center justify-between mb-4 border-b pb-2">
                             <h2 className="text-xl font-semibold text-gray-800">
                                 Register New Child
