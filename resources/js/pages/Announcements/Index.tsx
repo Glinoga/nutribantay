@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, TriangleAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { route } from '@/lib/routes';
@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import { smartToast } from '@/utils/smartToast';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Announcements', href: '/admin/announcements' },
@@ -42,8 +43,25 @@ interface Announcement {
     updated_at: string;
 }
 
-export default function Index({ announcements }: { announcements: Announcement[] }) {
+export default function Index({ announcements, categories }: { 
+    announcements: Announcement[];
+    categories: Category[];
+}) {
     const { delete: deleteForm, processing } = useForm();
+    
+    // State for create form
+    const { data, setData, post, processing: createProcessing, errors, reset } = useForm({
+        title: '',
+        date: '',
+        end_date: '',
+        category_id: '',
+        author: '',
+        summary: '',
+        content: '',
+        image: null as File | null,
+    });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleDelete = (announcement: Announcement) => {
         MySwal.fire({
@@ -69,7 +87,7 @@ export default function Index({ announcements }: { announcements: Announcement[]
                             <div style={{
                                 fontSize: '1rem',
                                 marginTop: '0.125rem'
-                            }}>⚠️</div>
+                            }}><TriangleAlert /></div>
                             <div style={{ flex: 1 }}>
                                 <p style={{
                                     color: 'hsl(181 100% 2%)',
@@ -447,171 +465,345 @@ export default function Index({ announcements }: { announcements: Announcement[]
         });
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setData('image', file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleFormSubmit = () => {
+        // Validation is now handled in preConfirm, so we can proceed directly
+        const loadingToast = smartToast.loading('Creating announcement...');
+
+        post(route('announcements.store'), {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.dismiss(loadingToast);
+                smartToast.success('Announcement created successfully!');
+                
+                // Reset form and close modal
+                reset();
+                setImagePreview(null);
+                
+                // Close SweetAlert
+                MySwal.close();
+            },
+            onError: (errors) => {
+                toast.dismiss(loadingToast);
+                const errorMessage = Object.values(errors).flat().join(', ');
+                smartToast.error(`Failed to create announcement: ${errorMessage}`);
+            }
+        });
+    };
+
     const handleCreateNew = () => {
+        // Reset form when opening modal
+        reset();
+        setImagePreview(null);
+
         MySwal.fire({
             title: 'Create New Announcement',
-            html: (
-                <div style={{
-                    textAlign: 'center',
-                    fontFamily: 'Montserrat, sans-serif'
-                }}>
-                    <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '50%',
-                        backgroundColor: 'hsl(217 22% 41%)',
-                        marginBottom: '1.5rem'
-                    }}>
-                        <span style={{ fontSize: '2rem', color: 'white' }}>📝</span>
+            html: `
+                <div style="font-family: 'Montserrat', sans-serif; text-align: left; max-height: 60vh; overflow-y: auto; padding: 0.5rem;">
+                    <!-- Title Section -->
+                    <div style="margin-bottom: 1rem; padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                        <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            Announcement Title *
+                        </label>
+                        <input id="swal-title" type="text" placeholder="Enter announcement title" 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                               onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                               onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'">
                     </div>
-                    <p style={{
-                        color: 'hsl(181 100% 2%)',
-                        fontSize: '1rem',
-                        lineHeight: '1.6',
-                        margin: '0 0 1rem 0'
-                    }}>
-                        Ready to share something important with your community?
-                    </p>
-                    <p style={{
-                        color: 'hsl(179 40% 22%)',
-                        fontSize: '0.875rem',
-                        margin: '0',
-                        fontStyle: 'italic'
-                    }}>
-                        Click "Continue" to start creating your announcement.
-                    </p>
+                    
+                    <!-- Category & Author Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                            <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                Category *
+                            </label>
+                            <select id="swal-category" 
+                                    style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                                    onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                    onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'">
+                                <option value="">Select category</option>
+                                ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        
+                        <div style="padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                            <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                Author
+                            </label>
+                            <input id="swal-author" type="text" placeholder="Enter author name"
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                                   onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                   onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'">
+                        </div>
+                    </div>
+                    
+                    <!-- Dates Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                            <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                Publication Date
+                            </label>
+                            <input id="swal-date" type="date" value="${new Date().toISOString().split('T')[0]}"
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                                   onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                   onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'"
+                                   min="${new Date().toISOString().split('T')[0]}">
+                            <p style="margin-top: 0.5rem; font-size: 0.75rem; color: hsl(147 19% 50%); font-family: 'Montserrat', sans-serif;">💡 Select today to publish immediately, or choose a future date to schedule the announcement</p>
+                        </div>
+                        
+                        <div style="padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                            <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                End Date (Optional)
+                            </label>
+                            <input id="swal-end-date" type="date"
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                                   onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                   onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'">
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Section -->
+                    <div style="margin-bottom: 1rem; padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                        <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            Summary *
+                        </label>
+                        <textarea id="swal-summary" placeholder="Enter a brief summary of the announcement" rows="3"
+                                  style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; resize: vertical; transition: all 0.2s ease;"
+                                  onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                  onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'"></textarea>
+                    </div>
+                    
+                    <!-- Content Section -->
+                    <div style="margin-bottom: 1rem; padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                        <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            Content *
+                        </label>
+                        <textarea id="swal-content" placeholder="Enter the full content of the announcement" rows="4"
+                                  style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; resize: vertical; transition: all 0.2s ease;"
+                                  onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                                  onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'"></textarea>
+                    </div>
+                    
+                    <!-- Image Upload Section -->
+                    <div style="margin-bottom: 1rem; padding: 1rem; border: 2px solid hsl(178 21% 57%); border-radius: 0.75rem; background: hsl(178 100% 99%);">
+                        <label style="display: block; font-weight: 600; color: hsl(181 100% 2%); margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            Image (Optional)
+                        </label>
+                        <input id="swal-image" type="file" accept="image/*"
+                               style="width: 100%; padding: 0.75rem; border: 2px solid hsl(178 21% 85%); border-radius: 0.5rem; font-family: 'Montserrat', sans-serif; font-size: 0.875rem; background: white; transition: all 0.2s ease;"
+                               onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
+                               onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'"
+                               onchange="handleImagePreview(this)">
+                        <div id="image-preview" style="margin-top: 0.5rem;"></div>
+                    </div>
+                    
+                    <div style="padding: 0.75rem; background: hsl(147 19% 96%); border: 1px solid hsl(147 19% 85%); border-radius: 0.5rem; margin-top: 1rem;">
+                        <p style="color: hsl(147 25% 30%); font-size: 0.75rem; margin: 0; text-align: center; font-weight: 500;">
+                            Fields marked with * are required
+                        </p>
+                    </div>
                 </div>
-            ),
-            icon: 'info',
+            `,
             showCancelButton: true,
-            confirmButtonColor: 'hsl(147 19% 36%)',
+            confirmButtonColor: 'hsl(180 100% 8%)',
             cancelButtonColor: 'hsl(179 20% 45%)',
-            confirmButtonText: 'Continue',
+            confirmButtonText: 'Create Announcement',
             cancelButtonText: 'Cancel',
             background: 'hsl(178 100% 98%)',
             color: 'hsl(181 100% 2%)',
-            allowOutsideClick: true,
+            width: 'min(90vw, 800px)',
+            allowOutsideClick: false,
             allowEscapeKey: true,
             customClass: {
-                popup: 'modern-swal-info-popup',
-                title: 'modern-swal-info-title',
-                confirmButton: 'modern-swal-info-confirm-btn',
-                cancelButton: 'modern-swal-info-cancel-btn',
-                actions: 'modern-swal-info-actions',
-                icon: 'modern-swal-info-icon',
-                htmlContainer: 'modern-swal-info-content'
+                popup: 'modern-swal-create-popup',
+                title: 'modern-swal-create-title',
+                confirmButton: 'modern-swal-create-confirm-btn',
+                cancelButton: 'modern-swal-create-cancel-btn',
+                actions: 'modern-swal-create-actions',
+                htmlContainer: 'modern-swal-create-content'
             },
             didOpen: () => {
+                // Add global image preview handler
+                (window as any).handleImagePreview = (input: HTMLInputElement) => {
+                    const previewDiv = document.getElementById('image-preview');
+                    if (input.files && input.files[0] && previewDiv) {
+                        const file = input.files[0];
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            previewDiv.innerHTML = `
+                                <img src="${e.target?.result}" alt="Preview" 
+                                     style="max-width: 100%; max-height: 150px; border-radius: 0.5rem; border: 2px solid hsl(178 21% 85%); margin-top: 0.5rem; object-fit: cover;">
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
                 const style = document.createElement('style');
                 style.textContent = `
-                    .modern-swal-info-popup {
-                        border-radius: 1.25rem !important;
+                    .modern-swal-create-popup {
+                        border-radius: 1.5rem !important;
                         background: hsl(178 100% 98%) !important;
-                        border-top: 0 !important;
-                        border-right: 2px solid hsl(217 22% 41%) !important;
-                        border-bottom: 2px solid hsl(217 22% 41%) !important;
-                        border-left: 2px solid hsl(217 22% 41%) !important;
+                        border-top: 0px !important;
+                        border-right: 3px solid hsl(147 19% 36%) !important;
+                        border-bottom: 3px solid hsl(147 19% 36%) !important;
+                        border-left: 3px solid hsl(147 19% 36%) !important;
                         box-shadow: 
-                            0 25px 50px -12px rgba(59, 130, 246, 0.15),
-                            0 4px 25px rgba(59, 130, 246, 0.08) !important;
+                            0 25px 50px -12px rgba(34, 197, 94, 0.25),
+                            0 10px 30px rgba(34, 197, 94, 0.1) !important;
                         font-family: 'Montserrat', sans-serif !important;
                         padding: 2rem !important;
-                        min-width: 420px !important;
-                        overflow: hidden !important;
                         position: relative !important;
+                        overflow: hidden !important;
                     }
-                    .modern-swal-info-popup::before {
+                    .modern-swal-create-popup::before {
                         content: '';
                         position: absolute;
                         top: 0;
                         left: 0;
                         right: 0;
-                        height: 4px;
-                        background: linear-gradient(90deg, hsl(217 22% 41%), hsl(217 30% 35%));
-                        border-radius: 1rem 1rem 0 0;
+                        height: 6px;
+                        background: linear-gradient(90deg, hsl(147 19% 36%), hsl(147 25% 30%), hsl(217 22% 41%));
+                        border-radius: 1.5rem 1.5rem 0 0;
                     }
-                    .modern-swal-title {
-                        color: hsl(181 100% 2%) !important;
-                        font-size: 1.25rem !important;
+                    .modern-swal-create-title {
+                        color: hsl(147 19% 36%) !important;
+                        font-size: 1.75rem !important;
                         font-weight: 700 !important;
                         font-family: 'Montserrat', sans-serif !important;
-                        margin-bottom: 1rem !important;
+                        margin-bottom: 1.5rem !important;
                         text-align: center !important;
+                        position: relative !important;
                     }
-                    .modern-swal-info-content {
+                    .modern-swal-create-content {
                         margin: 0 !important;
                         padding: 0 !important;
+                        text-align: left !important;
                     }
-                    .modern-swal-info-confirm-btn {
-                        background: linear-gradient(135deg, hsl(147 19% 36%) 0%, hsl(147 25% 30%) 100%) !important;
+                    .modern-swal-create-confirm-btn {
+                        background: hsl(180 100% 8%) !important;
                         border: none !important;
-                        border-radius: 0.875rem !important;
-                        padding: 1rem 2rem !important;
-                        font-weight: 600 !important;
+                        border-radius: 1rem !important;
+                        padding: 1rem 2.5rem !important;
+                        font-weight: 700 !important;
                         font-family: 'Montserrat', sans-serif !important;
                         font-size: 1rem !important;
                         color: white !important;
                         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3) !important;
+                        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3) !important;
                         cursor: pointer !important;
-                        pointer-events: auto !important;
-                        z-index: 999999 !important;
+                        position: relative !important;
+                        overflow: hidden !important;
                     }
-                    .modern-swal-info-confirm-btn:hover {
-                        background: linear-gradient(135deg, hsl(147 25% 30%) 0%, hsl(147 30% 25%) 100%) !important;
-                        transform: translateY(-2px) !important;
-                        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4) !important;
+                    .modern-swal-create-confirm-btn:hover {
+                        background: hsl(180 100% 12%) !important;
+                        transform: translateY(-3px) !important;
+                        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4) !important;
                     }
-                    .modern-swal-info-cancel-btn {
+                    .modern-swal-create-confirm-btn:active {
+                        transform: translateY(-1px) !important;
+                    }
+                    .modern-swal-create-cancel-btn {
                         background: hsl(178 100% 98%) !important;
                         color: hsl(179 40% 22%) !important;
                         border: 2px solid hsl(179 20% 45%) !important;
-                        border-radius: 0.875rem !important;
+                        border-radius: 1rem !important;
                         padding: 1rem 2rem !important;
                         font-weight: 600 !important;
                         font-family: 'Montserrat', sans-serif !important;
                         font-size: 1rem !important;
                         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
                         cursor: pointer !important;
-                        pointer-events: auto !important;
-                        z-index: 999999 !important;
                     }
-                    .modern-swal-info-cancel-btn:hover {
+                    .modern-swal-create-cancel-btn:hover {
                         background: hsl(178 100% 95%) !important;
                         border-color: hsl(180 100% 8%) !important;
                         color: hsl(180 100% 8%) !important;
                         transform: translateY(-2px) !important;
-                        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
                     }
-                    .modern-swal-info-actions {
-                        gap: 1rem !important;
+                    .modern-swal-create-actions {
+                        gap: 1.5rem !important;
                         margin-top: 2rem !important;
                         justify-content: center !important;
                     }
-                    .modern-swal-info-icon {
-                        color: hsl(217 22% 41%) !important;
-                        border-color: hsl(217 22% 41%) !important;
-                        font-size: 1rem !important;
-                        margin-bottom: 1rem !important;
-                    }
-
                 `;
                 document.head.appendChild(style);
+            },
+            preConfirm: () => {
+                // Get form values
+                const title = (document.getElementById('swal-title') as HTMLInputElement)?.value;
+                const category_id = (document.getElementById('swal-category') as HTMLSelectElement)?.value;
+                const author = (document.getElementById('swal-author') as HTMLInputElement)?.value;
+                const date = (document.getElementById('swal-date') as HTMLInputElement)?.value;
+                const end_date = (document.getElementById('swal-end-date') as HTMLInputElement)?.value;
+                const summary = (document.getElementById('swal-summary') as HTMLTextAreaElement)?.value;
+                const content = (document.getElementById('swal-content') as HTMLTextAreaElement)?.value;
+                const imageFile = (document.getElementById('swal-image') as HTMLInputElement)?.files?.[0];
+                
+                // Validate required fields
+                if (!title?.trim()) {
+                    smartToast.error('Please enter an announcement title');
+                    return false; // Keep modal open
+                }
+                if (!category_id) {
+                    smartToast.error('Please select a category');
+                    return false; // Keep modal open
+                }
+
+                if (!date) {
+                    smartToast.error('The date field is required');
+                    return false; // Keep modal open
+                }
+
+                const selectedDate = new Date(date);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < today) {
+                    smartToast.error('Please enter a valid start date (cannot be in the past)');
+                    return false; // Keep modal open
+                }
+
+                if (!summary?.trim()) {
+                    smartToast.error('Please enter a summary');
+                    return false; // Keep modal open
+                }
+                if (!content?.trim()) {
+                    smartToast.error('Please enter content');
+                    return false; // Keep modal open
+                }
+                
+                // Update form data only if validation passes
+                setData({
+                    title: title || '',
+                    category_id: category_id || '',
+                    author: author || '',
+                    date: date || '',
+                    end_date: end_date || '',
+                    summary: summary || '',
+                    content: content || '',
+                    image: imageFile || null
+                });
+                
+                return true; // Allow modal to close and proceed
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Show success toast with dynamic duration
-                smartToast.success('Redirecting to create form...');
-
-                // Navigate to create page
-                window.location.href = route('announcements.create');
-            } else if (result.isDismissed || result.dismiss) {
-                // Modal dismissed - no action needed, just ensure it closes
+                handleFormSubmit();
+            } else if (result.isDismissed) {
                 console.log('Create modal cancelled');
+                reset();
+                setImagePreview(null);
             }
         }).catch((error) => {
             console.error('SweetAlert2 error:', error);
