@@ -66,7 +66,8 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
             const matchesSearch = searchQuery === '' ||
                 announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                announcement.content.toLowerCase().includes(searchQuery.toLowerCase());
+                announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                announcement.category.name.toLowerCase().includes(searchQuery.toLowerCase());
 
             // Apply category filter
             const matchesCategory = activeFilter === null ||
