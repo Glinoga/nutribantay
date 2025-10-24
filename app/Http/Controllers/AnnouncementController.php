@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
@@ -16,12 +17,22 @@ class AnnouncementController extends Controller
 
         return Inertia::render('Announcements/Index', [
             'announcements' => $announcements,
+            'categories' => Category::all(),
         ]);
     }
 
-    public function guestIndex() 
+    public function guestIndex()
     {
-        $announcements = Announcement::with('category')->whereDate('end_date', '>=', now())->latest()->get();
+        // Only show announcements where the publication date has arrived (today or in the past)
+        // and if they have an end_date, make sure it hasn't passed yet
+        $announcements = Announcement::with('category')
+            ->whereDate('date', '<=', now()) // Publication date has arrived
+            ->where(function ($query) {
+                $query->whereNull('end_date') // No end date (permanent announcements)
+                    ->orWhereDate('end_date', '>=', now()); // Or end date hasn't passed
+            })
+            ->latest()
+            ->get();
 
         return Inertia::render('guest/announcements', [
             'announcements' => $announcements,
@@ -46,7 +57,7 @@ class AnnouncementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'date' => 'required|date|after_or_equal:' . now()->format('Y-m-d'),
+            'date' => 'required|date|after_or_equal:today',
             'author' => 'nullable|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'end_date' => 'nullable|date|after_or_equal:date',
@@ -97,6 +108,17 @@ class AnnouncementController extends Controller
         return redirect()->route('announcements.index')->with('success', 'Announcement updated successfully.');
     }
 
+    // Archive old announcements (implemented) && If user wants to archive (not implemented yet)
+    // public function archive(Announcement $announcement)
+    // {
+    //     if ($announcement->end_date && Carbon::parse($announcement->end_date)->lt(now())) {
+    //         $announcement->delete();
+    //     }
+
+    //     return redirect()->route('announcements.index')->with('success', 'Announcement archived successfully.');
+    // }
+
+
     public function destroy(Announcement $announcement)
     {
         if ($announcement->image) {
@@ -104,6 +126,9 @@ class AnnouncementController extends Controller
         }
 
         $announcement->delete();
+
+        // for forceDeletion
+        // $announcement->forceDelete();
 
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }

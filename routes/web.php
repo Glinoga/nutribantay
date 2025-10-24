@@ -93,7 +93,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');        //Announcements
         Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
         Route::post('/admin/announcements/store',  [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
-        Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
+        // Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
