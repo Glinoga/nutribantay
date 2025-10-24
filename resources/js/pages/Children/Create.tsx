@@ -3,7 +3,7 @@ import { SharedData } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Create() {
-    const { auth } = usePage<SharedData>().props; 
+    const { auth } = usePage<SharedData>().props;
 
     const { data, setData, post, processing, errors } = useForm<{
         name: string;
@@ -13,6 +13,8 @@ export default function Create() {
         weight: string;
         height: string;
         barangay: string;
+        address: string;
+        contact_number: string;
     }>({
         name: '',
         sex: 'Male',
@@ -21,12 +23,13 @@ export default function Create() {
         weight: '',
         height: '',
         barangay: String(auth.user.barangay || ''),
+        address: '',
+        contact_number: '',
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-       
         if (Number(data.weight) > 200) {
             alert('Weight cannot exceed 200 kg');
             return;
@@ -53,7 +56,8 @@ export default function Create() {
             </div>
 
             <form onSubmit={submit} className="max-w-md space-y-4">
-         
+
+                {/* Name */}
                 <div>
                     <label className="block font-medium">Name</label>
                     <input
@@ -65,7 +69,7 @@ export default function Create() {
                     {errors.name && <div className="text-red-600">{errors.name}</div>}
                 </div>
 
-            
+                {/* Sex */}
                 <div>
                     <label className="block font-medium">Sex</label>
                     <select
@@ -78,7 +82,7 @@ export default function Create() {
                     </select>
                 </div>
 
-             
+                {/* Birthdate */}
                 <div>
                     <label className="block font-medium">Birthdate</label>
                     <input
@@ -90,7 +94,7 @@ export default function Create() {
                     {errors.birthdate && <div className="text-red-600">{errors.birthdate}</div>}
                 </div>
 
-               
+                {/* Age */}
                 <div>
                     <label className="block font-medium">Age (months)</label>
                     <input
@@ -102,7 +106,7 @@ export default function Create() {
                     {errors.age && <div className="text-red-600">{errors.age}</div>}
                 </div>
 
-          
+                {/* Weight */}
                 <div>
                     <label className="block font-medium">Weight (kg)</label>
                     <input
@@ -115,7 +119,7 @@ export default function Create() {
                     {errors.weight && <div className="text-red-600">{errors.weight}</div>}
                 </div>
 
-     
+                {/* Height */}
                 <div>
                     <label className="block font-medium">Height (cm)</label>
                     <input
@@ -128,7 +132,34 @@ export default function Create() {
                     {errors.height && <div className="text-red-600">{errors.height}</div>}
                 </div>
 
-            
+                {/* Address */}
+                <div>
+                    <label className="block font-medium">Address</label>
+                    <input
+                        type="text"
+                        value={data.address}
+                        onChange={(e) => setData('address', e.target.value)}
+                        className="w-full rounded border p-2"
+                    />
+                    {errors.address && <div className="text-red-600">{errors.address}</div>}
+                </div>
+
+                {/* Contact Number */}
+                <div>
+                    <label className="block font-medium">Contact Number</label>
+                    <input
+                        type="text"
+                        value={data.contact_number}
+                        onChange={(e) => setData('contact_number', e.target.value)}
+                        className="w-full rounded border p-2"
+                        placeholder="e.g. 09171234567"
+                    />
+                    {errors.contact_number && (
+                        <div className="text-red-600">{errors.contact_number}</div>
+                    )}
+                </div>
+
+                {/* Barangay */}
                 <div>
                     <label className="block font-medium">Barangay</label>
                     <input
@@ -140,6 +171,7 @@ export default function Create() {
                     />
                 </div>
 
+                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={processing}

@@ -11,16 +11,16 @@ class ChildNote extends Model
 
     protected $fillable = ['child_id', 'user_id', 'note'];
 
-    public function child() {
+    // Each note belongs to one child
+    public function child()
+    {
         return $this->belongsTo(Child::class);
     }
 
-    public function author() {
+    // Each note was written by one user
+    public function author()
+    {
         return $this->belongsTo(User::class, 'user_id');
-    }
-    public function notes(){
-        return $this->hasMany(ChildNote::class);
     }
 
 }
-

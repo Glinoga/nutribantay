@@ -15,15 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('sex', ['Male', 'Female']);
-            $table->integer('age')->nullable(); // optional
-            $table->date('birthdate')->nullable(); // ✅ needed for z-scores
+            $table->integer('age')->nullable(); 
+            $table->date('birthdate')->nullable(); 
             $table->string('barangay')->nullable();
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
             $table->string('address')->nullable();
-            $table->string('contact_number')->nullable(); // ✅ fixed
+            $table->string('contact_number')->nullable(); // ✅ fixed naming
             $table->unsignedBigInteger('created_by'); // user who created record
-            $table->timestamps(); // ✅ automatically adds created_at and updated_at
+            $table->unsignedBigInteger('updated_by')->nullable(); // optional updater
+            $table->timestamps();
+
+            // ✅ Foreign key relationships
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
