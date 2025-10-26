@@ -16,6 +16,7 @@ import {
     SelectValue
 } from '@/components/ui/select';
 import { route } from '@/lib/routes';
+import { smartToast } from '@/utils/smartToast';
 
 // Types
 interface Category {
@@ -69,31 +70,49 @@ export default function Edit({ announcement, categories }: EditProps) {
     };
 
     const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", data.title);
-    formData.append("date", data.date);
-    formData.append("end_date", data.end_date || "");
-    formData.append("category_id", data.category_id);
-    formData.append("author", data.author || "");
-    formData.append("summary", data.summary);
-    formData.append("content", data.content);
+        // Show loading toast
+        const loadingToast = smartToast.loading('Updating announcement...');
 
-    if (data.image) {
-        formData.append("image", data.image); // ✅ image file
-    }
+        const formData = new FormData();
+        formData.append("title", data.title);
+        formData.append("date", data.date);
+        formData.append("end_date", data.end_date || "");
+        formData.append("category_id", data.category_id);
+        formData.append("author", data.author || "");
+        formData.append("summary", data.summary);
+        formData.append("content", data.content);
 
-    // Important: tell Laravel this is a PUT request
-    formData.append("_method", "PUT");
+        if (data.image) {
+            formData.append("image", data.image); 
+        }
 
-    // Use router.post instead of put()
-    router.post(route("announcements.update", { announcement: announcement.id }), formData, {
-        forceFormData: true, // ✅ required for files
-        preserveScroll: true,
-    });
-};
+        // Important: tell Laravel this is a PUT request
+        formData.append("_method", "PUT");
 
+        // Use router.post instead of put()
+        router.post(route("announcements.update", { announcement: announcement.id }), formData, {
+            forceFormData: true, // ✅ required for files
+            preserveScroll: true,
+            onSuccess: () => {
+                smartToast.dismiss(loadingToast);
+                smartToast.success('Announcement updated successfully! 🎉');
+            },
+            onError: (errors) => {
+                smartToast.dismiss(loadingToast);
+                // Show specific error messages
+                const errorMessages = Object.values(errors).flat();
+                if (errorMessages.length > 0) {
+                    errorMessages.forEach((error) => {
+                        smartToast.error(error as string);
+                    });
+                } else {
+                    smartToast.error('Failed to update announcement. Please try again.');
+                }
+            }
+        });
+    };
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Announcements', href: '/admin/announcements' },
@@ -232,6 +251,18 @@ export default function Edit({ announcement, categories }: EditProps) {
 
                     <Button type="submit" disabled={processing}>
                         {processing ? 'Saving...' : 'Update Announcement'}
+                    </Button>
+
+                    <Button 
+                        type="button"
+                        className="ml-2 bg-[var(--Fsecondary)] text-[var(--popover)] shadow-xs hover:bg-[var(--Fsecondary)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--red)] focus:ring-offset-2 disabled:opacity-50"  
+                        disabled={processing} 
+                        onClick={() => {
+                            smartToast.info('Edit cancelled');
+                            router.visit(route('announcements.index'));
+                        }}
+                    >
+                        Cancel
                     </Button>
                 </form>
             </div>

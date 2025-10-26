@@ -85,7 +85,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
             </Head>
             <div className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--text)] dark:bg-[var(--bg-dark)]" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 {showHeader && (
-                    <header className="fixed top-0 z-50 w-full bg-[var(--bg-light)] shadow-md dark:bg-[var(--bg-light)]">
+                    <header className="fixed top-0 z-50 w-full bg-[var(--bg-light)] shadow-md dark:bg-[var(--bg-light)] z-[1001]">
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                             <div className="flex items-center gap-12">
                                 <Link href="/" className="relative text-2xl font-bold text-[var(--primary)]">

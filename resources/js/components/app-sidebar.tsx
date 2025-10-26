@@ -6,6 +6,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, UserCog, UserPen, Megaphone  } from 'lucide-react';
+import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
 type AuthProps = {
@@ -23,7 +24,7 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
         { title: 'Child Profiles', href: '/children', icon: UserPen },
-        { title: 'Announcements', href: '/admin/announcements', icon: Megaphone },
+        { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 
     if (isAdmin) {

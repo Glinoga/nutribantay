@@ -2,6 +2,17 @@ import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 
 const FAQs = [
@@ -395,23 +406,37 @@ export default function Contact() {
                     </div>
 
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-[var(--bg-light)]">
-                        {/* Map container - either Leaflet or Google Maps */}
-                        <div className="relative h-96 w-full">
-                            {/* Placeholder for the map */}
-                            <div className="absolute inset-0 bg-[var(--border)] bg-opacity-20 backdrop-blur-sm">
-                                <div className="flex h-full w-full items-center justify-center">
-                                    <div className="text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                        </svg>
-                                        <p className="mt-4 text-lg font-medium text-[var(--text)]">Interactive Map</p>
-                                        <p className="text-[var(--text-muted)]">Map would be displayed here (Leaflet or Google Maps)</p>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Leaflet Map */}
+                        <div className="relative h-[36rem] w-full">
+                            <MapContainer
+                                center={[14.6507, 120.9630]} // Caloocan City coordinates
+                                zoom={15}
+                                style={{ height: '100%', width: '100%' }}
+                                scrollWheelZoom={true}
+                                className="rounded-2xl"
+                            >
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <Marker position={[14.6507, 120.9630]}>
+                                    <Popup>
+                                        <div className="text-center p-2">
+                                            <h3 className="font-bold text-lg text-gray-800">NutriBantay Office</h3>
+                                            <p className="text-sm text-gray-600 mt-1">
+                                                Barangay Hall, 123 Main Street<br />
+                                                Caloocan City, Metro Manila
+                                            </p>
+                                            <p className="text-sm text-gray-600 mt-2">
+                                                <strong>Hours:</strong> Mon-Fri: 8AM - 5PM
+                                            </p>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
 
                             {/* Location information overlay */}
-                            <div className="absolute bottom-4 left-8 right-8 rounded-xl bg-white p-6 shadow-lg dark:bg-[var(--bg-light)]">
+                            <div className="absolute bottom-4 left-8 right-8 rounded-xl bg-white p-6 shadow-lg dark:bg-[var(--bg-light)] pointer-events-auto z-[1000]">
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                     <div>
                                         <h3 className="text-xl font-semibold text-[var(--text)]">NutriBantay Office</h3>
@@ -420,10 +445,10 @@ export default function Contact() {
                                         </p>
                                     </div>
                                     <a
-                                        href="https://maps.google.com"
+                                        href="https://maps.google.com/maps?q=14.6507,120.9630"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:bg-opacity-90"
+                                        className="inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:bg-opacity-90 hover:shadow-lg"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707L15 4m0 13V4m0 0L9 7" clipRule="evenodd" />

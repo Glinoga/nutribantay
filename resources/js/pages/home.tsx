@@ -1,4 +1,5 @@
 import GuestLayout from '@/layouts/guest-layout';
+import { route } from '@/lib/routes';
 
 const announcements = [
     {
@@ -195,7 +196,7 @@ export default function Home() {
                             </h2>
                         </div>
                         <a 
-                            href="/announcements"
+                            href={route('guest.announcements')}
                             className="inline-flex items-center rounded-full border-2 border-[var(--primary)] px-6 py-2 text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white"
                         >
                             <span>View All</span>
