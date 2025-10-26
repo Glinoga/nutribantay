@@ -1,5 +1,6 @@
 import GuestLayout from '@/layouts/guest-layout';
 import { usePage } from '@inertiajs/react';
+import { route } from '@/lib/routes';
 
 const announcements = [
     {
@@ -286,8 +287,8 @@ export default function Home() {
                             </span>
                             <h2 className="text-3xl font-bold text-[var(--text)] md:text-4xl">Latest Announcements</h2>
                         </div>
-                        <a
-                            href="/announcements"
+                        <a 
+                            href={route('guest.announcements')}
                             className="inline-flex items-center rounded-full border-2 border-[var(--primary)] px-6 py-2 text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white"
                         >
                             <span>View All</span>

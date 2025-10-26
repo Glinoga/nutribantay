@@ -1,5 +1,7 @@
+import React from 'react';
 import toast from 'react-hot-toast';
-
+import { Info } from 'lucide-react';
+ 
 /**
  * Smart toast notifications with dynamic duration based on content length
  * Provides better UX by giving users adequate time to read messages
@@ -16,7 +18,7 @@ export const smartToast = {
         const duration = Math.min(readingTime, 6000); // Cap at 6 seconds
         return toast.success(message, { duration });
     },
-    
+
     /**
      * Error toast with longer duration for important error messages
      * @param message - The error message to display
@@ -28,7 +30,7 @@ export const smartToast = {
         const duration = Math.min(readingTime, 10000); // Cap at 10 seconds
         return toast.error(message, { duration });
     },
-    
+
     /**
      * Loading toast that persists until manually dismissed
      * @param message - The loading message to display
@@ -37,7 +39,7 @@ export const smartToast = {
     loading: (message: string) => {
         return toast.loading(message, { duration: Infinity });
     },
-    
+
     /**
      * Default toast with dynamic duration
      * @param message - The message to display
@@ -59,9 +61,20 @@ export const smartToast = {
         const baseTime = 3000;
         const readingTime = Math.max(message.length * 50, baseTime);
         const duration = Math.min(readingTime, 7000);
-        return toast(message, { 
+        return toast(message, {
             duration,
-            icon: 'ℹ️',
+            icon: React.createElement(Info, { 
+                size: 16, 
+                color: '#3B82F6',
+                strokeWidth: 2 
+            }),
+            style: {
+                background: '#ffffff',
+                color: '#5394fcff',
+                border: '2px solid #3B82F6',
+                borderRadius: '15px',
+                boxShadow: '0 10px 25px -5px rgba(16, 72, 185, 0.2), 0 4px 6px -2px rgba(16, 114, 185, 0.1)',
+            }
         });
     },
 
@@ -82,10 +95,10 @@ export const smartToast = {
         return toast.promise(promise, {
             loading: messages.loading,
             success: (data) => {
-                const message = typeof messages.success === 'function' 
-                    ? messages.success(data) 
+                const message = typeof messages.success === 'function'
+                    ? messages.success(data)
                     : messages.success;
-                
+
                 // Use setTimeout to apply dynamic duration after toast is created
                 setTimeout(() => {
                     const baseTime = 2500;
@@ -94,14 +107,14 @@ export const smartToast = {
                     // Note: react-hot-toast doesn't support updating duration after creation
                     // This is a limitation of the library
                 }, 0);
-                
+
                 return message;
             },
             error: (error) => {
-                const message = typeof messages.error === 'function' 
-                    ? messages.error(error) 
+                const message = typeof messages.error === 'function'
+                    ? messages.error(error)
                     : messages.error;
-                
+
                 // Use setTimeout to apply dynamic duration after toast is created
                 setTimeout(() => {
                     const baseTime = 4000;
@@ -110,7 +123,7 @@ export const smartToast = {
                     // Note: react-hot-toast doesn't support updating duration after creation
                     // This is a limitation of the library
                 }, 0);
-                
+
                 return message;
             },
         });
@@ -131,25 +144,33 @@ export const smartToast = {
         }
     ) => {
         const loadingToast = toast.loading(messages.loading);
-        
+
         try {
             const result = await promise;
-            const successMessage = typeof messages.success === 'function' 
-                ? messages.success(result) 
+            const successMessage = typeof messages.success === 'function'
+                ? messages.success(result)
                 : messages.success;
-            
+
             toast.dismiss(loadingToast);
             smartToast.success(successMessage);
             return result;
         } catch (error) {
-            const errorMessage = typeof messages.error === 'function' 
-                ? messages.error(error) 
+            const errorMessage = typeof messages.error === 'function'
+                ? messages.error(error)
                 : messages.error;
-            
+
             toast.dismiss(loadingToast);
             smartToast.error(errorMessage);
             throw error;
         }
+    },
+
+    /**
+     * Dismiss a specific toast or all toasts
+     * @param toastId - Optional toast ID to dismiss specific toast, if not provided dismisses all
+     */
+    dismiss: (toastId?: string) => {
+        return toast.dismiss(toastId);
     }
 };
 

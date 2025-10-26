@@ -86,7 +86,7 @@ createInertiaApp({
                             },
                         },
                         loading: {
-                            duration: Infinity, // Loading toasts should persist until dismissed
+                            duration: Infinity, 
                             style: {
                                 background: '#ffffff',
                                 color: '#374151',

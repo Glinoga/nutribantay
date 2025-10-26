@@ -6,6 +6,7 @@ import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen, Megaphone  } from 'lucide-react';
+import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -47,7 +48,7 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
         { title: 'Child Profiles', href: '/children', icon: UserPen },
-        { title: 'Announcements', href: '/admin/announcements', icon: Megaphone },
+        { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 
     // Admin-only menu

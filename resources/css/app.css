@@ -100,6 +100,8 @@
     --yellow: hsl(52 23% 34%);
     --success: hsl(147 19% 36%);
     --info: hsl(217 22% 41%);
+    --Fprimary: hsl(180 100% 8%);
+    --Fsecondary: hsl(351 44% 31%);
 }
 
 .dark {

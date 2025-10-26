@@ -1,6 +1,7 @@
 export function route(name: string, params?: Record<string, any>): string {
   // Direct route mapping
   const routes: Record<string, string> = {
+    // Announcement routes
     'announcements.create': '/admin/announcements/create',
     'announcements.store': '/admin/announcements/store',
     'announcements.index': '/admin/announcements',
@@ -8,9 +9,14 @@ export function route(name: string, params?: Record<string, any>): string {
     'announcements.edit': '/admin/announcements/{announcement}/edit',
     'announcements.destroy': '/admin/announcements/{announcement}',
     'dashboard': '/admin/dashboard',
+
+
     'home': '/',
+    // Guest routes
     'guest.contact': '/guest/contact',
     'guest.contact.send': '/guest/contact',
+    'guest.announcements': '/guest/announcements',
+
   };
 
   const path = routes[name];
