@@ -16,6 +16,7 @@ export function route(name: string, params?: Record<string, any>): string {
     'guest.contact': '/guest/contact',
     'guest.contact.send': '/guest/contact',
     'guest.announcements': '/guest/announcements',
+    'guest.announcements.show': '/guest/announcements/{announcement}',
 
   };
 
