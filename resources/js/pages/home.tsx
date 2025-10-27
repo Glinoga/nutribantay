@@ -1,35 +1,33 @@
+import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
+import { Link } from '@inertiajs/react';
 
-const announcements = [
-    {
-        id: 1,
-        title: 'Free Nutrition Assessment for Children',
-        category: 'Nutrition Program',
-        categoryColor: 'info',
-        date: 'September 24, 2025',
-        summary: 'Join us for free nutrition assessments for children ages 0-5 this coming weekend.',
-        content: 'We are pleased to announce that our health team will be conducting free nutrition assessments for children ages 0-5 this coming weekend. The assessment will include height and weight measurements, BMI calculation, and nutritional advice from our registered nutritionists. Each family will receive a personalized nutrition plan based on their child\'s assessment results. The event will take place at the Barangay Health Center from 8:00 AM to 5:00 PM on Saturday and Sunday.'
-    },
-    {
-        id: 2,
-        title: 'Parent\'s Workshop on Child Nutrition',
-        category: 'Workshop',
-        categoryColor: 'warning',
-        date: 'October 5, 2025',
-        summary: 'Learn effective strategies for ensuring your child receives proper nutrition at all development stages.',
-        content: 'We invite all parents to join our comprehensive workshop on child nutrition. This workshop will cover essential topics such as age-appropriate food choices, meal planning on a budget, and addressing picky eating habits. Our expert speakers will share practical tips and answer your questions about your child\'s nutritional needs. The workshop will be held at the Community Center from 9:00 AM to 12:00 PM. Registration is free but limited to 50 participants, so please sign up early!'
-    },
-    {
-        id: 3,
-        title: 'Barangay Health Fair',
-        category: 'Community',
-        categoryColor: 'success',
-        date: 'October 15, 2025',
-        summary: 'Annual health fair featuring free checkups, nutritional counseling, and activities for the whole family.',
-        content: 'Mark your calendars for our Annual Barangay Health Fair! This event brings together health professionals from various fields to provide free services to our community. Services include basic health checkups, dental examinations, vision screening, nutritional counseling, and vaccination updates. There will also be fun activities for children and educational booths for adults. The Health Fair will run from 8:00 AM to 4:00 PM at the Barangay Plaza. All residents are encouraged to attend this important community health event.'
-    }
-];
+// Define interface for the announcements
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    color: string;
+    description?: string;
+}
+
+interface Announcement {
+    id: number;
+    title: string;
+    date: string;
+    end_date?: string;
+    category_id: number;
+    category: Category;
+    author?: string;
+    summary: string;
+    content: string;
+    image?: string;
+}
+
+interface HomeProps {
+    announcements: Announcement[];
+}
 
 // get color class based on category
 function getCategoryColorClass(categoryColor: string) {
@@ -44,7 +42,7 @@ function getCategoryColorClass(categoryColor: string) {
     return colorMap[categoryColor] || 'bg-[var(--primary)]';
 }
 
-export default function Home() {
+export default function Home({ announcements = [] }: HomeProps) {
     return (
         <GuestLayout title="Home">
             {/* Hero Section */}
@@ -208,39 +206,36 @@ export default function Home() {
                     </div>
                     
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {/* Announcement 1 */}
-                        {announcements.map(announcement => (
-                        <div key={announcement.id} className="card-hover group relative overflow-hidden rounded-2xl bg-white shadow-sm">
+                        {announcements.length > 0 ? announcements.map(announcement => (
+                        <div key={announcement.id} className="card-hover group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm h-full">
                             <div className="absolute inset-0 bg-[(--bg-light)]"></div>
-                            <div className="absolute top-0 left-0 right-0 p-6">
-                                <span className={`inline-block rounded-full ${getCategoryColorClass(announcement.categoryColor)} px-3 py-1 text-xs font-medium text-white`}>
-                                    {announcement.category}
+                            <div className="absolute top-0 left-0 right-0 p-6 z-10">
+                                <span className={`inline-block rounded-full ${getCategoryColorClass(announcement.category.color)} px-3 py-1 text-xs font-medium text-white`}>
+                                    {announcement.category.name}
                                 </span>
                             </div>
-                            <div className="p-6 pt-16">
+                            <div className="flex flex-col p-6 pt-16 h-full relative z-20">
                                 <h3 className="mb-3 text-xl font-semibold group-hover:text-[var(--info)]">
                                     {announcement.title}
                                 </h3>
-                                <p className="mb-4 text-[var(--text-muted)]">
+                                <p className="mb-4 text-[var(--text-muted)] flex-grow">
                                     {announcement.summary}
                                 </p>
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between mt-auto pt-4 relative z-30">
                                     <span className="text-sm text-[var(--text-muted)]">{announcement.date}</span>
-                                    <a 
-                                        href="/announcements"
-                                        className="inline-flex items-center text-sm text-[var(--info)] hover:underline"
-                                    >
-                                        <span>Read More</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 12 19"></polyline>
-                                        </svg>
-                                    </a>
+                                        <Link href={route('guest.announcements.show', { announcement: announcement.id })}>
+                                            <Button className='rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)] hover:text-white hover:border-[var(--bg-light)]' size="sm">Read More</Button>
+                                        </Link>
                                 </div>
                             </div>
                         </div>
-                        ))};
-
+                        )) : (
+                            <div className="col-span-full text-center py-12">
+                                <p className="text-lg text-[var(--text-muted)]">
+                                    No announcements available at the moment.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

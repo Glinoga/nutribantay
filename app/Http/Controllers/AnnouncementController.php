@@ -39,6 +39,21 @@ class AnnouncementController extends Controller
         ]);
     }
 
+    public function guestShow(Announcement $announcement)
+    {
+        // Check if announcement is published and still active
+        if ($announcement->date > now()->toDateString() || 
+            ($announcement->end_date && $announcement->end_date < now()->toDateString())) {
+            abort(404);
+        }
+
+        $announcement->load('category');
+
+        return Inertia::render('guest/showannouncement', [
+            'announcement' => $announcement,
+        ]);
+    }
+
     public function show(Announcement $announcement)
     {
         return Inertia::render('Announcements/Show', [

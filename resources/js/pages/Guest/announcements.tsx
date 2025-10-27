@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { route } from '@/lib/routes';
 
 // get color class based on category
 function getCategoryColorClass(categoryColor: string) {
@@ -77,12 +78,21 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
         });
     }, [announcements, searchQuery, activeFilter]);
 
+    const handleResetClick = () => {
+        setSearchQuery('');
+        setActiveFilter(null);
+    }
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
 
     const handleFilterClick = (category: string | null) => {
         setActiveFilter(category === activeFilter ? null : category);
+    };
+
+    const handleSearchReset = () => {
+        setSearchQuery('');
     };
 
     return (
@@ -113,14 +123,16 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         <input
+                            id="announcement-search"
                             type="text"
                             placeholder="Search announcements..."
                             className="w-full bg-transparent px-4 py-3 text-[var(--text)] focus:outline-none"
+                            value={searchQuery}
                             onChange={handleSearchChange}
                         />
                         {searchQuery && (
                             <button
-                                onClick={() => setSearchQuery('')}
+                                onClick={handleSearchReset}
                                 className="mr-3 rounded-full border border-2 border-[var(--border)] p-1 text-[var(--text-muted)] hover:bg-[var(--text-muted)] hover:text-white"
                                 title="Clear search"
                             >
@@ -203,7 +215,7 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                         {announcement.summary}
                                     </p>
                                     <div className="flex items-center justify-between">
-                                        <Link href={`#`}>
+                                        <Link href={route('guest.announcements.show', { announcement: announcement.id })}>
                                             <Button className='rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:bg-[var(--primary)] hover:text-white hover:border-[var(--bg-light)]' size="sm">Read More</Button>
                                         </Link>
 

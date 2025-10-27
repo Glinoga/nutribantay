@@ -12,11 +12,23 @@ use App\Http\Controllers\ContactController;
 
 // Guest Pages
 Route::get('/', function () {
-    return Inertia::render('home');
+    $announcements = \App\Models\Announcement::with('category')
+        ->whereDate('date', '<=', now())
+        ->where(function ($query) {
+            $query->whereNull('end_date')
+                ->orWhereDate('end_date', '>=', now());
+        })
+        ->latest()
+        ->take(3) // Only show 3 latest announcements
+        ->get();
+    
+    return Inertia::render('home', [
+        'announcements' => $announcements
+    ]);
 })->name('home');
 
-
 Route::get('/guest/announcements', [AnnouncementController::class, 'guestIndex'])->name('guest.announcements');
+Route::get('/guest/announcements/{announcement}', [AnnouncementController::class, 'guestShow'])->name('guest.announcements.show');
 Route::get('/guest/contact', [ContactController::class, 'showContactForm'])->name('guest.contact');
 Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->name('guest.contact.send');
 
