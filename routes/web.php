@@ -19,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
 
-    Route::middleware(['role:admin'])->group(function () {
+    Route::middleware(['role:Admin'])->group(function () {
         Route::get('/users/archived', [UserController::class, 'archived'])->name('users.archived');
         Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('roles', RoleController::class);
     });
 
-    Route::middleware(['role:healthworker'])->group(function () {
+    Route::middleware(['role:Healthworker'])->group(function () {
         Route::get('/healthlog', [HealthlogController::class, 'index'])->name('healthlog.index');
         Route::get('/healthlog/create', [HealthlogController::class, 'create'])->name('healthlog.create');
         Route::post('/healthlog', [HealthlogController::class, 'store'])->name('healthlog.store');
