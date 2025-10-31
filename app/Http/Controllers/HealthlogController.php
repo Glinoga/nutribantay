@@ -7,6 +7,7 @@ use App\Models\Child;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Helpers\GrowthHelper;
+use App\Helpers\AIRecommender;
 use Carbon\Carbon;
 
 class HealthlogController extends Controller
@@ -79,7 +80,17 @@ class HealthlogController extends Controller
             $validated['zscore_wfa'] = $zScores['wfa'];
             $validated['zscore_lfa'] = $zScores['lfa'];
             $validated['zscore_wfh'] = $zScores['wfh'];
-            $validated['nutrition_status'] = $zScores['status'];
+$validated['nutrition_status'] = $zScores['status'];
+
+// ✅ Generate AI Recommendation
+$age = Carbon::parse($child->birthdate)->age;
+$bmi = GrowthHelper::calculateBMI($validated['weight'], $validated['height']);
+$validated['recommendation'] = AIRecommender::getRecommendation(
+    $zScores['status'],
+    $child->sex,
+    $age,
+    $bmi
+);
         }
 
         Healthlog::create($validated);

@@ -7,6 +7,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\HealthlogController;
+use App\Http\Controllers\RecommendationController;
 
 Route::get('/', fn() => Inertia::render('home'))->name('home');
 Route::get('/announcements', fn() => Inertia::render('announcements'))->name('announcements');
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/healthlog', [HealthlogController::class, 'store'])->name('healthlog.store');
         Route::get('/healthlog/{id}', [HealthlogController::class, 'show'])->name('healthlog.show');
         Route::delete('/healthlog/{id}', [HealthlogController::class, 'destroy'])->name('healthlog.destroy');
+        Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
         Route::resource('healthlogs', HealthlogController::class);
     });
 });
