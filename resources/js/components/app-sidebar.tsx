@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen, Megaphone  } from 'lucide-react';
+import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen, Megaphone, MessageSquare } from 'lucide-react';
 import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
@@ -54,7 +54,10 @@ export function AppSidebar() {
     // Admin-only menu
     if (isAdmin) {
         mainNavItems.push(
+            
             { title: 'User Management', href: '/users', icon: UserCog },
+            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare }
+        ,
             { title: 'Data Management', href: '/admin/database', icon: Database },
             {
                 title: 'Audit Logs',

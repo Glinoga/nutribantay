@@ -5,6 +5,7 @@ import { readExcel } from '@/utils/excel';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import { useState } from 'react';
+import { displayPhoneNumber } from '@/lib/phoneUtils';
 
 type Child = {
     id: number;
@@ -16,6 +17,7 @@ type Child = {
     age: number | null;
     weight?: number | null;
     height?: number | null;
+    contact_number?: string;
     address?: string | null;
     contact_number?: string | null;
     barangay?: string | null;
@@ -316,7 +318,8 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                             <th className="border px-4 py-2 text-left">Height (cm)</th>
                             <th className="border px-4 py-2 text-left">Address</th>
                             <th className="border px-4 py-2 text-left">Contact Number</th>
-                            <th className="border px-4 py-2 text-left">Created By</th>
+                            <th className="border px-4 py-2 text-left">Contact Number</th>
+                        <th className="border px-4 py-2 text-left">Created By</th>
                             <th className="border px-4 py-2 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -339,7 +342,8 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                                     <td className="border px-4 py-2">{child.height ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.address ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.contact_number ?? '-'}</td>
-                                    <td className="border px-4 py-2">{child.creator?.name ?? 'N/A'}</td>
+                                    <td className="border px-4 py-2">{displayPhoneNumber(child.contact_number)}</td>
+                            <td className="border px-4 py-2">{child.creator?.name ?? 'N/A'}</td>
                                     <td className="border px-4 py-2">
                                         <div className="flex gap-1">
                                             <Link href={`/children/${child.id}`} className="rounded bg-blue-500 px-2 py-1 text-xs text-white">

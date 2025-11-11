@@ -15,6 +15,8 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DatabaseMaintenanceController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SMSController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,28 @@ use App\Http\Controllers\AuditLogController;
 Route::get('/', fn () => Inertia::render('home'))->name('home');
 Route::get('/guest/announcements', fn () => Inertia::render('announcements'))->name('guest.announcements');
 Route::get('/guest/contact', fn () => Inertia::render('contact'))->name('guest.contact');
+
+// Guest Pages
+Route::get('/', function () {
+    $announcements = \App\Models\Announcement::with('category')
+        ->whereDate('date', '<=', now())
+        ->where(function ($query) {
+            $query->whereNull('end_date')
+                ->orWhereDate('end_date', '>=', now());
+        })
+        ->latest()
+        ->take(3) // Only show 3 latest announcements
+        ->get();
+    
+    return Inertia::render('home', [
+        'announcements' => $announcements
+    ]);
+})->name('home');
+
+Route::get('/guest/announcements', [AnnouncementController::class, 'guestIndex'])->name('guest.announcements');
+Route::get('/guest/announcements/{announcement}', [AnnouncementController::class, 'guestShow'])->name('guest.announcements.show');
+Route::get('/guest/contact', [ContactController::class, 'showContactForm'])->name('guest.contact');
+Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->name('guest.contact.send');
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +121,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
+        Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
 
         Route::resource('categories', CategoryController::class);
 
