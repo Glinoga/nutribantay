@@ -18,6 +18,7 @@ class Child extends Model
     'height',
     'created_by',
     'barangay',
+    'contact_number',
 ];
 
 

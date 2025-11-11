@@ -9,7 +9,8 @@ export function route(name: string, params?: Record<string, any>): string {
     'announcements.edit': '/admin/announcements/{announcement}/edit',
     'announcements.destroy': '/admin/announcements/{announcement}',
     'dashboard': '/admin/dashboard',
-
+    'sms.index': '/admin/sendsms',
+    'sms.send': '/admin/sendsms',
 
     'home': '/',
     // Guest routes

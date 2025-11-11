@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, UserCog, UserPen, Megaphone  } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, UserCog, UserPen, Megaphone, MessageSquare } from 'lucide-react';
 import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
@@ -28,7 +28,10 @@ export function AppSidebar() {
     ];
 
     if (isAdmin) {
-        mainNavItems.push({ title: 'User Management', href: '/users', icon: UserCog });
+        mainNavItems.push(
+            { title: 'User Management', href: '/users', icon: UserCog },
+            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare }
+        );
     }
 
     const footerNavItems: NavItem[] = [

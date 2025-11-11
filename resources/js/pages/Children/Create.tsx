@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AppLayout from "@/layouts/app-layout";
 import { Head, useForm, usePage, router } from "@inertiajs/react";
 import { SharedData } from "@/types";
+import { formatPhoneNumber } from "@/lib/phoneUtils";
 
 export default function ChildrenIndex() {
     const { auth } = usePage<SharedData>().props;
@@ -14,6 +15,7 @@ export default function ChildrenIndex() {
         weight: string;
         height: string;
         barangay: string;
+        contact_number: string;
     }>({
         name: "",
         sex: "Male",
@@ -21,7 +23,13 @@ export default function ChildrenIndex() {
         weight: "",
         height: "",
         barangay: String(auth.user.barangay || ""),
+        contact_number: "",
     });
+
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setData("contact_number", formatted);
+    };
 
     useEffect(() => {
         // Automatically open modal
@@ -219,6 +227,23 @@ export default function ChildrenIndex() {
                                         <p className="text-red-500 text-sm mt-1">{errors.height}</p>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* Contact Number */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Guardian Contact Number
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.contact_number}
+                                    onChange={handlePhoneNumberChange}
+                                    className="w-full rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-blue-500 p-2.5"
+                                    placeholder="+63 XXX XXX XXXX"
+                                />
+                                {errors.contact_number && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.contact_number}</p>
+                                )}
                             </div>
 
                             {/* Buttons */}

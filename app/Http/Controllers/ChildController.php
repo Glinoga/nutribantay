@@ -25,6 +25,7 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
+                'contact_number' => $child->contact_number,
                 'created_by' => $child->creator?->name, // correctly get creator's name
                 'barangay' => $child->barangay,
             ]),
@@ -44,9 +45,17 @@ class ChildController extends Controller
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
+            'contact_number' => 'nullable|string|max:50',
         ]);
 
         $user = auth()->user();
+
+        // Format phone number: remove spaces and ensure it's stored consistently
+        $contactNumber = $request->contact_number;
+        if ($contactNumber) {
+            // Keep the formatted version with spaces as user entered it
+            $contactNumber = trim($contactNumber);
+        }
 
         Child::create([
             'name'       => $request->name,
@@ -56,6 +65,7 @@ class ChildController extends Controller
             'height'     => $request->height,
             'created_by' => $user->id, // or $user->id if your DB expects integer
             'barangay'   => $user->barangay, // inherit from creator
+            'contact_number' => $contactNumber,
         ]);
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');

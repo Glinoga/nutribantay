@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { displayPhoneNumber } from '@/lib/phoneUtils';
 
 type Child = {
     id: number;
@@ -10,6 +11,7 @@ type Child = {
     age: number;
     weight?: number;
     height?: number;
+    contact_number?: string;
     created_by?: string; // ✅ just a name now
 };
 
@@ -45,6 +47,7 @@ export default function Index({ children }: Props) {
                         <th className="border px-4 py-2 text-left">Age</th>
                         <th className="border px-4 py-2 text-left">Weight</th>
                         <th className="border px-4 py-2 text-left">Height</th>
+                        <th className="border px-4 py-2 text-left">Contact Number</th>
                         <th className="border px-4 py-2 text-left">Created By</th>
                         <th className="border px-4 py-2 text-left">Actions</th>
                     </tr>
@@ -58,6 +61,7 @@ export default function Index({ children }: Props) {
                             <td className="border px-4 py-2">{child.age}</td>
                             <td className="border px-4 py-2">{child.weight ?? '-'}</td>
                             <td className="border px-4 py-2">{child.height ?? '-'}</td>
+                            <td className="border px-4 py-2">{displayPhoneNumber(child.contact_number)}</td>
                             <td className="border px-4 py-2">{child.created_by ?? 'N/A'}</td>
                             <td className="border px-4 py-2">
                                 <Link

@@ -9,6 +9,7 @@ use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SMSController;
 
 // Guest Pages
 Route::get('/', function () {
@@ -54,6 +55,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
+        Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
 
         Route::resource('categories', CategoryController::class);
 
