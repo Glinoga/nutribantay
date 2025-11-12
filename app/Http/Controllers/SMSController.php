@@ -19,7 +19,7 @@ class SMSController extends Controller
             ->map(function ($child) {
                 return [
                     'id' => $child->id,
-                    'name' => $child->name . ' (Guardian)',
+                    'name' => $child->name . ' (Child)',
                     'phone' => $child->contact_number
                 ];
             });

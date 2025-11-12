@@ -74,9 +74,9 @@ export default function SMSIndex({ users }: SMSPageProps) {
         setCharacterCount(message.length);
         setData('message', message);
         setIsTyping(true);
-        
-        // Reset typing indicator after 1 second
-        setTimeout(() => setIsTyping(false), 1000);
+
+        // Reset typing indicator after 2 seconds
+        setTimeout(() => setIsTyping(false), 2000);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -178,7 +178,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                     {/* Recipients Panel */}
                     <div className="lg:col-span-1 space-y-4">
                         <Card className="overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
-                            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+                            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 py-4">
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                             <input
                                                 type="text"
-                                                placeholder="Search guardians..."
+                                                placeholder="Search children/guardian..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                                 className="w-full pl-10 pr-10 py-2 border-2 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
@@ -365,7 +365,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                     <div className="lg:col-span-2 space-y-4">
                         {/* Message Composer */}
                         <Card className="overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
-                            <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+                            <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 py-4">
                                 <CardTitle className="flex items-center gap-2">
                                     <Mail className="h-5 w-5 text-purple-600" />
                                     Compose Message
@@ -399,7 +399,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                         
                                         <div className="relative">
                                             <Textarea
-                                                placeholder="Type your message here... 📱"
+                                                placeholder="Type your message here..."
                                                 value={data.message}
                                                 onChange={handleMessageChange}
                                                 rows={8}
