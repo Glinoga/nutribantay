@@ -5,7 +5,7 @@ import { readExcel } from '@/utils/excel';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { FileSpreadsheet, Upload, X } from 'lucide-react';
 import { useState } from 'react';
-import { displayPhoneNumber } from '@/lib/phoneUtils';
+import toast from 'react-hot-toast'; // ✅ Import your working toast
 
 type Child = {
     id: number;
@@ -41,10 +41,7 @@ type IndexProps = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Children Records',
-        href: '/children',
-    },
+  { title: 'Children Records', href: '/children' },
 ];
 
 type AuthProps = {
@@ -140,6 +137,28 @@ export default function Index({ children, pagination, search = '', flash }: Inde
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Children Records" />
+interface Props {
+  children: Child[];
+}
+
+export default function Index({ children }: Props) {
+  const handleDelete = (id: number) => {
+    if (confirm('Are you sure you want to delete this child profile?')) {
+      router.delete(`/children/${id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success('🗑️ Child record deleted successfully!');
+        },
+        onError: () => {
+          toast.error('❌ Failed to delete record. Please try again.');
+        },
+      });
+    }
+  };
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Children Records" />
 
             {/* HEADER */}
             <div className="m-4 mb-4 flex items-center justify-between">
