@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AppLayout from "@/layouts/app-layout";
-import { Head, useForm, usePage, router } from "@inertiajs/react";
-import { SharedData } from "@/types";
+import { Head, useForm, router } from "@inertiajs/react";
+import { Toaster, toast } from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
@@ -19,24 +19,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { OctagonAlert } from "lucide-react";
-import toast from "react-hot-toast"; 
 
-export default function ChildrenCreate() {
-  const { auth } = usePage<SharedData>().props;
+interface Child {
+  id: number;
+  name: string;
+  sex: string;
+  age: number;
+  weight?: number;
+  height?: number;
+  barangay?: string;
+}
+
+interface Props {
+  child: Child;
+}
+
+export default function Edit({ child }: Props) {
   const [showModal, setShowModal] = useState(true);
 
-  const { data, setData, post, processing, errors, reset } = useForm({
-    name: "",
-    sex: "Male",
-    age: "",
-    weight: "",
-    height: "",
-    barangay: typeof auth.user?.barangay === "string" ? auth.user.barangay : "",
+  const { data, setData, put, processing, errors } = useForm({
+    name: child.name || "",
+    sex: child.sex || "Male",
+    age: String(child.age || ""),
+    weight: String(child.weight ?? ""),
+    height: String(child.height ?? ""),
+    barangay: child.barangay ?? "",
   });
+
+  const greenPalette = "#355e3b";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
 
     if (Number(data.weight) > 200) {
       toast.error("Weight cannot exceed 200 kg");
@@ -47,14 +60,14 @@ export default function ChildrenCreate() {
       return;
     }
 
-    post("/children", {
+    put(`/children/${child.id}`, {
+      preserveScroll: true,
       onSuccess: () => {
-        toast.success("Child successfully registered!");
-        reset();
+        toast.success("✅ Child record updated successfully!");
         router.visit("/children");
       },
       onError: () => {
-        toast.error("Failed to register child. Please check your inputs.");
+        toast.error("❌ Failed to update record. Please try again.");
       },
     });
   };
@@ -63,11 +76,10 @@ export default function ChildrenCreate() {
     router.visit("/children");
   };
 
-  const greenPalette = "#355e3b";
-
   return (
     <AppLayout>
-      <Head title="Add Child" />
+      <Head title="Edit Child Record" />
+      <Toaster position="top-right" reverseOrder={false} />
 
       <Dialog
         open={showModal}
@@ -88,11 +100,11 @@ export default function ChildrenCreate() {
               className="text-center w-full text-3xl font-extrabold mb-6"
               style={{ color: greenPalette }}
             >
-              Register New Child
+              Edit Child Record
             </DialogTitle>
           </DialogHeader>
 
-          {/* ⚠️ Validation Errors */}
+          
           {Object.keys(errors).length > 0 && (
             <div className="mb-4 p-4 border border-red-600 bg-red-100 text-red-700 rounded">
               <div className="list-none list-inside">
@@ -107,7 +119,7 @@ export default function ChildrenCreate() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full Name */}
+        
             <div
               className="p-4 border rounded-lg bg-green-50"
               style={{ borderColor: greenPalette }}
@@ -125,7 +137,7 @@ export default function ChildrenCreate() {
               />
             </div>
 
-            {/* Sex & Barangay */}
+          
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
                 className="border rounded-lg p-4 bg-green-50"
@@ -164,7 +176,7 @@ export default function ChildrenCreate() {
                 </Label>
                 <Input
                   type="text"
-                  value={data.barangay ?? ""}
+                  value={data.barangay}
                   readOnly
                   className="w-full bg-gray-100 text-gray-600 cursor-not-allowed rounded-lg text-sm font-bold"
                   style={{ borderColor: greenPalette }}
@@ -172,7 +184,6 @@ export default function ChildrenCreate() {
               </div>
             </div>
 
-            {/* Age */}
             <div
               className="p-4 border rounded-lg bg-green-50"
               style={{ borderColor: greenPalette }}
@@ -190,7 +201,7 @@ export default function ChildrenCreate() {
               />
             </div>
 
-            {/* Weight & Height */}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
                 className="border rounded-lg p-4 bg-green-50"
@@ -229,7 +240,7 @@ export default function ChildrenCreate() {
               </div>
             </div>
 
-            {/* Buttons */}
+           
             <div className="flex justify-center gap-6 pt-6 border-t mt-6">
               <Button
                 type="submit"
@@ -240,7 +251,7 @@ export default function ChildrenCreate() {
                   boxShadow: `0 4px 10px ${greenPalette}80`,
                 }}
               >
-                {processing ? "Saving..." : "Save"}
+                {processing ? "Saving..." : "Save Changes"}
               </Button>
               <Button
                 type="button"

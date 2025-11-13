@@ -13,7 +13,7 @@ class ChildController extends Controller
         $user = auth()->user();
 
         $children = Child::with('creator')
-            ->where('barangay', $user->barangay) // only children in user's barangay
+            ->where('barangay', $user->barangay)
             ->get();
 
         return Inertia::render('Children/Index', [
@@ -25,8 +25,7 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
-                'contact_number' => $child->contact_number,
-                'created_by' => $child->creator?->name, // correctly get creator's name
+                'created_by' => $child->creator?->name,
                 'barangay' => $child->barangay,
             ]),
         ]);
@@ -63,12 +62,50 @@ class ChildController extends Controller
             'age'        => $request->age,
             'weight'     => $request->weight,
             'height'     => $request->height,
-            'created_by' => $user->id, // or $user->id if your DB expects integer
-            'barangay'   => $user->barangay, // inherit from creator
-            'contact_number' => $contactNumber,
+            'created_by' => $user->id,
+            'barangay'   => $user->barangay,
         ]);
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');
     }
+
+    public function edit($id)
+    {
+        $child = Child::findOrFail($id);
+
+        return Inertia::render('Children/Edit', [
+            'child' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'sex' => $child->sex,
+                'age' => $child->age,
+                'weight' => $child->weight,
+                'height' => $child->height,
+            ]
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'sex' => 'required|in:Male,Female',
+            'age' => 'required|integer|min:0',
+            'weight' => 'nullable|numeric|min:0|max:200',
+            'height' => 'nullable|numeric|min:0|max:250',
+        ]);
+
+        $child = Child::findOrFail($id);
+        $child->update($request->only(['name', 'sex', 'age', 'weight', 'height']));
+
+        return redirect()->route('children.index')->with('success', 'Child updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $child = Child::findOrFail($id);
+        $child->delete();
+
+        return redirect()->route('children.index')->with('success', 'Child deleted successfully!');
+    }
 }
-    
