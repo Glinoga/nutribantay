@@ -129,7 +129,7 @@ class ChildController extends Controller
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
-            'contact_number' => 'nullable|string|max:50',
+            
         ]);
 
         $user = auth()->user();
