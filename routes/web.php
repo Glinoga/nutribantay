@@ -8,6 +8,7 @@ use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\StockController;
 
 Route::get('/', fn() => Inertia::render('home'))->name('home');
 Route::get('/announcements', fn() => Inertia::render('announcements'))->name('announcements');
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/healthlog/{id}', [HealthlogController::class, 'show'])->name('healthlog.show');
         Route::delete('/healthlog/{id}', [HealthlogController::class, 'destroy'])->name('healthlog.destroy');
         Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
+        Route::resource('stocks', StockController::class)->except(['show']);
+Route::get('/api/stocks-for-barangay', [StockController::class, 'apiListForBarangay'])->name('stocks.api.forBarangay');
         Route::resource('healthlogs', HealthlogController::class);
     });
 });

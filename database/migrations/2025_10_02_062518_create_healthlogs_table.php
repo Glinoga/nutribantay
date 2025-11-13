@@ -46,8 +46,8 @@ return new class extends Migration
             $table->date('next_due_date')->nullable();
             $table->string('vaccine_status')->nullable();
 
-            $table->text('recommendation')->nullable();
             $table->timestamps();
+            $table->text('recommendation')->nullable();
         });
     }
 
