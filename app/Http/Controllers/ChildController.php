@@ -57,13 +57,14 @@ class ChildController extends Controller
         }
 
         Child::create([
-            'name'       => $request->name,
-            'sex'        => $request->sex,
-            'age'        => $request->age,
-            'weight'     => $request->weight,
-            'height'     => $request->height,
-            'created_by' => $user->id,
-            'barangay'   => $user->barangay,
+            'name'           => $request->name,
+            'sex'            => $request->sex,
+            'age'            => $request->age,
+            'weight'         => $request->weight,
+            'height'         => $request->height,
+            'contact_number' => $contactNumber,
+            'created_by'     => $user->id,
+            'barangay'       => $user->barangay,
         ]);
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');

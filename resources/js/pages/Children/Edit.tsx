@@ -63,11 +63,11 @@ export default function Edit({ child }: Props) {
     put(`/children/${child.id}`, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success("✅ Child record updated successfully!");
+        toast.success("Child record updated successfully!");
         router.visit("/children");
       },
       onError: () => {
-        toast.error("❌ Failed to update record. Please try again.");
+        toast.error("Failed to update record. Please try again.");
       },
     });
   };
