@@ -14,64 +14,122 @@ class RecommendationController extends Controller
     {
         $apiKey = config('openai.api_key');
 
-        // ✅ Step 1: Fetch child details
+        // Step 1: Fetch child
         $child = Child::find($request->child_id);
 
-        if (!$child) {
-            return response()->json(['recommendation' => '❌ Child not found.']);
+        if (!$child || !$child->birthdate) {
+            return response()->json(['recommendation' => '❌ Child data incomplete.']);
         }
 
-        // ✅ Step 2: Calculate age in months and days
-        $ageInDays = Carbon::parse($child->birthdate)->diffInDays(Carbon::now());
-        $months = floor($ageInDays / 30.44);
-        $days = $ageInDays % 30;
+        // Step 2: Calculate age in months and days
+        $birthdate = Carbon::parse($child->birthdate);
+$now = Carbon::now();
 
-        // ✅ Step 3: Fetch available stocks for the child's barangay
-        $stocks = Stock::where('barangay', $child->barangay)->get(['item_name']);
+// Calculate exact difference in years, months, and days
+$birthdate = Carbon::parse($child->birthdate);
+$now = Carbon::now();
 
-        $stockList = $stocks->isEmpty()
-    ? 'No available health supplies in the barangay.'
-    : $stocks->map(fn($s) => "{$s->item_name}")->join(', ');
+// Exact difference in years, months, and days
+$years = $birthdate->diffInYears($now);
+$months = $birthdate->copy()->addYears($years)->diffInMonths($now);
+$days = $birthdate->copy()->addYears($years)->addMonths($months)->diffInDays($now);
 
-        // ✅ Step 4: Prepare AI prompt
+// Human-readable format for AI prompt
+$ageFormatted = "{$years} year(s), {$months} month(s), and {$days} day(s)";
+
+
+
+        // Step 3: BMI and nutrition status defaults
+        $bmiText = $request->bmi ?? 'Hindi available';
+        $nutritionStatus = $request->nutrition_status ?? 'Normal';
+
+        // Step 4: Fetch stocks for the child’s barangay
+        // Fetch stocks for the child’s barangay
+$stocks = Stock::where('barangay', $child->barangay)->get(['item_name']);
+$stockList = $stocks->isEmpty()
+    ? 'Walang available health supplies sa barangay.'
+    : $stocks->pluck('item_name')->join(', ');
+
+        // Step 6: AI prompt with strict instructions
         $prompt = "
-            Ikaw ay isang AI assistant para sa mga barangay health workers sa Pilipinas. Layunin mo ay magbigay ng **praktikal, abot-kaya, at madaling gawin na rekomendasyon** para sa bata mula sa pamilyang may limitadong budget. Gamitin ang casual, normal na Tagalog na madaling maintindihan ng karaniwang magulang. Huwag lalampas sa 400 tokens. Huwag putulin ang mga pangungusap. Tapusin ang bawat ideya nang buo at malinaw. Ibigay ang sagot bilang 5–6 malinaw at kumpletong puntos, bawat isa ay kumpleto ang pangungusap.
+Ikaw ay isang AI nutrition assistant para sa mga barangay health workers sa Pilipinas.
+Sagutin sa casual at madaling maintindihan na Tagalog. Huwag lalampas sa 500 tokens.
+Magbigay ng 5 nutrition-based tips para sa bata, pagkatapos ay magbigay ng simpleng meal plan para sa isang araw. 
+Gamitin ang mga available health supplies sa barangay para sa practical na payo. 
+Ilagay ang food restrictions o allergy warnings sa dulo. Huwag mag-imbento o manghula; gamitin lamang ang ibinigay na detalye.
 
-            IMPORMASYON NG BATA:
-            - Edad: {$months} buwan at {$days} araw
-            - Kasarian: {$child->sex}
-            - BMI: {$request->bmi}
-            - Nutrition Status: {$request->nutrition_status}
-            - Barangay: {$child->barangay}
-            - Available health supplies: {$stockList}
+FEEDING RULES (STRICT – Huwag lalampas sa output):
+- 0–5 months: Gatas lamang (exclusive breastfeeding). Huwag magbigay ng solid food o complementary feeding.
+- 6–11 months: Breastfeeding + complementary feeding (malalambot na pagkain) puwede.
+- 12 months pataas: Regular solid foods na angkop sa edad.
+PAALALA: Huwag gamitin ang terminolohiyang “Milk Formula” o “Formula Milk.”
 
-            GABAY:
-            1. Batay sa BMI at nutrition status, magbigay ng simple at direktang payo kung kulang sa timbang, normal, o sobra sa timbang.
-            2. Magbigay ng **unique at realistic na ideya** na maaaring hindi agad maiisip ng healthworker.
-            3. Isama ang **dietary, lifestyle, o local resource-based solutions** gamit ang murang, lokal na pagkain o resources.
-            4. Magbigay ng maliit na hacks o tips na puwede sa bahay.
-            5. Gamitin ang **available barangay stocks** sa rekomendasyon, kung posible.
-            6. Sagutin nang malinaw, madaling maintindihan, at casual ang tono.
-            ";
+IMPORMASYON NG BATA:
+- Edad: {$ageFormatted}
+- Petsa ng kapanganakan: {$child->birthdate}
+- Kasarian: {$child->sex}
+- BMI: {$bmiText}
+- Nutrition Status: {$nutritionStatus}
+- Available health supplies sa barangay: {$stockList}
+
+INSTRUCTIONS:
+1. Magbigay ng 3–4 malinaw, maiksi, at praktikal na nutrition tips batay sa edad, BMI, at nutrition status.
+2. Sundin ang tamang feeding rules base sa edad ng bata. 
+   - Kung bata ay 0–5 months, ang meal plan ay **gatas lamang**. Huwag magbigay ng anumang solid food o complementary feeding.
+   - Kung bata ay 6–11 months, puwede nang magdagdag ng malalambot na pagkain (lugaw, mashed fruits/vegetables) kasama ng breastfeeding.
+   - Kung bata ay 12 months pataas, puwede na ang regular solid foods na angkop sa edad.
+3. Gumawa ng simpleng meal plan para sa isang araw sa linear format (hal. Umaga: ..., Tanghali: ..., Gabi: ...). Huwag gamitin ang pangalan ng bata sa meal plan.
+4. Isama ang anumang vitamins o milk na available sa barangay kung akma.
+5. Ilagay ang food restrictions o allergy warnings sa dulo.
+6. Sagutin sa Tagalog at plain text lamang. Walang HTML, walang bold, walang **.
+7. Tapusin ang sagot sa disclaimer na ito:
+   Kumunsulta sa pinakamalapit na health center sa lugar nila upang ma-counsel kayo ng isang nutrition/health worker.
+8. Pagkatapos ng disclaimer, ilahad muli ang mga detalye ng bata para sa reference. Ang edad ay dapat walang decimal point. Kung ang edad ay nakadepende sa buwan, ilagay kung ilang buwan na ang bata.
+
+FORMAT:
+- Gumamit ng line breaks sa pagitan ng sections.
+- Tips dapat naka numbered list.
+- Meal plan dapat naka linear (Umaga: ..., Tanghali: ..., Gabi: ...).
+- Food restrictions sa dulo bago ang disclaimer.
+";
 
 
-        // ✅ Step 5: Send to GPT
+
+
+
+        // Step 7: Send to AI
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$apiKey}",
             'Content-Type' => 'application/json',
         ])->post('https://api.openai.com/v1/chat/completions', [
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => 'Ikaw ay isang AI nutrition assistant para sa mga barangay health workers sa Pilipinas. Sagutin sa casual, madaling maintindihan na Tagalog.'],
+                ['role' => 'system', 'content' => 'Ikaw ay isang AI nutrition assistant.'],
                 ['role' => 'user', 'content' => $prompt],
             ],
-            'max_tokens' => 600,
+            'max_tokens' => 500,
+            'temperature' => 0.7,
         ]);
 
-        $aiMessage = $response->json('choices.0.message.content') ?? '⚠️ No response from AI.';
+        // Step 8: Fallback if AI fails
+        if (!$response->successful()) {
+            \Log::error('AI request failed', ['response' => $response->body()]);
+            $recommendation = \App\Helpers\AIRecommender::getRecommendation(
+                $nutritionStatus,
+                $child->sex,
+                $months,
+                $request->bmi ?? 0
+            );
+        } else {
+            $recommendation = $response->json('choices.0.message.content') ?? 
+                              \App\Helpers\AIRecommender::getRecommendation(
+                                  $nutritionStatus,
+                                  $child->sex,
+                                  $months,
+                                  $request->bmi ?? 0
+                              );
+        }
 
-        return response()->json([
-            'recommendation' => trim($aiMessage),
-        ]);
+        return response()->json(['recommendation' => trim($recommendation)]);
     }
 }
