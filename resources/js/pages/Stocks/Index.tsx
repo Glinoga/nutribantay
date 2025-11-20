@@ -7,9 +7,6 @@ type Stock = {
     barangay: string;
     item_name: string;
     category: string;
-    quantity: number;
-    unit?: string | null;
-    expiry_date?: string | null;
 };
 
 export default function Index({ stocks }: { stocks: Stock[] }) {
@@ -41,8 +38,6 @@ export default function Index({ stocks }: { stocks: Stock[] }) {
                         <tr>
                             <th className="border px-3 py-2 text-left">Item</th>
                             <th className="border px-3 py-2 text-left">Category</th>
-                            <th className="border px-3 py-2 text-left">Quantity</th>
-                            <th className="border px-3 py-2 text-left">Expiry</th>
                             <th className="border px-3 py-2 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -51,10 +46,6 @@ export default function Index({ stocks }: { stocks: Stock[] }) {
                             <tr key={s.id} className="hover:bg-gray-100">
                                 <td className="border px-3 py-2">{s.item_name}</td>
                                 <td className="border px-3 py-2">{s.category}</td>
-                                <td className="border px-3 py-2">
-                                    {s.quantity} {s.unit ?? ''}
-                                </td>
-                                <td className="border px-3 py-2">{s.expiry_date ? new Date(s.expiry_date).toLocaleDateString() : '—'}</td>
                                 <td className="border px-3 py-2">
                                     <Link href={`/stocks/${s.id}/edit`} className="mr-2 rounded bg-green-600 px-2 py-1 text-white">
                                         Edit

@@ -27,11 +27,11 @@ class RecommendationController extends Controller
         $days = $ageInDays % 30;
 
         // ✅ Step 3: Fetch available stocks for the child's barangay
-        $stocks = Stock::where('barangay', $child->barangay)->get(['item_name', 'quantity']);
+        $stocks = Stock::where('barangay', $child->barangay)->get(['item_name']);
 
         $stockList = $stocks->isEmpty()
     ? 'No available health supplies in the barangay.'
-    : $stocks->map(fn($s) => "{$s->item_name} ({$s->quantity})")->join(', ');
+    : $stocks->map(fn($s) => "{$s->item_name}")->join(', ');
 
         // ✅ Step 4: Prepare AI prompt
         $prompt = "

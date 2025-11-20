@@ -12,9 +12,6 @@ return new class extends Migration {
             $table->string('barangay')->index(); // which barangay this stock belongs to
             $table->string('item_name');         // e.g. "Vitamin A", "Lugaw"
             $table->enum('category', ['food','vitamin','medicine','other'])->default('food');
-            $table->integer('quantity')->default(0);
-            $table->string('unit')->nullable();   // e.g. "pcs", "bottles", "kg"
-            $table->date('expiry_date')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });

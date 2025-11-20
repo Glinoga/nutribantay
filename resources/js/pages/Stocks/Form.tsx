@@ -8,9 +8,6 @@ type Stock = {
     barangay?: string;
     item_name?: string;
     category?: string;
-    quantity?: number | null;
-    unit?: string | null;
-    expiry_date?: string | null;
 };
 
 export default function Form({ stock }: { stock: Stock | null }) {
@@ -18,9 +15,6 @@ export default function Form({ stock }: { stock: Stock | null }) {
         barangay: stock?.barangay ?? '',
         item_name: stock?.item_name ?? '',
         category: stock?.category ?? 'food',
-        quantity: stock?.quantity ?? 0,
-        unit: stock?.unit ?? '',
-        expiry_date: stock?.expiry_date ?? '',
     });
 
     const handleSubmit = async (e: any) => {
@@ -75,35 +69,6 @@ export default function Form({ stock }: { stock: Stock | null }) {
                             <option value="medicine">Medicine</option>
                             <option value="other">Other</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium">Quantity</label>
-                        <input
-                            type="number"
-                            value={form.quantity}
-                            onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })}
-                            className="w-full rounded border px-3 py-2"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium">Unit (optional)</label>
-                        <input
-                            value={form.unit}
-                            onChange={(e) => setForm({ ...form, unit: e.target.value })}
-                            className="w-full rounded border px-3 py-2"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium">Expiry Date (optional)</label>
-                        <input
-                            type="date"
-                            value={form.expiry_date ?? ''}
-                            onChange={(e) => setForm({ ...form, expiry_date: e.target.value })}
-                            className="w-full rounded border px-3 py-2"
-                        />
                     </div>
 
                     <div className="flex items-center gap-3">

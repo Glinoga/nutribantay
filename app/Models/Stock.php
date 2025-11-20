@@ -13,14 +13,7 @@ class Stock extends Model
         'barangay',
         'item_name',
         'category',
-        'quantity',
-        'unit',
-        'expiry_date',
         'created_by',
-    ];
-
-    protected $casts = [
-        'expiry_date' => 'date',
     ];
 
     public function creator()

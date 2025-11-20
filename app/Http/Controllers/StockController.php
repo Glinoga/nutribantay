@@ -47,9 +47,6 @@ class StockController extends Controller
             'barangay' => 'required|string|max:255',
             'item_name' => 'required|string|max:255',
             'category' => 'required|in:food,vitamin,medicine,other',
-            'quantity' => 'required|integer|min:0',
-            'unit' => 'nullable|string|max:50',
-            'expiry_date' => 'nullable|date',
         ]);
 
         $data['created_by'] = auth()->id();
@@ -89,9 +86,6 @@ class StockController extends Controller
             'barangay' => 'required|string|max:255',
             'item_name' => 'required|string|max:255',
             'category' => 'required|in:food,vitamin,medicine,other',
-            'quantity' => 'required|integer|min:0',
-            'unit' => 'nullable|string|max:50',
-            'expiry_date' => 'nullable|date',
         ]);
 
         $stock->update($data);
@@ -117,7 +111,6 @@ class StockController extends Controller
         $barangay = $request->input('barangay', $user->barangay ?? null);
 
         $items = Stock::where('barangay', $barangay)
-            ->where('quantity', '>', 0)
             ->orderBy('item_name')
             ->pluck('item_name');
 
