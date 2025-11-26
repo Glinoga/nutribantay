@@ -85,6 +85,7 @@ INSTRUCTIONS:
 7. Tapusin ang sagot sa disclaimer na ito:
    Kumunsulta sa pinakamalapit na health center sa lugar nila upang ma-counsel kayo ng isang nutrition/health worker.
 8. Pagkatapos ng disclaimer, ilahad muli ang mga detalye ng bata para sa reference. Ang edad ay dapat walang decimal point. Kung ang edad ay nakadepende sa buwan, ilagay kung ilang buwan na ang bata.
+9. Pagkatapos ng disclaimer, maglagay ng maikling ‘Pinaghugutan ng Datos’ section na nagsasaad lamang ng mga impormasyong ibinigay sa prompt (edad, BMI, nutrition status, kasarian, feeding rules, at stock list). Huwag maglagay ng external sources o medical citations. Ilahad lang kung aling input data ang ginamit bilang basehan ng rekomendasyon. Gamitin lamang ang formatted age ({$ageFormatted}). Huwag ilahad ang raw age values (decimals)
 
 FORMAT:
 - Gumamit ng line breaks sa pagitan ng sections.
