@@ -9,6 +9,8 @@ use App\Http\Controllers\ChildController;
 use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\HomeController;
 
 Route::get('/', fn() => Inertia::render('home'))->name('home');
 Route::get('/announcements', fn() => Inertia::render('announcements'))->name('announcements');
@@ -28,6 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);
+        Route::get('/maintenance/status', [SystemController::class, 'status']);
+        Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
     });

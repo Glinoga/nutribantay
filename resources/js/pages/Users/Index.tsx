@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type User = {
     id: number;
@@ -34,6 +34,28 @@ export default function Index({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [loading, setLoading] = useState(false);
 
+    // Maintenance mode state
+    const [maintenance, setMaintenance] = useState(false);
+
+    useEffect(() => {
+        // Fetch current maintenance mode on load
+        axios
+            .get('/maintenance/status')
+            .then((res) => setMaintenance(res.data.status))
+            .catch((err) => console.error('Failed to fetch maintenance status', err));
+    }, []);
+
+    const toggleMaintenance = async () => {
+        try {
+            const res = await axios.post('/maintenance/toggle', { status: !maintenance });
+            setMaintenance(res.data.status);
+            alert(`Maintenance mode ${res.data.status ? 'enabled' : 'disabled'}`);
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update maintenance mode');
+        }
+    };
+
     const generateAdminCodes = async () => {
         try {
             setLoading(true);
@@ -57,6 +79,7 @@ export default function Index({ users, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
+            {/* Header */}
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex space-x-2">
@@ -69,7 +92,14 @@ export default function Index({ users, filters }: Props) {
                 </div>
             </div>
 
-            {/* 🔹 Search Bar */}
+            {/* Maintenance Toggle */}
+            <div className="m-4">
+                <button onClick={toggleMaintenance} className={`rounded px-4 py-2 ${maintenance ? 'bg-red-600' : 'bg-green-600'} text-white`}>
+                    {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
+                </button>
+            </div>
+
+            {/* Search Bar */}
             <form onSubmit={handleSearch} className="m-4 flex items-center space-x-2">
                 <input
                     type="text"
@@ -83,7 +113,7 @@ export default function Index({ users, filters }: Props) {
                 </button>
             </form>
 
-            {/* 🔹 Admin Codes Section */}
+            {/* Admin Codes Section */}
             <div className="m-4 mb-6 rounded border p-4">
                 <h2 className="mb-2 text-lg font-semibold">Admin Codes</h2>
                 <div className="mb-3 flex items-center space-x-2">
@@ -125,7 +155,7 @@ export default function Index({ users, filters }: Props) {
                 )}
             </div>
 
-            {/* 🔹 Users Table */}
+            {/* Users Table */}
             <table className="min-w-full overflow-hidden rounded border">
                 <thead className="bg-gray-50">
                     <tr>

@@ -11,9 +11,10 @@ import { LoaderCircle } from 'lucide-react';
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    isMaintenanceMode?: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status, canResetPassword, isMaintenanceMode }: LoginProps) {
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
             <Head title="Log in" />
@@ -34,6 +35,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {/* Right Panel */}
                 <div className="flex w-1/2 flex-col justify-center bg-[#E8F8F8] p-12">
                     <h2 className="mb-6 text-2xl font-bold">Log In</h2>
+
+                    {/* Maintenance Mode Banner */}
+                    {isMaintenanceMode && (
+                        <div className="mb-4 rounded border-l-4 border-yellow-500 bg-yellow-100 p-4 text-yellow-800">
+                            ⚠️ The system is currently in maintenance mode. Only admins can log in.
+                        </div>
+                    )}
 
                     <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
                         {({ processing, errors }) => (

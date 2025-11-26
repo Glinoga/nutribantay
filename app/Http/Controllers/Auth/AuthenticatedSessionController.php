@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Setting;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -18,9 +19,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): Response
     {
+        $isMaintenanceMode = Setting::get('maintenance_mode', '0') === '1';
+
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
+             'isMaintenanceMode' => $isMaintenanceMode,
         ]);
     }
 
