@@ -4,17 +4,18 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 
 type Child = {
   id: number;
-  name: string;
+  fullname: string;
+  first_name: string;
+  middle_initial?: string | null;
+  last_name: string;
   sex: string;
   age: number | null;
-  birthdate?: string | null;
-  barangay?: string | null;
   weight?: number | null;
   height?: number | null;
   address?: string | null;
   contact_number?: string | null;
-  created_by?: number;
-  creator?: { name: string }; // ✅ if you load relationship in controller
+  barangay?: string | null;
+  creator?: { name: string | null };
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,25 +25,19 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-interface Props {
-  children: Child[];
-}
-
 type AuthProps = {
   auth?: {
-    user?: { id: number; name: string; email: string };
+    user?: { id: number; name: string; email: string; barangay?: string };
     roles?: string[];
   };
 };
 
-export default function Index({ children }: Props) {
+export default function Index({ children }: { children: Child[] }) {
   const { auth } = usePage<AuthProps>().props;
 
-  const isHealthworker = (auth?.roles ?? []).some(
-    (r) => r.toLowerCase() === 'healthworker'
-  );
-
-  const canManageChildren = isHealthworker;
+  const roles = auth?.roles ?? [];
+  const isHealthworker = roles.includes('Healthworker');
+  const canManageChildren = isHealthworker; // Healthworker only
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -66,7 +61,7 @@ export default function Index({ children }: Props) {
           <thead className="bg-gray-50">
             <tr>
               <th className="border px-4 py-2 text-left">ID</th>
-              <th className="border px-4 py-2 text-left">Name</th>
+              <th className="border px-4 py-2 text-left">Full Name</th>
               <th className="border px-4 py-2 text-left">Sex</th>
               <th className="border px-4 py-2 text-left">Age</th>
               <th className="border px-4 py-2 text-left">Weight (kg)</th>
@@ -77,20 +72,26 @@ export default function Index({ children }: Props) {
               <th className="border px-4 py-2 text-left">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {children.map((child) => (
               <tr key={child.id} className="hover:bg-gray-100">
                 <td className="border px-4 py-2">{child.id}</td>
-                <td className="border px-4 py-2">{child.name}</td>
+
+                {/* Full name from backend accessor */}
+                <td className="border px-4 py-2">{child.fullname}</td>
+
                 <td className="border px-4 py-2">{child.sex}</td>
                 <td className="border px-4 py-2">{child.age ?? '-'}</td>
                 <td className="border px-4 py-2">{child.weight ?? '-'}</td>
                 <td className="border px-4 py-2">{child.height ?? '-'}</td>
                 <td className="border px-4 py-2">{child.address ?? '-'}</td>
                 <td className="border px-4 py-2">{child.contact_number ?? '-'}</td>
+
                 <td className="border px-4 py-2">
                   {child.creator?.name ?? 'N/A'}
                 </td>
+
                 <td className="border px-4 py-2">
                   <Link
                     href={`/children/${child.id}`}
@@ -103,15 +104,14 @@ export default function Index({ children }: Props) {
                     <>
                       <Link
                         href={`/children/${child.id}/edit`}
-                        className="mr-2 rounded bg-green-500 px-3 py-1 text-white transition hover:bg-green-600"
+                        className="mr-2 rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600"
                       >
                         Edit
                       </Link>
+
                       <button
                         onClick={() => {
-                          if (
-                            confirm('Are you sure you want to delete this child profile?')
-                          ) {
+                          if (confirm('Delete child profile?')) {
                             router.delete(`/children/${child.id}`);
                           }
                         }}

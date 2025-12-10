@@ -2,6 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User',

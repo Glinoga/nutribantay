@@ -1,47 +1,39 @@
-import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, usePage, Link } from '@inertiajs/react';
-import { useEffect } from 'react';
-import { SharedData } from '@/types';
+import AppLayout from "@/layouts/app-layout";
+import { Head, useForm, Link } from "@inertiajs/react";
+import { useEffect } from "react";
 
-export default function Edit() {
-  const { healthlog, children } = usePage<SharedData & { healthlog: any; children: any[] }>().props;
-
+export default function Edit({ healthlog, children }: any) {
   const { data, setData, put, processing, errors } = useForm({
-    child_id: healthlog.child_id || '',
-    weight: healthlog.weight || '',
-    height: healthlog.height || '',
-    bmi: healthlog.bmi || '',
-    zscore_wfa: healthlog.zscore_wfa || '',
-    zscore_lfa: healthlog.zscore_lfa || '',
-    zscore_wfh: healthlog.zscore_wfh || '',
-    nutrition_status: healthlog.nutrition_status || '',
-    micronutrient_powder: healthlog.micronutrient_powder || '',
-    ruf: healthlog.ruf || '',
-    rusf: healthlog.rusf || '',
-    complementary_food: healthlog.complementary_food || '',
-    vitamin_a: healthlog.vitamin_a || false,
-    deworming: healthlog.deworming || false,
-    vaccine_name: healthlog.vaccine_name || '',
-    dose_number: healthlog.dose_number || '',
-    date_given: healthlog.date_given || '',
-    next_due_date: healthlog.next_due_date || '',
-    vaccine_status: healthlog.vaccine_status || '',
+    child_id: healthlog.child_id ?? "",
+    weight: healthlog.weight ?? "",
+    height: healthlog.height ?? "",
+    bmi: healthlog.bmi ?? "",
+    nutrition_status: healthlog.nutrition_status ?? "",
+
+    micronutrient_powder: healthlog.micronutrient_powder ?? "",
+    ruf: healthlog.ruf ?? "",
+    rusf: healthlog.rusf ?? "",
+    complementary_food: healthlog.complementary_food ?? "",
+    vitamin_a: !!healthlog.vitamin_a,
+    deworming: !!healthlog.deworming,
+
+    vaccine_name: healthlog.vaccine_name ?? "",
+    dose_number: healthlog.dose_number ?? "",
+    date_given: healthlog.date_given ?? "",
+    next_due_date: healthlog.next_due_date ?? "",
+    vaccine_status: healthlog.vaccine_status ?? "",
   });
 
-  // 🔹 Auto compute BMI and nutrition status
+  // Auto-calc BMI
   useEffect(() => {
-    if (data.weight && data.height) {
-      const heightM = parseFloat(data.height) / 100;
-      const bmi = parseFloat(data.weight) / (heightM * heightM);
-      const roundedBMI = bmi ? bmi.toFixed(2) : '';
+    const w = parseFloat(data.weight);
+    const h = parseFloat(data.height);
 
-      setData('bmi', roundedBMI);
-
-      let status = '';
-      if (bmi < 14) status = 'Underweight';
-      else if (bmi >= 14 && bmi < 18) status = 'Normal';
-      else if (bmi >= 18) status = 'Overweight';
-      setData('nutrition_status', status);
+    if (w > 0 && h > 0) {
+      const bmiValue = w / Math.pow(h / 100, 2); // cm → meters
+      setData("bmi", bmiValue.toFixed(2));
+    } else {
+      setData("bmi", "");
     }
   }, [data.weight, data.height]);
 
@@ -58,58 +50,63 @@ export default function Edit() {
         <h1 className="text-xl font-bold mb-4">Edit Health Log</h1>
 
         <form onSubmit={submit} className="space-y-4 max-w-2xl">
-          {/* Child Dropdown */}
+          {/* CHILD SELECT */}
           <div>
-            <label className="block font-medium">Select Child</label>
+            <label className="block font-medium mb-1">Child</label>
             <select
-              name="child_id"
               value={data.child_id}
-              onChange={(e) => setData('child_id', e.target.value)}
+              onChange={(e) => setData("child_id", e.target.value)}
               className="w-full border px-3 py-2 rounded"
               required
             >
-              <option value="">-- Select a child --</option>
-              {children.map((child) => (
+              <option value="">-- Select Child --</option>
+
+              {children.map((child: any) => (
                 <option key={child.id} value={child.id}>
-                  {child.name} ({child.sex}) – {child.birthdate}
+                  {child.fullname} ({child.sex}) – {child.birthdate}
                 </option>
               ))}
             </select>
-            {errors.child_id && <div className="text-red-600">{errors.child_id}</div>}
+
+            {errors.child_id && (
+              <p className="text-red-600">{errors.child_id}</p>
+            )}
           </div>
 
-          {/* Measurements */}
+          {/* MEASUREMENTS */}
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block font-medium">Weight (kg)</label>
               <input
-                name="weight"
                 type="number"
                 step="0.01"
                 value={data.weight}
-                onChange={(e) => setData('weight', e.target.value)}
+                onChange={(e) => setData("weight", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
+              {errors.weight && (
+                <p className="text-red-600">{errors.weight}</p>
+              )}
             </div>
 
             <div>
               <label className="block font-medium">Height (cm)</label>
               <input
-                name="height"
                 type="number"
                 step="0.01"
                 value={data.height}
-                onChange={(e) => setData('height', e.target.value)}
+                onChange={(e) => setData("height", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
+              {errors.height && (
+                <p className="text-red-600">{errors.height}</p>
+              )}
             </div>
 
             <div>
               <label className="block font-medium">BMI</label>
               <input
-                name="bmi"
-                type="number"
-                step="0.01"
+                type="text"
                 value={data.bmi}
                 readOnly
                 className="w-full border px-3 py-2 rounded bg-gray-100"
@@ -117,25 +114,25 @@ export default function Edit() {
             </div>
           </div>
 
-          {/* Nutrition Status */}
+          {/* NUTRITION STATUS */}
           <div>
             <label className="block font-medium">Nutrition Status</label>
             <input
-              name="nutrition_status"
               value={data.nutrition_status}
               readOnly
               className="w-full border px-3 py-2 rounded bg-gray-100"
             />
           </div>
 
-          {/* Supplementary Programs */}
+          {/* SUPPLEMENTARY PROGRAMS */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block font-medium">Micronutrient Powder</label>
               <input
-                name="micronutrient_powder"
                 value={data.micronutrient_powder}
-                onChange={(e) => setData('micronutrient_powder', e.target.value)}
+                onChange={(e) =>
+                  setData("micronutrient_powder", e.target.value)
+                }
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
@@ -143,9 +140,10 @@ export default function Edit() {
             <div>
               <label className="block font-medium">Complementary Food</label>
               <input
-                name="complementary_food"
                 value={data.complementary_food}
-                onChange={(e) => setData('complementary_food', e.target.value)}
+                onChange={(e) =>
+                  setData("complementary_food", e.target.value)
+                }
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
@@ -153,102 +151,97 @@ export default function Edit() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-medium">RUF (Ready-to-Use Food)</label>
+              <label className="block font-medium">RUF</label>
               <input
-                name="ruf"
                 value={data.ruf}
-                onChange={(e) => setData('ruf', e.target.value)}
+                onChange={(e) => setData("ruf", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
 
             <div>
-              <label className="block font-medium">RUSF (Ready-to-Use Supplementary Food)</label>
+              <label className="block font-medium">RUSF</label>
               <input
-                name="rusf"
                 value={data.rusf}
-                onChange={(e) => setData('rusf', e.target.value)}
+                onChange={(e) => setData("rusf", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
           </div>
 
-          {/* Vitamin A & Deworming */}
-          <div className="flex items-center gap-4">
+          {/* CHECKBOXES */}
+          <div className="flex gap-6 mt-2">
             <label>
               <input
                 type="checkbox"
-                name="vitamin_a"
                 checked={data.vitamin_a}
-                onChange={(e) => setData('vitamin_a', e.target.checked)}
-              />{' '}
+                onChange={(e) => setData("vitamin_a", e.target.checked)}
+              />{" "}
               Vitamin A
             </label>
+
             <label>
               <input
                 type="checkbox"
-                name="deworming"
                 checked={data.deworming}
-                onChange={(e) => setData('deworming', e.target.checked)}
-              />{' '}
+                onChange={(e) => setData("deworming", e.target.checked)}
+              />{" "}
               Deworming
             </label>
           </div>
 
-          {/* Vaccines */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* VACCINATION */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
               <label className="block font-medium">Vaccine Name</label>
               <input
-                name="vaccine_name"
                 value={data.vaccine_name}
-                onChange={(e) => setData('vaccine_name', e.target.value)}
+                onChange={(e) => setData("vaccine_name", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
+
             <div>
               <label className="block font-medium">Dose Number</label>
               <input
-                name="dose_number"
                 type="number"
                 value={data.dose_number}
-                onChange={(e) => setData('dose_number', e.target.value)}
+                onChange={(e) => setData("dose_number", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
               <label className="block font-medium">Date Given</label>
               <input
-                name="date_given"
                 type="date"
                 value={data.date_given}
-                onChange={(e) => setData('date_given', e.target.value)}
+                onChange={(e) => setData("date_given", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
+
             <div>
               <label className="block font-medium">Next Due Date</label>
               <input
-                name="next_due_date"
                 type="date"
                 value={data.next_due_date}
-                onChange={(e) => setData('next_due_date', e.target.value)}
+                onChange={(e) => setData("next_due_date", e.target.value)}
                 className="w-full border px-3 py-2 rounded"
               />
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-2 mt-4">
+          {/* BUTTONS */}
+          <div className="flex gap-2 mt-6">
             <button
               type="submit"
               disabled={processing}
               className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
             >
-              {processing ? 'Updating...' : 'Update'}
+              {processing ? "Updating..." : "Update"}
             </button>
 
             <Link

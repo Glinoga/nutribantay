@@ -3,60 +3,104 @@
 namespace App\Helpers;
 
 use Carbon\Carbon;
+use App\Models\GrowthStandard;
 
 class GrowthHelper
 {
+    /**
+     * BMI calculation
+     */
     public static function calculateBMI($weight, $height)
     {
-        if (empty($weight) || empty($height) || $height <= 0) {
+        if (!$weight || !$height || $height <= 0) {
             return null;
         }
 
-        $heightInMeters = $height / 100;
-        return round($weight / pow($heightInMeters, 2), 2);
+        return round($weight / pow($height / 100, 2), 2);
     }
 
-    public static function calculateZScores($sex, $birthdate, $weight, $height)
+    /**
+     * Convert birthdate to age in months
+     */
+    public static function calculateAgeInMonths($birthdate)
     {
-        if (empty($birthdate) || empty($weight) || empty($height)) {
-            return [
-                'wfa' => null,
-                'lfa' => null,
-                'wfh' => null,
-                'status' => 'Incomplete data',
-            ];
+        if (!$birthdate) {
+            return null;
         }
         
 
-        $ageMonths = Carbon::parse($birthdate)->diffInMonths(Carbon::now());
+        // FORCE INTEGER so DB lookup always matches
+        return intval(Carbon::parse($birthdate)->diffInMonths(Carbon::now()));
+    }
+
+    /**
+     * Main evaluation function
+     */
+    public static function evaluateChild($sex, $birthdate, $weight, $height)
+    {
+        $ageMonths = self::calculateAgeInMonths($birthdate);
         $bmi = self::calculateBMI($weight, $height);
 
-        if (is_null($bmi)) {
+        if ($ageMonths === null) {
             return [
-                'wfa' => null,
-                'lfa' => null,
-                'wfh' => null,
-                'status' => 'Invalid data',
+                'age_months' => null,
+                'bmi' => $bmi,
+                'status_wfa' => null,
+                'status_lfa' => null,
+                'status_wfl_wfh' => null,
+                'overall' => null,
             ];
         }
 
-        // Optional: separate thresholds for sex
-        $thresholds = ($sex === 'Female')
-            ? ['under' => 13.5, 'normal' => 17.5]
-            : ['under' => 14.0, 'normal' => 18.0];
+        $gender = strtolower($sex) === 'male' ? 'boy' : 'girl';
 
-        $status = 'Normal';
-        if ($bmi < $thresholds['under']) {
-            $status = 'Underweight';
-        } elseif ($bmi >= $thresholds['normal']) {
-            $status = 'Overweight';
-        }
+        // -------------------------------------------------------
+        // 1. WEIGHT-FOR-AGE (WFA)
+        // -------------------------------------------------------
+        $wfa = GrowthStandard::where('gender', $gender)
+            ->where('type', 'weight_for_age')
+            ->where('measure_value', $ageMonths)
+            ->first();
+
+        $statusWfa = $wfa ? self::classify($weight, $wfa, 'wfa') : null;
+
+        // -------------------------------------------------------
+        // 2. LENGTH/HEIGHT-FOR-AGE (LFA)
+        // -------------------------------------------------------
+        $lfa = GrowthStandard::where('gender', $gender)
+            ->where('type', 'length_for_age')
+            ->where('measure_value', $ageMonths)
+            ->first();
+
+        $statusLfa = $lfa ? self::classify($height, $lfa, 'lfa') : null;
+
+        // -------------------------------------------------------
+        // 3. WEIGHT-FOR-LENGTH or WEIGHT-FOR-HEIGHT
+        // -------------------------------------------------------
+        $type = $ageMonths < 24 ? 'weight_for_length' : 'weight_for_height';
+
+        // Round height to nearest .5 and force DB-safe formatting
+        $lookupHeight = number_format(round($height * 2) / 2, 1, '.', '');
+
+        $wfl = GrowthStandard::where('gender', $gender)
+            ->where('type', $type)
+            ->where('measure_value', $lookupHeight) // matches DB now
+            ->first();
+
+        $statusWflWfh = $wfl ? self::classify($weight, $wfl, 'wfl') : null;
+
+        // -------------------------------------------------------
+        // 4. OVERALL STATUS
+        // -------------------------------------------------------
+        $overall = self::computeOverallStatus($statusWfa, $statusLfa, $statusWflWfh);
 
         return [
-            'wfa' => round(($bmi - 15) / 2, 2),
-            'lfa' => round(($bmi - 15) / 3, 2),
-            'wfh' => round(($bmi - 15) / 2.5, 2),
-            'status' => $status,
+            'age_months' => $ageMonths,
+            'bmi' => $bmi,
+            'status_wfa' => $statusWfa,
+            'status_lfa' => $statusLfa,
+            'status_wfl_wfh' => $statusWflWfh,
+            'overall' => $overall,
         ];
     }
 
@@ -90,5 +134,69 @@ class GrowthHelper
             default:
                 return "Nutrition status is unclear. Please verify data and consult a health professional.";
         }
+    }
+    /**
+     * Classification based on WHO SD thresholds
+     */
+    private static function classify($value, GrowthStandard $standard, $mode)
+    {
+        $v = floatval($value);
+
+        if ($v < $standard->sd_neg_3) {
+            return [
+                'lfa' => 'Severely Stunted',
+                'wfa' => 'Severely Underweight',
+                'wfl' => 'Severely Wasted',
+            ][$mode];
+        }
+
+        if ($v < $standard->sd_neg_2) {
+            return [
+                'lfa' => 'Stunted',
+                'wfa' => 'Underweight',
+                'wfl' => 'Wasted',
+            ][$mode];
+        }
+
+        if ($v <= $standard->sd_plus_2) {
+            return 'Normal';
+        }
+
+        if ($standard->sd_plus_3 === null || $v <= $standard->sd_plus_3) {
+            return [
+                'lfa' => 'Tall',
+                'wfa' => 'Overweight',
+                'wfl' => 'Overweight',
+            ][$mode];
+        }
+
+        // Only weight-for-height has obesity
+        return $mode === 'lfa' ? 'Tall' : 'Obese';
+    }
+
+    /**
+     * Compute final combined nutrition status
+     */
+    private static function computeOverallStatus($wfa, $lfa, $wfl)
+    {
+        $list = [$wfa, $lfa, $wfl];
+
+        if (collect($list)->contains(fn($s) => $s && str_contains($s, 'Severely'))) {
+            return 'Severe Malnutrition';
+        }
+
+        if (collect($list)->contains(fn($s) => in_array($s, ['Underweight', 'Stunted', 'Wasted']))) {
+            return 'Moderate Malnutrition';
+        }
+
+        if (collect($list)->contains(fn($s) => in_array($s, ['Overweight', 'Obese']))) {
+            return 'Overweight/Obese';
+        }
+
+        if (collect($list)->filter()->every(fn($s) => in_array($s, ['Normal', 'Tall']))) {
+            return 'Normal';
+        }
+
+        return null;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Healthlog;
+use App\Models\HealthLog;
 use App\Models\Child;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,7 +14,9 @@ class HealthlogController extends Controller
 {
     public function index()
     {
-        $healthlogs = Healthlog::with('child')->latest()->get();
+        $healthlogs = HealthLog::with(['child', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return Inertia::render('Healthlog/Index', [
             'healthlogs' => $healthlogs,
@@ -23,158 +25,157 @@ class HealthlogController extends Controller
 
     public function create()
     {
-        // Include sex and birthdate for GrowthHelper
-        $children = Child::select('id', 'name', 'sex', 'birthdate')->get();
-
         return Inertia::render('Healthlog/Create', [
-            'children' => $children,
+            'children' => Child::all([
+                'id',
+                'first_name',
+                'middle_initial',
+                'last_name',
+                'sex',
+                'birthdate'
+            ]),
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'child_id' => 'required|exists:children,id',
-            'weight' => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
-            'bmi' => 'nullable|numeric|min:0',
-            'zscore_wfa' => 'nullable|numeric',
-            'zscore_lfa' => 'nullable|numeric',
-            'zscore_wfh' => 'nullable|numeric',
-            'nutrition_status' => 'nullable|string|max:255',
+            'child_id'  => 'required|exists:children,id',
+
+            'weight'    => 'nullable|numeric|min:0',
+            'height'    => 'nullable|numeric|min:0',
+
             'micronutrient_powder' => 'nullable|string|max:255',
-            'ruf' => 'nullable|string|max:255',
-            'rusf' => 'nullable|string|max:255',
-            'complementary_food' => 'nullable|string|max:255',
+            'ruf'                  => 'nullable|string|max:255',
+            'rusf'                 => 'nullable|string|max:255',
+            'complementary_food'   => 'nullable|string|max:255',
+
             'vitamin_a' => 'nullable|boolean',
             'deworming' => 'nullable|boolean',
-            'vaccine_name' => 'nullable|string|max:255',
-            'dose_number' => 'nullable|integer',
-            'date_given' => 'nullable|date',
+
+            'vaccine_name'  => 'nullable|string|max:255',
+            'dose_number'   => 'nullable|numeric',
+            'date_given'    => 'nullable|date',
             'next_due_date' => 'nullable|date',
-            'vaccine_status' => 'nullable|string|max:255',
+            'vaccine_status'=> 'nullable|string|max:255',
         ]);
 
-        // ✅ Attach logged-in user ID
         $validated['user_id'] = auth()->id();
 
-        $child = Child::find($validated['child_id']);
+        $child  = Child::findOrFail($validated['child_id']);
+        $weight = $validated['weight'] ?? null;
+        $height = $validated['height'] ?? null;
 
-        // ✅ Compute BMI
-        if (!empty($validated['weight']) && !empty($validated['height'])) {
-            $validated['bmi'] = GrowthHelper::calculateBMI(
-                $validated['weight'],
-                $validated['height']
+        if ($weight !== null && $height !== null) {
+            $evaluation = GrowthHelper::evaluateChild(
+                $child->sex,
+                $child->birthdate,
+                $weight,
+                $height
+            );
+
+            $validated['bmi']                = $evaluation['bmi'];
+            $validated['age_in_months']      = $evaluation['age_months'];
+            $validated['status_wfa']         = $evaluation['status_wfa'];
+            $validated['status_lfa']         = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh']     = $evaluation['status_wfl_wfh'];
+            $validated['nutrition_status']   = $evaluation['overall'];
+
+            // AI Recommendation (only when evaluation exists)
+            $age = Carbon::parse($child->birthdate)->age;
+
+            $validated['recommendation'] = AIRecommender::getRecommendation(
+                $evaluation['overall'],
+                $child->sex,
+                $age,
+                $evaluation['bmi']
             );
         }
 
-        // ✅ Compute Z-scores & nutrition status
-        if ($child && !empty($validated['weight']) && !empty($validated['height'])) {
-            $zScores = GrowthHelper::calculateZScores(
-                $child->sex ?? 'Male',
-                $child->birthdate ?? Carbon::now()->subYears(1),
-                $validated['weight'],
-                $validated['height']
-            );
-
-            $validated['zscore_wfa'] = $zScores['wfa'];
-            $validated['zscore_lfa'] = $zScores['lfa'];
-            $validated['zscore_wfh'] = $zScores['wfh'];
-$validated['nutrition_status'] = $zScores['status'];
-
-// ✅ Generate AI Recommendation
-$age = Carbon::parse($child->birthdate)->age;
-$bmi = GrowthHelper::calculateBMI($validated['weight'], $validated['height']);
-$validated['recommendation'] = AIRecommender::getRecommendation(
-    $zScores['status'],
-    $child->sex,
-    $age,
-    $bmi
-);
-        }
-
-        Healthlog::create($validated);
+        HealthLog::create($validated);
 
         return redirect()->route('healthlogs.index')
-            ->with('success', '✅ Health log created successfully with BMI and WHO-based evaluation.');
+            ->with('success', '✅ Health log created successfully with BMI, WHO evaluation, and AI recommendation.');
     }
 
-    public function show(Healthlog $healthlog)
+    public function show(HealthLog $healthlog)
     {
-        $healthlog->load('child');
+        $healthlog->load(['child', 'user']);
 
         return Inertia::render('Healthlog/Show', [
             'healthlog' => $healthlog,
         ]);
     }
 
-    public function edit(Healthlog $healthlog)
+    public function edit(HealthLog $healthlog)
     {
-        $healthlog->load('child');
-        $children = Child::select('id', 'name', 'sex', 'birthdate')->get();
-
         return Inertia::render('Healthlog/Edit', [
-            'healthlog' => $healthlog,
-            'children' => $children,
+            'healthlog' => $healthlog->load('child'),
+            'children'  => Child::all([
+                'id',
+                'first_name',
+                'middle_initial',
+                'last_name',
+                'sex',
+                'birthdate'
+            ]),
         ]);
     }
 
-    public function update(Request $request, Healthlog $healthlog)
+    public function update(Request $request, HealthLog $healthlog)
     {
         $validated = $request->validate([
-            'child_id' => 'required|exists:children,id',
-            'weight' => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
-            'bmi' => 'nullable|numeric|min:0',
-            'zscore_wfa' => 'nullable|numeric',
-            'zscore_lfa' => 'nullable|numeric',
-            'zscore_wfh' => 'nullable|numeric',
-            'nutrition_status' => 'nullable|string|max:255',
+            'child_id'  => 'required|exists:children,id',
+
+            'weight'    => 'nullable|numeric|min:0',
+            'height'    => 'nullable|numeric|min:0',
+
             'micronutrient_powder' => 'nullable|string|max:255',
-            'ruf' => 'nullable|string|max:255',
-            'rusf' => 'nullable|string|max:255',
-            'complementary_food' => 'nullable|string|max:255',
+            'ruf'                  => 'nullable|string|max:255',
+            'rusf'                 => 'nullable|string|max:255',
+            'complementary_food'   => 'nullable|string|max:255',
+
             'vitamin_a' => 'nullable|boolean',
             'deworming' => 'nullable|boolean',
-            'vaccine_name' => 'nullable|string|max:255',
-            'dose_number' => 'nullable|integer',
-            'date_given' => 'nullable|date',
+
+            'vaccine_name'  => 'nullable|string|max:255',
+            'dose_number'   => 'nullable|numeric',
+            'date_given'    => 'nullable|date',
             'next_due_date' => 'nullable|date',
-            'vaccine_status' => 'nullable|string|max:255',
+            'vaccine_status'=> 'nullable|string|max:255',
         ]);
 
-        $child = Child::find($validated['child_id']);
+        $child  = Child::findOrFail($validated['child_id']);
+        $weight = $validated['weight'] ?? null;
+        $height = $validated['height'] ?? null;
 
-        if ($child && !empty($validated['weight']) && !empty($validated['height'])) {
-            $validated['bmi'] = GrowthHelper::calculateBMI(
-                $validated['weight'],
-                $validated['height']
+        if ($weight !== null && $height !== null) {
+            $evaluation = GrowthHelper::evaluateChild(
+                $child->sex,
+                $child->birthdate,
+                $weight,
+                $height
             );
 
-            $zScores = GrowthHelper::calculateZScores(
-                $child->sex ?? 'Male',
-                $child->birthdate ?? Carbon::now()->subYears(1),
-                $validated['weight'],
-                $validated['height']
-            );
-
-            $validated['zscore_wfa'] = $zScores['wfa'];
-            $validated['zscore_lfa'] = $zScores['lfa'];
-            $validated['zscore_wfh'] = $zScores['wfh'];
-            $validated['nutrition_status'] = $zScores['status'];
+            $validated['bmi']              = $evaluation['bmi'];
+            $validated['age_in_months']    = $evaluation['age_months'];
+            $validated['status_wfa']       = $evaluation['status_wfa'];
+            $validated['status_lfa']       = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh']   = $evaluation['status_wfl_wfh'];
+            $validated['nutrition_status'] = $evaluation['overall'];
         }
 
         $healthlog->update($validated);
 
         return redirect()->route('healthlogs.index')
-            ->with('success', '✅ Health log updated successfully with recalculated BMI and nutrition data.');
+            ->with('success', 'Health log updated successfully.');
     }
 
-    public function destroy(Healthlog $healthlog)
+    public function destroy(HealthLog $healthlog)
     {
         $healthlog->delete();
 
         return redirect()->route('healthlogs.index')
-            ->with('success', '🗑️ Health log entry deleted.');
+            ->with('success', 'Health log deleted.');
     }
 }
