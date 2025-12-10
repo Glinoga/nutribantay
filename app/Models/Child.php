@@ -10,16 +10,18 @@ class Child extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_initial',
+        'last_name',
         'sex',
         'age',
         'weight',
         'height',
-        'created_by',
-        'address',
-        'contact_number', // ✅ fixed invalid key name
         'birthdate',
         'barangay',
+        'address',
+        'contact_number',
+        'created_by',
         'updated_by',
     ];
 
@@ -27,32 +29,50 @@ class Child extends Model
         'birthdate' => 'date',
     ];
 
-    // 🔹 Relation to User who created the record
+    // 🔥 This exposes computed attributes (fullname, formatted_name) to JSON/API
+    protected $appends = ['fullname', 'formatted_name'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+
+    // Full name accessor: "Firstname M. Lastname"
+    public function getFullnameAttribute()
+    {
+        $mi = $this->middle_initial ? strtoupper($this->middle_initial) . '.' : '';
+        return trim("{$this->first_name} {$mi} {$this->last_name}");
+    }
+
+    // Lastname, Firstname (M.)
+    public function getFormattedNameAttribute()
+    {
+        $mi = $this->middle_initial ? strtoupper($this->middle_initial) . '.' : '';
+        return trim("{$this->last_name}, {$this->first_name} {$mi}");
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    // 🔹 Relation to User who last updated it
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    // 🔹 Relation to notes (if you have a ChildNote model)
     public function notes()
     {
         return $this->hasMany(ChildNote::class);
-    }   
-
-
-    // 🔹 Optional author relation (if applicable)
-    public function author()
-    {
-        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // 🔹 Relation to health logs
     public function healthlogs()
     {
         return $this->hasMany(Healthlog::class);

@@ -6,28 +6,36 @@ type HealthLog = {
   id: number;
   child_id: number;
   user_id: number;
+
+  age_in_months: number | null;
   weight: number | null;
   height: number | null;
   bmi: number | null;
-  zscore_wfa: number | null;
-  zscore_lfa: number | null;
-  zscore_wfh: number | null;
+
+  status_wfa: string | null;
+  status_lfa: string | null;
+  status_wfl_wfh: string | null;
   nutrition_status: string | null;
+
   micronutrient_powder: string | null;
   ruf: string | null;
   rusf: string | null;
   complementary_food: string | null;
+
   vitamin_a: boolean;
   deworming: boolean;
+
   vaccine_name: string | null;
   dose_number: number | null;
   date_given: string | null;
   next_due_date: string | null;
   vaccine_status: string | null;
+
   created_at: string;
   updated_at: string;
+
   created_by?: string | null;
-  child_name?: string | null;
+  child_name?: string | null; // mapped from backend (child.fullname)
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,7 +59,10 @@ type AuthProps = {
 export default function Index({ healthlogs }: Props) {
   const { auth } = usePage<AuthProps>().props;
 
-  const isHealthworker = (auth?.roles ?? []).some((r) => r.toLowerCase() === 'healthworker');
+  // check healthworker role
+  const isHealthworker = (auth?.roles ?? []).some(
+    (role) => role.toLowerCase() === 'healthworker'
+  );
 
   const canManageLogs = isHealthworker;
 
@@ -64,7 +75,7 @@ export default function Index({ healthlogs }: Props) {
 
         {canManageLogs && (
           <Link
-            href="/healthlog/create"
+            href="/healthlogs/create"
             className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
             Add Health Log
@@ -73,51 +84,80 @@ export default function Index({ healthlogs }: Props) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full overflow-hidden rounded border text-sm">
+        <table className="min-w-full overflow-hidden rounded border text-xs">
           <thead className="bg-gray-50">
             <tr>
-              <th className="border px-4 py-2 text-left">ID</th>
-              <th className="border px-4 py-2 text-left">Child</th>
-              <th className="border px-4 py-2 text-left">Weight (kg)</th>
-              <th className="border px-4 py-2 text-left">Height (cm)</th>
-              <th className="border px-4 py-2 text-left">BMI</th>
-              <th className="border px-4 py-2 text-left">Nutrition Status</th>
-              <th className="border px-4 py-2 text-left">Micronutrient Powder</th>
-              <th className="border px-4 py-2 text-left">RUF</th>
-              <th className="border px-4 py-2 text-left">RUSF</th>
-              <th className="border px-4 py-2 text-left">Complementary Food</th>
-              <th className="border px-4 py-2 text-left">Vitamin A</th>
-              <th className="border px-4 py-2 text-left">Deworming</th>
-              <th className="border px-4 py-2 text-left">Vaccine</th>
-              <th className="border px-4 py-2 text-left">Dose</th>
-              <th className="border px-4 py-2 text-left">Date Given</th>
-              <th className="border px-4 py-2 text-left">Next Due</th>
-              <th className="border px-4 py-2 text-left">Vaccine Status</th>
-              <th className="border px-4 py-2 text-left">Actions</th>
+              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">Child</th>
+              <th className="border px-4 py-2">Age</th>
+              <th className="border px-4 py-2">Weight</th>
+              <th className="border px-4 py-2">Height</th>
+              <th className="border px-4 py-2">BMI</th>
+              <th className="border px-4 py-2">WFA</th>
+              <th className="border px-4 py-2">LFA</th>
+              <th className="border px-4 py-2">WFL/WFH</th>
+              <th className="border px-4 py-2">Status</th>
+              <th className="border px-4 py-2">MNP</th>
+              <th className="border px-4 py-2">RUF</th>
+              <th className="border px-4 py-2">RUSF</th>
+              <th className="border px-4 py-2">Complementary Food</th>
+              <th className="border px-4 py-2">Vit A</th>
+              <th className="border px-4 py-2">Deworm</th>
+              <th className="border px-4 py-2">Vaccine</th>
+              <th className="border px-4 py-2">Dose</th>
+              <th className="border px-4 py-2">Date Given</th>
+              <th className="border px-4 py-2">Next Due</th>
+              <th className="border px-4 py-2">Vaccine Status</th>
+              <th className="border px-4 py-2">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {healthlogs.map((log) => (
               <tr key={log.id} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">{log.id}</td>
-                <td className="border px-4 py-2">{log.child_name ?? `Child #${log.child_id}`}</td>
+                <td className="border px-4 py-2 text-center">{log.id}</td>
+
+                {/* CHILD NAME */}
+                <td className="border px-4 py-2">
+                  {log.child_name ?? `Child #${log.child_id}`}
+                </td>
+
+                {/* BASIC INFO */}
+                <td className="border px-4 py-2">{log.age_in_months ?? '-'}</td>
                 <td className="border px-4 py-2">{log.weight ?? '-'}</td>
                 <td className="border px-4 py-2">{log.height ?? '-'}</td>
                 <td className="border px-4 py-2">{log.bmi ?? '-'}</td>
-                <td className="border px-4 py-2">{log.nutrition_status ?? '-'}</td>
+
+                {/* WHO STATUS */}
+                <td className="border px-4 py-2">{log.status_wfa ?? '-'}</td>
+                <td className="border px-4 py-2">{log.status_lfa ?? '-'}</td>
+                <td className="border px-4 py-2">{log.status_wfl_wfh ?? '-'}</td>
+                <td className="border px-4 py-2 font-semibold">
+                  {log.nutrition_status ?? '-'}
+                </td>
+
+                {/* SUPPLEMENTS */}
                 <td className="border px-4 py-2">{log.micronutrient_powder ?? '-'}</td>
                 <td className="border px-4 py-2">{log.ruf ?? '-'}</td>
                 <td className="border px-4 py-2">{log.rusf ?? '-'}</td>
                 <td className="border px-4 py-2">{log.complementary_food ?? '-'}</td>
-                <td className="border px-4 py-2">{log.vitamin_a ? '✔️' : '❌'}</td>
-                <td className="border px-4 py-2">{log.deworming ? '✔️' : '❌'}</td>
+
+                {/* CHECKBOX FIELDS */}
+                <td className="border px-4 py-2 text-center">
+                  {log.vitamin_a ? '✔️' : '❌'}
+                </td>
+                <td className="border px-4 py-2 text-center">
+                  {log.deworming ? '✔️' : '❌'}
+                </td>
+
+                {/* VACCINES */}
                 <td className="border px-4 py-2">{log.vaccine_name ?? '-'}</td>
                 <td className="border px-4 py-2">{log.dose_number ?? '-'}</td>
                 <td className="border px-4 py-2">{log.date_given ?? '-'}</td>
                 <td className="border px-4 py-2">{log.next_due_date ?? '-'}</td>
                 <td className="border px-4 py-2">{log.vaccine_status ?? '-'}</td>
 
+                {/* ACTIONS */}
                 <td className="border px-4 py-2 whitespace-nowrap">
                   <Link
                     href={`/healthlogs/${log.id}`}

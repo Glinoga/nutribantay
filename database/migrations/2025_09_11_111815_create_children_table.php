@@ -13,22 +13,42 @@ return new class extends Migration
     {
         Schema::create('children', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+
+            // ---- Name Fields ----
+            $table->string('first_name');
+            $table->string('middle_initial')->nullable();
+            $table->string('last_name');
+
+            // ---- Personal Info ----
             $table->enum('sex', ['Male', 'Female']);
-            $table->integer('age')->nullable(); 
-            $table->date('birthdate')->nullable(); 
+            $table->integer('age')->nullable();
+            $table->date('birthdate')->nullable();
+
+            // ---- Location / Contact ----
             $table->string('barangay')->nullable();
+            $table->string('address')->nullable();
+            $table->string('contact_number')->nullable();
+
+            // ---- Anthropometric Data ----
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
-            $table->string('address')->nullable();
-            $table->string('contact_number')->nullable(); // ✅ fixed naming
-            $table->unsignedBigInteger('created_by'); // user who created record
-            $table->unsignedBigInteger('updated_by')->nullable(); // optional updater
+
+            // ---- User Tracking ----
+            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('updated_by')->nullable();
+
             $table->timestamps();
 
-            // ✅ Foreign key relationships
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            // ---- Foreign Keys ----
+            $table->foreign('created_by')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
+
+            $table->foreign('updated_by')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('set null');
         });
     }
 
