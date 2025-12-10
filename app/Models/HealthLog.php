@@ -14,8 +14,6 @@ class HealthLog extends Model
     protected $fillable = [
         'child_id',
         'user_id',
-
-        'age_in_months',
         'weight',
         'height',
         'bmi',
@@ -72,9 +70,6 @@ class HealthLog extends Model
         return $this->belongsTo(Child::class);
     }
 
-    /**
-     * Get the user who created this health log.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);

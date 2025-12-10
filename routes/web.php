@@ -30,6 +30,8 @@ Route::get('/contact', fn () => Inertia::render('contact'))->name('contact');
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::get('/dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
+
     Route::get('/dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
 
     /*
@@ -84,59 +86,52 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         Route::resource('users', UserController::class);
+        Route::resource('roles', RoleController::class);
     });
+
 
     /*
     |--------------------------------------------------------------------------
-    | HEALTHWORKER ONLY
+    | HEALTHLOG ROUTES (Full Fix — Admin = view only, HW = full access)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:Healthworker'])->group(function () {
 
-        Route::resource('stocks', StockController::class)->except(['show']);
-        Route::get('/api/stocks-for-barangay', [StockController::class, 'apiListForBarangay'])
-            ->name('stocks.api.forBarangay');
-
-    });
-
-    //recommendations - both admin and healthworker (waiting if admin needs to be restricted)
-
-    /**Route::post('/recommendations', [RecommendationController::class, 'generate'])
-            ->name('recommendations.generate');
-    }); */
-    Route::middleware(['role:Admin|Healthworker', 'throttle:recommendations'])->group(function () {
-        Route::post('/recommendations', [RecommendationController::class, 'generate'])
-            ->name('recommendations.generate');
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | HEALTHLOGS
-    | Admin = View only
-    | Healthworker = Full access
-    |--------------------------------------------------------------------------
-    */
     Route::prefix('healthlogs')->group(function () {
 
-        // Create & Store
+        /*
+        |----------------------------------------------------------
+        | CREATE + STORE (Healthworker only)
+        |----------------------------------------------------------
+        */
         Route::middleware(['role:Healthworker'])->group(function () {
             Route::get('/create', [HealthlogController::class, 'create'])->name('healthlogs.create');
             Route::post('/', [HealthlogController::class, 'store'])->name('healthlogs.store');
         });
 
-        // Edit / Update / Delete
+        /*
+        |----------------------------------------------------------
+        | EDIT + UPDATE + DELETE (Healthworker only)
+        |----------------------------------------------------------
+        */
         Route::middleware(['role:Healthworker'])->group(function () {
             Route::get('/{healthlog}/edit', [HealthlogController::class, 'edit'])->name('healthlogs.edit');
             Route::put('/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
             Route::delete('/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');
         });
 
-        // View (Admin + Healthworker)
+        /*
+        |----------------------------------------------------------
+        | VIEW ROUTES (Admin + Healthworker)
+        | Must ALWAYS be last so it does NOT override /create
+        |----------------------------------------------------------
+        */
         Route::middleware(['role:Admin|Healthworker'])->group(function () {
             Route::get('/', [HealthlogController::class, 'index'])->name('healthlogs.index');
             Route::get('/{healthlog}', [HealthlogController::class, 'show'])->name('healthlogs.show');
         });
+
     });
+
 });
 
 require __DIR__ . '/settings.php';
