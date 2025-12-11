@@ -46,13 +46,30 @@ export default function Index({ users, filters }: Props) {
     }, []);
 
     const toggleMaintenance = async () => {
+        // NEW: Add confirmation when enabling
+        if (!maintenance) {
+            const confirmed = confirm(
+                '⚠️ Enabling maintenance mode will immediately log out ALL health workers.\n\n' +
+                    'Only admin accounts will remain logged in.\n\n' +
+                    'Are you sure you want to continue?',
+            );
+
+            if (!confirmed) return;
+        }
+
         try {
             const res = await axios.post('/maintenance/toggle', { status: !maintenance });
             setMaintenance(res.data.status);
-            alert(`Maintenance mode ${res.data.status ? 'enabled' : 'disabled'}`);
+
+            // NEW: Show success message
+            if (res.data.status) {
+                alert('✅ Maintenance mode enabled. All healthworkers have been logged out.');
+            } else {
+                alert('✅ Maintenance mode disabled. System is now accessible.');
+            }
         } catch (err) {
             console.error(err);
-            alert('Failed to update maintenance mode');
+            alert('❌ Failed to update maintenance mode');
         }
     };
 

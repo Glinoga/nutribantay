@@ -15,42 +15,31 @@ class SystemController extends Controller
         return response()->json(['status' => $status]);
     }
 
-    // Toggle maintenance mode
+     // Toggle maintenance mode
     public function toggle(Request $request)
-    {
-        $value = $request->input('status') ? '1' : '0';
-        Setting::set('maintenance_mode', $value);
+{
+    $value = $request->input('status') ? '1' : '0';
+    Setting::set('maintenance_mode', $value);
 
-        // Log out all healthworkers when enabling maintenance
-        if ($value === '1') {
-            $this->logoutHealthworkers();
-        }
-
-        return response()->json([
-            'status' => $value === '1',
-            'message' => $value === '1' 
-                ? 'Maintenance mode enabled. All healthworkers have been logged out.' 
-                : 'Maintenance mode disabled.'
-        ]);
+    // NEW: Log out all healthworkers when enabling maintenance
+    if ($value === '1') {
+        $this->logoutHealthworkers();
     }
 
-    // Force logout healthworkers
-    private function logoutHealthworkers()
-    {
-        // Get all healthworker users
-        $healthworkers = \App\Models\User::whereHas('roles', function($query) {
-            $query->where('name', 'Healthworker');
-        })->get();
+    return response()->json(['status' => $value === '1']);
+}
 
-        // Delete their sessions from database
-        DB::table('sessions')
-            ->whereIn('user_id', $healthworkers->pluck('id'))
-            ->delete();
-        
-        // Clear remember tokens
-        foreach ($healthworkers as $user) {
-            $user->remember_token = null;
-            $user->save();
-        }
-    }
+// NEW METHOD: Force logout healthworkers
+private function logoutHealthworkers()
+{
+    // Get all healthworker users
+    $healthworkers = \App\Models\User::whereHas('roles', function($query) {
+        $query->where('name', 'Healthworker');
+    })->get();
+
+    // Delete their sessions from database
+    \DB::table('sessions')
+        ->whereIn('user_id', $healthworkers->pluck('id'))
+        ->delete();
+}
 }
