@@ -3,6 +3,7 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    roles: string[]; // Added roles array
 }
 
 export interface BreadcrumbItem {
@@ -36,7 +37,8 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    barangay?: number | string; // Added barangay
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
+    [key: string]: unknown;
 }
