@@ -12,9 +12,10 @@ interface LoginProps {
     status?: string;
     canResetPassword: boolean;
     isMaintenanceMode?: boolean;
+    maintenance?: string;
 }
 
-export default function Login({ status, canResetPassword, isMaintenanceMode }: LoginProps) {
+export default function Login({ status, canResetPassword, isMaintenanceMode, maintenance }: LoginProps) {
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
             <Head title="Log in" />
@@ -35,6 +36,13 @@ export default function Login({ status, canResetPassword, isMaintenanceMode }: L
                 {/* Right Panel */}
                 <div className="flex w-1/2 flex-col justify-center bg-[#E8F8F8] p-12">
                     <h2 className="mb-6 text-2xl font-bold">Log In</h2>
+
+                    {/* Maintenance Mode Warning from Logout */}
+                    {maintenance && (
+                        <div className="mb-4 rounded border-l-4 border-red-500 bg-red-100 p-4 text-red-800">
+                            <p className="font-semibold">⚠️ {maintenance}</p>
+                        </div>
+                    )}
 
                     {/* Maintenance Mode Banner */}
                     {isMaintenanceMode && (
@@ -87,7 +95,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode }: L
 
                                 {/* Footer */}
                                 <div className="mt-4 text-center text-sm text-gray-600">
-                                    Don’t have an account?{' '}
+                                    Don't have an account?{' '}
                                     <TextLink href={register()} className="font-medium">
                                         Sign Up
                                     </TextLink>{' '}

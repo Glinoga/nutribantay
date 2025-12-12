@@ -1,4 +1,5 @@
 import GuestLayout from '@/layouts/guest-layout';
+import { usePage } from '@inertiajs/react';
 
 const announcements = [
     {
@@ -47,8 +48,25 @@ function getCategoryColorClass(categoryColor: string) {
 }
 
 export default function Home() {
+    const { maintenance } = usePage().props as { maintenance?: string };
+
     return (
         <GuestLayout title="Home">
+            {/* Maintenance Message Banner */}
+            {maintenance && (
+                <div className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800" role="alert">
+                    <div className="flex items-center">
+                        <svg className="mr-3 h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                        <p className="font-semibold">{maintenance}</p>
+                    </div>
+                </div>
+            )}
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-20 md:pt-32 md:pb-24">
                 <div className="absolute top-0 right-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">

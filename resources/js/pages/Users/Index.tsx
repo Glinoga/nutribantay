@@ -47,12 +47,27 @@ export default function Index({ users, filters }: Props) {
 
     const toggleMaintenance = async () => {
         try {
-            const res = await axios.post('/maintenance/toggle', { status: !maintenance });
+            const newStatus = !maintenance;
+            const res = await axios.post('/maintenance/toggle', { status: newStatus });
             setMaintenance(res.data.status);
-            alert(`Maintenance mode ${res.data.status ? 'enabled' : 'disabled'}`);
+
+            // Show appropriate alert
+            if (res.data.status) {
+                alert(
+                    '✅ Maintenance mode ENABLED\n\n' +
+                        '• All Healthworker users will be logged out on their next request\n' +
+                        '• They will be redirected to the home page\n' +
+                        '• Only Admin users can access the system',
+                );
+            } else {
+                alert('✅ Maintenance mode DISABLED\n\nAll users can now access the system normally.');
+            }
+
+            // Optionally reload the page to ensure UI is in sync
+            // window.location.reload();
         } catch (err) {
             console.error(err);
-            alert('Failed to update maintenance mode');
+            alert('❌ Failed to update maintenance mode. Please try again.');
         }
     };
 
