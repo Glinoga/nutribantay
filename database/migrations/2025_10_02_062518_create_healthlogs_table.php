@@ -19,17 +19,21 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
             // Anthropometric data
+            // Added age_in_months to freeze the age at the time of checkup
+            $table->integer('age_in_months')->nullable(); 
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
             $table->decimal('bmi', 5, 2)->nullable();
 
-            // Z-scores
-            $table->decimal('zscore_wfa', 5, 2)->nullable();
-            $table->decimal('zscore_lfa', 5, 2)->nullable();
-            $table->decimal('zscore_wfh', 5, 2)->nullable();
+            // Nutrition Status (Changed from 'decimal' zscore to 'string' status)
+            // These will store values like: "Normal", "Severely Wasted", "Stunted"
+            $table->string('status_wfa')->nullable(); // Weight for Age Status
+            $table->string('status_lfa')->nullable(); // Length/Height for Age Status
+            $table->string('status_wfl_wfh')->nullable(); // Weight for Length/Height Status
 
             // Nutrition & supplements
-            $table->string('nutrition_status')->nullable();
+            // This can store the "Overall" status (e.g., if any of the above are bad)
+            $table->string('nutrition_status')->nullable(); 
             $table->string('micronutrient_powder')->nullable();
             $table->string('ruf')->nullable();
             $table->string('rusf')->nullable();

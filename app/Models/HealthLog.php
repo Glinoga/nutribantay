@@ -12,19 +12,25 @@ class HealthLog extends Model
     protected $fillable = [
         'child_id',
         'user_id',
+
+        'age_in_months',
         'weight',
         'height',
         'bmi',
-        'zscore_wfa',
-        'zscore_lfa',
-        'zscore_wfh',
+
+        'status_wfa',
+        'status_lfa',
+        'status_wfl_wfh',
         'nutrition_status',
+
         'micronutrient_powder',
         'ruf',
         'rusf',
         'complementary_food',
+
         'vitamin_a',
         'deworming',
+
         'vaccine_name',
         'dose_number',
         'date_given',
@@ -32,17 +38,27 @@ class HealthLog extends Model
         'vaccine_status',
     ];
 
-    /**
-     * Relationship: A HealthLog belongs to a Child.
-     */
+    protected $casts = [
+        'weight' => 'float',
+        'height' => 'float',
+        'bmi' => 'float',
+
+        'vitamin_a' => 'boolean',
+        'deworming' => 'boolean',
+
+        'dose_number' => 'integer',
+
+        'date_given' => 'datetime',
+        'next_due_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function child()
     {
         return $this->belongsTo(Child::class);
     }
 
-    /**
-     * Relationship: A HealthLog belongs to a User (created by).
-     */
     public function user()
     {
         return $this->belongsTo(User::class);

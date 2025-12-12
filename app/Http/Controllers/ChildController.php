@@ -19,14 +19,17 @@ class ChildController extends Controller
         return Inertia::render('Children/Index', [
             'children' => $children->map(fn($child) => [
                 'id' => $child->id,
-                'name' => $child->name,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
                 'sex' => $child->sex,
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'contact_number' => $child->contact_number, // ✅ fixed key name
+                'contact_number' => $child->contact_number,
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
@@ -43,14 +46,16 @@ class ChildController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_initial' => 'nullable|string|max:5',
+            'last_name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:50', // ✅ corrected field name
+            'contact_number' => 'nullable|string|max:50',
         ]);
 
         $user = auth()->user();
@@ -71,13 +76,16 @@ class ChildController extends Controller
         $child->load(['notes.author']);
 
         if ($child->barangay !== $user->barangay) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         return Inertia::render('Children/Show', [
             'child' => [
                 'id' => $child->id,
-                'name' => $child->name,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
                 'sex' => $child->sex,
                 'age' => $child->age,
                 'weight' => $child->weight,
@@ -105,20 +113,22 @@ class ChildController extends Controller
         $user = auth()->user();
 
         if ($child->barangay !== $user->barangay) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         return Inertia::render('Children/Edit', [
             'child' => [
                 'id' => $child->id,
-                'name' => $child->name,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
                 'sex' => $child->sex,
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'contact_number' => $child->contact_number, // ✅ fixed
+                'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
@@ -131,18 +141,20 @@ class ChildController extends Controller
         $user = auth()->user();
 
         if ($child->barangay !== $user->barangay) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_initial' => 'nullable|string|max:5',
+            'last_name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:50', // ✅ fixed
+            'contact_number' => 'nullable|string|max:50',
         ]);
 
         $child->update([
@@ -159,7 +171,7 @@ class ChildController extends Controller
         $user = auth()->user();
 
         if ($child->barangay !== $user->barangay) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         $child->delete();
@@ -173,7 +185,7 @@ class ChildController extends Controller
         $user = auth()->user();
 
         if ($child->barangay !== $user->barangay) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         $request->validate([
@@ -194,8 +206,8 @@ class ChildController extends Controller
 
         $user = auth()->user();
 
-        if ($note->user_id !== $user->id && !$user->hasRole('admin')) {
-            abort(403, 'You are not authorized to delete this note.');
+        if ($note->user_id !== $user->id && !$user->hasRole('Admin')) {
+            abort(403);
         }
 
         $note->delete();

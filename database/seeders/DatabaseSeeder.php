@@ -10,18 +10,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Run the PermissionSeeder first
+        // Run PermissionSeeder first
         $this->call(PermissionSeeder::class);
 
         // Create admin account
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name' => 'Super Admin',
+                'name'  => 'Super Admin',
                 'password' => Hash::make('password123'),
             ]
         );
-        $admin->assignRole('Admin');
+        $admin->syncRoles(['Admin']);   // use syncRoles for reliability
 
         // Create healthworker account
         $healthworker = User::firstOrCreate(
@@ -31,6 +31,6 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password123'),
             ]
         );
-        $healthworker->assignRole('Healthworker');
+        $healthworker->syncRoles(['Healthworker']);
     }
 }
