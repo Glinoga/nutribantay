@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
         // Run PermissionSeeder first
         $this->call(PermissionSeeder::class);
 
+        $this->call(GrowthStandardSeeder::class);
+
         // Create admin account
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],

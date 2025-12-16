@@ -24,7 +24,7 @@ class HealthlogController extends Controller
     public function create()
     {
         return Inertia::render('Healthlog/Create', [
-            'children' => Child::all(['id', 'fullname', 'sex', 'birthdate']),
+        'children' => Child::all(['id', 'first_name','middle_initial','last_name','sex', 'birthdate']),
         ]);
     }
 
@@ -58,8 +58,11 @@ class HealthlogController extends Controller
         $weight = $validated['weight'] ?? null;
         $height = $validated['height'] ?? null;
 
-        if ($weight && $height) {
+        if ($weight !== null && $height !== null) {
             $evaluation = GrowthHelper::evaluateChild($child->sex, $child->birthdate, $weight, $height);
+
+
+            \Log::info('Growth evaluation', $evaluation);
 
             $validated['bmi'] = $evaluation['bmi'];
             $validated['age_in_months'] = $evaluation['age_months'];
@@ -87,7 +90,7 @@ class HealthlogController extends Controller
     {
         return Inertia::render('Healthlog/Edit', [
             'healthlog' => $healthlog->load('child'),
-            'children'  => Child::all(['id', 'fullname', 'sex', 'birthdate']),
+            'children'  => Child::all(['id', 'first_name','middle_initial','last_name', 'sex', 'birthdate']),
         ]);
     }
 

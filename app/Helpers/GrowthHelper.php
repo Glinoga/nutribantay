@@ -67,7 +67,7 @@ class GrowthHelper
         // 2. LENGTH/HEIGHT-FOR-AGE (LFA)
         // -------------------------------------------------------
         $lfa = GrowthStandard::where('gender', $gender)
-            ->where('type', 'length_for_age')
+            ->where('type', 'height_length_for_age')
             ->where('measure_value', $ageMonths)
             ->first();
 
