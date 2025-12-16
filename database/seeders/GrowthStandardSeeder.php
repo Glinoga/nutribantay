@@ -521,8 +521,8 @@ class GrowthStandardSeeder extends Seeder
         
         $this->insertData($boys_wfa, 'boy', 'weight_for_age');
         $this->insertData($girls_wfa, 'girl', 'weight_for_age');
-        $this->insertData($boys_lfa, 'boy', 'length_for_age');
-        $this->insertData($girls_lfa, 'girl', 'length_for_age');
+        $this->insertData($boys_lfa, 'boy', 'height_length_for_age');
+        $this->insertData($girls_lfa, 'girl', 'height_length_for_age');
         $this->insertData($boys_wfl, 'boy', 'weight_for_length');
         $this->insertData($girls_wfl, 'girl', 'weight_for_length');
         $this->insertData($boys_wfh, 'boy', 'weight_for_height');

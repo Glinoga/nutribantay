@@ -15,7 +15,7 @@ class HealthlogController extends Controller
     public function index()
     {
         $healthlogs = HealthLog::with(['child', 'user'])
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get();
 
         return Inertia::render('Healthlog/Index', [
@@ -41,7 +41,6 @@ class HealthlogController extends Controller
     {
         $validated = $request->validate([
             'child_id'  => 'required|exists:children,id',
-
             'weight'    => 'nullable|numeric|min:0',
             'height'    => 'nullable|numeric|min:0',
 
@@ -74,14 +73,13 @@ class HealthlogController extends Controller
                 $height
             );
 
-            $validated['bmi']                = $evaluation['bmi'];
-            $validated['age_in_months']      = $evaluation['age_months'];
-            $validated['status_wfa']         = $evaluation['status_wfa'];
-            $validated['status_lfa']         = $evaluation['status_lfa'];
-            $validated['status_wfl_wfh']     = $evaluation['status_wfl_wfh'];
-            $validated['nutrition_status']   = $evaluation['overall'];
+            $validated['bmi']              = $evaluation['bmi'];
+            $validated['age_in_months']    = $evaluation['age_months'];
+            $validated['status_wfa']       = $evaluation['status_wfa'];
+            $validated['status_lfa']       = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh']   = $evaluation['status_wfl_wfh'];
+            $validated['nutrition_status'] = $evaluation['overall'];
 
-            // AI Recommendation (only when evaluation exists)
             $age = Carbon::parse($child->birthdate)->age;
 
             $validated['recommendation'] = AIRecommender::getRecommendation(
@@ -90,6 +88,8 @@ class HealthlogController extends Controller
                 $age,
                 $evaluation['bmi']
             );
+
+            \Log::info('Growth evaluation', $evaluation);
         }
 
         HealthLog::create($validated);
@@ -100,10 +100,8 @@ class HealthlogController extends Controller
 
     public function show(HealthLog $healthlog)
     {
-        $healthlog->load(['child', 'user']);
-
         return Inertia::render('Healthlog/Show', [
-            'healthlog' => $healthlog,
+            'healthlog' => $healthlog->load(['child', 'user']),
         ]);
     }
 
@@ -126,7 +124,6 @@ class HealthlogController extends Controller
     {
         $validated = $request->validate([
             'child_id'  => 'required|exists:children,id',
-
             'weight'    => 'nullable|numeric|min:0',
             'height'    => 'nullable|numeric|min:0',
 
