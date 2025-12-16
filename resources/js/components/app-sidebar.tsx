@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Boxes, Folder, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
+import { BookOpen, Boxes, Database, Folder, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -59,6 +59,7 @@ export function AppSidebar() {
         mainNavItems.push(
             { title: 'Healthlog Management', href: '/healthlogs', icon: HeartPulse },
             { title: 'Stocks Management', href: '/stocks', icon: Boxes },
+            { title: 'Data Management', href: '/admin/database', icon: Database },
         );
     }
     // Healthlog Management
