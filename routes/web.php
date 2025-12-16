@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\HealthlogController;
+use App\Http\Controllers\DatabaseMaintenanceController;
 
 // Public pages
 Route::get('/', fn() => Inertia::render('home'))->name('home');
@@ -42,6 +43,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);
+        Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
+        ->name('admin.database.index');
+    
+    Route::post('/admin/database/backup', [DatabaseMaintenanceController::class, 'backup'])
+        ->name('admin.database.backup');
+    
+    Route::get('/admin/database/list', [DatabaseMaintenanceController::class, 'list'])
+        ->name('admin.database.list');
+    
+    Route::post('/admin/database/restore', [DatabaseMaintenanceController::class, 'restore'])
+        ->name('admin.database.restore');
+    
+    Route::get('/admin/database/download/{filename}', [DatabaseMaintenanceController::class, 'download'])
+        ->name('admin.database.download');
+    
+    Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
+        ->name('admin.database.delete');
 
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
