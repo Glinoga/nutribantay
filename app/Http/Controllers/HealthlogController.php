@@ -73,6 +73,9 @@ class HealthlogController extends Controller
                 $height
             );
 
+
+            \Log::info('Growth evaluation', $evaluation);
+
             $validated['bmi']              = $evaluation['bmi'];
             $validated['age_in_months']    = $evaluation['age_months'];
             $validated['status_wfa']       = $evaluation['status_wfa'];
