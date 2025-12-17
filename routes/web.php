@@ -122,6 +122,53 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
+    Route::get('/debug/storage-test', function() {
+    $results = [];
+    
+    // Test 1: Check if backup folder exists
+    $backupPath = storage_path('app/private/Laravel');
+    $results['backup_folder_exists'] = file_exists($backupPath);
+    $results['backup_folder_path'] = $backupPath;
+    
+    // Test 2: Check if we can write to it
+    $testFile = $backupPath . '/test-' . time() . '.txt';
+    try {
+        file_put_contents($testFile, 'test');
+        $results['can_write'] = true;
+        unlink($testFile);
+    } catch (\Exception $e) {
+        $results['can_write'] = false;
+        $results['write_error'] = $e->getMessage();
+    }
+    
+    // Test 3: Check temp directories
+    $tempPaths = [
+        'backup-temp' => storage_path('app/backup-temp'),
+        'restore-temp' => storage_path('app/restore-temp'),
+    ];
+    
+    foreach ($tempPaths as $name => $path) {
+        $results['temp_dirs'][$name] = [
+            'exists' => file_exists($path),
+            'path' => $path,
+        ];
+    }
+    
+    // Test 4: Check if PHP can execute shell commands
+    $results['shell_exec_enabled'] = function_exists('shell_exec');
+    $results['exec_enabled'] = function_exists('exec');
+    
+    // Test 5: Check PHP binary path
+    $results['php_binary'] = PHP_BINARY;
+    $results['php_version'] = PHP_VERSION;
+    
+    // Test 6: Check artisan path
+    $results['artisan_path'] = base_path('artisan');
+    $results['artisan_exists'] = file_exists(base_path('artisan'));
+    
+    return response()->json($results);
+})->middleware(['auth', 'role:Admin']);
+
 });
 
 require __DIR__ . '/settings.php';

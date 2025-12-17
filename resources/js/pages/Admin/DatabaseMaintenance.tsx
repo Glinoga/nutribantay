@@ -45,14 +45,31 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             const response = await axios.post('/admin/database/backup');
 
             if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
+                setMessage({
+                    type: 'success',
+                    text: response.data.message,
+                });
 
-                // Refresh backup list
-                await refreshBackupList();
+                // Show additional details if available
+                if (response.data.filename) {
+                    console.log('Backup created:', response.data.filename);
+                    console.log('Size:', response.data.size);
+                    console.log('Time:', response.data.timestamp);
+                }
+
+                // Refresh backup list after 2 seconds to ensure file is ready
+                setTimeout(async () => {
+                    await refreshBackupList();
+                }, 2000);
             } else {
-                setMessage({ type: 'error', text: response.data.message });
+                setMessage({
+                    type: 'error',
+                    text: response.data.message,
+                });
             }
         } catch (error: any) {
+            console.error('Backup error:', error);
+
             setMessage({
                 type: 'error',
                 text: error.response?.data?.message || '❌ Failed to create backup. Please try again.',
@@ -111,10 +128,20 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                 setMessage({ type: 'error', text: response.data.message });
             }
         } catch (error: any) {
-            setMessage({
-                type: 'error',
-                text: error.response?.data?.message || '❌ Failed to restore database. Please try again.',
-            });
+            const errorMessage = error.response?.data?.message || '❌ Failed to restore database.';
+
+            // Check if it's the SQLite incompatibility error
+            if (errorMessage.includes('SQLite')) {
+                setMessage({
+                    type: 'error',
+                    text: '❌ This backup is incompatible (SQLite format). Please delete old backups and create new MySQL backups.',
+                });
+            } else {
+                setMessage({
+                    type: 'error',
+                    text: errorMessage,
+                });
+            }
         } finally {
             setRestoring(false);
         }
