@@ -51,16 +51,15 @@ export function AppSidebar() {
 
     // Admin-only menu
     if (isAdmin) {
-        mainNavItems.push({ title: 'User Management', href: '/users', icon: UserCog });
+        mainNavItems.push(
+            { title: 'User Management', href: '/users', icon: UserCog },
+            { title: 'Data Management', href: '/admin/database', icon: Database },
+        );
     }
 
     // Healthworker-only menu
     if (isHealthworker) {
-        mainNavItems.push(
-            { title: 'Healthlog Management', href: '/healthlogs', icon: HeartPulse },
-            { title: 'Stocks Management', href: '/stocks', icon: Boxes },
-            { title: 'Data Management', href: '/admin/database', icon: Database },
-        );
+        mainNavItems.push({ title: 'Stocks Management', href: '/stocks', icon: Boxes });
     }
     // Healthlog Management
     // Logic updated: Allow if user is Healthworker OR Admin (Admins should usually see everything)
