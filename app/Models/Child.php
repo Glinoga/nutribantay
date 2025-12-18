@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\AuditableModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Child extends Model
 {
-    use HasFactory;
+    use HasFactory, AuditableModel;
 
     protected $fillable = [
         'first_name',

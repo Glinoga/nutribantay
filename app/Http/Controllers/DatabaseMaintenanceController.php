@@ -97,6 +97,17 @@ public function backup()
     } catch (\Exception $e) {
         \Log::error('Database backup failed (Exception): ' . $e->getMessage());
         \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+        \App\Models\AuditLog::logAction([
+        'action' => 'backup_created',
+        'model_type' => 'System',
+        'description' => "Database backup created: {$filename}",
+        'new_values' => [
+            'filename' => basename($afterBackup),
+            'size' => $this->formatBytes($newBackupSize),
+            'timestamp' => date('Y-m-d H:i:s', $newBackupDate),
+        ],
+    ]);
         
         return response()->json([
             'success' => false,

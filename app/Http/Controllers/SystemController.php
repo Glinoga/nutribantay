@@ -22,6 +22,14 @@ class SystemController extends Controller
         $value = $request->input('status') ? '1' : '0';
         Setting::set('maintenance_mode', $value);
 
+        \App\Models\AuditLog::logAction([
+        'action' => $value === '1' ? 'maintenance_enabled' : 'maintenance_disabled',
+        'model_type' => 'System',
+        'description' => $value === '1' 
+            ? 'Maintenance mode was enabled' 
+            : 'Maintenance mode was disabled',
+    ]);
+
         // If enabling maintenance mode, store a flag in the session
         // This will trigger logout on the next request for non-admins
         if ($value === '1') {

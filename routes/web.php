@@ -13,6 +13,7 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DatabaseMaintenanceController;
+use App\Http\Controllers\AuditLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
         ->name('admin.database.delete');
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+
 
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
