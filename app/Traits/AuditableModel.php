@@ -23,15 +23,12 @@ trait AuditableModel
             $model->auditDeleted();
         });
 
-        // For soft deletes
-        if (method_exists(static::class, 'restored')) {
+        // Only register soft delete events if the model uses SoftDeletes
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
             static::restored(function ($model) {
                 $model->auditRestored();
             });
-        }
 
-        // For force delete
-        if (method_exists(static::class, 'forceDeleted')) {
             static::forceDeleted(function ($model) {
                 $model->auditForceDeleted();
             });

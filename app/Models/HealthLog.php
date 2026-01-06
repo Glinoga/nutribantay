@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class HealthLog extends Model
 {
     use HasFactory;
-     protected $table = 'health_logs';
+    
+    protected $table = 'health_logs';
 
     protected $fillable = [
         'child_id',
@@ -37,6 +38,8 @@ class HealthLog extends Model
         'date_given',
         'next_due_date',
         'vaccine_status',
+
+        'recommendation',
     ];
 
     protected $casts = [
@@ -55,11 +58,23 @@ class HealthLog extends Model
         'updated_at' => 'datetime',
     ];
 
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get the child that this health log belongs to.
+     */
     public function child()
     {
         return $this->belongsTo(Child::class);
     }
 
+    /**
+     * Get the user who created this health log.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);

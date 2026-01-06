@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Traits\AuditableModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Child extends Model
 {
-    use HasFactory, AuditableModel;
+    use HasFactory, SoftDeletes, AuditableModel;
 
     protected $fillable = [
         'first_name',
@@ -76,6 +77,6 @@ class Child extends Model
 
     public function healthlogs()
     {
-        return $this->hasMany(Healthlog::class);
+        return $this->hasMany(HealthLog::class);
     }
 }

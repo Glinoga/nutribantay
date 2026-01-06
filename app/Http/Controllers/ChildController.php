@@ -12,6 +12,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
+        // Only get non-deleted children
         $children = Child::with(['creator', 'updater'])
             ->where('barangay', $user->barangay)
             ->get();
@@ -33,6 +34,30 @@ class ChildController extends Controller
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
+                'barangay' => $child->barangay,
+            ]),
+        ]);
+    }
+
+    public function archived()
+    {
+        $user = auth()->user();
+
+        $archivedChildren = Child::onlyTrashed()
+            ->where('barangay', $user->barangay)
+            ->with(['creator', 'updater'])
+            ->get();
+
+        return Inertia::render('Children/Archived', [
+            'children' => $archivedChildren->map(fn($child) => [
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'age' => $child->age,
+                'deleted_at' => $child->deleted_at,
                 'barangay' => $child->barangay,
             ]),
         ]);
@@ -174,10 +199,45 @@ class ChildController extends Controller
             abort(403);
         }
 
+        // Soft delete - will trigger audit log
         $child->delete();
 
         return redirect()->route('children.index')
-            ->with('success', 'Child deleted successfully!');
+            ->with('success', 'Child archived successfully!');
+    }
+
+    public function restore(string $id)
+    {
+        $user = auth()->user();
+
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        if ($child->barangay !== $user->barangay) {
+            abort(403);
+        }
+
+        // Restore - will trigger audit log
+        $child->restore();
+
+        return redirect()->route('children.index')
+            ->with('success', 'Child restored successfully!');
+    }
+
+    public function forceDelete(string $id)
+    {
+        $user = auth()->user();
+
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        if ($child->barangay !== $user->barangay) {
+            abort(403);
+        }
+
+        // Permanently delete - will trigger audit log
+        $child->forceDelete();
+
+        return redirect()->route('children.archived')
+            ->with('success', 'Child permanently deleted!');
     }
 
     public function storeNote(Request $request, Child $child)
