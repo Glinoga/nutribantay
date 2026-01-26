@@ -118,26 +118,6 @@ export default function Show({ log }: Props) {
                         </dl>
                     </div>
 
-                    {/* Old Values */}
-                    {log.old_values && Object.keys(log.old_values).length > 0 && (
-                        <div className="rounded-lg bg-white p-6 shadow">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Previous Values</h2>
-                            <div className="rounded bg-red-50 p-4">
-                                <pre className="overflow-x-auto text-sm text-gray-800">{JSON.stringify(log.old_values, null, 2)}</pre>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* New Values */}
-                    {log.new_values && Object.keys(log.new_values).length > 0 && (
-                        <div className="rounded-lg bg-white p-6 shadow">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">New Values</h2>
-                            <div className="rounded bg-green-50 p-4">
-                                <pre className="overflow-x-auto text-sm text-gray-800">{JSON.stringify(log.new_values, null, 2)}</pre>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Changes Comparison */}
                     {log.old_values && log.new_values && Object.keys(log.old_values).length > 0 && Object.keys(log.new_values).length > 0 && (
                         <div className="rounded-lg bg-white p-6 shadow">
