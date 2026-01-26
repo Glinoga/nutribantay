@@ -79,15 +79,19 @@ class UserController extends Controller
             'role' => 'required|string|exists:roles,name',
         ]);
 
+        $user = auth()->user();
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'barangay' => $user->barangay, // Inherit barangay from authenticated user
         ]);
 
         $user->assignRole($request->role);
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')
+            ->with('success', 'User created successfully!');
     }
 
     public function updateRole(Request $request, string $id)
