@@ -23,19 +23,19 @@ class RecommendationController extends Controller
 
         // Step 2: Calculate age in months and days
         $birthdate = Carbon::parse($child->birthdate);
-$now = Carbon::now();
+        $now = Carbon::now();
 
-// Calculate exact difference in years, months, and days
-$birthdate = Carbon::parse($child->birthdate);
-$now = Carbon::now();
+        // Calculate exact difference in years, months, and days
+        $birthdate = Carbon::parse($child->birthdate);
+        $now = Carbon::now();
 
-// Exact difference in years, months, and days
-$years = $birthdate->diffInYears($now);
-$months = $birthdate->copy()->addYears($years)->diffInMonths($now);
-$days = $birthdate->copy()->addYears($years)->addMonths($months)->diffInDays($now);
+        // Exact difference in years, months, and days
+        $years = $birthdate->diffInYears($now);
+        $months = $birthdate->copy()->addYears($years)->diffInMonths($now);
+        $days = $birthdate->copy()->addYears($years)->addMonths($months)->diffInDays($now);
 
-// Human-readable format for AI prompt
-$ageFormatted = "{$years} year(s), {$months} month(s), and {$days} day(s)";
+        // Human-readable format for AI prompt
+        $ageFormatted = "{$years} year(s), {$months} month(s), and {$days} day(s)";
 
 
 
@@ -144,23 +144,10 @@ FORMAT:
 
 
 
-        // Step 7: Send to AI
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer {$apiKey}",
-            'Content-Type' => 'application/json',
-        ])->post('https://api.openai.com/v1/chat/completions', [
-            'model' => 'gpt-4o-mini',
-            'messages' => [
-                ['role' => 'system', 'content' => 'Ikaw ay isang AI nutrition assistant.'],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'max_tokens' => 500,
-            'temperature' => 0.7,
-        ]);
+        $recommendation = null;
 
-        // Step 8: Fallback if AI fails
-        if (!$response->successful()) {
-            \Log::error('AI request failed', ['response' => $response->body()]);
+        if (empty($apiKey)) {
+            \Log::warning('OpenAI API key missing. Falling back to local recommendation.');
             $recommendation = \App\Helpers\AIRecommender::getRecommendation(
                 $nutritionStatus,
                 $child->sex,
@@ -168,13 +155,48 @@ FORMAT:
                 $request->bmi ?? 0
             );
         } else {
-            $recommendation = $response->json('choices.0.message.content') ?? 
-                              \App\Helpers\AIRecommender::getRecommendation(
-                                  $nutritionStatus,
-                                  $child->sex,
-                                  $months,
-                                  $request->bmi ?? 0
-                              );
+            try {
+                // Step 7: Send to AI
+                $response = Http::withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                    'Content-Type' => 'application/json',
+                ])->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Ikaw ay isang AI nutrition assistant.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'max_tokens' => 500,
+                    'temperature' => 0.7,
+                ]);
+
+                // Step 8: Fallback if AI fails
+                if (!$response->successful()) {
+                    \Log::error('AI request failed', ['response' => $response->body()]);
+                    $recommendation = \App\Helpers\AIRecommender::getRecommendation(
+                        $nutritionStatus,
+                        $child->sex,
+                        $months,
+                        $request->bmi ?? 0
+                    );
+                } else {
+                    $recommendation = $response->json('choices.0.message.content') ??
+                        \App\Helpers\AIRecommender::getRecommendation(
+                            $nutritionStatus,
+                            $child->sex,
+                            $months,
+                            $request->bmi ?? 0
+                        );
+                }
+            } catch (\Throwable $e) {
+                \Log::error('AI request exception', ['error' => $e->getMessage()]);
+                $recommendation = \App\Helpers\AIRecommender::getRecommendation(
+                    $nutritionStatus,
+                    $child->sex,
+                    $months,
+                    $request->bmi ?? 0
+                );
+            }
         }
 
         return response()->json(['recommendation' => trim($recommendation)]);

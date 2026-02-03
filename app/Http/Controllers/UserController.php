@@ -33,7 +33,7 @@ class UserController extends Controller
         }
 
         $users = $query->get();
-
+    
         return Inertia::render('Users/Index', [
             'users' => $users->map(fn($u) => [
                 'id' => $u->id,
@@ -92,31 +92,6 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully!');
-    }
-
-    public function updateRole(Request $request, string $id)
-    {
-        $request->validate([
-            'role' => 'required|in:admin,healthworker',
-        ]);
-
-        $user = User::findOrFail($id);
-        $oldRoles = $user->getRoleNames()->toArray();
-        
-        $user->syncRoles([$request->role]);
-
-        // Log role change
-        AuditLog::logAction([
-            'action' => 'updated',
-            'model_type' => 'User',
-            'model_id' => $user->id,
-            'model_name' => $user->name,
-            'description' => "User role changed from '" . implode(', ', $oldRoles) . "' to '{$request->role}'",
-            'old_values' => ['roles' => $oldRoles],
-            'new_values' => ['roles' => [$request->role]],
-        ]);
-
-        return to_route('users.index')->with('success', 'User role updated successfully.');
     }
 
     /**

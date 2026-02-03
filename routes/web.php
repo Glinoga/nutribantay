@@ -96,6 +96,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/api/stocks-for-barangay', [StockController::class, 'apiListForBarangay'])
             ->name('stocks.api.forBarangay');
 
+    });
+
+    //recommendations - both admin and healthworker (waiting if admin needs to be restricted)
+
+    /**Route::post('/recommendations', [RecommendationController::class, 'generate'])
+            ->name('recommendations.generate');
+    }); */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
         Route::post('/recommendations', [RecommendationController::class, 'generate'])
             ->name('recommendations.generate');
     });
