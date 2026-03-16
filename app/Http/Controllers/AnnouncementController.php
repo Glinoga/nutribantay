@@ -79,6 +79,7 @@ class AnnouncementController extends Controller
             'summary' => 'required|string',
             'content' => 'required|string',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'message' => ['required', 'string', 'max:500'],
         ]);
 
         if ($request->hasFile('image')) {

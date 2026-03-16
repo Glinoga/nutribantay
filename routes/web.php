@@ -36,6 +36,7 @@ Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->na
 // Routes for authenticated users
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
+    Route::get('dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('children', ChildController::class);
     // Route::resource('announcements', AnnouncementController::class);
 
@@ -47,6 +48,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);
+        Route::post('/dashboard/messages', [App\Http\Controllers\DashboardMessageController::class, 'store'])
+    ->name('dashboard.messages.store');
+
+Route::delete('/dashboard/messages/{dashboardMessage}', [App\Http\Controllers\DashboardMessageController::class, 'destroy'])
+    ->name('dashboard.messages.destroy');
+
+        
 
         //Announcements
         Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');

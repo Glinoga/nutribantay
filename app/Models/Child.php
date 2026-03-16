@@ -19,6 +19,7 @@ class Child extends Model
     'created_by',
     'barangay',
     'contact_number',
+    'vaccinated',
 ];
 
 

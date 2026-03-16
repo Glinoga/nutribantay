@@ -22,6 +22,7 @@ return new class extends Migration
             $table->longText('content');
             $table->string('image')->nullable();
             $table->timestamps();
+             $table->text('message');
         });
     }
 
