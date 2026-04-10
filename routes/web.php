@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/children/{id}/force-delete', [ChildController::class, 'forceDelete'])->name('children.forceDelete');
     Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
+    Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
 
     /*
     |--------------------------------------------------------------------------

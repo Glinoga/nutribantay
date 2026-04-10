@@ -31,10 +31,12 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
-                'created_by' => $child->creator?->name,
-                'updated_by' => $child->updater?->name,
-                'updated_at' => $child->updated_at,
                 'barangay' => $child->barangay,
+
+                // ✅ FIXED STRUCTURE (matches frontend)
+                'creator' => [
+                    'name' => $child->creator?->name
+                ],
             ]),
         ]);
     }
@@ -74,7 +76,7 @@ class ChildController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
-            'sex' => 'required|in:Male,Female',
+            'sex' => 'required|in:M,F,Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
@@ -84,6 +86,9 @@ class ChildController extends Controller
         ]);
 
         $user = auth()->user();
+
+        // ✅ Normalize sex
+        $validated['sex'] = strtoupper($validated['sex']) === 'M' ? 'Male' : 'Female';
 
         Child::create([
             ...$validated,
@@ -119,10 +124,11 @@ class ChildController extends Controller
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
-                'created_by' => $child->creator?->name,
-                'updated_by' => $child->updater?->name,
-                'updated_at' => $child->updated_at,
-                'created_at' => $child->created_at,
+
+                'creator' => [
+                    'name' => $child->creator?->name
+                ],
+
                 'notes' => $child->notes->map(fn($note) => [
                     'id' => $note->id,
                     'note' => $note->note,
@@ -155,8 +161,6 @@ class ChildController extends Controller
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
-                'updated_by' => $child->updater?->name,
-                'updated_at' => $child->updated_at,
             ],
         ]);
     }
@@ -173,7 +177,7 @@ class ChildController extends Controller
             'first_name' => 'required|string|max:255',
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
-            'sex' => 'required|in:Male,Female',
+            'sex' => 'required|in:M,F,Male,Female',
             'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
@@ -181,6 +185,9 @@ class ChildController extends Controller
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
         ]);
+
+        // ✅ Normalize sex
+        $validated['sex'] = strtoupper($validated['sex']) === 'M' ? 'Male' : 'Female';
 
         $child->update([
             ...$validated,
@@ -238,6 +245,52 @@ class ChildController extends Controller
 
         return redirect()->route('children.archived')
             ->with('success', 'Child permanently deleted!');
+    }
+
+    // 🔥 ✅ IMPORT FUNCTION (NEW)
+    public function import(Request $request)
+    {
+        $user = auth()->user();
+
+        $rows = $request->input('data');
+
+        if (!$rows || !is_array($rows)) {
+            return back()->with('error', 'Invalid import data.');
+        }
+
+        foreach ($rows as $row) {
+
+            // skip invalid rows
+            if (
+                empty($row['first_name']) ||
+                empty($row['last_name']) ||
+                empty($row['sex'])
+            ) {
+                continue;
+            }
+
+            $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
+
+            Child::create([
+                'first_name' => $row['first_name'],
+                'middle_initial' => $row['middle_initial'] ?? null,
+                'last_name' => $row['last_name'],
+                'sex' => $sex,
+                'age' => $row['age'] ?? 0,
+                'weight' => $row['weight'] ?? 0,
+                'height' => $row['height'] ?? 0,
+                'birthdate' => $row['birthdate'] ?? null,
+
+                'barangay' => $user->barangay,
+                'created_by' => $user->id,
+
+                'address' => null,
+                'contact_number' => null,
+            ]);
+        }
+
+        return redirect()->route('children.index')
+            ->with('success', 'Excel imported successfully!');
     }
 
     public function storeNote(Request $request, Child $child)
