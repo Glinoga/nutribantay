@@ -34,7 +34,7 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-   public function share(Request $request): array
+    public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
             'auth' => [
@@ -49,6 +49,10 @@ class HandleInertiaRequests extends Middleware
                 'roles' => $request->user()
                     ? $request->user()->getRoleNames()->toArray()
                     : [],
+            ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
             ],
         ]);
     }
