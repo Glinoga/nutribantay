@@ -57,7 +57,7 @@ class RecommendationController extends Controller
         // Step 6: Build the prompt
         $prompt = $this->buildPrompt(
             ageFormatted: $ageFormatted,
-            months: $months,
+            months: $totalMonths,
             birthdate: $child->birthdate,
             sex: $child->sex,
             bmi: $bmi,
@@ -155,18 +155,9 @@ AGE-SPECIFIC RULES:
 
 ⚠️ CRITICAL: Kung ang bata ay 12-35 buwan, GAMITIN ANG REGULAR NA PORMAT - HUWAG GAMITIN ANG MASHED O PUREED!
 
-DEWORMING RULE (STRICT - MANDATORY):
-KUNG ANG BATA AY 12 BUWAN O LUMANG KAMPAR AT DEWORMING = No:
-- KAILANGANG NAKAINCLUDE SA OUTPUT: Deworming tablets dapat kumuha sa health center
-
-KUNG ANG BATA AY BABABA SA 11 BUWAN AT DEWORMING = No:
-- HUWAG MAGBIGAY NG DEWORMING RECOMMENDATION
-
-DEWORMING RULE (ISTMAHIN MO):
+DEWORMING RULE (MANDATORY - SUMUNOD SA NEEDS DEWORMING FIELD):
 - Kung NEEDS DEWORMING = Yes: MAGBIGAY NG DEWORMING TABLETS SA OUTPUT
 - Kung NEEDS DEWORMING = No: HUWAG MAGBIGAY NG DEWORMING SA OUTPUT
-
-HUWAG MAGDAGDAG NG IMAHINAWON TUNGKOL SA EDAD - SUMUNOD KA LAGE SA NEEDS DEWORMING FIELD
 
 FOOD RESTRICTIONS FORMAT:
 - Kung 0-5 months: Bawal ang anumang solid food - gatas lamang
