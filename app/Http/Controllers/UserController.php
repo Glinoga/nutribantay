@@ -125,24 +125,33 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required',
             'password' => 'nullable|string|min:8',
-            'role' => 'required|in:admin,healthworker',
-            'barangay' => 'required|integer'
+            'role' => 'required|string|exists:roles,name',
         ]);
 
-        $user = User::findOrFail($id);
+        $user = auth()->user();
+        $targetUser = User::findOrFail($id);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->barangay = $request->barangay;
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        // Prevent admin from editing users in different barangays
+        if ($targetUser->barangay !== $user->barangay) {
+            abort(403, 'You cannot edit users from other barangays.');
         }
 
-        $user->save();
+        // Validate role exists in database
+        if (!Role::where('name', $request->role)->exists()) {
+            return back()->withErrors(['role' => 'Invalid role selected.']);
+        }
+
+        $targetUser->name = $request->name;
+        $targetUser->email = $request->email;
+
+        if ($request->filled('password')) {
+            $targetUser->password = Hash::make($request->password);
+        }
+
+        $targetUser->save();
 
         // Assign role with Spatie
-        $user->syncRoles([$request->role]);
+        $targetUser->syncRoles([$request->role]);
 
         return to_route('users.index');
     }

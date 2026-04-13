@@ -12,8 +12,13 @@ type User = {
 };
 
 type RegistrationCode = {
+    id: number;
     code: string;
+    barangay: number;
     expires_at: string | null;
+    is_used: boolean;
+    status: 'active' | 'used' | 'expired';
+    created_at: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -34,11 +39,16 @@ export default function Index({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [loading, setLoading] = useState(false);
 
+    // Modal state
+    const [showModal, setShowModal] = useState(false);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [codeSearch, setCodeSearch] = useState('');
+    const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
     // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
 
     useEffect(() => {
-        // Fetch current maintenance mode on load
         axios
             .get('/maintenance/status')
             .then((res) => setMaintenance(res.data.status))
@@ -51,7 +61,6 @@ export default function Index({ users, filters }: Props) {
             const res = await axios.post('/maintenance/toggle', { status: newStatus });
             setMaintenance(res.data.status);
 
-            // Show appropriate alert
             if (res.data.status) {
                 alert(
                     '✅ Maintenance mode ENABLED\n\n' +
@@ -62,9 +71,6 @@ export default function Index({ users, filters }: Props) {
             } else {
                 alert('✅ Maintenance mode DISABLED\n\nAll users can now access the system normally.');
             }
-
-            // Optionally reload the page to ensure UI is in sync
-            // window.location.reload();
         } catch (err) {
             console.error(err);
             alert('❌ Failed to update maintenance mode. Please try again.');
@@ -76,12 +82,83 @@ export default function Index({ users, filters }: Props) {
             setLoading(true);
             const response = await axios.post('/registration-codes/generate', { count });
             setCodes(response.data.codes);
+
+            // If modal is open, refresh the list
+            if (showModal) {
+                const modalResponse = await axios.get('/registration-codes');
+                setCodes(modalResponse.data.codes);
+            }
+
             alert(`Successfully generated ${response.data.codes.length} code(s)!`);
         } catch (error) {
             console.error(error);
             alert('Failed to generate admin codes.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const openCodeModal = async () => {
+        setShowModal(true);
+        setModalLoading(true);
+        try {
+            const response = await axios.get('/registration-codes');
+            console.log('Response:', response.data);
+            setCodes(response.data.codes || response.data);
+        } catch (error: any) {
+            console.error('Failed to fetch codes:', error);
+            const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message;
+            alert('Failed to load codes: ' + errorMessage);
+        } finally {
+            setModalLoading(false);
+        }
+    };
+
+    const copyToClipboard = async (code: string) => {
+        try {
+            await navigator.clipboard.writeText(code);
+            setCopiedCode(code);
+            setTimeout(() => setCopiedCode(null), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
+    const copyAllCodes = async () => {
+        const codeList = filteredCodes.map((c) => c.code).join('\n');
+        try {
+            await navigator.clipboard.writeText(codeList);
+            alert('All codes copied to clipboard!');
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
+    const deleteCode = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this code?')) return;
+
+        try {
+            await axios.delete(`/registration-codes/${id}`);
+            setCodes(codes.filter((c) => c.id !== id));
+            alert('Code deleted successfully.');
+        } catch (error) {
+            console.error('Failed to delete code:', error);
+            alert('Failed to delete code.');
+        }
+    };
+
+    const filteredCodes = codes.filter((c) => c.code.toLowerCase().includes(codeSearch.toLowerCase()));
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'active':
+                return 'bg-green-100 text-green-800';
+            case 'used':
+                return 'bg-gray-100 text-gray-800';
+            case 'expired':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
         }
     };
 
@@ -150,24 +227,10 @@ export default function Index({ users, filters }: Props) {
                     >
                         {loading ? 'Generating...' : 'Generate'}
                     </button>
+                    <button onClick={openCodeModal} className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
+                        View All Codes
+                    </button>
                 </div>
-
-                {codes.length > 0 ? (
-                    <div className="mt-3">
-                        <ul className="list-inside list-disc space-y-1">
-                            {codes.map((code, index) => (
-                                <li key={index} className="font-mono text-blue-600">
-                                    {code.code}{' '}
-                                    {code.expires_at && (
-                                        <span className="text-sm text-gray-600">(expires {new Date(code.expires_at).toLocaleString()})</span>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ) : (
-                    <div className="mt-3 text-gray-500">No codes generated yet.</div>
-                )}
             </div>
 
             {/* Users Table */}
@@ -216,6 +279,95 @@ export default function Index({ users, filters }: Props) {
                     ))}
                 </tbody>
             </table>
+
+            {/* Codes Modal */}
+            {showModal && (
+                <>
+                    {/* Backdrop with blur */}
+                    <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
+
+                    {/* Modal Container */}
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="max-h-[80vh] w-full max-w-4xl rounded-lg bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                            <div className="mb-4 flex items-center justify-between">
+                                <h2 className="text-xl font-bold">Registration Codes</h2>
+                                <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">
+                                    ✕ Close
+                                </button>
+                            </div>
+
+                            {/* Search and Actions */}
+                            <div className="mb-4 flex items-center justify-between">
+                                <input
+                                    type="text"
+                                    value={codeSearch}
+                                    onChange={(e) => setCodeSearch(e.target.value)}
+                                    placeholder="Search codes..."
+                                    className="w-64 rounded border px-3 py-2"
+                                />
+                                <button onClick={copyAllCodes} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                                    Copy All
+                                </button>
+                            </div>
+
+                            {/* Codes Table */}
+                            {modalLoading ? (
+                                <div className="py-8 text-center">Loading...</div>
+                            ) : (
+                                <div className="max-h-96 overflow-y-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="sticky top-0 bg-gray-50">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Barangay</th>
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Expires</th>
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200">
+                                            {filteredCodes.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                                                        No codes found.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredCodes.map((code) => (
+                                                    <tr key={code.id} className="hover:bg-gray-50">
+                                                        <td className="px-4 py-2 font-mono text-sm">{code.code}</td>
+                                                        <td className="px-4 py-2">{code.barangay}</td>
+                                                        <td className="px-4 py-2 text-sm">
+                                                            {code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}
+                                                        </td>
+                                                        <td className="px-4 py-2">
+                                                            <button
+                                                                onClick={() => copyToClipboard(code.code)}
+                                                                className="mr-2 rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
+                                                            >
+                                                                {copiedCode === code.code ? 'Copied!' : 'Copy'}
+                                                            </button>
+                                                            {code.status !== 'active' && (
+                                                                <button
+                                                                    onClick={() => deleteCode(code.id)}
+                                                                    className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+                                                                >
+                                                                    Delete
+                                                                </button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            <div className="mt-4 text-sm text-gray-500">Total: {filteredCodes.length} code(s)</div>
+                        </div>
+                    </div>
+                </>
+            )}
         </AppLayout>
     );
 }

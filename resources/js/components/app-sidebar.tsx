@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Boxes, Database, FileTextIcon, Folder, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
+import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -73,18 +73,7 @@ export function AppSidebar() {
     }
 
     // Footer items (static)
-    const footerNavItems: NavItem[] = [
-        {
-            title: 'Repository',
-            href: 'https://github.com/laravel/react-starter-kit',
-            icon: Folder,
-        },
-        {
-            title: 'Documentation',
-            href: 'https://laravel.com/docs/starter-kits#react',
-            icon: BookOpen,
-        },
-    ];
+    const footerNavItems: NavItem[] = [];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

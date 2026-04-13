@@ -16,6 +16,21 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        // Daily database backup at 2:00 AM
+        $schedule->command('backup:run --only-db --disable-notifications')
+            ->dailyAt('02:00')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->appendOutputTo(storage_path('logs/backup.log'));
+
+        // Clean old backups daily at 3:00 AM
+        $schedule->command('clean:old-backups')
+            ->dailyAt('03:00')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->appendOutputTo(storage_path('logs/backup-cleanup.log'));
+    })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 

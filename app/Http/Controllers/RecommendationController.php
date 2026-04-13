@@ -10,195 +10,402 @@ use Carbon\Carbon;
 
 class RecommendationController extends Controller
 {
+    private const MAX_RETRIES = 2;
+    private const VALIDATION_FAILED = 'VALIDATION_FAILED';
+
     public function generate(Request $request)
     {
         $apiKey = config('openai.api_key');
 
-        // Step 1: Fetch child
-        $child = Child::find($request->child_id);
+        // Step 1: Validate and fetch child
+        $child = Child::with(['healthLogs' => function ($query) {
+            $query->latest()->first();
+        }])->find($request->child_id);
 
         if (!$child || !$child->birthdate) {
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
         }
 
-        // Step 2: Calculate age in months and days
+        // Step 2: Calculate age accurately
         $birthdate = Carbon::parse($child->birthdate);
         $now = Carbon::now();
+        $totalMonths = (int) $birthdate->diffInMonths($now);
+        $years = floor($totalMonths / 12);
+        $months = $totalMonths % 12;
+        $ageFormatted = "{$years} taon, {$months} buwan";
 
-        // Calculate exact difference in years, months, and days
-        $birthdate = Carbon::parse($child->birthdate);
-        $now = Carbon::now();
+        // Step 3: Get child data
+        $bmi = $request->bmi ?? $child->healthLogs?->first()?->bmi ?? 0;
+        $nutritionStatus = $request->nutrition_status ?? $child->healthLogs?->first()?->nutrition_status ?? 'Normal';
+        
+        // Step 4: Get Vitamin A and Deworming status from health log (latest one)
+        $latestHealthLog = $child->healthLogs()->latest()->first();
+        $vitaminAStatus = $latestHealthLog?->vitamin_a ? 'Yes' : 'No';
+        $dewormingStatus = $latestHealthLog?->deworming ? 'Yes' : 'No';
+        
+        // Compute deworming recommendation flag - only for 12+ months AND no deworming yet
+        $needsDeworming = ($totalMonths >= 12 && $dewormingStatus === 'No') ? 'Yes' : 'No';
 
-        // Exact difference in years, months, and days
-        $years = $birthdate->diffInYears($now);
-        $months = $birthdate->copy()->addYears($years)->diffInMonths($now);
-        $days = $birthdate->copy()->addYears($years)->addMonths($months)->diffInDays($now);
+        // Step 5: Fetch stocks by category
+        $stocks = Stock::where('barangay', $child->barangay)->get();
+        $foodItems = $stocks->where('category', 'food')->pluck('item_name')->toArray();
+        $vitaminItems = $stocks->where('category', 'vitamin')->pluck('item_name')->toArray();
+        
+        $foodList = !empty($foodItems) ? implode(', ', $foodItems) : 'Walang available na pagkain sa barangay.';
+        $vitaminList = !empty($vitaminItems) ? implode(', ', $vitaminItems) : 'Walang available na vitamin sa barangay.';
 
-        // Human-readable format for AI prompt
-        $ageFormatted = "{$years} year(s), {$months} month(s), and {$days} day(s)";
+        // Step 6: Build the prompt
+        $prompt = $this->buildPrompt(
+            ageFormatted: $ageFormatted,
+            months: $months,
+            birthdate: $child->birthdate,
+            sex: $child->sex,
+            bmi: $bmi,
+            nutritionStatus: $nutritionStatus,
+            vitaminAStatus: $vitaminAStatus,
+            dewormingStatus: $dewormingStatus,
+            needsDeworming: $needsDeworming,
+            foodList: $foodList,
+            vitaminList: $vitaminList
+        );
 
+        // Step 7: Try API with retry logic
+        $recommendation = $this->generateWithRetry($apiKey, $prompt, $nutritionStatus, $child->sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
 
+        // Step 8: Post-process to fix any meals with only light foods
+        $recommendation = $this->fixMealPlan($recommendation, $months);
 
-        // Step 3: BMI and nutrition status defaults
-        $bmiText = $request->bmi ?? 'Hindi available';
-        $nutritionStatus = $request->nutrition_status ?? 'Normal';
+        return response()->json(['recommendation' => trim($recommendation)]);
+    }
 
-        // Step 4: Fetch stocks for the child’s barangay
-        // Fetch stocks for the child’s barangay
-$stocks = Stock::where('barangay', $child->barangay)->get(['item_name']);
-$stockList = $stocks->isEmpty()
-    ? 'Walang available health supplies sa barangay.'
-    : $stocks->pluck('item_name')->join(', ');
-
-        // Step 6: AI prompt with strict instructions
-        $prompt = "
+    private function buildPrompt(
+        string $ageFormatted,
+        int $months,
+        string $birthdate,
+        string $sex,
+        float $bmi,
+        string $nutritionStatus,
+        string $vitaminAStatus,
+        string $dewormingStatus,
+        string $needsDeworming,
+        string $foodList,
+        string $vitaminList
+    ): string {
+        return "
 Ikaw ay isang AI nutrition assistant para sa mga barangay health workers sa Pilipinas.
-Sagutin sa casual at madaling maintindihan na Tagalog. Huwag lalampas sa 500 tokens.
-Magbigay ng 5 nutrition-based tips para sa bata, pagkatapos ay magbigay ng simpleng meal plan para sa isang araw. 
-Gamitin ang mga available health supplies sa barangay para sa practical na payo. 
-Ilagay ang food restrictions o allergy warnings sa dulo. Huwag mag-imbento o manghula; gamitin lamang ang ibinigay na detalye.
+Sagutin sa simpleng Tagalog. Huwag lalampas sa 500 tokens.
 
-FEEDING RULES (STRICT – Huwag lalampas sa output):
-- 0–5 months: Gatas lamang (exclusive breastfeeding). Huwag magbigay ng solid food o complementary feeding.
-- 6–11 months: Breastfeeding + complementary feeding (malalambot na pagkain) puwede.
-- 12 months pataas: Regular solid foods na angkop sa edad.
-PAALALA: Huwag gamitin ang terminolohiyang “Milk Formula” o “Formula Milk.”
+IMPORMASYON NG BATA:
+- Edad: {$ageFormatted} ({$months} buwan)
+- Petsa ng kapanganakan: {$birthdate}
+- Kasarian: {$sex}
+- BMI: {$bmi}
+- Nutrition Status: {$nutritionStatus}
+- Vitamin A: {$vitaminAStatus}
+- Deworming: {$dewormingStatus}
+- NEEDS DEWORMING: {$needsDeworming}
 
-IMPORMASYON NG BATA (Siguraduhing isang beses lang ito lalabas):
-- Edad: {$ageFormatted}
-- Petsa ng kapanganakan: {$child->birthdate}
-- Kasarian: {$child->sex}
-- Available health supplies sa barangay: {$stockList}
+AVAILABLE SA BARANGAY:
+- Pagkain: {$foodList}
+- Vitamins: {$vitaminList}
 
-INSTRUCTIONS:
-1. Magbigay ng 3–4 malinaw, maiksi, at praktikal na nutrition tips batay sa edad, BMI, at nutrition status.
-2. Sundin ang tamang feeding rules base sa edad ng bata. 
-   - Kung bata ay 0–5 months, ang meal plan ay **gatas lamang**. Huwag magbigay ng anumang solid food o complementary feeding.
-   - Kung bata ay 6–11 months, puwede nang magdagdag ng malalambot na pagkain (lugaw, mashed fruits/vegetables) kasama ng breastfeeding.
-   - Kung bata ay 12 months pataas, puwede na ang regular solid foods na angkop sa edad.
-3. Gumawa ng **simpleng meal plan para sa isang araw** sa **linear format** (hal. *Umaga: …, Tanghali: …, Gabi: …*). **Huwag gamitin ang pangalan ng bata** sa meal plan.
+FEEDING RULES (STRICT):
+- 0-5 months: Gatas lamang (breastmilk/formula) - WALANG SOLID FOOD
+- 6-11 months: Breastmilk + soft foods (lugaw, mashed fruits/vegetables)
+- 12-35 months: Lugaw/Kanin na may gulay at itlog, may prutas
+- 36+ months: Regular solid foods - dapat may base food + side dish
 
-**Validity Conditions — kailangang pumasa ang output sa LAHAT ng ito**
+MEAL FORMAT (STRICT - Bawat meal dapat may heavy food + side dish):
+HALIMBAWA NG VALID MEAL PLAN (para sa 3+ taong gulang):
+- Umaga: Lugaw na may itlog at gulay
+- Tanghali: Kanin na may tinadtad na karne at gulay
+- Gabi: Kamote na may sabaw at prutas
+HALIMBAWA NG INVALID (HINDI PUWEDE):
+- Tanghali: Saging lang (WALANG BASE FOOD!)
+- Gabi: Gulay lang (WALANG BASE FOOD!)
+- Umaga: Lugaw lang (KAILANGAN MAY SIDE DISH!)
 
-* **Eksaktong tatlong magkaibang meal entries lamang** ang dapat lumabas (Umaga, Tanghali, Gabi)
-* **Walang base food o pangunahing ulam ang maaaring maulit**
+AGE-SPECIFIC MEAL EXAMPLES:
+- 0-5 months: GATAS LAMANG - Walang solid food!
+- 6-11 months: Lugaw na may MASHED fruits/vegetables, o soft na pagkain (PUREED)
+- 12-35 months: Lugaw/Kanin na may gulay at itlog, may prutas
+- 36+ months: Lugaw/Kanin/Kamote na may karne/gulay/prutas
 
-  * Ang **base food** ay ang pangunahing putahe o starch (hal. lugaw, kanin, kamote, mais, tinapay)
-  * Ang pagdagdag ng itlog, gulay, o prutas **HINDI** nagpapabago ng base food
-* Kung may **kahit isang base food na naulit**, **INVALID ang output at kailangang muling buuin**
+**STRICT PARA SA 6-11 BUWAN:**
+- Lahat ng pagkain ay dapat MASHED o PUREED
+- Halimbawa: Lugaw na may MASHED na saging, Lugaw na may PUREED na gulay
+- Bawal ang: sinigang, nilagang buo, steak, anumang hindi mashed
 
-**Food Eligibility Rules**
+VALIDATION RULES (BAGO ILABAS ANG SAGOT, DAPAT PASSING LAHAT):
+1. **Tatlong magkaibang base foods lamang** sa meal plan (Umaga, Tanghali, Gabi)
+   - Bawal ang: lugaw, kanin, kamote, tinapay, pasta, noodles na paulit-ulit
+   - Halimbawa ng valid: Umaga: Lugaw, Tanghali: Kanin, Gabi: Kamote
+   - Halimbawa ng invalid: Umaga: Lugaw, Tanghali: Lugaw, Gabi: Lugaw (DOBULIN!)
+2. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
+3. **Bawat meal dapat may heavy food (lugaw/kanin/kamote/tinapay)** - bawal ang prutas o gulay lang
+4. **Light food (prutas/gulay) dapat KASAMA ng heavy food**, hindi pamalit sa heavy food
+5. **0-5 months - GATAS LAMANG** - huwag magbigay ng anumang solid food
+6. **6-11 months - SOFT FOODS LAMANG** - dapat mashed o pureed, huwag magbigay ng regular solid food
 
-* **Magrekomenda lamang ng pagkaing akma sa edad, BMI, nutrition status, at feeding rules ng bata**
-* **Ipinagbabawal ang processed at high-sodium foods**, kabilang ngunit hindi limitado sa:
+AGE-SPECIFIC RULES:
+- 0-5 months: GATAS LAMANG (breastmilk/formula) - WALANG SOLID FOOD
+- 6-11 months: SOFT FOODS - dapat MASHED o PUREED (hal. Lugaw na may MASHED na saging)
+- 12-35 months: REGULAR SOLIDS - hindi na kailangan ng MASHED (hal. Lugaw na may gulay, Kanin na may itlog)
+- 36+ months: Regular solid foods - buong pagkain pwede na
 
-  * instant noodles / Pancit Canton
-  * de-lata
-  * soft drinks
-  * instant o packaged snacks
-* Kung ang pagkain ay **hindi akma sa feeding rules**, **HINDI ito maaaring irekomenda**, kahit available sa barangay
+⚠️ CRITICAL: Kung ang bata ay 12-35 buwan, GAMITIN ANG REGULAR NA PORMAT - HUWAG GAMITIN ANG MASHED O PUREED!
 
-**Light vs Heavy Food Rule**
+DEWORMING RULE (STRICT - MANDATORY):
+KUNG ANG BATA AY 12 BUWAN O LUMANG KAMPAR AT DEWORMING = No:
+- KAILANGANG NAKAINCLUDE SA OUTPUT: Deworming tablets dapat kumuha sa health center
 
-* Ang **light o small foods** (hal. prutas, simpleng gulay, sabaw lamang) ay **HINDI maaaring tumayo mag-isa bilang isang meal**
-* Maaari lamang silang isama **kasama ng isang heavy o filling base food**
-* Bawat meal ay dapat may **isang malinaw na heavy o filling base food**
+KUNG ANG BATA AY BABABA SA 11 BUWAN AT DEWORMING = No:
+- HUWAG MAGBIGAY NG DEWORMING RECOMMENDATION
 
-**Barangay Food Rule**
+DEWORMING RULE (ISTMAHIN MO):
+- Kung NEEDS DEWORMING = Yes: MAGBIGAY NG DEWORMING TABLETS SA OUTPUT
+- Kung NEEDS DEWORMING = No: HUWAG MAGBIGAY NG DEWORMING SA OUTPUT
 
-* Suriin ang food supplies na available sa barangay
-* **Isama lamang ang barangay food kung PASOK sa BMI, nutrition status, at feeding rules**
-* **Huwag magrekomenda ng barangay food kung hindi ito akma**, kahit may stock
+HUWAG MAGDAGDAG NG IMAHINAWON TUNGKOL SA EDAD - SUMUNOD KA LAGE SA NEEDS DEWORMING FIELD
 
-**Feasibility Rule**
+FOOD RESTRICTIONS FORMAT:
+- Kung 0-5 months: Bawal ang anumang solid food - gatas lamang
+- Kung 6-11 months: Lahat ng pagkain ay dapat mashed o pureed
+- Kung 12+ months: Iwasan ang processed foods
+- Huwag magbigay ng generic na text na bawal ang solid food kung ang bata ay 6 buwan na
 
-* Lahat ng pagkain ay dapat **simple, pang-bahay, at kayang ihanda ng low-income na pamilya**
+OUTPUT FORMAT (Clean Version):
+1. Mga Nutrition Tips (3-4 items)
+2. Meal Plan:
+   - Umaga: [pagkain]
+   - Tanghali: [pagkain]
+   - Gabi: [pagkain]
+3. Mga Vitamin/Supplements:
+   - Vitamin A capsule (kumuha sa health center)
+4. Food Restrictions (kung may)
+5. Disclaimer
+6. Pinagkuhanan ng Datos
 
-**Fallback Rule**
-
-* Kung **walang angkop na pagkain mula sa barangay**, magbigay ng **general meal plan** na naaayon sa nutrition status at feeding rules
-
-**Hard Enforcement**
-
-* **Bago ilabas ang sagot, suriin kung pasado sa lahat ng Validity Conditions**
-* Kung may kahit isang violation, **i-discard ang sagot at bumuo ng panibago**
-
-
-
-4. Isama ang anumang vitamins o milk na available sa barangay kung akma.
-5. Ilagay ang food restrictions o allergy warnings sa dulo.
-6. Sagutin sa Tagalog at plain text lamang. Walang HTML, walang bold, walang **.
-7. Tapusin ang sagot sa disclaimer na ito:
-   Kumunsulta sa pinakamalapit na health center sa lugar nila upang ma-counsel kayo ng isang nutrition/health worker.
-8. Pagkatapos ng disclaimer, ilahad muli ang mga detalye ng bata para sa reference. Ang edad ay dapat walang decimal point. Kung ang edad ay nakadepende sa buwan, ilagay kung ilang buwan na ang bata.
-9. Pagkatapos ng disclaimer, maglagay ng maikling ‘Pinaghugutan ng Datos’ section. Maglagay ng sources na pinagkuhanan mo ng datos.
-
-FORMAT:
-- Gumamit ng line breaks sa pagitan ng sections.
-- Tips dapat naka numbered list.
-- Meal plan dapat naka linear (Umaga: ..., Tanghali: ..., Gabi: ...).
-- Food restrictions sa dulo bago ang disclaimer.
+IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot.
 ";
+    }
 
+    private function generateWithRetry(string $apiKey, string $prompt, string $nutritionStatus, string $sex, int $months, float $bmi, string $vitaminAStatus, string $dewormingStatus): string
+    {
+        $attempts = 0;
+        $lastError = null;
 
+        while ($attempts <= self::MAX_RETRIES) {
+            $attempts++;
 
+            // If not first attempt, add stricter instruction
+            if ($attempts > 1) {
+                $prompt .= "\n\n⚠️ WARNING: Ang nakaraang sagot ay INVALID dahil may duplicate base food. Gumamit ng TATLONG MAGKAIBANG base foods sa meal plan!";
+            }
 
-
-        $recommendation = null;
-
-        if (empty($apiKey)) {
-            \Log::warning('OpenAI API key missing. Falling back to local recommendation.');
-            $recommendation = \App\Helpers\AIRecommender::getRecommendation(
-                $nutritionStatus,
-                $child->sex,
-                $months,
-                $request->bmi ?? 0
-            );
-        } else {
             try {
-                // Step 7: Send to AI
                 $response = Http::withHeaders([
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])->post('https://api.openai.com/v1/chat/completions', [
                     'model' => 'gpt-4o-mini',
                     'messages' => [
-                        ['role' => 'system', 'content' => 'Ikaw ay isang AI nutrition assistant.'],
+                        ['role' => 'system', 'content' => 'Ikaw ay AI nutrition assistant para sa Filipino children.'],
                         ['role' => 'user', 'content' => $prompt],
                     ],
-                    'max_tokens' => 500,
-                    'temperature' => 0.7,
+                    'max_tokens' => 600,
+                    'temperature' => 0.5,
                 ]);
 
-                // Step 8: Fallback if AI fails
                 if (!$response->successful()) {
-                    \Log::error('AI request failed', ['response' => $response->body()]);
-                    $recommendation = \App\Helpers\AIRecommender::getRecommendation(
-                        $nutritionStatus,
-                        $child->sex,
-                        $months,
-                        $request->bmi ?? 0
-                    );
-                } else {
-                    $recommendation = $response->json('choices.0.message.content') ??
-                        \App\Helpers\AIRecommender::getRecommendation(
-                            $nutritionStatus,
-                            $child->sex,
-                            $months,
-                            $request->bmi ?? 0
-                        );
+                    $lastError = 'API Error: ' . $response->status();
+                    continue;
                 }
+
+                $recommendation = $response->json('choices.0.message.content');
+
+                // Validate the output
+                $validationResult = $this->validateRecommendation($recommendation);
+                
+                if ($validationResult === true) {
+                    return $recommendation;
+                } else {
+                    $lastError = $validationResult; // Validation failed reason
+                    // Continue to retry
+                }
+
             } catch (\Throwable $e) {
-                \Log::error('AI request exception', ['error' => $e->getMessage()]);
-                $recommendation = \App\Helpers\AIRecommender::getRecommendation(
-                    $nutritionStatus,
-                    $child->sex,
-                    $months,
-                    $request->bmi ?? 0
-                );
+                $lastError = $e->getMessage();
+                continue;
             }
         }
 
-        return response()->json(['recommendation' => trim($recommendation)]);
+        // All retries failed - use local fallback
+        \Log::warning("AI recommendation failed after {$attempts} attempts. Using fallback. Last error: {$lastError}");
+        
+        return $this->getLocalFallback(
+            $nutritionStatus,
+            $sex,
+            $months,
+            $bmi,
+            $vitaminAStatus,
+            $dewormingStatus
+        );
+    }
+
+    private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, string $vitaminA = null, string $deworming = null): string
+    {
+        // Call the improved local recommender
+        return \App\Helpers\AIRecommender::getRecommendation(
+            $status,
+            $sex,
+            $ageInMonths,
+            $bmi,
+            $vitaminA,
+            $deworming
+        );
+    }
+
+    private function validateRecommendation(string $recommendation): true|string
+    {
+        // Check for duplicate base foods in meal plan
+        $mealPlanPatterns = [
+            '/Umaga:.*?Lugaw/i',
+            '/Umaga:.*?Kanin/i',
+            '/Umaga:.*?Kamote/i',
+            '/Umaga:.*?Tinapay/i',
+            '/Umaga:.*?Pasta/i',
+            '/Umaga:.*?Noodles/i',
+            '/Tanghali:.*?Lugaw/i',
+            '/Tanghali:.*?Kanin/i',
+            '/Tanghali:.*?Kamote/i',
+            '/Tanghali:.*?Tinapay/i',
+            '/Tanghali:.*?Pasta/i',
+            '/Tanghali:.*?Noodles/i',
+            '/Gabi:.*?Lugaw/i',
+            '/Gabi:.*?Kanin/i',
+            '/Gabi:.*?Kamote/i',
+            '/Gabi:.*?Tinapay/i',
+            '/Gabi:.*?Pasta/i',
+            '/Gabi:.*?Noodles/i',
+        ];
+
+        $matches = [];
+        foreach ($mealPlanPatterns as $pattern) {
+            if (preg_match($pattern, $recommendation, $match)) {
+                $matches[] = $match[0];
+            }
+        }
+
+        // Remove duplicates and check if we have 3 different meals
+        $uniqueBaseFoods = array_unique($matches);
+        
+        // Count how many unique base foods we found
+        $lugawCount = preg_grep('/Lugaw/i', $matches);
+        $kaninCount = preg_grep('/Kanin/i', $matches);
+        $kamoteCount = preg_grep('/Kamote/i', $matches);
+        $tinapayCount = preg_grep('/Tinapay/i', $matches);
+        
+        $differentBases = 0;
+        if (!empty($lugawCount)) $differentBases++;
+        if (!empty($kaninCount)) $differentBases++;
+        if (!empty($kamoteCount)) $differentBases++;
+        if (!empty($tinapayCount)) $differentBases++;
+
+        // If we have duplicates, validation fails
+        if (count($matches) > $differentBases) {
+            return self::VALIDATION_FAILED . ': May duplicate base food sa meal plan';
+        }
+
+        // Check for processed foods (banned)
+        $bannedFoods = ['Pancit Canton', 'De Lata', 'soft drinks', 'instant noodles'];
+        foreach ($bannedFoods as $banned) {
+            if (stripos($recommendation, $banned) !== false) {
+                return self::VALIDATION_FAILED . ': Banned food found: ' . $banned;
+            }
+        }
+
+        return true;
+    }
+
+    private function fixMealPlan(string $recommendation, int $ageInMonths): string
+    {
+        // Fix meals that have only light foods (prutas/gulay) without heavy food base
+        $lines = explode("\n", $recommendation);
+        $fixedLines = [];
+        
+        $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
+        $lightFoods = ['saging', 'prutas', 'gulay', 'vegetables', 'salad', 'sabaw'];
+        
+        foreach ($lines as $line) {
+            $lineLower = strtolower($line);
+            
+            // Check if this is a meal line
+            if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $matches)) {
+                $mealTime = $matches[1];
+                $mealContent = trim($matches[2]);
+                $mealContentLower = strtolower($mealContent);
+                
+                // Check if meal has heavy food
+                $hasHeavyFood = false;
+                foreach ($heavyFoods as $heavy) {
+                    if (strpos($mealContentLower, $heavy) !== false) {
+                        $hasHeavyFood = true;
+                        break;
+                    }
+                }
+                
+                // If no heavy food, add one based on age
+                if (!$hasHeavyFood) {
+                    // Determine appropriate heavy food based on age
+                    if ($ageInMonths < 6) {
+                        // For 0-5 months, no solid food should be suggested
+                        $mealContent = 'Gatas lamang (breastmilk/formula)';
+                    } elseif ($ageInMonths < 12) {
+                        // 6-11 months: add lugaw
+                        $mealContent = 'Lugaw na may ' . $mealContent;
+                    } elseif ($ageInMonths < 36) {
+                        // 12-35 months: add lugaw or kanin
+                        $mealContent = 'Lugaw na may ' . $mealContent;
+                    } else {
+                        // 36+ months: add appropriate base
+                        $mealContent = 'Lugaw na may ' . $mealContent;
+                    }
+                    
+                    $line = $mealTime . ': ' . $mealContent;
+                }
+            }
+            
+            $fixedLines[] = $line;
+        }
+        
+        return implode("\n", $fixedLines);
+    }
+
+    private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
+    {
+        if ($ageInMonths >= 12 && strtolower($dewormingStatus) === 'no') {
+            if (stripos($recommendation, 'deworming') === false) {
+                // Handle multi-line format: line ending with newline
+                $recommendation = preg_replace(
+                    '/(Vitamin A[^\n]*\n)/i',
+                    "$1- Deworming tablets dapat kumuha sa health center\n",
+                    $recommendation,
+                    1
+                );
+                
+                // Handle single-line format: "Vitamin A: description."
+                if (stripos($recommendation, 'deworming') === false) {
+                    $recommendation = preg_replace(
+                        '/(Vitamin A[^.]*\.)/i',
+                        "$1\n- Deworming tablets dapat kumuha sa health center.",
+                        $recommendation,
+                        1
+                    );
+                }
+            }
+        }
+        
+        return $recommendation;
     }
 }

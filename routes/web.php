@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\HealthlogController;
@@ -58,6 +57,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);
+        Route::get('/registration-codes', [RegistrationCodeController::class, 'index']);
+        Route::delete('/registration-codes/{id}', [RegistrationCodeController::class, 'destroy']);
         Route::get('/maintenance/status', [SystemController::class, 'status']);
         Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
@@ -79,10 +80,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.database.delete');
         
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         Route::resource('users', UserController::class);
-        Route::resource('roles', RoleController::class);
     });
 
     /*

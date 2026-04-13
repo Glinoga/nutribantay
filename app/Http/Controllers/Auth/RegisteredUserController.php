@@ -40,8 +40,9 @@ class RegisteredUserController extends Controller
         'registration_code' => ['required', 'string'],
     ]);
 
-    // fetch the code (must exist, not expired, and not used yet)
+    // fetch the code (must exist, not expired, not used, and barangay must match)
     $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
+        ->where('barangay', $request->barangay)
         ->where(function ($q) {
             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
         })
@@ -50,7 +51,7 @@ class RegisteredUserController extends Controller
 
     if (! $registrationCode) {
         return back()->withErrors([
-            'registration_code' => 'The admin code is invalid, expired, or already used.',
+            'registration_code' => 'The registration code is invalid, expired, or not for this barangay.',
         ])->onlyInput('registration_code');
     }
 

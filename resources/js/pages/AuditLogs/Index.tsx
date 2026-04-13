@@ -107,6 +107,20 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                         <h1 className="text-2xl font-bold text-gray-900">Audit Logs</h1>
                         <p className="mt-1 text-sm text-gray-600">Track all system activities and changes</p>
                     </div>
+                    <button
+                        onClick={() => {
+                            const params = new URLSearchParams();
+                            if (searchTerm) params.append('search', searchTerm);
+                            if (selectedAction) params.append('action', selectedAction);
+                            if (selectedModel) params.append('model_type', selectedModel);
+                            if (startDate) params.append('start_date', startDate);
+                            if (endDate) params.append('end_date', endDate);
+                            window.location.href = `/audit-logs/export?${params.toString()}`;
+                        }}
+                        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                    >
+                        Export CSV
+                    </button>
                 </div>
 
                 {/* Filters */}
