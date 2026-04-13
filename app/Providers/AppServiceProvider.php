@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->configureRateLimiting();
+    }
+
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('recommendations', function ($request) {
+            $user = $request->user();
+            
+            if (!$user) {
+                return null;
+            }
+
+            if ($user->hasRole('Admin')) {
+                return Limit::none();
+            }
+
+            return Limit::perMinute(10)->by('recommendations:' . $user->id);
+        });
     }
 }

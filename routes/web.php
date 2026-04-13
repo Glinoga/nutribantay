@@ -104,7 +104,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /**Route::post('/recommendations', [RecommendationController::class, 'generate'])
             ->name('recommendations.generate');
     }); */
-    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+    Route::middleware(['role:Admin|Healthworker', 'throttle:recommendations'])->group(function () {
         Route::post('/recommendations', [RecommendationController::class, 'generate'])
             ->name('recommendations.generate');
     });
