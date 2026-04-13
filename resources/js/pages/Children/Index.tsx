@@ -1,7 +1,10 @@
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { readExcel } from '@/utils/excel';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { FileSpreadsheet, Upload, X } from 'lucide-react';
+import { useState } from 'react';
 
 type Child = {
     id: number;
@@ -19,6 +22,22 @@ type Child = {
     creator?: { name: string | null };
 };
 
+type Pagination = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+};
+
+type IndexProps = {
+    children: Child[];
+    pagination?: Pagination;
+    search?: string;
+    flash?: { success?: string };
+};
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Children Records',
@@ -33,102 +52,87 @@ type AuthProps = {
     };
 };
 
-export default function Index({ children }: { children: Child[] }) {
+export default function Index({ children, pagination, search = '', flash }: IndexProps) {
     const { auth } = usePage<AuthProps>().props;
+    const [searchQuery, setSearchQuery] = useState(search);
 
     const roles = auth?.roles ?? [];
     const isHealthworker = roles.includes('Healthworker');
     const canManageChildren = isHealthworker;
 
-    // 🔥 FULLY FIXED IMPORT FUNCTION
-    const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log('🔥 HANDLE IMPORT RUNNING');
+    // Modal states
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewData, setPreviewData] = useState<any[]>([]);
+    const [importData, setImportData] = useState<any[]>([]);
+    const [isImporting, setIsImporting] = useState(false);
 
+    // Reset modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedFile(null);
+        setPreviewData([]);
+        setImportData([]);
+    };
+
+    // Handle file selection in modal
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        console.log('📂 FILE:', file);
+        if (!file) return;
 
-        if (!file) {
-            alert('No file selected');
-            return;
-        }
+        setSelectedFile(file);
 
         try {
             const rawData = await readExcel(file);
-
-            console.log('📊 RAW DATA:', rawData);
-
             if (!rawData || rawData.length === 0) {
                 alert('Excel file is empty or not readable');
                 return;
             }
 
-            console.log('🧠 SAMPLE ROW:', rawData[0]);
-
-            // Convert Excel serial date to YYYY-MM-DD
-            const excelToDate = (serial: number | undefined) => {
-                if (!serial) return null;
-                const date = new Date((serial - 25569) * 86400 * 1000);
-                return date.toISOString().split('T')[0];
-            };
-
-            // Parse name in format "LASTNAME, Firstname Middlename"
-            const parseName = (fullName: string) => {
-                if (!fullName) return { first_name: '', middle_initial: '', last_name: '' };
-                const parts = fullName.split(',').map((s) => s.trim());
-                const lastName = parts[0] || '';
-                const firstParts = parts[1]?.split(' ') || [];
-                const firstName = firstParts[0] || '';
-                const middleInitial = firstParts.length > 1 ? firstParts[1][0] : '';
-                return { first_name: firstName, middle_initial: middleInitial, last_name: lastName };
-            };
-
-            const formatted = rawData
-                .map((row: any) => {
-                    const fullName = row.fullName;
-                    if (!fullName) return null;
-
-                    const nameParts = parseName(fullName);
-                    const sex = row.sex === 'M' ? 'Male' : row.sex === 'F' ? 'Female' : '';
-
-                    return {
-                        ...nameParts,
-                        sex: sex,
-                        age: 0,
-                        weight: parseFloat(row.weight) || 0,
-                        height: parseFloat(row.height) || 0,
-                        birthdate: excelToDate(row.birthdate),
-                    };
-                })
-                .filter(Boolean);
-
-            console.log('✅ FORMATTED:', formatted);
-
-            if (formatted.length === 0) {
-                alert('No valid rows detected from Excel.');
-                return;
-            }
-
-            router.post(
-                '/children/import',
-                {
-                    data: formatted,
-                },
-                {
-                    onSuccess: () => {
-                        console.log('✅ IMPORT SUCCESS');
-                        alert('Import successful!');
-                        router.reload();
-                    },
-                    onError: (err) => {
-                        console.error('❌ IMPORT ERROR:', err);
-                        alert('Import failed. Check console.');
-                    },
-                },
-            );
+            setPreviewData(rawData.slice(0, 10)); // First 10 rows
+            setImportData(rawData); // All data for import
         } catch (err) {
-            console.error('❌ ERROR READING FILE:', err);
-            alert('Failed to read Excel file.');
+            console.error('Error reading file:', err);
+            alert('Failed to read Excel file');
         }
+    };
+
+    // Handle actual import
+    const handleConfirmImport = () => {
+        if (importData.length === 0) return;
+
+        setIsImporting(true);
+
+        router.post(
+            '/children/import',
+            { data: importData },
+            {
+                onSuccess: () => {
+                    setIsImporting(false);
+                    closeModal();
+                    // Show alert and manually reload
+                    alert('Import complete! Children imported successfully.');
+                    window.location.reload();
+                },
+                onError: () => {
+                    setIsImporting(false);
+                    alert('Import failed');
+                },
+            },
+        );
+    };
+
+    // Open modal and reset
+    const openImportModal = () => {
+        setSelectedFile(null);
+        setPreviewData([]);
+        setImportData([]);
+        setIsModalOpen(true);
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get('/children', { search: searchQuery }, { replace: true });
     };
 
     return (
@@ -142,10 +146,90 @@ export default function Index({ children }: { children: Child[] }) {
                 <div className="flex gap-2">
                     {/* 🔥 FIXED INPUT */}
                     {canManageChildren && (
-                        <label className="cursor-pointer rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">
-                            Upload Excel
-                            <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleImport} />
-                        </label>
+                        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                            <DialogTrigger asChild>
+                                <button onClick={openImportModal} className="cursor-pointer rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">
+                                    Upload Excel
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                    <DialogTitle>Import Children from Excel</DialogTitle>
+                                    <DialogDescription>
+                                        Upload an Excel file (.xlsx or .xls) with child records. Preview will be shown before importing.
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                {!selectedFile ? (
+                                    <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12">
+                                        <Upload className="mb-4 h-12 w-12 text-gray-400" />
+                                        <p className="mb-4 text-gray-600">Click to select an Excel file</p>
+                                        <label className="cursor-pointer rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                                            Select File
+                                            <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleFileSelect} />
+                                        </label>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="mb-4 flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <FileSpreadsheet className="h-6 w-6 text-green-600" />
+                                                <div>
+                                                    <p className="font-medium">{selectedFile.name}</p>
+                                                    <p className="text-sm text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                                                </div>
+                                            </div>
+                                            <button onClick={() => setSelectedFile(null)} className="rounded p-2 hover:bg-gray-100">
+                                                <X className="h-5 w-5" />
+                                            </button>
+                                        </div>
+
+                                        {previewData.length > 0 && (
+                                            <div className="mb-4">
+                                                <p className="mb-2 font-medium">Preview ({importData.length} total rows):</p>
+                                                <div className="max-h-60 overflow-x-auto overflow-y-auto rounded-lg border">
+                                                    <table className="min-w-full text-sm">
+                                                        <thead className="sticky top-0 bg-gray-50">
+                                                            <tr>
+                                                                <th className="border px-2 py-1 text-left">Full Name</th>
+                                                                <th className="border px-2 py-1 text-left">Sex</th>
+                                                                <th className="border px-2 py-1 text-left">Birthdate</th>
+                                                                <th className="border px-2 py-1 text-left">Weight</th>
+                                                                <th className="border px-2 py-1 text-left">Height</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {previewData.map((row, i) => (
+                                                                <tr key={i} className="hover:bg-gray-50">
+                                                                    <td className="border px-2 py-1">{row.fullName || '-'}</td>
+                                                                    <td className="border px-2 py-1">{row.sex || '-'}</td>
+                                                                    <td className="border px-2 py-1">{row.birthdate || '-'}</td>
+                                                                    <td className="border px-2 py-1">{row.weight || '-'}</td>
+                                                                    <td className="border px-2 py-1">{row.height || '-'}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => setSelectedFile(null)} className="rounded border px-4 py-2 hover:bg-gray-50">
+                                                Choose Different File
+                                            </button>
+                                            <button
+                                                onClick={handleConfirmImport}
+                                                disabled={isImporting || importData.length === 0}
+                                                className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                {isImporting ? 'Importing...' : `Import ${importData.length} Records`}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </DialogContent>
+                        </Dialog>
                     )}
 
                     {/* ADD CHILD */}
@@ -156,6 +240,35 @@ export default function Index({ children }: { children: Child[] }) {
                     )}
                 </div>
             </div>
+
+            {/* SEARCH BAR */}
+            <form onSubmit={handleSearch} className="m-4 flex gap-2">
+                <input
+                    type="text"
+                    placeholder="Search by name, sex, or barangay..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 rounded border px-4 py-2"
+                />
+                <button type="submit" className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                    Search
+                </button>
+                {search && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setSearchQuery('');
+                            router.get('/children', {}, { replace: true });
+                        }}
+                        className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300"
+                    >
+                        Clear
+                    </button>
+                )}
+            </form>
+
+            {/* FLASH MESSAGE */}
+            {flash?.success && <div className="mx-4 mb-4 rounded bg-green-100 p-4 text-green-800">{flash.success}</div>}
 
             {/* TABLE */}
             <div className="overflow-x-auto">
@@ -195,26 +308,31 @@ export default function Index({ children }: { children: Child[] }) {
                                     <td className="border px-4 py-2">{child.contact_number ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.creator?.name ?? 'N/A'}</td>
                                     <td className="border px-4 py-2">
-                                        <Link href={`/children/${child.id}`} className="mr-2 rounded bg-blue-500 px-3 py-1 text-white">
-                                            View
-                                        </Link>
-                                        {canManageChildren && (
-                                            <>
-                                                <Link href={`/children/${child.id}/edit`} className="mr-2 rounded bg-green-500 px-3 py-1 text-white">
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    onClick={() => {
-                                                        if (confirm('Delete child profile?')) {
-                                                            router.delete(`/children/${child.id}`);
-                                                        }
-                                                    }}
-                                                    className="rounded bg-red-500 px-3 py-1 text-white"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </>
-                                        )}
+                                        <div className="flex gap-1">
+                                            <Link href={`/children/${child.id}`} className="rounded bg-blue-500 px-2 py-1 text-xs text-white">
+                                                View
+                                            </Link>
+                                            {canManageChildren && (
+                                                <>
+                                                    <Link
+                                                        href={`/children/${child.id}/edit`}
+                                                        className="rounded bg-green-500 px-2 py-1 text-xs text-white"
+                                                    >
+                                                        Edit
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm('Delete child profile?')) {
+                                                                router.delete(`/children/${child.id}`);
+                                                            }
+                                                        }}
+                                                        className="rounded bg-red-500 px-2 py-1 text-xs text-white"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -222,6 +340,28 @@ export default function Index({ children }: { children: Child[] }) {
                     </tbody>
                 </table>
             </div>
+
+            {/* PAGINATION */}
+            {pagination && pagination.last_page > 1 && (
+                <div className="m-4 flex items-center justify-between">
+                    <div className="text-sm text-gray-600">
+                        Showing {pagination.from} to {pagination.to} of {pagination.total} results
+                    </div>
+                    <div className="flex gap-1">
+                        {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => router.get('/children', { page, search: searchQuery }, { replace: true })}
+                                className={`rounded px-3 py-1 ${
+                                    page === pagination.current_page ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

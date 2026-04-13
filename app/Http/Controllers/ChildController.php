@@ -8,14 +8,25 @@ use Inertia\Inertia;
 
 class ChildController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
-        // Only get non-deleted children
-        $children = Child::with(['creator', 'updater'])
-            ->where('barangay', $user->barangay)
-            ->get();
+        $query = Child::with(['creator', 'updater'])
+            ->where('barangay', $user->barangay);
+
+        // Search filter
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('sex', 'like', "%{$search}%")
+                  ->orWhere('barangay', 'like', "%{$search}%");
+            });
+        }
+
+        $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
 
         return Inertia::render('Children/Index', [
             'children' => $children->map(fn($child) => [
@@ -33,7 +44,6 @@ class ChildController extends Controller
                 'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
 
-                // ✅ FIXED STRUCTURE (matches frontend)
                 'creator' => [
                     'name' => $child->creator?->name
                 ],
@@ -258,6 +268,9 @@ class ChildController extends Controller
             return back()->with('error', 'Invalid import data.');
         }
 
+        $created = 0;
+        $skipped = 0;
+
         foreach ($rows as $row) {
 
             // skip invalid rows
@@ -266,6 +279,18 @@ class ChildController extends Controller
                 empty($row['last_name']) ||
                 empty($row['sex'])
             ) {
+                continue;
+            }
+
+            // Check for duplicates within same barangay
+            $existingChild = Child::where('barangay', $user->barangay)
+                ->where('first_name', $row['first_name'])
+                ->where('last_name', $row['last_name'])
+                ->where('birthdate', $row['birthdate'])
+                ->first();
+
+            if ($existingChild) {
+                $skipped++;
                 continue;
             }
 
@@ -287,10 +312,17 @@ class ChildController extends Controller
                 'address' => null,
                 'contact_number' => null,
             ]);
+
+            $created++;
         }
 
-        return redirect()->route('children.index')
-            ->with('success', 'Excel imported successfully!');
+        $message = "Import complete! {$created} children imported.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} duplicates skipped.";
+        }
+
+        // Use regular redirect instead of Inertia to preserve flash message
+        return redirect('/children')->with('success', $message);
     }
 
     public function storeNote(Request $request, Child $child)
