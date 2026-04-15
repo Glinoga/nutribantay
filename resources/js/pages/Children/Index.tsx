@@ -267,6 +267,39 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                 )}
             </form>
 
+            {/* EXPORT FILTERS */}
+<form method="GET" action="/children/export" className="m-4 flex gap-2">
+
+    <input
+        type="number"
+        name="age_min"
+        placeholder="Min Age"
+        className="rounded border px-3 py-2"
+    />
+
+    <input
+        type="number"
+        name="age_max"
+        placeholder="Max Age"
+        className="rounded border px-3 py-2"
+    />
+
+    <input
+        type="text"
+        name="barangay"
+        placeholder="Barangay"
+        className="rounded border px-3 py-2"
+    />
+
+    <button
+        type="submit"
+        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+    >
+        Export CSV
+    </button>
+
+</form>
+
             {/* FLASH MESSAGE */}
             {flash?.success && <div className="mx-4 mb-4 rounded bg-green-100 p-4 text-green-800">{flash.success}</div>}
 

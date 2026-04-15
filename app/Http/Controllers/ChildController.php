@@ -60,6 +60,41 @@ class ChildController extends Controller
         ]);
     }
 
+    public function export(Request $request)
+{
+    $user = auth()->user();
+
+    $query = Child::query();
+
+    // 🔒 Healthworker restricted to own barangay
+    if (!$user->hasRole('Admin')) {
+        $query->where('barangay', $user->barangay);
+    }
+
+    // ✅ Barangay filter (both roles can use it)
+    if ($request->barangay) {
+        if ($user->hasRole('Admin')) {
+            $query->where('barangay', $request->barangay);
+        } else {
+            // Healthworker still limited to their own
+            $query->where('barangay', $user->barangay);
+        }
+    }
+
+    // ✅ Age filters
+    if ($request->age_min) {
+        $query->where('age', '>=', $request->age_min);
+    }
+
+    if ($request->age_max) {
+        $query->where('age', '<=', $request->age_max);
+    }
+
+    $children = $query->get();
+
+    return $this->exportCSV($children);
+}
+
     public function create()
     {
         return Inertia::render('Children/Create');
@@ -309,4 +344,38 @@ class ChildController extends Controller
 
         return redirect()->back()->with('success', 'Note deleted successfully.');
     }
+
+    public function exportCSV($children)
+{
+    $filename = "children_export.csv";
+
+    $headers = [
+        "Content-Type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=$filename",
+    ];
+
+    $callback = function () use ($children) {
+        $file = fopen('php://output', 'w');
+
+        fputcsv($file, [
+            'Full Name',
+            'Age',
+            'Barangay',
+            'BMI'
+        ]);
+
+        foreach ($children as $child) {
+            fputcsv($file, [
+                $child->fullname,
+                $child->age,
+                $child->barangay,
+                $child->bmi
+            ]);
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
 }
