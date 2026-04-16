@@ -1,5 +1,15 @@
 import * as XLSX from 'xlsx';
 
+const excelDateToJSDate = (serial: number): string | null => {
+    if (!serial) return null;
+    const date = XLSX.SSF.parse_date_code(serial);
+    if (!date) return null;
+    const year = date.y;
+    const month = String(date.m).padStart(2, '0');
+    const day = String(date.d).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export const readExcel = async (file: File) => {
     const data = await file.arrayBuffer();
 
@@ -28,35 +38,43 @@ export const readExcel = async (file: File) => {
     }
 
     const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1 });
-    const headers = rows[headerIndex];
 
-    // Find exact column indices
-    const fullNameIdx = 3; // 'Full Name of Child' is at column 3
-    const sexIdx = 5; // 'Sex' is at column 5
-    const birthdateIdx = 6; // Date of Birth (Excel serial) at column 6
-    const weightIdx = 8; // Weight at column 8
-    const heightIdx = 9; // Height at column 9
+    const fullNameIdx = 3;
+    const sexIdx = 5;
+    const birthdateIdx = 6;
+    const weightIdx = 8;
+    const heightIdx = 9;
 
-    // Skip header row + instruction row (row 8 has instructions like "(kg)")
     const dataRows = rows.slice(headerIndex + 2);
 
     const formatted = dataRows
         .filter((row) => {
             const fullName = row[fullNameIdx];
             if (!fullName || typeof fullName !== 'string') return false;
-            // Skip instruction placeholders
             if (fullName.includes('Surname') || fullName.includes('(')) return false;
             return true;
         })
-        .map((row) => ({
-            fullName: row[fullNameIdx],
-            sex: row[sexIdx],
-            birthdate: row[birthdateIdx],
-            weight: row[weightIdx],
-            height: row[heightIdx],
-        }));
+        .map((row) => {
+            const fullName = row[fullNameIdx]?.toString().trim() || '';
+            const nameParts = fullName.split(' ');
+            const lastName = nameParts[0] || '';
+            const firstName = nameParts.slice(1).join(' ') || '';
+            const sex = row[sexIdx]?.toString().trim() || '';
+            const sexNormalized = sex.toUpperCase().startsWith('M') ? 'M' : 'F';
+            const birthdateRaw = row[birthdateIdx];
+            const birthdate = typeof birthdateRaw === 'number' ? excelDateToJSDate(birthdateRaw) : birthdateRaw;
 
-    console.log(`Parsed ${formatted.length} valid rows`);
+            return {
+                first_name: firstName,
+                last_name: lastName,
+                sex: sexNormalized,
+                birthdate: birthdate,
+                weight: row[weightIdx] || null,
+                height: row[heightIdx] || null,
+            };
+        });
+
+    console.log(`Parsed ${formatted.length} valid rows`, formatted);
 
     return formatted;
 };
