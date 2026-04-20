@@ -102,6 +102,15 @@ export default function Index({ healthlogs }: Props) {
                 </button>
             </form>
 
+            {/* EXPORT FILTERS */}
+            <form method="GET" action="/healthlogs/export" className="m-4 flex gap-2">
+                <input type="number" name="age_min" placeholder="Min Age (months)" className="rounded border px-3 py-2" />
+                <input type="number" name="age_max" placeholder="Max Age (months)" className="rounded border px-3 py-2" />
+                <button type="submit" className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+                    Export CSV
+                </button>
+            </form>
+
             <div className="overflow-x-auto">
                 <table className="min-w-full overflow-hidden rounded border text-xs">
                     <thead className="bg-gray-50">

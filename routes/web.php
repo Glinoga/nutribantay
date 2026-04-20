@@ -109,6 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::middleware(['role:Healthworker'])->group(function () {
             Route::get('/create', [HealthlogController::class, 'create'])->name('healthlogs.create');
             Route::post('/', [HealthlogController::class, 'store'])->name('healthlogs.store');
+            Route::get('/export', [HealthlogController::class, 'export'])->name('healthlogs.export');
         });
 
         /*
@@ -130,6 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         */
         Route::middleware(['role:Admin|Healthworker'])->group(function () {
             Route::get('/', [HealthlogController::class, 'index'])->name('healthlogs.index');
+            Route::get('/export', [HealthlogController::class, 'export'])->name('healthlogs.export');
             Route::get('/{healthlog}', [HealthlogController::class, 'show'])->name('healthlogs.show');
         });
 

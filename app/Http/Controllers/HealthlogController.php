@@ -138,6 +138,79 @@ class HealthlogController extends Controller
             ->with('success', '✅ Health log created successfully with BMI, WHO evaluation, and AI recommendation.');
     }
 
+    public function export(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = HealthLog::query()->with(['child', 'user']);
+
+        // Non-admins restricted to their barangay
+        if (!$user->hasRole('Admin')) {
+            $query->whereHas('child', fn($q) => $q->where('barangay', $user->barangay));
+        }
+
+        // Age filters
+        if ($request->age_min) {
+            $minBirthdate = now()->subMonths($request->age_min)->toDateString();
+            $query->whereHas('child', fn($q) => $q->where('birthdate', '<=', $minBirthdate));
+        }
+
+        if ($request->age_max) {
+            $maxBirthdate = now()->subMonths($request->age_max)->toDateString();
+            $query->whereHas('child', fn($q) => $q->where('birthdate', '>=', $maxBirthdate));
+        }
+
+        $healthlogs = $query->latest()->get();
+
+        return $this->exportCSV($healthlogs);
+    }
+
+    private function exportCSV($healthlogs)
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="healthlogs_' . date('Y-m-d') . '.csv"',
+        ];
+
+        $callback = function() use ($healthlogs) {
+            $handle = fopen('php://output', 'w');
+            
+            // Header row
+            fputcsv($handle, [
+                'ID',
+                'Child Name',
+                'Sex',
+                'Age (Months)',
+                'Weight (kg)',
+                'Height (cm)',
+                'BMI',
+                'Nutrition Status',
+                'Created By',
+                'Created At',
+            ]);
+
+            // Data rows
+            foreach ($healthlogs as $log) {
+                fputcsv($handle, [
+                    $log->id,
+                    $log->child->fullname ?? '',
+                    $log->child->sex ?? '',
+                    $log->age_in_months ?? '',
+                    $log->weight ?? '',
+                    $log->height ?? '',
+                    $log->bmi ?? '',
+                    $log->nutrition_status ?? '',
+                    $log->user->name ?? '',
+                    $log->created_at ?? '',
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function show(HealthLog $healthlog)
     {
         return Inertia::render('Healthlog/Show', [
