@@ -49,7 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('children', ChildController::class);
     Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
-    Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
 
     /*
     |--------------------------------------------------------------------------
@@ -91,7 +90,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         Route::resource('users', UserController::class);
-        Route::resource('roles', RoleController::class);
     });
 
 

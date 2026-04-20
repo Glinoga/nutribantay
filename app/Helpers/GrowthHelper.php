@@ -13,18 +13,12 @@ class GrowthHelper
     public static function calculateBMI($weight, $height)
     {
         if (!$weight || !$height || $height <= 0) {
-        if (!$weight || !$height || $height <= 0) {
             return null;
         }
 
         return round($weight / pow($height / 100, 2), 2);
-        return round($weight / pow($height / 100, 2), 2);
     }
 
-    /**
-     * Convert birthdate to age in months
-     */
-    public static function calculateAgeInMonths($birthdate)
     /**
      * Convert birthdate to age in months
      */
@@ -34,7 +28,6 @@ class GrowthHelper
             return null;
         }
 
-        // FORCE INTEGER so DB lookup always matches
         return intval(Carbon::parse($birthdate)->diffInMonths(Carbon::now()));
     }
 
@@ -47,14 +40,7 @@ class GrowthHelper
         $bmi = self::calculateBMI($weight, $height);
 
         if ($ageMonths === null) {
-        if ($ageMonths === null) {
             return [
-                'age_months' => null,
-                'bmi' => $bmi,
-                'status_wfa' => null,
-                'status_lfa' => null,
-                'status_wfl_wfh' => null,
-                'overall' => null,
                 'age_months' => null,
                 'bmi' => $bmi,
                 'status_wfa' => null,
@@ -91,33 +77,11 @@ class GrowthHelper
         // -------------------------------------------------------
         $type = $ageMonths < 24 ? 'weight_for_length' : 'weight_for_height';
 
-        // Round height to nearest .5 and force DB-safe formatting
         $lookupHeight = number_format(round($height * 2) / 2, 1, '.', '');
 
         $wfl = GrowthStandard::where('gender', $gender)
             ->where('type', $type)
-            ->where('measure_value', $lookupHeight) // matches DB now
-            ->first();
-
-        $statusWflWfh = $wfl ? self::classify($weight, $wfl, 'wfl') : null;
-
-        // -------------------------------------------------------
-        // 4. OVERALL STATUS
-        // -------------------------------------------------------
-        $overall = self::computeOverallStatus($statusWfa, $statusLfa, $statusWflWfh);
-        $statusLfa = $lfa ? self::classify($height, $lfa, 'lfa') : null;
-
-        // -------------------------------------------------------
-        // 3. WEIGHT-FOR-LENGTH or WEIGHT-FOR-HEIGHT
-        // -------------------------------------------------------
-        $type = $ageMonths < 24 ? 'weight_for_length' : 'weight_for_height';
-
-        // Round height to nearest .5 and force DB-safe formatting
-        $lookupHeight = number_format(round($height * 2) / 2, 1, '.', '');
-
-        $wfl = GrowthStandard::where('gender', $gender)
-            ->where('type', $type)
-            ->where('measure_value', $lookupHeight) // matches DB now
+            ->where('measure_value', $lookupHeight)
             ->first();
 
         $statusWflWfh = $wfl ? self::classify($weight, $wfl, 'wfl') : null;
@@ -172,7 +136,6 @@ class GrowthHelper
             ][$mode];
         }
 
-        // Only weight-for-height has obesity
         return $mode === 'lfa' ? 'Tall' : 'Obese';
     }
 

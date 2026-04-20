@@ -32,7 +32,7 @@ class Child extends Model
     ];
 
     // 🔥 This exposes computed attributes (fullname, formatted_name) to JSON/API
-    protected $appends = ['fullname', 'formatted_name'];
+    protected $appends = ['fullname', 'formatted_name', 'bmi'];
 
     /*
     |--------------------------------------------------------------------------
@@ -52,6 +52,15 @@ class Child extends Model
     {
         $mi = $this->middle_initial ? strtoupper($this->middle_initial) . '.' : '';
         return trim("{$this->last_name}, {$this->first_name} {$mi}");
+    }
+
+    // BMI accessor - calculates from weight and height
+    public function getBmiAttribute()
+    {
+        if (!$this->weight || !$this->height || $this->height <= 0) {
+            return null;
+        }
+        return round($this->weight / pow($this->height / 100, 2), 2);
     }
 
     /*

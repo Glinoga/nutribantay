@@ -14,9 +14,18 @@ class HealthlogController extends Controller
 {
     public function index()
     {
-        $healthlogs = HealthLog::with(['child', 'user'])
-            ->latest()
-            ->get();
+        $user = auth()->user();
+
+        $query = HealthLog::with(['child', 'user']);
+
+        // Non-admins restricted to their barangay
+        if (!$user->hasRole('Admin')) {
+            $query->whereHas('child', function ($q) use ($user) {
+                $q->where('barangay', $user->barangay);
+            });
+        }
+
+        $healthlogs = $query->latest()->get();
 
         return Inertia::render('Healthlog/Index', [
             'healthlogs' => $healthlogs,
@@ -163,6 +172,15 @@ class HealthlogController extends Controller
             $validated['status_lfa']       = $evaluation['status_lfa'];
             $validated['status_wfl_wfh']   = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
+
+            $age = Carbon::parse($child->birthdate)->age;
+
+            $validated['recommendation'] = AIRecommender::getRecommendation(
+                $evaluation['overall'],
+                $child->sex,
+                $age,
+                $evaluation['bmi']
+            );
         }
 
         $healthlog->update($validated);
