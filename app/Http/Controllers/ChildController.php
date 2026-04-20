@@ -39,6 +39,7 @@ class ChildController extends Controller
                 'age' => $child->age,
                 'weight' => $child->weight,
                 'height' => $child->height,
+                'contact_number' => $child->contact_number,
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
@@ -128,12 +129,20 @@ class ChildController extends Controller
             'birthdate' => 'nullable|date',
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
+            
         ]);
 
         $user = auth()->user();
 
         // ✅ Normalize sex
         $validated['sex'] = strtoupper($validated['sex']) === 'M' ? 'Male' : 'Female';
+
+        // Format phone number: remove spaces and ensure it's stored consistently
+        $contactNumber = $request->contact_number;
+        if ($contactNumber) {
+            // Keep the formatted version with spaces as user entered it
+            $contactNumber = trim($contactNumber);
+        }
 
         Child::create([
             ...$validated,
@@ -375,6 +384,7 @@ class ChildController extends Controller
         $child->notes()->create([
             'note' => $request->note,
             'user_id' => $user->id,
+            'contact_number' => $contactNumber,
         ]);
 
         return redirect()->back()->with('success', 'Note added successfully!');

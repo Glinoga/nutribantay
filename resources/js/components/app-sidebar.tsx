@@ -5,7 +5,8 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
+import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen, Megaphone, MessageSquare } from 'lucide-react';
+import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -47,12 +48,16 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
         { title: 'Child Profiles', href: '/children', icon: UserPen },
+        { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 
     // Admin-only menu
     if (isAdmin) {
         mainNavItems.push(
+            
             { title: 'User Management', href: '/users', icon: UserCog },
+            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare }
+        ,
             { title: 'Data Management', href: '/admin/database', icon: Database },
             {
                 title: 'Audit Logs',
