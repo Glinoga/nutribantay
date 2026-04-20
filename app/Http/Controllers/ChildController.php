@@ -18,12 +18,20 @@ class ChildController extends Controller
         // Search filter
         if ($request->search) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('sex', 'like', "%{$search}%")
-                  ->orWhere('barangay', 'like', "%{$search}%");
-            });
+            
+            // If search is a number, filter by age >= that number
+            if (is_numeric($search)) {
+                $minBirthdate = now()->subMonths($search)->toDateString();
+                $query->where('birthdate', '<=', $minBirthdate);
+            } else {
+                // Otherwise search by name/sex/barangay
+                $query->where(function($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%")
+                      ->orWhere('sex', 'like', "%{$search}%")
+                      ->orWhere('barangay', 'like', "%{$search}%");
+                });
+            }
         }
 
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
@@ -48,6 +56,13 @@ class ChildController extends Controller
                     'name' => $child->creator?->name
                 ],
             ]),
+            'pagination' => [
+                'current_page' => $children->currentPage(),
+                'last_page' => $children->lastPage(),
+                'total' => $children->total(),
+                'from' => $children->firstItem(),
+                'to' => $children->lastItem(),
+            ],
         ]);
     }
 
@@ -96,13 +111,15 @@ class ChildController extends Controller
         }
     }
 
-    // ✅ Age filters
+    // ✅ Age filters (calculated from birthdate in months)
     if ($request->age_min) {
-        $query->where('age', '>=', $request->age_min);
+        $minBirthdate = now()->subMonths($request->age_min + 1)->toDateString();
+        $query->where('birthdate', '<=', $minBirthdate);
     }
 
     if ($request->age_max) {
-        $query->where('age', '<=', $request->age_max);
+        $maxBirthdate = now()->subMonths($request->age_max)->toDateString();
+        $query->where('birthdate', '>=', $maxBirthdate);
     }
 
     $children = $query->get();
@@ -122,7 +139,6 @@ class ChildController extends Controller
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:M,F,Male,Female',
-            'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
             'birthdate' => 'nullable|date',
@@ -148,7 +164,7 @@ class ChildController extends Controller
     public function show(Child $child)
     {
         $user = auth()->user();
-        $child->load(['notes.author']);
+        $child->load(['notes.author', 'creator', 'updater']);
 
         if ($child->barangay !== $user->barangay) {
             abort(403);
@@ -170,8 +186,15 @@ class ChildController extends Controller
                 'contact_number' => $child->contact_number,
                 'barangay' => $child->barangay,
 
+                'created_at' => $child->created_at,
+                'updated_at' => $child->updated_at,
+
                 'creator' => [
                     'name' => $child->creator?->name
+                ],
+
+                'updater' => [
+                    'name' => $child->updater?->name
                 ],
 
                 'notes' => $child->notes->map(fn($note) => [
@@ -223,7 +246,6 @@ class ChildController extends Controller
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:M,F,Male,Female',
-            'age' => 'required|integer|min:0',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
             'birthdate' => 'nullable|date',
@@ -336,7 +358,6 @@ class ChildController extends Controller
                 'middle_initial' => $row['middle_initial'] ?? null,
                 'last_name' => $row['last_name'],
                 'sex' => $sex,
-                'age' => $row['age'] ?? 0,
                 'weight' => $row['weight'] ?? 0,
                 'height' => $row['height'] ?? 0,
                 'birthdate' => $row['birthdate'] ?? null,

@@ -137,5 +137,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
+Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
+
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

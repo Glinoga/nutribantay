@@ -64,21 +64,6 @@ export default function Register() {
                                         <InputError message={errors.email} />
                                     </div>
 
-                                    {/* Barangay */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="barangay">Barangay Number</Label>
-                                        <Input
-                                            id="barangay"
-                                            type="number"
-                                            name="barangay"
-                                            min={0}
-                                            required
-                                            tabIndex={3}
-                                            placeholder="Enter your barangay number"
-                                        />
-                                        <InputError message={errors.barangay} />
-                                    </div>
-
                                     {/* Password */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="password">Password</Label>
@@ -87,7 +72,7 @@ export default function Register() {
                                             type="password"
                                             name="password"
                                             required
-                                            tabIndex={4}
+                                            tabIndex={3}
                                             autoComplete="new-password"
                                             placeholder="Password"
                                         />
@@ -102,9 +87,8 @@ export default function Register() {
                                             type="password"
                                             name="password_confirmation"
                                             required
-                                            tabIndex={5}
-                                            autoComplete="new-password"
-                                            placeholder="Confirm password"
+                                            tabIndex={4}
+                                            placeholder="Confirm your password"
                                         />
                                         <InputError message={errors.password_confirmation} />
                                     </div>

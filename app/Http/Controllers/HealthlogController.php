@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class HealthlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -25,10 +25,38 @@ class HealthlogController extends Controller
             });
         }
 
+        // Search filter
+        if ($request->search) {
+            $search = $request->search;
+            $query->whereHas('child', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('sex', 'like', "%{$search}%")
+                  ->orWhere('barangay', 'like', "%{$search}%");
+            });
+        }
+
         $healthlogs = $query->latest()->get();
 
         return Inertia::render('Healthlog/Index', [
-            'healthlogs' => $healthlogs,
+            'healthlogs' => $healthlogs->map(fn($log) => [
+                'id' => $log->id,
+                'child_id' => $log->child_id,
+                'child' => [
+                    'id' => $log->child->id,
+                    'fullname' => $log->child->fullname,
+                    'sex' => $log->child->sex,
+                ],
+                'user' => [
+                    'name' => $log->user?->name,
+                ],
+                'age_in_months' => $log->age_in_months,
+                'weight' => $log->weight,
+                'height' => $log->height,
+                'bmi' => $log->bmi,
+                'nutrition_status' => $log->nutrition_status,
+                'created_at' => $log->created_at,
+            ]),
         ]);
     }
 

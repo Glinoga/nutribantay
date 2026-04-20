@@ -51,7 +51,7 @@ export default function Show({ log }: Props) {
                         <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                             <div>
                                 <dt className="text-sm font-medium text-gray-500">Timestamp</dt>
-                                <dd className="mt-1 text-sm text-gray-900">{new Date(log.created_at).toLocaleString()}</dd>
+                                <dd className="mt-1 text-sm text-gray-900">{log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}</dd>
                             </div>
 
                             <div>
@@ -141,11 +141,13 @@ export default function Show({ log }: Props) {
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{key}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">
                                                     <span className="rounded bg-red-100 px-2 py-1">
-                                                        {log.old_values?.[key] !== undefined ? String(log.old_values[key]) : '-'}
+                                                        {log.old_values && log.old_values[key] !== undefined ? String(log.old_values[key]) : '-'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className="rounded bg-green-100 px-2 py-1">{String(log.new_values[key])}</span>
+                                                    <span className="rounded bg-green-100 px-2 py-1">
+                                                        {log.new_values?.[key] !== undefined ? String(log.new_values[key]) : '-'}
+                                                    </span>
                                                 </td>
                                             </tr>
                                         ))}

@@ -16,7 +16,6 @@ class Child extends Model
         'middle_initial',
         'last_name',
         'sex',
-        'age',
         'weight',
         'height',
         'birthdate',
@@ -32,7 +31,7 @@ class Child extends Model
     ];
 
     // 🔥 This exposes computed attributes (fullname, formatted_name) to JSON/API
-    protected $appends = ['fullname', 'formatted_name', 'bmi'];
+    protected $appends = ['fullname', 'formatted_name', 'bmi', 'age', 'is_over_60_months'];
 
     /*
     |--------------------------------------------------------------------------
@@ -61,6 +60,21 @@ class Child extends Model
             return null;
         }
         return round($this->weight / pow($this->height / 100, 2), 2);
+    }
+
+    // Age accessor - calculates from birthdate in MONTHS (floor)
+    public function getAgeAttribute()
+    {
+        if (!$this->birthdate) {
+            return null;
+        }
+        return floor(\Carbon\Carbon::parse($this->birthdate)->diffInMonths(\Carbon\Carbon::now()));
+    }
+
+    // Boolean flag - 60 months and above (no longer in 0-5 years bracket)
+    public function getIsOver60MonthsAttribute()
+    {
+        return $this->age >= 60;
     }
 
     /*

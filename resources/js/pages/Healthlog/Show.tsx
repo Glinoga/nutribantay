@@ -37,6 +37,7 @@ type HealthLog = {
 
     child?: { fullname?: string };
     user?: { name: string };
+    creator?: { name: string };
 };
 
 export default function Show({ healthlog }: { healthlog: HealthLog }) {
@@ -111,10 +112,16 @@ export default function Show({ healthlog }: { healthlog: HealthLog }) {
                     </p>
 
                     <p>
-                        <span className="font-semibold">Created At:</span> {new Date(healthlog.created_at).toLocaleString()}
+                        <span className="font-semibold">Created At:</span>{' '}
+                        {healthlog.created_at
+                            ? `by ${healthlog.creator?.name ?? healthlog.user?.name ?? 'Unknown'} on ${new Date(healthlog.created_at).toLocaleString()}`
+                            : 'N/A'}
                     </p>
                     <p>
-                        <span className="font-semibold">Updated At:</span> {new Date(healthlog.updated_at).toLocaleString()}
+                        <span className="font-semibold">Updated At:</span>{' '}
+                        {healthlog.updated_at
+                            ? `by ${healthlog.user?.name ?? 'Unknown'} on ${new Date(healthlog.updated_at).toLocaleString()}`
+                            : 'N/A'}
                     </p>
                 </div>
 

@@ -14,6 +14,7 @@ type Child = {
     last_name: string;
     sex: string;
     age: number | null;
+    is_over_60_months: boolean;
     weight?: number | null;
     height?: number | null;
     address?: string | null;
@@ -73,6 +74,18 @@ export default function Index({ children, pagination, search = '', flash }: Inde
         setSelectedFile(null);
         setPreviewData([]);
         setImportData([]);
+    };
+
+    // Pagination state
+    const [jumpToPage, setJumpToPage] = useState('');
+
+    const handleJumpToPage = (e: React.FormEvent) => {
+        e.preventDefault();
+        const page = parseInt(jumpToPage);
+        if (page >= 1 && page <= (pagination?.last_page || 1)) {
+            router.get('/children', { page, search: searchQuery }, { replace: true });
+            setJumpToPage('');
+        }
     };
 
     // Handle file selection in modal
@@ -268,37 +281,17 @@ export default function Index({ children, pagination, search = '', flash }: Inde
             </form>
 
             {/* EXPORT FILTERS */}
-<form method="GET" action="/children/export" className="m-4 flex gap-2">
+            <form method="GET" action="/children/export" className="m-4 flex gap-2">
+                <input type="number" name="age_min" placeholder="Min Age" className="rounded border px-3 py-2" />
 
-    <input
-        type="number"
-        name="age_min"
-        placeholder="Min Age"
-        className="rounded border px-3 py-2"
-    />
+                <input type="number" name="age_max" placeholder="Max Age" className="rounded border px-3 py-2" />
 
-    <input
-        type="number"
-        name="age_max"
-        placeholder="Max Age"
-        className="rounded border px-3 py-2"
-    />
+                <input type="text" name="barangay" placeholder="Barangay" className="rounded border px-3 py-2" />
 
-    <input
-        type="text"
-        name="barangay"
-        placeholder="Barangay"
-        className="rounded border px-3 py-2"
-    />
-
-    <button
-        type="submit"
-        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-    >
-        Export CSV
-    </button>
-
-</form>
+                <button type="submit" className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+                    Export CSV
+                </button>
+            </form>
 
             {/* FLASH MESSAGE */}
             {flash?.success && <div className="mx-4 mb-4 rounded bg-green-100 p-4 text-green-800">{flash.success}</div>}
@@ -334,7 +327,14 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                                     <td className="border px-4 py-2">{child.id}</td>
                                     <td className="border px-4 py-2">{child.fullname}</td>
                                     <td className="border px-4 py-2">{child.sex}</td>
-                                    <td className="border px-4 py-2">{child.age ?? '-'}</td>
+                                    <td className="border px-4 py-2">
+                                        {child.age ?? '-'}
+                                        {child.is_over_60_months && (
+                                            <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800">
+                                                60+
+                                            </span>
+                                        )}
+                                    </td>
                                     <td className="border px-4 py-2">{child.weight ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.height ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.address ?? '-'}</td>
@@ -375,23 +375,53 @@ export default function Index({ children, pagination, search = '', flash }: Inde
             </div>
 
             {/* PAGINATION */}
-            {pagination && pagination.last_page > 1 && (
+            {pagination && pagination.last_page >= 1 && (
                 <div className="m-4 flex items-center justify-between">
+                    {/* Results count */}
                     <div className="text-sm text-gray-600">
-                        Showing {pagination.from} to {pagination.to} of {pagination.total} results
+                        Showing {pagination.from || 0} to {pagination.to || 0} of {pagination.total || 0} children
                     </div>
-                    <div className="flex gap-1">
-                        {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => (
-                            <button
-                                key={page}
-                                onClick={() => router.get('/children', { page, search: searchQuery }, { replace: true })}
-                                className={`rounded px-3 py-1 ${
-                                    page === pagination.current_page ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                }`}
-                            >
-                                {page}
+
+                    {/* Page navigation */}
+                    <div className="flex items-center gap-2">
+                        {/* Page counter */}
+                        <span className="text-sm text-gray-600">
+                            Page {pagination.current_page} of {pagination.last_page}
+                        </span>
+
+                        {/* Previous button */}
+                        <button
+                            onClick={() => router.get('/children', { page: pagination.current_page - 1, search: searchQuery }, { replace: true })}
+                            disabled={pagination.current_page <= 1}
+                            className="rounded bg-gray-200 px-3 py-1 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Back
+                        </button>
+
+                        {/* Next button */}
+                        <button
+                            onClick={() => router.get('/children', { page: pagination.current_page + 1, search: searchQuery }, { replace: true })}
+                            disabled={pagination.current_page >= pagination.last_page}
+                            className="rounded bg-gray-200 px-3 py-1 hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Next
+                        </button>
+
+                        {/* Jump to page input */}
+                        <form onSubmit={handleJumpToPage} className="flex items-center gap-1">
+                            <input
+                                type="number"
+                                min="1"
+                                max={pagination.last_page}
+                                value={jumpToPage}
+                                onChange={(e) => setJumpToPage(e.target.value)}
+                                placeholder="#"
+                                className="w-16 rounded border px-2 py-1"
+                            />
+                            <button type="submit" className="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700">
+                                Go
                             </button>
-                        ))}
+                        </form>
                     </div>
                 </div>
             )}

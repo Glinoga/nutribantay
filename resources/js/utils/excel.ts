@@ -65,6 +65,7 @@ export const readExcel = async (file: File) => {
             const birthdate = typeof birthdateRaw === 'number' ? excelDateToJSDate(birthdateRaw) : birthdateRaw;
 
             return {
+                fullName: fullName,
                 first_name: firstName,
                 last_name: lastName,
                 sex: sexNormalized,

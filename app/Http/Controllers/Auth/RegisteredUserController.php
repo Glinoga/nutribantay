@@ -36,13 +36,11 @@ class RegisteredUserController extends Controller
         'name' => 'required|string|max:255',
         'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
         'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        'barangay' => ['required', 'string', 'max:255'],
         'registration_code' => ['required', 'string'],
     ]);
 
-    // fetch the code (must exist, not expired, not used, and barangay must match)
+    // fetch the code (must exist, not expired, not used)
     $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
-        ->where('barangay', $request->barangay)
         ->where(function ($q) {
             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
         })
@@ -51,16 +49,16 @@ class RegisteredUserController extends Controller
 
     if (! $registrationCode) {
         return back()->withErrors([
-            'registration_code' => 'The registration code is invalid, expired, or not for this barangay.',
+            'registration_code' => 'The registration code is invalid, expired, or already used.',
         ])->onlyInput('registration_code');
     }
 
-    // create user
+    // create user - inherit barangay from registration code
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'barangay' => $request->barangay,
+        'barangay' => $registrationCode->barangay,
     ]);
 
     // assign default role
