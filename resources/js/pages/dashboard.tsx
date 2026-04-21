@@ -1,7 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { useState } from 'react';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
 
 type Stats = {
     total_children: number;
@@ -42,8 +46,20 @@ type Stats = {
     };
 };
 
+type TrendData = {
+    monthly_6months: Array<{ month: string; count: number }>;
+    monthly_1year: Array<{ month: string; count: number }>;
+    status_distribution: {
+        normal: number;
+        underweight: number;
+        overweight: number;
+        stunted: number;
+    };
+};
+
 type DashboardProps = {
     stats: Stats;
+    trends: TrendData;
     user_barangay: string;
     is_admin: boolean;
 };
@@ -55,12 +71,56 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ stats, user_barangay, is_admin }: DashboardProps) {
+export default function Dashboard({ stats, trends, user_barangay, is_admin }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
+    const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
 
     const handlePrint = () => {
         window.open(`/dashboard/print?period=${printPeriod}`, '_blank');
+    };
+
+    const trendData = trendRange === '6months' ? trends.monthly_6months : trends.monthly_1year;
+
+    const lineChartData = {
+        labels: trendData.map((t) => t.month),
+        datasets: [
+            {
+                label: 'Health Logs',
+                data: trendData.map((t) => t.count),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                tension: 0.3,
+            },
+        ],
+    };
+
+    const barChartData = {
+        labels: trendData.map((t) => t.month),
+        datasets: [
+            {
+                label: 'Health Logs',
+                data: trendData.map((t) => t.count),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            },
+        ],
+    };
+
+    const doughnutData = {
+        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted'],
+        datasets: [
+            {
+                data: [
+                    trends.status_distribution.normal,
+                    trends.status_distribution.underweight,
+                    trends.status_distribution.overweight,
+                    trends.status_distribution.stunted,
+                ],
+                backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
+                borderColor: ['rgb(34, 197, 94)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
+                borderWidth: 1,
+            },
+        ],
     };
 
     return (
@@ -68,7 +128,6 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
             <Head title="Dashboard" />
 
             <div className="p-6">
-                {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -79,7 +138,6 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                     </button>
                 </div>
 
-                {/* Daily Stats */}
                 <div className="mb-6">
                     <h2 className="mb-3 text-lg font-semibold">Daily Stats</h2>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -102,7 +160,6 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                     </div>
                 </div>
 
-                {/* Total Children */}
                 <div className="mb-6">
                     <div className="rounded-lg bg-blue-600 p-6 text-white">
                         <p className="text-sm opacity-80">Total Children Registered</p>
@@ -110,7 +167,6 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                     </div>
                 </div>
 
-                {/* Age Breakdown */}
                 <div className="mb-6">
                     <h2 className="mb-3 text-lg font-semibold">Age Breakdown</h2>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -127,13 +183,12 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                             <p className="text-2xl font-bold">{stats.age_breakdown['12to35']}</p>
                         </div>
                         <div className="rounded-lg bg-orange-100 p-4 shadow">
-                            <p className="text-sm text-orange-600">36+ months (No longer in bracket)</p>
+                            <p className="text-sm text-orange-600">36+ months</p>
                             <p className="text-2xl font-bold text-orange-600">{stats.age_breakdown['36plus']}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Nutrition Status */}
                 <div className="mb-6">
                     <h2 className="mb-3 text-lg font-semibold">Nutrition Status (This Year)</h2>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -156,9 +211,8 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                     </div>
                 </div>
 
-                {/* Coverage */}
                 <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Coverage (Vitamin A & Deworming)</h2>
+                    <h2 className="mb-3 text-lg font-semibold">Coverage</h2>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                         <div className="rounded-lg bg-white p-4 shadow">
                             <p className="text-sm text-gray-500">Vitamin A Given</p>
@@ -180,9 +234,79 @@ export default function Dashboard({ stats, user_barangay, is_admin }: DashboardP
                         </div>
                     </div>
                 </div>
+
+                {/* Trend Charts Section */}
+                <div className="mb-6">
+                    <h2 className="mb-3 text-lg font-semibold">Trends</h2>
+
+                    <div className="mb-4 flex gap-2">
+                        <button
+                            onClick={() => setTrendRange('6months')}
+                            className={`rounded px-4 py-2 ${trendRange === '6months' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                        >
+                            Last 6 Months
+                        </button>
+                        <button
+                            onClick={() => setTrendRange('1year')}
+                            className={`rounded px-4 py-2 ${trendRange === '1year' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                        >
+                            Last Year
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        <div className="rounded-lg bg-white p-4 shadow">
+                            <h3 className="mb-2 font-semibold">Health Logs Over Time</h3>
+                            <Line
+                                data={lineChartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'bottom' },
+                                    },
+                                }}
+                            />
+                        </div>
+
+                        <div className="rounded-lg bg-white p-4 shadow">
+                            <h3 className="mb-2 font-semibold">Monthly Comparison</h3>
+                            <Bar
+                                data={barChartData}
+                                options={{
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { position: 'bottom' },
+                                    },
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        <div className="rounded-lg bg-white p-4 shadow">
+                            <h3 className="mb-2 font-semibold">Nutrition Status Distribution (Last 6 Months)</h3>
+                            {trends.status_distribution.normal +
+                                trends.status_distribution.underweight +
+                                trends.status_distribution.overweight +
+                                trends.status_distribution.stunted >
+                            0 ? (
+                                <Doughnut
+                                    data={doughnutData}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { position: 'bottom' },
+                                        },
+                                    }}
+                                />
+                            ) : (
+                                <p className="text-gray-500">No nutrition status data available.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Print/Export Modal */}
             {showPrintModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <div className="w-full max-w-md rounded-lg bg-white p-6">

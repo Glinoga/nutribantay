@@ -72,22 +72,14 @@ class DashboardController extends Controller
         // Total children
         $totalChildren = $this->getBaseQuery($request)->count();
 
-        // Get age ranges (for monitoring)
-        $age0to5 = $this->getBaseQuery($request)
-            ->whereRaw('TIMESTAMPDIFF(MONTH, birthdate, NOW()) BETWEEN 0 AND 5')
-            ->count();
-            
-        $age6to11 = $this->getBaseQuery($request)
-            ->whereRaw('TIMESTAMPDIFF(MONTH, birthdate, NOW()) BETWEEN 6 AND 11')
-            ->count();
-            
-        $age12to35 = $this->getBaseQuery($request)
-            ->whereRaw('TIMESTAMPDIFF(MONTH, birthdate, NOW()) BETWEEN 12 AND 35')
-            ->count();
-            
-        $age36plus = $this->getBaseQuery($request)
-            ->whereRaw('TIMESTAMPDIFF(MONTH, birthdate, NOW()) >= 36')
-            ->count();
+        // Get age ranges (for monitoring) - using PHP Carbon for DB compatibility
+        $children = $this->getBaseQuery($request)->get();
+        
+        $now = Carbon::now();
+        $age0to5 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 0 && $c->birthdate->floatDiffInMonths($now) <= 5)->count();
+        $age6to11 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 6 && $c->birthdate->floatDiffInMonths($now) <= 11)->count();
+        $age12to35 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 12 && $c->birthdate->floatDiffInMonths($now) <= 35)->count();
+        $age36plus = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 36)->count();
 
         // Current year healthlogs
         $currentYear = Carbon::now()->startOfYear();
@@ -140,6 +132,42 @@ class DashboardController extends Controller
             ->where('created_at', '>=', $currentYear)
             ->count();
 
+        $monthlyTrend6 = [];
+        $monthlyTrend12 = [];
+        
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $monthlyTrend6[] = [
+                'month' => $month->format('M Y'),
+                'count' => HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count(),
+            ];
+        }
+        
+        for ($i = 11; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $monthlyTrend12[] = [
+                'month' => $month->format('M Y'),
+                'count' => HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count(),
+            ];
+        }
+
+        $last6MonthsLogs = HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
+            ->where('created_at', '>=', Carbon::now()->subMonths(6))
+            ->get();
+
+        $statusDistribution = [
+            'normal' => $last6MonthsLogs->where('nutrition_status', 'Normal')->count(),
+            'underweight' => $last6MonthsLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
+            'overweight' => $last6MonthsLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
+            'stunted' => $last6MonthsLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+        ];
+
         return Inertia::render('dashboard', [
             'stats' => [
                 'total_children' => $totalChildren,
@@ -173,6 +201,11 @@ class DashboardController extends Controller
                 'yearly' => [
                     'healthlogs' => $healthlogsThisYear,
                 ],
+            ],
+            'trends' => [
+                'monthly_6months' => $monthlyTrend6,
+                'monthly_1year' => $monthlyTrend12,
+                'status_distribution' => $statusDistribution,
             ],
             'user_barangay' => $barangay,
             'is_admin' => $isAdmin,

@@ -205,6 +205,21 @@ class ChildController extends Controller
                     'author' => ['name' => $note->author?->name],
                     'created_at' => $note->created_at,
                 ]),
+
+                'healthlogs' => $child->healthlogs()
+                    ->where('created_at', '>=', now()->subMonths(12))
+                    ->orderBy('created_at', 'asc')
+                    ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'vitamin_a', 'deworming', 'created_at'])
+                    ->map(fn($log) => [
+                        'id' => $log->id,
+                        'weight' => $log->weight,
+                        'height' => $log->height,
+                        'bmi' => $log->bmi,
+                        'nutrition_status' => $log->nutrition_status,
+                        'vitamin_a' => $log->vitamin_a,
+                        'deworming' => $log->deworming,
+                        'created_at' => $log->created_at,
+                    ]),
             ],
         ]);
     }
