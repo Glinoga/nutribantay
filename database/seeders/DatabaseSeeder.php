@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(GrowthStandardSeeder::class);
 
+        $this->call(DashboardTestSeeder::class);
+
         // Create admin account
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],

@@ -13,6 +13,7 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DatabaseMaintenanceController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +31,9 @@ Route::get('/contact', fn () => Inertia::render('contact'))->name('contact');
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
-
-    Route::get('/dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
+    Route::get('/dashboard/print', [DashboardController::class, 'printView'])->name('dashboard.print');
 
     /*
     |--------------------------------------------------------------------------
