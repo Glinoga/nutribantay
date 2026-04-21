@@ -12,7 +12,6 @@ type Stock = {
 
 export default function Form({ stock }: { stock: Stock | null }) {
     const [form, setForm] = useState<Stock>({
-        barangay: stock?.barangay ?? '',
         item_name: stock?.item_name ?? '',
         category: stock?.category ?? 'food',
     });
@@ -39,15 +38,6 @@ export default function Form({ stock }: { stock: Stock | null }) {
                 <h1 className="mb-4 text-2xl font-bold">{stock ? 'Edit Stock' : 'Add Stock'}</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4 rounded bg-white p-6 shadow">
-                    <div>
-                        <label className="block text-sm font-medium">Barangay</label>
-                        <input
-                            value={form.barangay}
-                            onChange={(e) => setForm({ ...form, barangay: e.target.value })}
-                            className="w-full rounded border px-3 py-2"
-                        />
-                    </div>
-
                     <div>
                         <label className="block text-sm font-medium">Item Name</label>
                         <input

@@ -213,8 +213,18 @@ class HealthlogController extends Controller
 
     public function show(HealthLog $healthlog)
     {
+        $healthlog->load(['child', 'user']);
+        
+        // Calculate age from child's birthdate if age_in_months is null
+        $ageInMonths = $healthlog->age_in_months;
+        if ($ageInMonths === null && $healthlog->child && $healthlog->child->birthdate) {
+            $ageInMonths = floor(\Carbon\Carbon::parse($healthlog->child->birthdate)->diffInMonths(\Carbon\Carbon::now()));
+        }
+
         return Inertia::render('Healthlog/Show', [
-            'healthlog' => $healthlog->load(['child', 'user']),
+            'healthlog' => array_merge($healthlog->toArray(), [
+                'age_in_months' => $ageInMonths,
+            ]),
         ]);
     }
 

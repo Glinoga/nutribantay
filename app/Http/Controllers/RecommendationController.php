@@ -46,8 +46,10 @@ class RecommendationController extends Controller
         // Compute deworming recommendation flag - only for 12+ months AND no deworming yet
         $needsDeworming = ($totalMonths >= 12 && $dewormingStatus === 'No') ? 'Yes' : 'No';
 
-        // Step 5: Fetch stocks by category
-        $stocks = Stock::where('barangay', $child->barangay)->get();
+        // Step 5: Fetch stocks by authenticated user's barangay
+        $user = auth()->user();
+        $userBarangay = $user ? $user->barangay : $child->barangay;
+        $stocks = Stock::where('barangay', $userBarangay)->get();
         $foodItems = $stocks->where('category', 'food')->pluck('item_name')->toArray();
         $vitaminItems = $stocks->where('category', 'vitamin')->pluck('item_name')->toArray();
         
@@ -166,16 +168,16 @@ FOOD RESTRICTIONS FORMAT:
 - Huwag magbigay ng generic na text na bawal ang solid food kung ang bata ay 6 buwan na
 
 OUTPUT FORMAT (Clean Version):
-1. Mga Nutrition Tips (3-4 items)
-2. Meal Plan:
-   - Umaga: [pagkain]
-   - Tanghali: [pagkain]
-   - Gabi: [pagkain]
-3. Mga Vitamin/Supplements:
-   - Vitamin A capsule (kumuha sa health center)
-4. Food Restrictions (kung may)
-5. Disclaimer
-6. Pinagkuhanan ng Datos
+ 1. Mga Nutrition Tips (3-4 items)
+ 2. Meal Plan:
+    - Umaga: [pagkain]
+    - Tanghali: [pagkain]
+    - Gabi: [pagkain]
+ 3. Mga Vitamin/Supplements:
+    - {$vitaminList}
+ 4. Food Restrictions (kung may)
+ 5. Disclaimer
+ 6. Pinagkuhanan ng Datos
 
 IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot.
 ";
@@ -376,11 +378,26 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
     private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
     {
         if ($ageInMonths >= 12 && strtolower($dewormingStatus) === 'no') {
+            // Fetch medicine stocks for the user's barangay
+            $user = auth()->user();
+            $userBarangay = $user ? $user->barangay : null;
+            $medicineList = 'Deworming tablets';
+            
+            if ($userBarangay) {
+                $medicines = Stock::where('barangay', $userBarangay)
+                    ->where('category', 'medicine')
+                    ->pluck('item_name')
+                    ->toArray();
+                if (!empty($medicines)) {
+                    $medicineList = implode(', ', $medicines);
+                }
+            }
+            
             if (stripos($recommendation, 'deworming') === false) {
                 // Handle multi-line format: line ending with newline
                 $recommendation = preg_replace(
                     '/(Vitamin A[^\n]*\n)/i',
-                    "$1- Deworming tablets dapat kumuha sa health center\n",
+                    "$1- {$medicineList}\n",
                     $recommendation,
                     1
                 );
@@ -389,7 +406,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 if (stripos($recommendation, 'deworming') === false) {
                     $recommendation = preg_replace(
                         '/(Vitamin A[^.]*\.)/i',
-                        "$1\n- Deworming tablets dapat kumuha sa health center.",
+                        "$1\n- {$medicineList}.",
                         $recommendation,
                         1
                     );

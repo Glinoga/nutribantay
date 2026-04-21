@@ -43,12 +43,15 @@ class StockController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
         $data = $request->validate([
-            'barangay' => 'required|string|max:255',
             'item_name' => 'required|string|max:255',
             'category' => 'required|in:food,vitamin,medicine,other',
         ]);
 
+        // Auto-inherit barangay from authenticated user
+        $data['barangay'] = $user->barangay;
         $data['created_by'] = auth()->id();
 
         Stock::create($data);
