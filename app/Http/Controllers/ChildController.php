@@ -24,12 +24,12 @@ class ChildController extends Controller
                 $minBirthdate = now()->subMonths($search)->toDateString();
                 $query->where('birthdate', '<=', $minBirthdate);
             } else {
-                // Otherwise search by name/sex/barangay
+                // Otherwise search by name/sex only
                 $query->where(function($q) use ($search) {
+                    $searchLower = strtolower($search);
                     $q->where('first_name', 'like', "%{$search}%")
                       ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhere('sex', 'like', "%{$search}%")
-                      ->orWhere('barangay', 'like', "%{$search}%");
+                      ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);  // case-insensitive for sex
                 });
             }
         }
@@ -114,13 +114,13 @@ class ChildController extends Controller
 
     // ✅ Age filters (calculated from birthdate in months)
     if ($request->age_min) {
-        $minBirthdate = now()->subMonths($request->age_min + 1)->toDateString();
+        $minBirthdate = now()->subMonths($request->age_min)->toDateString();
         $query->where('birthdate', '<=', $minBirthdate);
     }
 
     if ($request->age_max) {
-        $maxBirthdate = now()->subMonths($request->age_max)->toDateString();
-        $query->where('birthdate', '>=', $maxBirthdate);
+        $maxBirthdate = now()->subMonths($request->age_max + 1)->addDay()->toDateString();
+        $query->where('birthdate', '<', $maxBirthdate);
     }
 
     $children = $query->get();

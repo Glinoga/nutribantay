@@ -258,7 +258,7 @@ export default function Index({ children, pagination, search = '', flash }: Inde
             <form onSubmit={handleSearch} className="m-4 flex gap-2">
                 <input
                     type="text"
-                    placeholder="Search by name, sex, or barangay..."
+                    placeholder="Search by name or sex..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 rounded border px-4 py-2"
@@ -285,8 +285,6 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                 <input type="number" name="age_min" placeholder="Min Age" className="rounded border px-3 py-2" />
 
                 <input type="number" name="age_max" placeholder="Max Age" className="rounded border px-3 py-2" />
-
-                <input type="text" name="barangay" placeholder="Barangay" className="rounded border px-3 py-2" />
 
                 <button type="submit" className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
                     Export CSV
