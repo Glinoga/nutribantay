@@ -12,12 +12,38 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
+<<<<<<< Updated upstream
         $children = Child::with(['creator', 'updater'])
             ->where('barangay', $user->barangay)
             ->get();
+=======
+        $query = Child::with(['creator', 'updater'])
+            ->where('barangay', $user->barangay);
+
+        // Search filter
+        if ($request->search) {
+            $search = $request->search;
+
+            // If search is a number, filter by age >= that number
+            if (is_numeric($search)) {
+                $minBirthdate = now()->subMonths($search)->toDateString();
+                $query->where('birthdate', '<=', $minBirthdate);
+            } else {
+                // Otherwise search by name/sex/barangay
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('sex', 'like', "%{$search}%")
+                        ->orWhere('barangay', 'like', "%{$search}%");
+                });
+            }
+        }
+
+        $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
+>>>>>>> Stashed changes
 
         return Inertia::render('Children/Index', [
-            'children' => $children->map(fn($child) => [
+            'children' => $children->map(fn ($child) => [
                 'id' => $child->id,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
@@ -30,14 +56,92 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
+<<<<<<< Updated upstream
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
+=======
+                'barangay' => $child->barangay,
+
+                'creator' => [
+                    'name' => $child->creator?->name,
+                ],
+            ]),
+            'pagination' => [
+                'current_page' => $children->currentPage(),
+                'last_page' => $children->lastPage(),
+                'total' => $children->total(),
+                'from' => $children->firstItem(),
+                'to' => $children->lastItem(),
+            ],
+        ]);
+    }
+
+    public function archived()
+    {
+        $user = auth()->user();
+
+        $archivedChildren = Child::onlyTrashed()
+            ->where('barangay', $user->barangay)
+            ->with(['creator', 'updater'])
+            ->get();
+
+        return Inertia::render('Children/Archived', [
+            'children' => $archivedChildren->map(fn ($child) => [
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'age' => $child->age,
+                'deleted_at' => $child->deleted_at,
+>>>>>>> Stashed changes
                 'barangay' => $child->barangay,
             ]),
         ]);
     }
 
+<<<<<<< Updated upstream
+=======
+    public function export(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = Child::query();
+
+        // 🔒 Healthworker restricted to own barangay
+        if (! $user->hasRole('Admin')) {
+            $query->where('barangay', $user->barangay);
+        }
+
+        // ✅ Barangay filter (both roles can use it)
+        if ($request->barangay) {
+            if ($user->hasRole('Admin')) {
+                $query->where('barangay', $request->barangay);
+            } else {
+                // Healthworker still limited to their own
+                $query->where('barangay', $user->barangay);
+            }
+        }
+
+        // ✅ Age filters (calculated from birthdate in months)
+        if ($request->age_min) {
+            $minBirthdate = now()->subMonths($request->age_min + 1)->toDateString();
+            $query->where('birthdate', '<=', $minBirthdate);
+        }
+
+        if ($request->age_max) {
+            $maxBirthdate = now()->subMonths($request->age_max)->toDateString();
+            $query->where('birthdate', '>=', $maxBirthdate);
+        }
+
+        $children = $query->get();
+
+        return $this->exportCSV($children);
+    }
+
+>>>>>>> Stashed changes
     public function create()
     {
         return Inertia::render('Children/Create');
@@ -97,13 +201,64 @@ class ChildController extends Controller
                 'created_by' => $child->creator?->name,
                 'updated_by' => $child->updater?->name,
                 'updated_at' => $child->updated_at,
+<<<<<<< Updated upstream
                 'created_at' => $child->created_at,
                 'notes' => $child->notes->map(fn($note) => [
+=======
+
+                'creator' => [
+                    'name' => $child->creator?->name,
+                ],
+
+                'updater' => [
+                    'name' => $child->updater?->name,
+                ],
+
+                'notes' => $child->notes->map(fn ($note) => [
+>>>>>>> Stashed changes
                     'id' => $note->id,
                     'note' => $note->note,
                     'author' => ['name' => $note->author?->name],
                     'created_at' => $note->created_at,
                 ]),
+<<<<<<< Updated upstream
+=======
+
+                'healthlogs' => $child->healthlogs()
+                    ->orderBy('created_at', 'asc')
+                    ->get([
+                        'id', 'weight', 'height', 'bmi', 'age_in_months',
+                        'status_wfa', 'status_lfa', 'status_wfl_wfh', 'nutrition_status',
+                        'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
+                        'vitamin_a', 'deworming',
+                        'vaccine_name', 'dose_number', 'date_given', 'next_due_date', 'vaccine_status',
+                        'recommendation', 'created_at',
+                    ])
+                    ->map(fn ($log) => [
+                        'id' => $log->id,
+                        'weight' => $log->weight,
+                        'height' => $log->height,
+                        'bmi' => $log->bmi,
+                        'age_in_months' => $log->age_in_months,
+                        'status_wfa' => $log->status_wfa,
+                        'status_lfa' => $log->status_lfa,
+                        'status_wfl_wfh' => $log->status_wfl_wfh,
+                        'nutrition_status' => $log->nutrition_status,
+                        'micronutrient_powder' => $log->micronutrient_powder,
+                        'ruf' => $log->ruf,
+                        'rusf' => $log->rusf,
+                        'complementary_food' => $log->complementary_food,
+                        'vitamin_a' => $log->vitamin_a,
+                        'deworming' => $log->deworming,
+                        'vaccine_name' => $log->vaccine_name,
+                        'dose_number' => $log->dose_number,
+                        'date_given' => $log->date_given,
+                        'next_due_date' => $log->next_due_date,
+                        'vaccine_status' => $log->vaccine_status,
+                        'recommendation' => $log->recommendation,
+                        'created_at' => $log->created_at,
+                    ]),
+>>>>>>> Stashed changes
             ],
         ]);
     }
@@ -177,7 +332,128 @@ class ChildController extends Controller
         $child->delete();
 
         return redirect()->route('children.index')
+<<<<<<< Updated upstream
             ->with('success', 'Child deleted successfully!');
+=======
+            ->with('success', 'Child archived successfully!');
+    }
+
+    public function restore(string $id)
+    {
+        $user = auth()->user();
+
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        if ($child->barangay !== $user->barangay) {
+            abort(403);
+        }
+
+        // Restore - will trigger audit log
+        $child->restore();
+
+        return redirect()->route('children.index')
+            ->with('success', 'Child restored successfully!');
+    }
+
+    public function forceDelete(string $id)
+    {
+        $user = auth()->user();
+
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        if ($child->barangay !== $user->barangay) {
+            abort(403);
+        }
+
+        // Permanently delete - will trigger audit log
+        $child->forceDelete();
+
+        return redirect()->route('children.archived')
+            ->with('success', 'Child permanently deleted!');
+    }
+
+    // 🔥 ✅ IMPORT FUNCTION (NEW)
+    public function import(Request $request)
+    {
+        $user = auth()->user();
+
+        $rows = $request->input('data');
+
+        if (! $rows || ! is_array($rows)) {
+            return back()->with('error', 'Invalid import data.');
+        }
+
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($rows as $row) {
+
+            // skip invalid rows
+            if (
+                empty($row['first_name']) ||
+                empty($row['last_name']) ||
+                empty($row['sex'])
+            ) {
+                continue;
+            }
+
+            // Check for duplicates within same barangay
+            $existingChild = Child::where('barangay', $user->barangay)
+                ->where('first_name', $row['first_name'])
+                ->where('last_name', $row['last_name'])
+                ->where('birthdate', $row['birthdate'])
+                ->first();
+
+            if ($existingChild) {
+                $skipped++;
+
+                continue;
+            }
+
+            $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
+
+            Child::create([
+                'first_name' => $row['first_name'],
+                'middle_initial' => $row['middle_initial'] ?? null,
+                'last_name' => $row['last_name'],
+                'sex' => $sex,
+                'weight' => $row['weight'] ?? 0,
+                'height' => $row['height'] ?? 0,
+                'birthdate' => $row['birthdate'] ?? null,
+
+                'barangay' => $user->barangay,
+                'created_by' => $user->id,
+
+                'address' => null,
+                'contact_number' => null,
+            ]);
+
+            $created++;
+        }
+
+        $message = "Import complete! {$created} children imported.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} duplicates skipped.";
+        }
+
+        // Auto-update child profiles with latest healthlog values (for newly created children)
+        $newChildren = Child::where('created_by', $user->id)
+            ->where('created_at', '>=', now()->subSeconds(30))
+            ->get();
+
+        foreach ($newChildren as $child) {
+            $latestLog = $child->healthlogs()->latest()->first();
+            if ($latestLog) {
+                $child->update([
+                    'weight' => $latestLog->weight,
+                    'height' => $latestLog->height,
+                ]);
+            }
+        }
+
+        // Use regular redirect instead of Inertia to preserve flash message
+        return redirect('/children')->with('success', $message);
+>>>>>>> Stashed changes
     }
 
     public function storeNote(Request $request, Child $child)
@@ -206,7 +482,7 @@ class ChildController extends Controller
 
         $user = auth()->user();
 
-        if ($note->user_id !== $user->id && !$user->hasRole('Admin')) {
+        if ($note->user_id !== $user->id && ! $user->hasRole('Admin')) {
             abort(403);
         }
 
@@ -214,4 +490,41 @@ class ChildController extends Controller
 
         return redirect()->back()->with('success', 'Note deleted successfully.');
     }
+<<<<<<< Updated upstream
+=======
+
+    public function exportCSV($children)
+    {
+        $filename = 'children_export.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ];
+
+        $callback = function () use ($children) {
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, [
+                'Full Name',
+                'Age',
+                'Barangay',
+                'BMI',
+            ]);
+
+            foreach ($children as $child) {
+                fputcsv($file, [
+                    $child->fullname,
+                    $child->age,
+                    $child->barangay,
+                    $child->bmi,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+>>>>>>> Stashed changes
 }
