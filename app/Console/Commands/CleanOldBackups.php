@@ -16,13 +16,14 @@ class CleanOldBackups extends Command
     public function handle(): int
     {
         $retentionDays = Setting::get('backup_retention_days', 14);
-        
+
         $this->info("Starting backup cleanup (retention: {$retentionDays} days)...");
 
         $backupPath = 'Laravel';
-        
-        if (!Storage::disk('local')->exists($backupPath)) {
+
+        if (! Storage::disk('local')->exists($backupPath)) {
             $this->info('No backup directory found. Exiting.');
+
             return Command::SUCCESS;
         }
 

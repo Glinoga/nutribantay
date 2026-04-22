@@ -18,18 +18,18 @@ class ChildController extends Controller
         // Search filter
         if ($request->search) {
             $search = $request->search;
-            
+
             // If search is a number, filter by age >= that number
             if (is_numeric($search)) {
                 $minBirthdate = now()->subMonths($search)->toDateString();
                 $query->where('birthdate', '<=', $minBirthdate);
             } else {
                 // Otherwise search by name/sex only
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $searchLower = strtolower($search);
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('last_name', 'like', "%{$search}%")
-                      ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);  // case-insensitive for sex
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);  // case-insensitive for sex
                 });
             }
         }
@@ -37,7 +37,7 @@ class ChildController extends Controller
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
 
         return Inertia::render('Children/Index', [
-            'children' => $children->map(fn($child) => [
+            'children' => $children->map(fn ($child) => [
                 'id' => $child->id,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
@@ -54,7 +54,7 @@ class ChildController extends Controller
                 'barangay' => $child->barangay,
 
                 'creator' => [
-                    'name' => $child->creator?->name
+                    'name' => $child->creator?->name,
                 ],
             ]),
             'pagination' => [
@@ -77,7 +77,7 @@ class ChildController extends Controller
             ->get();
 
         return Inertia::render('Children/Archived', [
-            'children' => $archivedChildren->map(fn($child) => [
+            'children' => $archivedChildren->map(fn ($child) => [
                 'id' => $child->id,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
@@ -92,41 +92,41 @@ class ChildController extends Controller
     }
 
     public function export(Request $request)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    $query = Child::query();
+        $query = Child::query();
 
-    // 🔒 Healthworker restricted to own barangay
-    if (!$user->hasRole('Admin')) {
-        $query->where('barangay', $user->barangay);
-    }
-
-    // ✅ Barangay filter (both roles can use it)
-    if ($request->barangay) {
-        if ($user->hasRole('Admin')) {
-            $query->where('barangay', $request->barangay);
-        } else {
-            // Healthworker still limited to their own
+        // 🔒 Healthworker restricted to own barangay
+        if (! $user->hasRole('Admin')) {
             $query->where('barangay', $user->barangay);
         }
+
+        // ✅ Barangay filter (both roles can use it)
+        if ($request->barangay) {
+            if ($user->hasRole('Admin')) {
+                $query->where('barangay', $request->barangay);
+            } else {
+                // Healthworker still limited to their own
+                $query->where('barangay', $user->barangay);
+            }
+        }
+
+        // ✅ Age filters (calculated from birthdate in months)
+        if ($request->age_min) {
+            $minBirthdate = now()->subMonths($request->age_min)->toDateString();
+            $query->where('birthdate', '<=', $minBirthdate);
+        }
+
+        if ($request->age_max) {
+            $maxBirthdate = now()->subMonths($request->age_max + 1)->addDay()->toDateString();
+            $query->where('birthdate', '<', $maxBirthdate);
+        }
+
+        $children = $query->get();
+
+        return $this->exportCSV($children);
     }
-
-    // ✅ Age filters (calculated from birthdate in months)
-    if ($request->age_min) {
-        $minBirthdate = now()->subMonths($request->age_min)->toDateString();
-        $query->where('birthdate', '<=', $minBirthdate);
-    }
-
-    if ($request->age_max) {
-        $maxBirthdate = now()->subMonths($request->age_max + 1)->addDay()->toDateString();
-        $query->where('birthdate', '<', $maxBirthdate);
-    }
-
-    $children = $query->get();
-
-    return $this->exportCSV($children);
-}
 
     public function create()
     {
@@ -192,14 +192,14 @@ class ChildController extends Controller
                 'updated_at' => $child->updated_at,
 
                 'creator' => [
-                    'name' => $child->creator?->name
+                    'name' => $child->creator?->name,
                 ],
 
                 'updater' => [
-                    'name' => $child->updater?->name
+                    'name' => $child->updater?->name,
                 ],
 
-                'notes' => $child->notes->map(fn($note) => [
+                'notes' => $child->notes->map(fn ($note) => [
                     'id' => $note->id,
                     'note' => $note->note,
                     'author' => ['name' => $note->author?->name],
@@ -207,10 +207,9 @@ class ChildController extends Controller
                 ]),
 
                 'healthlogs' => $child->healthlogs()
-                    ->where('created_at', '>=', now()->subMonths(12))
                     ->orderBy('created_at', 'asc')
                     ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'vitamin_a', 'deworming', 'created_at'])
-                    ->map(fn($log) => [
+                    ->map(fn ($log) => [
                         'id' => $log->id,
                         'weight' => $log->weight,
                         'height' => $log->height,
@@ -339,7 +338,7 @@ class ChildController extends Controller
 
         $rows = $request->input('data');
 
-        if (!$rows || !is_array($rows)) {
+        if (! $rows || ! is_array($rows)) {
             return back()->with('error', 'Invalid import data.');
         }
 
@@ -366,6 +365,7 @@ class ChildController extends Controller
 
             if ($existingChild) {
                 $skipped++;
+
                 continue;
             }
 
@@ -425,7 +425,7 @@ class ChildController extends Controller
 
         $user = auth()->user();
 
-        if ($note->user_id !== $user->id && !$user->hasRole('Admin')) {
+        if ($note->user_id !== $user->id && ! $user->hasRole('Admin')) {
             abort(403);
         }
 
@@ -435,36 +435,36 @@ class ChildController extends Controller
     }
 
     public function exportCSV($children)
-{
-    $filename = "children_export.csv";
+    {
+        $filename = 'children_export.csv';
 
-    $headers = [
-        "Content-Type" => "text/csv",
-        "Content-Disposition" => "attachment; filename=$filename",
-    ];
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ];
 
-    $callback = function () use ($children) {
-        $file = fopen('php://output', 'w');
+        $callback = function () use ($children) {
+            $file = fopen('php://output', 'w');
 
-        fputcsv($file, [
-            'Full Name',
-            'Age',
-            'Barangay',
-            'BMI'
-        ]);
-
-        foreach ($children as $child) {
             fputcsv($file, [
-                $child->fullname,
-                $child->age,
-                $child->barangay,
-                $child->bmi
+                'Full Name',
+                'Age',
+                'Barangay',
+                'BMI',
             ]);
-        }
 
-        fclose($file);
-    };
+            foreach ($children as $child) {
+                fputcsv($file, [
+                    $child->fullname,
+                    $child->age,
+                    $child->barangay,
+                    $child->bmi,
+                ]);
+            }
 
-    return response()->stream($callback, 200, $headers);
-}
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

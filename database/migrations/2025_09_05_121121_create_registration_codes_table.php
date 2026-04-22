@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('registration_codes', function (Blueprint $table) {
-        $table->id();
-        $table->string('code')->unique();
-        $table->boolean('is_used')->default(false);
-        $table->timestamp('expires_at')->nullable();
-        $table->timestamps();
-    });
+            $table->id();
+            $table->string('code')->unique();
+            $table->boolean('is_used')->default(false);
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamps();
+        });
 
     }
 

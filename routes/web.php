@@ -1,19 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RegistrationCodeController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DatabaseMaintenanceController;
 use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SystemController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DatabaseMaintenanceController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,29 +70,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
             ->name('admin.database.index');
-    
+
         Route::post('/admin/database/backup', [DatabaseMaintenanceController::class, 'backup'])
             ->name('admin.database.backup');
-    
+
         Route::get('/admin/database/list', [DatabaseMaintenanceController::class, 'list'])
             ->name('admin.database.list');
-    
+
         Route::post('/admin/database/restore', [DatabaseMaintenanceController::class, 'restore'])
             ->name('admin.database.restore');
-    
+
         Route::get('/admin/database/download/{filename}', [DatabaseMaintenanceController::class, 'download'])
             ->name('admin.database.download');
-    
+
         Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
             ->name('admin.database.delete');
-        
+
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         Route::resource('users', UserController::class);
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -158,5 +155,5 @@ Route::prefix('stocks')->middleware(['role:Admin|Healthworker'])->group(function
     Route::delete('/{stock}', [StockController::class, 'destroy'])->name('stocks.destroy');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

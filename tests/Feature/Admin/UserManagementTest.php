@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\User;
-use App\Models\RegistrationCode;
-use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     $this->admin = User::factory()->create([
@@ -37,7 +35,7 @@ describe('Admin User Management', function () {
         ]);
 
         $response->assertRedirect('/users');
-        
+
         $this->assertDatabaseHas('users', [
             'name' => 'New Healthworker',
             'email' => 'newhealthworker@test.com',
@@ -59,7 +57,7 @@ describe('Admin User Management', function () {
         ]);
 
         $response->assertRedirect('/users');
-        
+
         $this->assertDatabaseHas('users', [
             'id' => $targetUser->id,
             'name' => 'Updated Name',
@@ -144,7 +142,7 @@ describe('Registration Code Management', function () {
 
         $response->assertOk();
         $response->assertJsonStructure(['codes' => [['code', 'expires_at', 'barangay']]]);
-        
+
         $codes = $response->json('codes');
         expect($codes[0]['barangay'])->toBe(1);
     });
@@ -161,9 +159,9 @@ describe('Registration Code Management', function () {
 
     test('generated code is linked to barangay', function () {
         $response = $this->actingAs($this->admin)->post('/registration-codes/generate');
-        
+
         $code = $response->json('codes.0.code');
-        
+
         $this->assertDatabaseHas('registration_codes', [
             'code' => $code,
             'barangay' => 1,

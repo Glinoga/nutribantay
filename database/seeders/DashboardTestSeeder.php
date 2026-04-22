@@ -13,9 +13,10 @@ class DashboardTestSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', 'admin@example.com')->first();
-        
-        if (!$admin) {
+
+        if (! $admin) {
             $this->command->warn('No admin user found. Run seeder first: php artisan db:seed');
+
             return;
         }
 
@@ -101,6 +102,6 @@ class DashboardTestSeeder extends Seeder
             }
         }
 
-        $this->command->info('Created ' . count($children) . ' children with healthlogs.');
+        $this->command->info('Created '.count($children).' children with healthlogs.');
     }
 }

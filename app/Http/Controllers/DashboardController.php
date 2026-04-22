@@ -13,7 +13,7 @@ class DashboardController extends Controller
     private function getDateRange(string $period): array
     {
         $now = Carbon::now();
-        
+
         switch ($period) {
             case 'daily':
                 return [
@@ -42,24 +42,24 @@ class DashboardController extends Controller
     private function getBaseQuery(Request $request)
     {
         $user = auth()->user();
-        
+
         if ($user->hasRole('Admin')) {
             return Child::query()->where('barangay', $user->barangay);
         }
-        
+
         return Child::query()->where('barangay', $user->barangay);
     }
 
     private function getHealthlogBaseQuery(Request $request)
     {
         $user = auth()->user();
-        
+
         $query = HealthLog::query();
-        
-        if (!$user->hasRole('Admin')) {
-            $query->whereHas('child', fn($q) => $q->where('barangay', $user->barangay));
+
+        if (! $user->hasRole('Admin')) {
+            $query->whereHas('child', fn ($q) => $q->where('barangay', $user->barangay));
         }
-        
+
         return $query;
     }
 
@@ -74,24 +74,24 @@ class DashboardController extends Controller
 
         // Get age ranges (for monitoring) - using PHP Carbon for DB compatibility
         $children = $this->getBaseQuery($request)->get();
-        
+
         $now = Carbon::now();
-        $age0to5 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 0 && $c->birthdate->floatDiffInMonths($now) <= 5)->count();
-        $age6to11 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 6 && $c->birthdate->floatDiffInMonths($now) <= 11)->count();
-        $age12to35 = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 12 && $c->birthdate->floatDiffInMonths($now) <= 35)->count();
-        $age36plus = $children->filter(fn($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 36)->count();
+        $age0to5 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 0 && $c->birthdate->floatDiffInMonths($now) <= 5)->count();
+        $age6to11 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 6 && $c->birthdate->floatDiffInMonths($now) <= 11)->count();
+        $age12to35 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 12 && $c->birthdate->floatDiffInMonths($now) <= 35)->count();
+        $age36plus = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 36)->count();
 
         // Current year healthlogs
         $currentYear = Carbon::now()->startOfYear();
-        
+
         // Get latest healthlogs per child for nutrition status
         $latestHealthlogs = HealthLog::select('health_logs.*')
-            ->whereHas('child', fn($q) => $q->where('barangay', $barangay))
+            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
             ->where('created_at', '>=', $currentYear)
             ->latest('created_at')
             ->get()
             ->groupBy('child_id')
-            ->map(fn($logs) => $logs->first());
+            ->map(fn ($logs) => $logs->first());
 
         // Nutrition status breakdown
         $nutritionStatus = [
@@ -134,30 +134,30 @@ class DashboardController extends Controller
 
         $monthlyTrend6 = [];
         $monthlyTrend12 = [];
-        
+
         for ($i = 5; $i >= 0; $i--) {
             $month = Carbon::now()->subMonths($i);
             $monthlyTrend6[] = [
                 'month' => $month->format('M Y'),
-                'count' => HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
-                    ->whereYear('created_at', $month->year)
-                    ->whereMonth('created_at', $month->month)
-                    ->count(),
-            ];
-        }
-        
-        for ($i = 11; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $monthlyTrend12[] = [
-                'month' => $month->format('M Y'),
-                'count' => HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
+                'count' => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
                     ->whereYear('created_at', $month->year)
                     ->whereMonth('created_at', $month->month)
                     ->count(),
             ];
         }
 
-        $last6MonthsLogs = HealthLog::whereHas('child', fn($q) => $q->where('barangay', $barangay))
+        for ($i = 11; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $monthlyTrend12[] = [
+                'month' => $month->format('M Y'),
+                'count' => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+                    ->whereYear('created_at', $month->year)
+                    ->whereMonth('created_at', $month->month)
+                    ->count(),
+            ];
+        }
+
+        $last6MonthsLogs = HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
             ->where('created_at', '>=', Carbon::now()->subMonths(6))
             ->get();
 
@@ -216,14 +216,14 @@ class DashboardController extends Controller
     {
         $period = $request->period ?? 'monthly';
         $range = $this->getDateRange($period);
-        
+
         $user = auth()->user();
         $barangay = $user->barangay;
 
         // Get healthlogs for the period with latest child data
         $healthlogs = HealthLog::query()
             ->with(['child', 'user'])
-            ->whereHas('child', fn($q) => $q->where('barangay', $barangay))
+            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
             ->where('created_at', '>=', $range['start'])
             ->where('created_at', '<=', $range['end'])
             ->orderBy('created_at', 'desc')
@@ -236,20 +236,20 @@ class DashboardController extends Controller
     {
         $period = $request->period ?? 'monthly';
         $range = $this->getDateRange($period);
-        
+
         $user = auth()->user();
         $barangay = $user->barangay;
 
         // Get latest healthlogs per child for the period
         $healthlogs = HealthLog::query()
             ->with(['child', 'user'])
-            ->whereHas('child', fn($q) => $q->where('barangay', $barangay))
+            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
             ->where('created_at', '>=', $range['start'])
             ->where('created_at', '<=', $range['end'])
             ->latest('created_at')
             ->get()
             ->groupBy('child_id')
-            ->map(fn($logs) => $logs->first());
+            ->map(fn ($logs) => $logs->first());
 
         // Calculate stats for print view
         $totalChildren = $healthlogs->count();
@@ -259,14 +259,14 @@ class DashboardController extends Controller
             'overweight' => $healthlogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
             'stunted' => $healthlogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
         ];
-        
+
         $vitaminA = $healthlogs->where('vitamin_a', true)->count();
         $deworming = $healthlogs->where('deworming', true)->count();
 
         return Inertia::render('DashboardPrint', [
             'period' => $period,
             'data' => [
-                'healthlogs' => $healthlogs->values()->map(fn($log) => [
+                'healthlogs' => $healthlogs->values()->map(fn ($log) => [
                     'child_name' => $log->child->fullname ?? '',
                     'age' => $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),
                     'sex' => $log->child->sex ?? '',
@@ -296,10 +296,10 @@ class DashboardController extends Controller
     {
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="dashboard_' . $period . '_' . date('Y-m-d') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="dashboard_'.$period.'_'.date('Y-m-d').'.csv"',
         ];
 
-        $callback = function() use ($healthlogs) {
+        $callback = function () use ($healthlogs) {
             $handle = fopen('php://output', 'w');
 
             // Header row

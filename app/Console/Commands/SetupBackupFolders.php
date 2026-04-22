@@ -24,23 +24,22 @@ class SetupBackupFolders extends Command
      * Execute the console command.
      */
     public function handle()
-{
-    $folders = [
-        storage_path('app/Laravel'),
-        storage_path('app/backup-temp'),
-        storage_path('app/restore-temp'),
-    ];
+    {
+        $folders = [
+            storage_path('app/Laravel'),
+            storage_path('app/backup-temp'),
+            storage_path('app/restore-temp'),
+        ];
 
-    foreach ($folders as $folder) {
-        if (!file_exists($folder)) {
-            mkdir($folder, 0755, true);
-            $this->info("Created folder: {$folder}");
-        } else {
-            $this->info("Folder already exists: {$folder}");
+        foreach ($folders as $folder) {
+            if (! file_exists($folder)) {
+                mkdir($folder, 0755, true);
+                $this->info("Created folder: {$folder}");
+            } else {
+                $this->info("Folder already exists: {$folder}");
+            }
         }
+
+        $this->info('✅ Backup folders setup complete!');
     }
-
-    $this->info('✅ Backup folders setup complete!');
-}
-
 }

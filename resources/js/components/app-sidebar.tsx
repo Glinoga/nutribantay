@@ -5,7 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen } from 'lucide-react';
+import { Boxes, Database, FileTextIcon, LayoutGrid, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -65,11 +65,6 @@ export function AppSidebar() {
     // Healthworker-only menu
     if (isHealthworker) {
         mainNavItems.push({ title: 'Stocks Management', href: '/stocks', icon: Boxes });
-    }
-    // Healthlog Management
-    // Logic updated: Allow if user is Healthworker OR Admin (Admins should usually see everything)
-    if (isHealthworker || isAdmin) {
-        mainNavItems.push({ title: 'Healthlog Management', href: '/healthlogs', icon: HeartPulse });
     }
 
     // Footer items (static)

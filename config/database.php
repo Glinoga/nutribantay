@@ -62,7 +62,7 @@ return [
             ]) : [],
             'dump' => [
                 'dump_binary_path' => 'C:/xampp/mysql/bin',
-    ],
+            ],
         ],
 
         'mariadb' => [

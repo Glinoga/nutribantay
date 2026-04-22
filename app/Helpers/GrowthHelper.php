@@ -2,8 +2,8 @@
 
 namespace App\Helpers;
 
-use Carbon\Carbon;
 use App\Models\GrowthStandard;
+use Carbon\Carbon;
 
 class GrowthHelper
 {
@@ -12,7 +12,7 @@ class GrowthHelper
      */
     public static function calculateBMI($weight, $height)
     {
-        if (!$weight || !$height || $height <= 0) {
+        if (! $weight || ! $height || $height <= 0) {
             return null;
         }
 
@@ -24,7 +24,7 @@ class GrowthHelper
      */
     public static function calculateAgeInMonths($birthdate)
     {
-        if (!$birthdate) {
+        if (! $birthdate) {
             return null;
         }
 
@@ -146,19 +146,19 @@ class GrowthHelper
     {
         $list = [$wfa, $lfa, $wfl];
 
-        if (collect($list)->contains(fn($s) => $s && str_contains($s, 'Severely'))) {
+        if (collect($list)->contains(fn ($s) => $s && str_contains($s, 'Severely'))) {
             return 'Severe Malnutrition';
         }
 
-        if (collect($list)->contains(fn($s) => in_array($s, ['Underweight', 'Stunted', 'Wasted']))) {
+        if (collect($list)->contains(fn ($s) => in_array($s, ['Underweight', 'Stunted', 'Wasted']))) {
             return 'Moderate Malnutrition';
         }
 
-        if (collect($list)->contains(fn($s) => in_array($s, ['Overweight', 'Obese']))) {
+        if (collect($list)->contains(fn ($s) => in_array($s, ['Overweight', 'Obese']))) {
             return 'Overweight/Obese';
         }
 
-        if (collect($list)->filter()->every(fn($s) => in_array($s, ['Normal', 'Tall']))) {
+        if (collect($list)->filter()->every(fn ($s) => in_array($s, ['Normal', 'Tall']))) {
             return 'Normal';
         }
 

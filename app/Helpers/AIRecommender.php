@@ -7,7 +7,7 @@ class AIRecommender
     public static function getRecommendation($status, $sex, $ageInMonths, $bmi, $vitaminA = null, $deworming = null)
     {
         if (empty($status) || empty($sex) || empty($ageInMonths)) {
-            return "Hindi sapat ang datos para gumawa ng recommendation.";
+            return 'Hindi sapat ang datos para gumawa ng recommendation.';
         }
 
         $ageMonths = floor($ageInMonths);
@@ -37,16 +37,16 @@ class AIRecommender
 
         $output = "MGA NUTRITIOUS NA TIP:\n";
         foreach ($tips as $index => $tip) {
-            $output .= ($index + 1) . ". " . $tip . "\n";
+            $output .= ($index + 1).'. '.$tip."\n";
         }
 
         $output .= "\nMEAL PLAN PARA SA ISANG ARAW:\n";
-        $output .= "Umaga: " . $mealPlan['morning'] . "\n";
-        $output .= "Tanghali: " . $mealPlan['afternoon'] . "\n";
-        $output .= "Gabi: " . $mealPlan['evening'] . "\n";
+        $output .= 'Umaga: '.$mealPlan['morning']."\n";
+        $output .= 'Tanghali: '.$mealPlan['afternoon']."\n";
+        $output .= 'Gabi: '.$mealPlan['evening']."\n";
 
-        if (!empty($supplements)) {
-            $output .= "\nMGA SUPPLMENTS:\n" . $supplements . "\n";
+        if (! empty($supplements)) {
+            $output .= "\nMGA SUPPLMENTS:\n".$supplements."\n";
         }
 
         $output .= "\nPAALALA: Kumunsulta sa pinakamalapit na health center para sa karagdagang gabay at pagsusuri sa nutrisyon ng iyong anak.";
@@ -72,32 +72,32 @@ class AIRecommender
         // Status-based tips
         switch ($status) {
             case 'Underweight':
-                $tips[] = "Ang bata ay may mababang timbang para sa edad. Magbigay ng masustansiyang pagkain na may mataas na protina at calories.";
-                $tips[] = "Dapat kumain ng 3-4 na beses sa isang araw. Hindi dapat skip ang anumang meal.";
+                $tips[] = 'Ang bata ay may mababang timbang para sa edad. Magbigay ng masustansiyang pagkain na may mataas na protina at calories.';
+                $tips[] = 'Dapat kumain ng 3-4 na beses sa isang araw. Hindi dapat skip ang anumang meal.';
                 break;
 
             case 'Overweight':
-                $tips[] = "Ang bata ay may mataas na timbang para sa edad. Limitahan ang matatamis at maasim na pagkain.";
-                $tips[] = "Dapat magkaroon ng regular na pisikal na aktibidad tulad ng paglalaro sa labas.";
+                $tips[] = 'Ang bata ay may mataas na timbang para sa edad. Limitahan ang matatamis at maasim na pagkain.';
+                $tips[] = 'Dapat magkaroon ng regular na pisikal na aktibidad tulad ng paglalaro sa labas.';
                 break;
 
             default: // Normal
-                $tips[] = "Magpatuloy sa balanseng pagkain na may prutas, gulay, protina, at carbohydrates.";
-                $tips[] = "Dapat regular ang pagkain at hindi skip ang anumang meal.";
+                $tips[] = 'Magpatuloy sa balanseng pagkain na may prutas, gulay, protina, at carbohydrates.';
+                $tips[] = 'Dapat regular ang pagkain at hindi skip ang anumang meal.';
         }
 
         // Age-based tips
         if ($ageMonths < 24) {
-            $tips[] = "Para sa edad na " . $ageMonths . " buwan, mag-focus sa soft foods at maliit na frequent na meals.";
+            $tips[] = 'Para sa edad na '.$ageMonths.' buwan, mag-focus sa soft foods at maliit na frequent na meals.';
         } else {
-            $tips[] = "Para sa edad na " . $ageMonths . " buwan, puwedeng magbigay ng regular na solid foods na angkop sa edad.";
+            $tips[] = 'Para sa edad na '.$ageMonths.' buwan, puwedeng magbigay ng regular na solid foods na angkop sa edad.';
         }
 
         // Sex-based tip
         if (strtolower($sex) === 'male') {
-            $tips[] = "Mahalaga ang sapat na protina para sa tamang paglaki ng mga bata.";
+            $tips[] = 'Mahalaga ang sapat na protina para sa tamang paglaki ng mga bata.';
         } else {
-            $tips[] = "Mahalaga ang iron at calcium para sa kalusugan ng mga bata.";
+            $tips[] = 'Mahalaga ang iron at calcium para sa kalusugan ng mga bata.';
         }
 
         return $tips;
@@ -107,7 +107,7 @@ class AIRecommender
     {
         // Ensure we have at least 3 different base foods
         $foods = array_slice($baseFoods, 0, 3);
-        
+
         // Make sure we have 3 items, fill if needed
         while (count($foods) < 3) {
             $foods[] = 'Lugaw';
@@ -132,9 +132,9 @@ class AIRecommender
         }
 
         return [
-            'morning' => $foods[0] . ' ' . $morningSide,
-            'afternoon' => $foods[1] . ' ' . $afternoonSide,
-            'evening' => $foods[2] . ' ' . $eveningSide,
+            'morning' => $foods[0].' '.$morningSide,
+            'afternoon' => $foods[1].' '.$afternoonSide,
+            'evening' => $foods[2].' '.$eveningSide,
         ];
     }
 
@@ -143,11 +143,11 @@ class AIRecommender
         $recommendations = [];
 
         if ($vitaminA === 'No' || $vitaminA === null) {
-            $recommendations[] = "Kumuha ng Vitamin A capsule mula sa health center - importante para sa mata at immune system.";
+            $recommendations[] = 'Kumuha ng Vitamin A capsule mula sa health center - importante para sa mata at immune system.';
         }
 
         if ($deworming === 'No' || $deworming === null) {
-            $recommendations[] = "Deworming tablets dapat kumuha sa health center taun-taon para maiwasan ang worm infection.";
+            $recommendations[] = 'Deworming tablets dapat kumuha sa health center taun-taon para maiwasan ang worm infection.';
         }
 
         return implode("\n", $recommendations);

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class SystemController extends Controller
@@ -13,6 +12,7 @@ class SystemController extends Controller
     public function status()
     {
         $status = Setting::get('maintenance_mode', '0') === '1';
+
         return response()->json(['status' => $status]);
     }
 
@@ -23,12 +23,12 @@ class SystemController extends Controller
         Setting::set('maintenance_mode', $value);
 
         \App\Models\AuditLog::logAction([
-        'action' => $value === '1' ? 'maintenance_enabled' : 'maintenance_disabled',
-        'model_type' => 'System',
-        'description' => $value === '1' 
-            ? 'Maintenance mode was enabled' 
-            : 'Maintenance mode was disabled',
-    ]);
+            'action' => $value === '1' ? 'maintenance_enabled' : 'maintenance_disabled',
+            'model_type' => 'System',
+            'description' => $value === '1'
+                ? 'Maintenance mode was enabled'
+                : 'Maintenance mode was disabled',
+        ]);
 
         // If enabling maintenance mode, store a flag in the session
         // This will trigger logout on the next request for non-admins
@@ -38,9 +38,9 @@ class SystemController extends Controller
 
         return response()->json([
             'status' => $value === '1',
-            'message' => $value === '1' 
-                ? 'Maintenance mode enabled. Non-admin users will be logged out on their next request.' 
-                : 'Maintenance mode disabled.'
+            'message' => $value === '1'
+                ? 'Maintenance mode enabled. Non-admin users will be logged out on their next request.'
+                : 'Maintenance mode disabled.',
         ]);
     }
 }

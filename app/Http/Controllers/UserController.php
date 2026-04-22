@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\User;
-use App\Models\AuditLog;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
-     */ 
+     */
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -24,18 +23,18 @@ class UserController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', $search)
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('roles', function ($roleQuery) use ($search) {
-                      $roleQuery->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('roles', function ($roleQuery) use ($search) {
+                        $roleQuery->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
         $users = $query->get();
-    
+
         return Inertia::render('Users/Index', [
-            'users' => $users->map(fn($u) => [
+            'users' => $users->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'email' => $u->email,
@@ -101,6 +100,7 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::findOrFail($id);
+
         return Inertia::render('Users/Show', [
             'user' => $user,
         ]);
@@ -112,8 +112,9 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::find($id);
+
         return Inertia::render('Users/Edit', [
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -138,7 +139,7 @@ class UserController extends Controller
         }
 
         // Validate role exists in database
-        if (!Role::where('name', $request->role)->exists()) {
+        if (! Role::where('name', $request->role)->exists()) {
             return back()->withErrors(['role' => 'Invalid role selected.']);
         }
 
@@ -164,7 +165,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->delete(); // This will trigger the auditable trait's deleted event
-        
+
         return to_route('users.index')->with('success', 'User archived successfully.');
     }
 
@@ -174,10 +175,10 @@ class UserController extends Controller
     public function restore(string $id)
     {
         $user = User::withTrashed()->findOrFail($id);
-        
+
         // Restore the user - this will automatically trigger the auditable trait's restored event
         $user->restore();
-        
+
         return to_route('users.index')->with('success', 'User restored successfully.');
     }
 
@@ -187,36 +188,36 @@ class UserController extends Controller
     public function forceDelete(string $id)
     {
         $user = User::withTrashed()->findOrFail($id);
-        
+
         // Force delete - this will trigger the auditable trait's forceDeleted event
         $user->forceDelete();
-        
+
         return to_route('users.index')->with('success', 'User permanently deleted.');
     }
 
     public function approve(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if ($user->barangay !== auth()->user()->barangay) {
             abort(403, 'You cannot approve users from other barangays.');
         }
 
         $user->update(['status' => 'approved']);
-        
+
         return to_route('users.index')->with('success', 'User approved successfully.');
     }
 
     public function reject(string $id)
     {
         $user = User::findOrFail($id);
-        
+
         if ($user->barangay !== auth()->user()->barangay) {
             abort(403, 'You cannot reject users from other barangays.');
         }
 
         $user->update(['status' => 'rejected']);
-        
+
         return to_route('users.index')->with('success', 'User rejected.');
     }
 }

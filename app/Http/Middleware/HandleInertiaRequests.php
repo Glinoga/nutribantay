@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,8 +39,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user()
                     ? [
-                        'id'    => $request->user()->id,
-                        'name'  => $request->user()->name,
+                        'id' => $request->user()->id,
+                        'name' => $request->user()->name,
                         'email' => $request->user()->email,
                     ]
                     : null,

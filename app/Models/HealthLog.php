@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HealthLog extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'health_logs';
 
     protected $fillable = [

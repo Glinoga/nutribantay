@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use App\Models\Child;
 use App\Models\Stock;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class RecommendationController extends Controller
 {
     private const MAX_RETRIES = 2;
+
     private const VALIDATION_FAILED = 'VALIDATION_FAILED';
 
     public function generate(Request $request)
@@ -22,7 +23,7 @@ class RecommendationController extends Controller
             $query->latest()->first();
         }])->find($request->child_id);
 
-        if (!$child || !$child->birthdate) {
+        if (! $child || ! $child->birthdate) {
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
         }
 
@@ -37,12 +38,12 @@ class RecommendationController extends Controller
         // Step 3: Get child data
         $bmi = $request->bmi ?? $child->healthLogs?->first()?->bmi ?? 0;
         $nutritionStatus = $request->nutrition_status ?? $child->healthLogs?->first()?->nutrition_status ?? 'Normal';
-        
+
         // Step 4: Get Vitamin A and Deworming status from health log (latest one)
         $latestHealthLog = $child->healthLogs()->latest()->first();
         $vitaminAStatus = $latestHealthLog?->vitamin_a ? 'Yes' : 'No';
         $dewormingStatus = $latestHealthLog?->deworming ? 'Yes' : 'No';
-        
+
         // Compute deworming recommendation flag - only for 12+ months AND no deworming yet
         $needsDeworming = ($totalMonths >= 12 && $dewormingStatus === 'No') ? 'Yes' : 'No';
 
@@ -52,9 +53,9 @@ class RecommendationController extends Controller
         $stocks = Stock::where('barangay', $userBarangay)->get();
         $foodItems = $stocks->where('category', 'food')->pluck('item_name')->toArray();
         $vitaminItems = $stocks->where('category', 'vitamin')->pluck('item_name')->toArray();
-        
-        $foodList = !empty($foodItems) ? implode(', ', $foodItems) : 'Walang available na pagkain sa barangay.';
-        $vitaminList = !empty($vitaminItems) ? implode(', ', $vitaminItems) : 'Walang available na vitamin sa barangay.';
+
+        $foodList = ! empty($foodItems) ? implode(', ', $foodItems) : 'Walang available na pagkain sa barangay.';
+        $vitaminList = ! empty($vitaminItems) ? implode(', ', $vitaminItems) : 'Walang available na vitamin sa barangay.';
 
         // Step 6: Build the prompt
         $prompt = $this->buildPrompt(
@@ -210,8 +211,9 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                     'temperature' => 0.5,
                 ]);
 
-                if (!$response->successful()) {
-                    $lastError = 'API Error: ' . $response->status();
+                if (! $response->successful()) {
+                    $lastError = 'API Error: '.$response->status();
+
                     continue;
                 }
 
@@ -219,7 +221,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
                 // Validate the output
                 $validationResult = $this->validateRecommendation($recommendation);
-                
+
                 if ($validationResult === true) {
                     return $recommendation;
                 } else {
@@ -229,13 +231,14 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
             } catch (\Throwable $e) {
                 $lastError = $e->getMessage();
+
                 continue;
             }
         }
 
         // All retries failed - use local fallback
         \Log::warning("AI recommendation failed after {$attempts} attempts. Using fallback. Last error: {$lastError}");
-        
+
         return $this->getLocalFallback(
             $nutritionStatus,
             $sex,
@@ -246,7 +249,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         );
     }
 
-    private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, string $vitaminA = null, string $deworming = null): string
+    private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, ?string $vitaminA = null, ?string $deworming = null): string
     {
         // Call the improved local recommender
         return \App\Helpers\AIRecommender::getRecommendation(
@@ -292,29 +295,37 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
         // Remove duplicates and check if we have 3 different meals
         $uniqueBaseFoods = array_unique($matches);
-        
+
         // Count how many unique base foods we found
         $lugawCount = preg_grep('/Lugaw/i', $matches);
         $kaninCount = preg_grep('/Kanin/i', $matches);
         $kamoteCount = preg_grep('/Kamote/i', $matches);
         $tinapayCount = preg_grep('/Tinapay/i', $matches);
-        
+
         $differentBases = 0;
-        if (!empty($lugawCount)) $differentBases++;
-        if (!empty($kaninCount)) $differentBases++;
-        if (!empty($kamoteCount)) $differentBases++;
-        if (!empty($tinapayCount)) $differentBases++;
+        if (! empty($lugawCount)) {
+            $differentBases++;
+        }
+        if (! empty($kaninCount)) {
+            $differentBases++;
+        }
+        if (! empty($kamoteCount)) {
+            $differentBases++;
+        }
+        if (! empty($tinapayCount)) {
+            $differentBases++;
+        }
 
         // If we have duplicates, validation fails
         if (count($matches) > $differentBases) {
-            return self::VALIDATION_FAILED . ': May duplicate base food sa meal plan';
+            return self::VALIDATION_FAILED.': May duplicate base food sa meal plan';
         }
 
         // Check for processed foods (banned)
         $bannedFoods = ['Pancit Canton', 'De Lata', 'soft drinks', 'instant noodles'];
         foreach ($bannedFoods as $banned) {
             if (stripos($recommendation, $banned) !== false) {
-                return self::VALIDATION_FAILED . ': Banned food found: ' . $banned;
+                return self::VALIDATION_FAILED.': Banned food found: '.$banned;
             }
         }
 
@@ -326,19 +337,19 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         // Fix meals that have only light foods (prutas/gulay) without heavy food base
         $lines = explode("\n", $recommendation);
         $fixedLines = [];
-        
+
         $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
         $lightFoods = ['saging', 'prutas', 'gulay', 'vegetables', 'salad', 'sabaw'];
-        
+
         foreach ($lines as $line) {
             $lineLower = strtolower($line);
-            
+
             // Check if this is a meal line
             if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $matches)) {
                 $mealTime = $matches[1];
                 $mealContent = trim($matches[2]);
                 $mealContentLower = strtolower($mealContent);
-                
+
                 // Check if meal has heavy food
                 $hasHeavyFood = false;
                 foreach ($heavyFoods as $heavy) {
@@ -347,31 +358,31 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                         break;
                     }
                 }
-                
+
                 // If no heavy food, add one based on age
-                if (!$hasHeavyFood) {
+                if (! $hasHeavyFood) {
                     // Determine appropriate heavy food based on age
                     if ($ageInMonths < 6) {
                         // For 0-5 months, no solid food should be suggested
                         $mealContent = 'Gatas lamang (breastmilk/formula)';
                     } elseif ($ageInMonths < 12) {
                         // 6-11 months: add lugaw
-                        $mealContent = 'Lugaw na may ' . $mealContent;
+                        $mealContent = 'Lugaw na may '.$mealContent;
                     } elseif ($ageInMonths < 36) {
                         // 12-35 months: add lugaw or kanin
-                        $mealContent = 'Lugaw na may ' . $mealContent;
+                        $mealContent = 'Lugaw na may '.$mealContent;
                     } else {
                         // 36+ months: add appropriate base
-                        $mealContent = 'Lugaw na may ' . $mealContent;
+                        $mealContent = 'Lugaw na may '.$mealContent;
                     }
-                    
-                    $line = $mealTime . ': ' . $mealContent;
+
+                    $line = $mealTime.': '.$mealContent;
                 }
             }
-            
+
             $fixedLines[] = $line;
         }
-        
+
         return implode("\n", $fixedLines);
     }
 
@@ -382,17 +393,17 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             $user = auth()->user();
             $userBarangay = $user ? $user->barangay : null;
             $medicineList = 'Deworming tablets';
-            
+
             if ($userBarangay) {
                 $medicines = Stock::where('barangay', $userBarangay)
                     ->where('category', 'medicine')
                     ->pluck('item_name')
                     ->toArray();
-                if (!empty($medicines)) {
+                if (! empty($medicines)) {
                     $medicineList = implode(', ', $medicines);
                 }
             }
-            
+
             if (stripos($recommendation, 'deworming') === false) {
                 // Handle multi-line format: line ending with newline
                 $recommendation = preg_replace(
@@ -401,7 +412,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                     $recommendation,
                     1
                 );
-                
+
                 // Handle single-line format: "Vitamin A: description."
                 if (stripos($recommendation, 'deworming') === false) {
                     $recommendation = preg_replace(
@@ -413,7 +424,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 }
             }
         }
-        
+
         return $recommendation;
     }
 }
