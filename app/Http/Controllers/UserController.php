@@ -41,6 +41,7 @@ class UserController extends Controller
                 'email' => $u->email,
                 'roles' => $u->getRoleNames()->toArray(),
                 'barangay' => $u->barangay,
+                'status' => $u->status,
             ]),
             'filters' => $request->only('search'),
         ]);
@@ -191,5 +192,31 @@ class UserController extends Controller
         $user->forceDelete();
         
         return to_route('users.index')->with('success', 'User permanently deleted.');
+    }
+
+    public function approve(string $id)
+    {
+        $user = User::findOrFail($id);
+        
+        if ($user->barangay !== auth()->user()->barangay) {
+            abort(403, 'You cannot approve users from other barangays.');
+        }
+
+        $user->update(['status' => 'approved']);
+        
+        return to_route('users.index')->with('success', 'User approved successfully.');
+    }
+
+    public function reject(string $id)
+    {
+        $user = User::findOrFail($id);
+        
+        if ($user->barangay !== auth()->user()->barangay) {
+            abort(403, 'You cannot reject users from other barangays.');
+        }
+
+        $user->update(['status' => 'rejected']);
+        
+        return to_route('users.index')->with('success', 'User rejected.');
     }
 }

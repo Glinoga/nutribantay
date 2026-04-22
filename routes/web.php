@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
+        Route::post('/users/{id}/approve', [UserController::class, 'approve'])->name('users.approve');
+        Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
 
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);

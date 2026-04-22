@@ -305,10 +305,6 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                             <th className="border px-4 py-2 text-left">Full Name</th>
                             <th className="border px-4 py-2 text-left">Sex</th>
                             <th className="border px-4 py-2 text-left">Age</th>
-                            <th className="border px-4 py-2 text-left">Weight (kg)</th>
-                            <th className="border px-4 py-2 text-left">Height (cm)</th>
-                            <th className="border px-4 py-2 text-left">Address</th>
-                            <th className="border px-4 py-2 text-left">Contact Number</th>
                             <th className="border px-4 py-2 text-left">Created By</th>
                             <th className="border px-4 py-2 text-left">Actions</th>
                         </tr>
@@ -317,7 +313,7 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                     <tbody>
                         {children.length === 0 ? (
                             <tr>
-                                <td colSpan={10} className="p-4 text-center">
+                                <td colSpan={6} className="p-4 text-center">
                                     No records found
                                 </td>
                             </tr>
@@ -335,10 +331,6 @@ export default function Index({ children, pagination, search = '', flash }: Inde
                                             </span>
                                         )}
                                     </td>
-                                    <td className="border px-4 py-2">{child.weight ?? '-'}</td>
-                                    <td className="border px-4 py-2">{child.height ?? '-'}</td>
-                                    <td className="border px-4 py-2">{child.address ?? '-'}</td>
-                                    <td className="border px-4 py-2">{child.contact_number ?? '-'}</td>
                                     <td className="border px-4 py-2">{child.creator?.name ?? 'N/A'}</td>
                                     <td className="border px-4 py-2">
                                         <div className="flex gap-1">

@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             [
                 'name'  => 'Super Admin',
                 'password' => Hash::make('password123'),
+                'barangay' => 'Barangay 1',
+                'status' => 'approved',
             ]
         );
         $admin->syncRoles(['Admin']);   // use syncRoles for reliability
@@ -33,6 +35,8 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Health Worker',
                 'password' => Hash::make('password123'),
+                'barangay' => 'Barangay 1',
+                'status' => 'approved',
             ]
         );
         $healthworker->syncRoles(['Healthworker']);

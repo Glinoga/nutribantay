@@ -9,6 +9,7 @@ type User = {
     name: string;
     email: string;
     roles: string[];
+    status?: 'pending' | 'approved' | 'rejected';
 };
 
 type RegistrationCode = {
@@ -241,6 +242,7 @@ export default function Index({ users, filters }: Props) {
                         <th className="border px-4 py-2 text-left">Name</th>
                         <th className="border px-4 py-2 text-left">Email</th>
                         <th className="border px-4 py-2 text-left">Role</th>
+                        <th className="border px-4 py-2 text-left">Status</th>
                         <th className="border px-4 py-2 text-left">Actions</th>
                     </tr>
                 </thead>
@@ -252,15 +254,51 @@ export default function Index({ users, filters }: Props) {
                             <td className="border px-4 py-2">{user.email}</td>
                             <td className="border px-4 py-2">{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</td>
                             <td className="border px-4 py-2">
+                                {user.status === 'pending' && (
+                                    <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">Pending</span>
+                                )}
+                                {user.status === 'approved' && (
+                                    <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">Approved</span>
+                                )}
+                                {user.status === 'rejected' && (
+                                    <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Rejected</span>
+                                )}
+                                {!user.status && <span className="text-gray-500">-</span>}
+                            </td>
+                            <td className="border px-4 py-2">
+                                {user.status === 'pending' && (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Approve this user?')) {
+                                                    router.post(`/users/${user.id}/approve`);
+                                                }
+                                            }}
+                                            className="mr-1 rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600"
+                                        >
+                                            Approve
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (confirm('Reject this user?')) {
+                                                    router.post(`/users/${user.id}/reject`);
+                                                }
+                                            }}
+                                            className="mr-1 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
+                                        >
+                                            Reject
+                                        </button>
+                                    </>
+                                )}
                                 <Link
                                     href={`/users/${user.id}`}
-                                    className="mr-2 rounded bg-gray-500 px-3 py-1 text-white transition hover:bg-gray-600"
+                                    className="mr-1 rounded bg-gray-500 px-2 py-1 text-xs text-white transition hover:bg-gray-600"
                                 >
                                     View
                                 </Link>
                                 <Link
                                     href={`/users/${user.id}/edit`}
-                                    className="mr-2 rounded bg-green-500 px-3 py-1 text-white transition hover:bg-green-600"
+                                    className="mr-1 rounded bg-green-500 px-2 py-1 text-xs text-white transition hover:bg-green-600"
                                 >
                                     Edit
                                 </Link>
@@ -270,7 +308,7 @@ export default function Index({ users, filters }: Props) {
                                             router.delete(`/users/${user.id}`);
                                         }
                                     }}
-                                    className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                                    className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
                                 >
                                     Archive
                                 </button>
