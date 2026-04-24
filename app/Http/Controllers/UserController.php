@@ -76,7 +76,7 @@ $users = $query->get();
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|string|email|max:255|unique:users,email',
+            'email' => 'nullable|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
             'role' => 'required|string|exists:roles,name',
         ]);
@@ -103,9 +103,25 @@ $users = $query->get();
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:6',
             'role' => 'required|string|exists:roles,name',
+            'barangay' => 'nullable|string|max:255',
         ]);
 
         $admin = auth()->user();
+        
+        // Determine barangay: nutribantay@gmail.com can select, others auto-inherit
+        $barangay = $admin->barangay;
+        $isSeededAdmin = $admin->email === 'nutribantay@gmail.com';
+        
+        // If seeded admin and barangay is provided and role is Admin, use selected barangay
+        if ($isSeededAdmin && $request->filled('barangay')) {
+            $barangayInput = $request->barangay;
+            // Add "Barangay" prefix if not present
+            if (!preg_match('/^Barangay\s*/i', $barangayInput)) {
+                $barangay = 'Barangay ' . $barangayInput;
+            } else {
+                $barangay = $barangayInput;
+            }
+        }
 
         // Generate registration code (8 random characters like before)
         $code = strtoupper(\Illuminate\Support\Str::random(8));
@@ -113,7 +129,7 @@ $users = $query->get();
         // Create registration code
         $registrationCode = RegistrationCode::create([
             'code' => $code,
-            'barangay' => $admin->barangay,
+            'barangay' => $barangay,
             'is_used' => true, // Mark as used (assigned to this user)
         ]);
 
@@ -128,7 +144,7 @@ $users = $query->get();
             'name' => $request->name,
             'email' => $email, // nullable
             'password' => Hash::make($request->password),
-            'barangay' => $admin->barangay,
+            'barangay' => $barangay,
             'status' => 'approved',
             'registration_code_id' => $registrationCode->id,
         ]);
@@ -160,9 +176,12 @@ $users = $query->get();
     public function edit(string $id)
     {
         $user = User::find($id);
+        $currentUser = auth()->user();
+        $isSeededAdmin = $currentUser->email === 'nutribantay@gmail.com';
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
+            'isSeededAdmin' => $isSeededAdmin,
         ]);
     }
 
@@ -173,9 +192,10 @@ $users = $query->get();
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'nullable',
             'password' => 'nullable|string|min:8',
             'role' => 'required|string|exists:roles,name',
+            'barangay' => 'nullable|string|max:255',
         ]);
 
         $user = auth()->user();
@@ -192,13 +212,26 @@ $users = $query->get();
         }
 
         $targetUser->name = $request->name;
-        $targetUser->email = $request->email;
+        
+        // Handle nullable email - convert empty string to null
+        $targetUser->email = $request->email ?: null;
 
         if ($request->filled('password')) {
             $targetUser->password = Hash::make($request->password);
         }
 
         $targetUser->save();
+
+        // Also update barangay if provided and admin role
+        if ($user->email === 'nutribantay@gmail.com' && $request->filled('barangay')) {
+            $barangayValue = $request->barangay;
+            // Add "Barangay" prefix if not present
+            if (!preg_match('/^Barangay\s*/i', $barangayValue)) {
+                $barangayValue = 'Barangay ' . $barangayValue;
+            }
+            $targetUser->barangay = $barangayValue;
+            $targetUser->save();
+        }
 
         // Assign role with Spatie
         $targetUser->syncRoles([$request->role]);

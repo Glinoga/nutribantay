@@ -9,13 +9,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Edit({ user }) {
+export default function Edit({ user, isSeededAdmin }: { user: any; isSeededAdmin?: boolean }) {
     const { data, setData, errors, put, processing } = useForm({
         name: user.name || '',
         email: user.email || '',
         role: user.role || 'healthworker',
-        barangay: user.barangay || '',
+        barangay: user.barangay ? user.barangay.replace(/^Barangay\s*/i, '') : '',
     });
+
+    // Determine if barangay field should be editable
+    const canEditBarangay = isSeededAdmin === true;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
@@ -49,7 +52,7 @@ export default function Edit({ user }) {
 
                 {/* Email */}
                 <div className="mb-4">
-                    <label className="mb-1 block font-medium">Email</label>
+                    <label className="mb-1 block font-medium">Email (optional)</label>
                     <input
                         type="email"
                         name="email"
@@ -57,7 +60,6 @@ export default function Edit({ user }) {
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="Enter email address"
                         className="w-full rounded border px-4 py-2"
-                        required
                     />
                     {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
                 </div>
@@ -83,9 +85,9 @@ export default function Edit({ user }) {
                     <input
                         type="text"
                         name="barangay"
-                        value={data.barangay}
-                        readOnly
-                        className="w-full cursor-not-allowed rounded border bg-gray-100 px-4 py-2"
+                        value={data.barangay.replace(/^Barangay\s*/i, '')}
+                        readOnly={!canEditBarangay}
+                        className={`w-full rounded border px-4 py-2 ${!canEditBarangay ? 'cursor-not-allowed bg-gray-100' : ''}`}
                     />
                     {errors.barangay && <div className="mt-1 text-sm text-red-600">{errors.barangay}</div>}
                 </div>

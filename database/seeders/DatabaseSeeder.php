@@ -19,15 +19,15 @@ class DatabaseSeeder extends Seeder
 
         // Create admin account
         $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'nutribantay@gmail.com'],
             [
                 'name' => 'Super Admin',
                 'password' => Hash::make('password123'),
-                'barangay' => 'Barangay 1',
+                'barangay' => '176B',
                 'status' => 'approved',
             ]
         );
-        $admin->syncRoles(['Admin']);   // use syncRoles for reliability
+        $admin->syncRoles(['Admin']);
 
         // Create healthworker account
         $healthworker = User::firstOrCreate(
@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Health Worker',
                 'password' => Hash::make('password123'),
-                'barangay' => 'Barangay 1',
+                'barangay' => '176B',
                 'status' => 'approved',
             ]
         );

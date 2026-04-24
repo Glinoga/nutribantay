@@ -49,7 +49,7 @@ export default function Index({ users, filters }: Props) {
 
     // Create User Modal state
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
     const [createError, setCreateError] = useState('');
     const [createSuccess, setCreateSuccess] = useState('');
     const [generatedCode, setGeneratedCode] = useState('');
@@ -58,6 +58,10 @@ export default function Index({ users, filters }: Props) {
 
     // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
+
+    // Check if seeded admin - currently disabled until we add auth prop from backend
+    const isSeededAdmin = true; // Enable for nutribantay@gmail.com - shows dropdown for Admin role
+    const showBarangayDropdown = newUser.role === 'Admin';
 
     const copyCredentials = async () => {
         const login = `${generatedCode} - ${generatedPassword}`;
@@ -109,7 +113,7 @@ export default function Index({ users, filters }: Props) {
                 window.location.reload();
             } else {
                 // Reset form fields but KEEP the code visible for admin to copy
-                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
             }
         } catch (err: any) {
             setCreateError(err.response?.data?.message || 'Failed to create user');
@@ -251,7 +255,7 @@ export default function Index({ users, filters }: Props) {
                             setCreateError('');
                             setGeneratedCode('');
                             setGeneratedPassword('');
-                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
                             setShowCreateModal(true);
                         }}
                         className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
@@ -543,13 +547,26 @@ export default function Index({ users, filters }: Props) {
                                     <label className="block text-sm font-medium">Role</label>
                                     <select
                                         value={newUser.role}
-                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
                                         className="w-full rounded border px-3 py-2"
                                     >
                                         <option value="Healthworker">Healthworker</option>
                                         <option value="Admin">Admin</option>
                                     </select>
                                 </div>
+
+                                {newUser.role === 'Admin' && (
+                                    <div>
+                                        <label className="block text-sm font-medium">Barangay</label>
+                                        <input
+                                            type="text"
+                                            value={newUser.barangay}
+                                            onChange={(e) => setNewUser({ ...newUser, barangay: e.target.value })}
+                                            placeholder="Enter barangay"
+                                            className="w-full rounded border px-3 py-2"
+                                        />
+                                    </div>
+                                )}
 
                                 {createError && <div className="text-sm text-red-600">{createError}</div>}
                                 {createSuccess && generatedCode && (
@@ -578,7 +595,7 @@ export default function Index({ users, filters }: Props) {
                                 <button
                                     onClick={() => {
                                         // Reset all states when closing
-                                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
                                         setCreateSuccess('');
                                         setCreateError('');
                                         setGeneratedCode('');
