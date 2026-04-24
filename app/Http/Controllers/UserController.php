@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RegistrationCode;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
@@ -31,8 +32,8 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->get();
-
+$users = $query->get();
+ 
         return Inertia::render('Users/Index', [
             'users' => $users->map(fn ($u) => [
                 'id' => $u->id,
@@ -41,6 +42,7 @@ class UserController extends Controller
                 'roles' => $u->getRoleNames()->toArray(),
                 'barangay' => $u->barangay,
                 'status' => $u->status,
+                'registration_code' => $u->registrationCode?->code,
             ]),
             'filters' => $request->only('search'),
         ]);
@@ -92,6 +94,52 @@ class UserController extends Controller
 
         return redirect()->route('users.index')
             ->with('success', 'User created successfully!');
+    }
+
+    public function storeBulk(Request $request)
+    {
+        // Validate name and password only (email now optional)
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'password' => 'required|string|min:6',
+            'role' => 'required|string|exists:roles,name',
+        ]);
+
+        $admin = auth()->user();
+
+        // Generate registration code (8 random characters like before)
+        $code = strtoupper(\Illuminate\Support\Str::random(8));
+
+        // Create registration code
+        $registrationCode = RegistrationCode::create([
+            'code' => $code,
+            'barangay' => $admin->barangay,
+            'is_used' => true, // Mark as used (assigned to this user)
+        ]);
+
+        // Check for duplicate email if provided
+        $email = $request->input('email');
+        if ($email && User::where('email', $email)->exists()) {
+            return response()->json(['message' => 'Email already exists'], 422);
+        }
+
+        // Create user with linked registration code
+        $newUser = User::create([
+            'name' => $request->name,
+            'email' => $email, // nullable
+            'password' => Hash::make($request->password),
+            'barangay' => $admin->barangay,
+            'status' => 'approved',
+            'registration_code_id' => $registrationCode->id,
+        ]);
+
+        $newUser->assignRole($request->role);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'code' => $code,
+            'password' => $request->password,
+        ]);
     }
 
     /**

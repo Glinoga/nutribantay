@@ -61,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/users/{id}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
+        Route::post('/users/store-bulk', [UserController::class, 'storeBulk'])->name('users.storeBulk');
 
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
         Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);

@@ -55,20 +55,20 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                         {({ processing, errors }) => (
                             <>
                                 <div className="grid gap-4">
-                                    {/* Email */}
+                                    {/* Login (Code or Email) */}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="login">Registration Code / Email</Label>
                                         <Input
-                                            id="email"
-                                            type="email"
-                                            name="email"
+                                            id="login"
+                                            type="text"
+                                            name="login"
                                             required
                                             autoFocus
                                             tabIndex={1}
-                                            autoComplete="email"
-                                            placeholder="Enter your email"
+                                            autoComplete="username"
+                                            placeholder="Enter your code or email"
                                         />
-                                        <InputError message={errors.email} />
+                                        <InputError message={errors.login} />
                                     </div>
 
                                     {/* Password */}

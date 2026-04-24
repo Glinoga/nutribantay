@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password',
         'barangay',
         'status',
+        'registration_code_id',
     ];
 
     /**
@@ -49,5 +50,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function registrationCode()
+    {
+        return $this->belongsTo(RegistrationCode::class);
     }
 }

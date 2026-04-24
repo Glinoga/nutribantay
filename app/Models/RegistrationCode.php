@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegistrationCode extends Model
 {
-    protected $fillable = ['code', 'expires_at', 'barangay'];
+    protected $fillable = ['code', 'expires_at', 'barangay', 'is_used', 'code_number'];
 
-    protected static function booted()
+    protected $casts = [
+        'is_used' => 'boolean',
+        'expires_at' => 'datetime',
+    ];
+
+    public function user()
     {
-        //
+        return $this->hasOne(User::class);
     }
 }

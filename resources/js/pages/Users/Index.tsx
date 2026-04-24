@@ -10,6 +10,7 @@ type User = {
     email: string;
     roles: string[];
     status?: 'pending' | 'approved' | 'rejected';
+    registration_code?: string;
 };
 
 type RegistrationCode = {
@@ -46,8 +47,76 @@ export default function Index({ users, filters }: Props) {
     const [codeSearch, setCodeSearch] = useState('');
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+    // Create User Modal state
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker' });
+    const [createError, setCreateError] = useState('');
+    const [createSuccess, setCreateSuccess] = useState('');
+    const [generatedCode, setGeneratedCode] = useState('');
+    const [generatedPassword, setGeneratedPassword] = useState('');
+    const [copiedLogin, setCopiedLogin] = useState(false);
+
     // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
+
+    const copyCredentials = async () => {
+        const login = `${generatedCode} - ${generatedPassword}`;
+        try {
+            await navigator.clipboard.writeText(login);
+            setCopiedLogin(true);
+            setTimeout(() => setCopiedLogin(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
+
+    const generatePassword = () => {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let password = '';
+        for (let i = 0; i < 8; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setNewUser({ ...newUser, password });
+    };
+
+    const handleCreateUser = async (closeAfter = false) => {
+        if (!newUser.name || !newUser.password) {
+            setCreateError('Please fill in name and password');
+            return;
+        }
+
+        setModalLoading(true);
+        setCreateError('');
+
+        try {
+            const res = await axios.post('/users/store-bulk', {
+                name: newUser.name,
+                email: newUser.email || null,
+                password: newUser.password,
+                role: newUser.role,
+            });
+
+            setGeneratedCode(res.data.code || '');
+            setGeneratedPassword(res.data.password || '');
+            setCreateSuccess('User created successfully!');
+            setModalLoading(false);
+
+            if (closeAfter) {
+                setShowCreateModal(false);
+                setCreateSuccess('');
+                setGeneratedCode('');
+                setGeneratedPassword('');
+                window.location.reload();
+            } else {
+                // Reset form fields but KEEP the code visible for admin to copy
+                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+            }
+        } catch (err: any) {
+            setCreateError(err.response?.data?.message || 'Failed to create user');
+        } finally {
+            setModalLoading(false);
+        }
+    };
 
     useEffect(() => {
         axios
@@ -176,9 +245,19 @@ export default function Index({ users, filters }: Props) {
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex space-x-2">
-                    <Link href="/users/create" className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                        Create Account
-                    </Link>
+                    <button
+                        onClick={() => {
+                            setCreateSuccess('');
+                            setCreateError('');
+                            setGeneratedCode('');
+                            setGeneratedPassword('');
+                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                            setShowCreateModal(true);
+                        }}
+                        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                    >
+                        Create User
+                    </button>
                     <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
                         View Archived Users
                     </Link>
@@ -240,6 +319,7 @@ export default function Index({ users, filters }: Props) {
                     <tr>
                         <th className="border px-4 py-2 text-left">ID</th>
                         <th className="border px-4 py-2 text-left">Name</th>
+                        <th className="border px-4 py-2 text-left">Code</th>
                         <th className="border px-4 py-2 text-left">Email</th>
                         <th className="border px-4 py-2 text-left">Role</th>
                         <th className="border px-4 py-2 text-left">Status</th>
@@ -251,7 +331,8 @@ export default function Index({ users, filters }: Props) {
                         <tr key={user.id} className="hover:bg-gray-100">
                             <td className="border px-4 py-2">{user.id}</td>
                             <td className="border px-4 py-2">{user.name}</td>
-                            <td className="border px-4 py-2">{user.email}</td>
+                            <td className="border px-4 py-2 font-mono">{user.registration_code || '-'}</td>
+                            <td className="border px-4 py-2">{user.email || '-'}</td>
                             <td className="border px-4 py-2">{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</td>
                             <td className="border px-4 py-2">
                                 {user.status === 'pending' && (
@@ -402,6 +483,128 @@ export default function Index({ users, filters }: Props) {
                             )}
 
                             <div className="mt-4 text-sm text-gray-500">Total: {filteredCodes.length} code(s)</div>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* Create User Modal */}
+            {showCreateModal && (
+                <>
+                    <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setShowCreateModal(false)} />
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
+                            <h2 className="mb-4 text-xl font-bold">Create User</h2>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium">Name</label>
+                                    <input
+                                        type="text"
+                                        value={newUser.name}
+                                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                                        className="w-full rounded border px-3 py-2"
+                                        placeholder="Full name"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium">Email</label>
+                                    <input
+                                        type="email"
+                                        value={newUser.email}
+                                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                        className="w-full rounded border px-3 py-2"
+                                        placeholder="Email address"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium">Password</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={newUser.password}
+                                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                            className="flex-1 rounded border px-3 py-2"
+                                            placeholder="Password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={generatePassword}
+                                            className="rounded bg-gray-200 px-3 py-2 text-sm hover:bg-gray-300"
+                                        >
+                                            Generate
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium">Role</label>
+                                    <select
+                                        value={newUser.role}
+                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                                        className="w-full rounded border px-3 py-2"
+                                    >
+                                        <option value="Healthworker">Healthworker</option>
+                                        <option value="Admin">Admin</option>
+                                    </select>
+                                </div>
+
+                                {createError && <div className="text-sm text-red-600">{createError}</div>}
+                                {createSuccess && generatedCode && (
+                                    <div className="rounded bg-green-100 p-3 text-sm">
+                                        <p className="mb-2 font-medium text-green-800">User created successfully!</p>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div>
+                                                <p className="text-xs text-green-600">Code - Password:</p>
+                                                <p className="font-mono text-lg font-bold text-green-900">
+                                                    {generatedCode} - {generatedPassword}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={copyCredentials}
+                                                className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700"
+                                            >
+                                                {copiedLogin ? 'Copied!' : 'Copy'}
+                                            </button>
+                                        </div>
+                                        <p className="mt-1 text-xs text-green-600">Give these credentials to the healthworker</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-6 flex justify-end gap-2">
+                                <button
+                                    onClick={() => {
+                                        // Reset all states when closing
+                                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                                        setCreateSuccess('');
+                                        setCreateError('');
+                                        setGeneratedCode('');
+                                        setGeneratedPassword('');
+                                        setShowCreateModal(false);
+                                        window.location.reload();
+                                    }}
+                                    className="rounded border px-4 py-2 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => handleCreateUser(false)}
+                                    disabled={modalLoading}
+                                    className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 disabled:opacity-50"
+                                >
+                                    {modalLoading ? 'Creating...' : 'Create & Add Another'}
+                                </button>
+                                <button
+                                    onClick={() => handleCreateUser(true)}
+                                    disabled={modalLoading}
+                                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {modalLoading ? 'Creating...' : 'Create'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </>

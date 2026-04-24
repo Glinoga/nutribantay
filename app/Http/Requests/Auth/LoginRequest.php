@@ -2,61 +2,68 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\RegistrationCode;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
 
-        $credentials = $this->only('email', 'password');
+        $login = $this->input('login');
+        $password = $this->input('password');
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+        // Try registration code first
+        $code = RegistrationCode::where('code', $login)->first();
+        if ($code) {
+            $user = User::where('registration_code_id', $code->id)->first();
+            if ($user && Hash::check($password, $user->password)) {
+                $this->loginUser($user);
+                return;
+            }
         }
 
-        $user = Auth::user();
+        // Fallback: try email
+        $user = User::where('email', $login)->first();
+        if ($user && Hash::check($password, $user->password)) {
+            $this->loginUser($user);
+            return;
+        }
 
+        // Login failed
+        RateLimiter::hit($this->throttleKey());
+        throw ValidationException::withMessages([
+            'login' => __('auth.failed'),
+        ]);
+    }
+
+    private function loginUser($user): void
+    {
         if ($user->status === 'pending') {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => __('Your account is pending approval. Please wait for the admin to approve your registration.'),
+                'login' => __('Your account is pending approval. Please wait for the admin to approve your registration.'),
             ]);
         }
 
@@ -64,18 +71,14 @@ class LoginRequest extends FormRequest
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
-                'email' => __('Your registration has been rejected. Please contact the admin for more information.'),
+                'login' => __('Your registration has been rejected. Please contact the admin for more information.'),
             ]);
         }
 
+        Auth::login($user, $this->boolean('remember'));
         RateLimiter::clear($this->throttleKey());
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function ensureIsNotRateLimited(): void
     {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
@@ -87,19 +90,16 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
+            'login' => __('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
     public function throttleKey(): string
     {
-        return $this->string('email')
+        return $this->string('login')
             ->lower()
             ->append('|'.$this->ip())
             ->transliterate()
