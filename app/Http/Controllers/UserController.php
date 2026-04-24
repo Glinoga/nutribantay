@@ -18,6 +18,10 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
+        if (! $user) {
+            return redirect('/login');
+        }
+
         $query = User::with('roles')
             ->where('barangay', $user->barangay); // only same barangay
 
@@ -32,8 +36,8 @@ class UserController extends Controller
             });
         }
 
-$users = $query->get();
- 
+        $users = $query->get();
+
         return Inertia::render('Users/Index', [
             'users' => $users->map(fn ($u) => [
                 'id' => $u->id,
@@ -45,6 +49,7 @@ $users = $query->get();
                 'registration_code' => $u->registrationCode?->code,
             ]),
             'filters' => $request->only('search'),
+            'isSeededAdmin' => $user->email === 'nutribantay@gmail.com',
         ]);
     }
 
@@ -107,17 +112,17 @@ $users = $query->get();
         ]);
 
         $admin = auth()->user();
-        
+
         // Determine barangay: nutribantay@gmail.com can select, others auto-inherit
         $barangay = $admin->barangay;
         $isSeededAdmin = $admin->email === 'nutribantay@gmail.com';
-        
+
         // If seeded admin and barangay is provided and role is Admin, use selected barangay
         if ($isSeededAdmin && $request->filled('barangay')) {
             $barangayInput = $request->barangay;
             // Add "Barangay" prefix if not present
-            if (!preg_match('/^Barangay\s*/i', $barangayInput)) {
-                $barangay = 'Barangay ' . $barangayInput;
+            if (! preg_match('/^Barangay\s*/i', $barangayInput)) {
+                $barangay = 'Barangay '.$barangayInput;
             } else {
                 $barangay = $barangayInput;
             }
@@ -212,7 +217,7 @@ $users = $query->get();
         }
 
         $targetUser->name = $request->name;
-        
+
         // Handle nullable email - convert empty string to null
         $targetUser->email = $request->email ?: null;
 
@@ -226,8 +231,8 @@ $users = $query->get();
         if ($user->email === 'nutribantay@gmail.com' && $request->filled('barangay')) {
             $barangayValue = $request->barangay;
             // Add "Barangay" prefix if not present
-            if (!preg_match('/^Barangay\s*/i', $barangayValue)) {
-                $barangayValue = 'Barangay ' . $barangayValue;
+            if (! preg_match('/^Barangay\s*/i', $barangayValue)) {
+                $barangayValue = 'Barangay '.$barangayValue;
             }
             $targetUser->barangay = $barangayValue;
             $targetUser->save();

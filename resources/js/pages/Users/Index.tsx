@@ -33,9 +33,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface Props {
     users: User[];
     filters: { search?: string };
+    isSeededAdmin?: boolean;
 }
 
-export default function Index({ users, filters }: Props) {
+export default function Index({ users, filters, isSeededAdmin = false }: Props) {
     const [codes, setCodes] = useState<RegistrationCode[]>([]);
     const [count, setCount] = useState(1);
     const [search, setSearch] = useState(filters.search || '');
@@ -59,9 +60,8 @@ export default function Index({ users, filters }: Props) {
     // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
 
-    // Check if seeded admin - currently disabled until we add auth prop from backend
-    const isSeededAdmin = true; // Enable for nutribantay@gmail.com - shows dropdown for Admin role
-    const showBarangayDropdown = newUser.role === 'Admin';
+    // Show barangay dropdown ONLY for nutribantay@gmail.com when creating Admin role
+    const showBarangayDropdown = isSeededAdmin && newUser.role === 'Admin';
 
     const copyCredentials = async () => {
         const login = `${generatedCode} - ${generatedPassword}`;
@@ -555,7 +555,7 @@ export default function Index({ users, filters }: Props) {
                                     </select>
                                 </div>
 
-                                {newUser.role === 'Admin' && (
+                                {showBarangayDropdown && (
                                     <div>
                                         <label className="block text-sm font-medium">Barangay</label>
                                         <input
