@@ -51,6 +51,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | HEALTHLOG ROUTES (From Child Profile - Healthworker only)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Healthworker'])->group(function () {
+        Route::get('/children/{child}/healthlogs/create', [HealthlogController::class, 'createForChild'])->name('children.healthlogs.create');
+        Route::post('/children/{child}/healthlogs', [HealthlogController::class, 'storeForChild'])->name('children.healthlogs.store');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | ADMIN ONLY
     |--------------------------------------------------------------------------
     */

@@ -74,6 +74,87 @@ class HealthlogController extends Controller
         ]);
     }
 
+    public function createForChild(Child $child)
+    {
+        return Inertia::render('Healthlog/Create', [
+            'child' => [
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'sex' => $child->sex,
+                'birthdate' => $child->birthdate,
+            ],
+        ]);
+    }
+
+    public function storeForChild(Request $request, Child $child)
+    {
+        $validated = $request->validate([
+            'weight' => 'nullable|numeric|min:0',
+            'height' => 'nullable|numeric|min:0',
+
+            'micronutrient_powder' => 'nullable|string|max:255',
+            'ruf' => 'nullable|string|max:255',
+            'rusf' => 'nullable|string|max:255',
+            'complementary_food' => 'nullable|string|max:255',
+
+            'vitamin_a' => 'nullable|boolean',
+            'deworming' => 'nullable|boolean',
+
+            'vaccine_name' => 'nullable|string|max:255',
+            'dose_number' => 'nullable|numeric',
+            'date_given' => 'nullable|date',
+            'next_due_date' => 'nullable|date',
+            'vaccine_status' => 'nullable|string|max:255',
+        ]);
+
+        $validated['user_id'] = auth()->id();
+        $validated['child_id'] = $child->id;
+
+        $weight = $validated['weight'] ?? null;
+        $height = $validated['height'] ?? null;
+
+        if ($weight !== null && $height !== null) {
+            $evaluation = GrowthHelper::evaluateChild(
+                $child->sex,
+                $child->birthdate,
+                $weight,
+                $height
+            );
+
+            \Log::info('Growth evaluation', $evaluation);
+
+            $validated['bmi'] = $evaluation['bmi'];
+            $validated['age_in_months'] = $evaluation['age_months'];
+            $validated['status_wfa'] = $evaluation['status_wfa'];
+            $validated['status_lfa'] = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
+            $validated['nutrition_status'] = $evaluation['overall'];
+
+            $age = Carbon::parse($child->birthdate)->age;
+
+            $validated['recommendation'] = AIRecommender::getRecommendation(
+                $evaluation['overall'],
+                $child->sex,
+                $age,
+                $evaluation['bmi']
+            );
+        }
+
+        HealthLog::create($validated);
+
+        // Auto-update child's current weight/height with latest health log (only if values exist)
+        if (! empty($validated['weight']) && ! empty($validated['height'])) {
+            $child->update([
+                'weight' => $validated['weight'],
+                'height' => $validated['height'],
+                'updated_by' => auth()->id(),
+            ]);
+        }
+
+        return redirect()->route('children.show', $child->id)
+            ->with('success', '✅ Health log added successfully.');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -132,6 +213,15 @@ class HealthlogController extends Controller
         }
 
         HealthLog::create($validated);
+
+        // Auto-update child's current weight/height with latest health log (only if values exist)
+        if (! empty($validated['weight']) && ! empty($validated['height'])) {
+            $child->update([
+                'weight' => $validated['weight'],
+                'height' => $validated['height'],
+                'updated_by' => auth()->id(),
+            ]);
+        }
 
         return redirect()->route('healthlogs.index')
             ->with('success', '✅ Health log created successfully with BMI, WHO evaluation, and AI recommendation.');

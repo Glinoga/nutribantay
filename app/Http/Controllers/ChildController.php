@@ -207,17 +207,22 @@ class ChildController extends Controller
                 ]),
 
                 'healthlogs' => $child->healthlogs()
+                    ->with('user:id,name')
                     ->orderBy('created_at', 'asc')
-                    ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'vitamin_a', 'deworming', 'created_at'])
+                    ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'status_wfa', 'status_lfa', 'status_wfl_wfh', 'vitamin_a', 'deworming', 'created_at', 'user_id'])
                     ->map(fn ($log) => [
                         'id' => $log->id,
                         'weight' => $log->weight,
                         'height' => $log->height,
                         'bmi' => $log->bmi,
                         'nutrition_status' => $log->nutrition_status,
+                        'status_wfa' => $log->status_wfa,
+                        'status_lfa' => $log->status_lfa,
+                        'status_wfl_wfh' => $log->status_wfl_wfh,
                         'vitamin_a' => $log->vitamin_a,
                         'deworming' => $log->deworming,
                         'created_at' => $log->created_at,
+                        'user' => ['name' => $log->user?->name],
                     ]),
             ],
         ]);

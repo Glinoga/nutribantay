@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { Inertia } from '@inertiajs/inertia';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
@@ -20,9 +20,13 @@ type HealthLog = {
     height: number | null;
     bmi: number | null;
     nutrition_status: string | null;
+    status_wfa: string | null;
+    status_lfa: string | null;
+    status_wfl_wfh: string | null;
     vitamin_a: boolean;
     deworming: boolean;
     created_at: string;
+    user?: { name: string | null };
 };
 
 type Child = {
@@ -50,6 +54,24 @@ export default function Show({ child }: { child: Child }) {
     const [notesOpen, setNotesOpen] = useState(false);
     const [newNote, setNewNote] = useState('');
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
+    const [logPage, setLogPage] = useState(1);
+    const logsPerPage = 10;
+
+    const { auth } = usePage<{ auth?: { roles?: string[]; user?: { roles?: string[] } } }>().props;
+    const userRoles: string[] = auth?.roles ?? auth?.user?.roles ?? [];
+    const isHealthworker = userRoles.some((r: string) => r.toLowerCase().replace(/[\s_]/g, '') === 'healthworker');
+
+    // Helper function for status badge colors
+    const getStatusBadgeClass = (status: string | null | undefined) => {
+        const s = status || '';
+        if (s === 'Normal') return 'bg-green-100 text-green-800';
+        if (s.includes('Severe')) return 'bg-red-100 text-red-800';
+        if (s.includes('Moderate') || s.includes('Underweight') || s.includes('Wasted') || s.includes('Stunted'))
+            return 'bg-yellow-100 text-yellow-800';
+        if (s.includes('Overweight') || s.includes('Obese')) return 'bg-orange-100 text-orange-800';
+        if (s.includes('Tall')) return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-100 text-gray-800';
+    };
 
     const submitNote = (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,6 +82,16 @@ export default function Show({ child }: { child: Child }) {
     const deleteNote = (noteId: number) => {
         if (confirm('Delete this note?')) {
             Inertia.delete(`/children/${child.id}/notes/${noteId}`);
+        }
+    };
+
+    const deleteHealthLog = (logId: number) => {
+        if (confirm('Delete this health log?')) {
+            Inertia.delete(`/healthlogs/${logId}`, {
+                onSuccess: () => {
+                    Inertia.reload({ only: ['child'] });
+                },
+            });
         }
     };
 
@@ -102,10 +134,12 @@ export default function Show({ child }: { child: Child }) {
     };
 
     filteredLogs.forEach((log) => {
-        if (log.nutrition_status === 'Normal') nutritionCounts.normal++;
-        else if (['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'].includes(log.nutrition_status || '')) nutritionCounts.underweight++;
-        else if (['Overweight', 'Obese'].includes(log.nutrition_status || '')) nutritionCounts.overweight++;
-        else if (['Stunted', 'Severely Stunted'].includes(log.nutrition_status || '')) nutritionCounts.stunted++;
+        const status = log.nutrition_status || '';
+        // Must check Stunted BEFORE checking for Severe/Moderate Malnutrition
+        if (status === 'Normal') nutritionCounts.normal++;
+        else if (['Overweight/Obese', 'Overweight', 'Obese'].includes(status)) nutritionCounts.overweight++;
+        else if (['Stunted', 'Severely Stunted'].includes(status)) nutritionCounts.stunted++;
+        else if (['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'].includes(status)) nutritionCounts.underweight++;
     });
 
     const doughnutData = {
@@ -172,6 +206,15 @@ export default function Show({ child }: { child: Child }) {
                     <Link href={`/children/${child.id}/edit`} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
                         Edit
                     </Link>
+
+                    {isHealthworker && (
+                        <Link
+                            href={`/children/${child.id}/healthlogs/create`}
+                            className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                        >
+                            Add Health Log
+                        </Link>
+                    )}
 
                     <Link href="/children" className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
                         Back to List
@@ -246,6 +289,126 @@ export default function Show({ child }: { child: Child }) {
                 {healthlogs.length === 0 && (
                     <div className="mt-8 rounded-lg bg-gray-100 p-6 text-center">
                         <p className="text-gray-500">No health logs yet. Add a health log to see growth trends.</p>
+                    </div>
+                )}
+
+                {/* Health Log Records Table */}
+                {healthlogs.length > 0 && (
+                    <div className="mt-8">
+                        <h2 className="mb-4 text-xl font-bold">Health Log Records</h2>
+
+                        <div className="overflow-x-auto rounded-lg bg-white shadow">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-3 py-2 text-left">Date</th>
+                                        <th className="px-3 py-2 text-left">Weight (kg)</th>
+                                        <th className="px-3 py-2 text-left">Height (cm)</th>
+                                        <th className="px-3 py-2 text-left">BMI</th>
+                                        <th className="px-3 py-2 text-left">Nutrition Status</th>
+                                        <th className="px-3 py-2 text-center">Status WFA</th>
+                                        <th className="px-3 py-2 text-center">Status LFA</th>
+                                        <th className="px-3 py-2 text-center">Status WFL</th>
+                                        <th className="px-3 py-2 text-center">Vit A</th>
+                                        <th className="px-3 py-2 text-center">Deworming</th>
+                                        <th className="px-3 py-2 text-left">Created By</th>
+                                        {isHealthworker && <th className="px-3 py-2 text-center">Action</th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(() => {
+                                        const sortedLogs = [...healthlogs].sort(
+                                            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+                                        );
+                                        const paginatedLogs = sortedLogs.slice((logPage - 1) * logsPerPage, logPage * logsPerPage);
+
+                                        return paginatedLogs.map((log) => (
+                                            <tr key={log.id} className="border-t hover:bg-gray-50">
+                                                <td className="px-3 py-2">
+                                                    {log.created_at ? new Date(log.created_at).toLocaleDateString() : 'N/A'}
+                                                </td>
+                                                <td className="px-3 py-2">{log.weight ?? '-'}</td>
+                                                <td className="px-3 py-2">{log.height ?? '-'}</td>
+                                                <td className="px-3 py-2">{log.bmi ?? '-'}</td>
+                                                <td className="px-3 py-2">
+                                                    <span
+                                                        className={`inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(log.nutrition_status)}`}
+                                                    >
+                                                        {log.nutrition_status ?? '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2 text-center">
+                                                    <span
+                                                        className={`inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(log.status_wfa)}`}
+                                                    >
+                                                        {log.status_wfa ?? '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2 text-center">
+                                                    <span
+                                                        className={`inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(log.status_lfa)}`}
+                                                    >
+                                                        {log.status_lfa ?? '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2 text-center">
+                                                    <span
+                                                        className={`inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(log.status_wfl_wfh)}`}
+                                                    >
+                                                        {log.status_wfl_wfh ?? '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-3 py-2 text-center">{log.vitamin_a ? '✓' : '✗'}</td>
+                                                <td className="px-3 py-2 text-center">{log.deworming ? '✓' : '✗'}</td>
+                                                <td className="px-3 py-2">{log.user?.name ?? '-'}</td>
+                                                {isHealthworker && (
+                                                    <td className="px-3 py-2 text-center">
+                                                        <button
+                                                            onClick={() => deleteHealthLog(log.id)}
+                                                            className="text-xs text-red-600 hover:text-red-800"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ));
+                                    })()}
+                                </tbody>
+                            </table>
+
+                            {/* Pagination */}
+                            {(() => {
+                                const sortedLogs = [...healthlogs].sort(
+                                    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+                                );
+                                const totalPages = Math.ceil(sortedLogs.length / logsPerPage);
+
+                                return totalPages > 1 ? (
+                                    <div className="flex items-center justify-between border-t px-3 py-2">
+                                        <span className="text-sm text-gray-500">
+                                            Page {logPage} of {totalPages} ({sortedLogs.length} total)
+                                        </span>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setLogPage((p) => Math.max(1, p - 1))}
+                                                disabled={logPage === 1}
+                                                className="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                Previous
+                                            </button>
+                                            <button
+                                                onClick={() => setLogPage((p) => Math.min(totalPages, p + 1))}
+                                                disabled={logPage === totalPages}
+                                                className="rounded bg-gray-200 px-3 py-1 text-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                Next
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : null;
+                            })()}
+                        </div>
                     </div>
                 )}
 
