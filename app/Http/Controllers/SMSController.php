@@ -2,30 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Twilio\Rest\Client;
-use Inertia\Inertia;
 use App\Models\Child;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Twilio\Rest\Client;
 
 class SMSController extends Controller
 {
     public function index()
     {
         // Get all children with contact numbers (caregiver/parent numbers) for the recipient list
-        $children = Child::select('id', 'name', 'contact_number')
+        $children = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
             ->whereNotNull('contact_number')
             ->where('contact_number', '!=', '')
+            ->where('contact_number', '!=', '0')
             ->get()
             ->map(function ($child) {
+                $mi = $child->middle_initial ? strtoupper($child->middle_initial).'.' : '';
+                $fullName = trim("{$child->first_name} {$mi} {$child->last_name}");
+
                 return [
                     'id' => $child->id,
-                    'name' => $child->name . ' (Child)',
-                    'phone' => $child->contact_number
+                    'name' => $fullName,
+                    'phone' => $child->contact_number,
                 ];
             });
 
         return Inertia::render('SMS/index', [
-            'users' => $children // Keep the prop name as 'users' for frontend compatibility
+            'users' => $children,
         ]);
     }
 
@@ -43,24 +47,31 @@ class SMSController extends Controller
             $token = config('services.twilio.token');
             $from = config('services.twilio.phone_number');
 
-            if (!$sid || !$token || !$from) {
+            if (! $sid || ! $token || ! $from) {
                 return back()->with('error', 'Twilio configuration is missing. Please check your .env file for TWILIO_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER.');
             }
 
             $client = new Client($sid, $token);
-            
+
             $recipients = [];
             if ($validated['recipient_type'] === 'all') {
-                $recipients = Child::whereNotNull('contact_number')
+                $childRecords = Child::whereNotNull('contact_number')
                     ->where('contact_number', '!=', '')
-                    ->pluck('contact_number', 'name')
-                    ->toArray();
+                    ->where('contact_number', '!=', '0')
+                    ->get();
             } else {
-                $recipients = Child::whereIn('id', $validated['recipients'])
+                $childRecords = Child::whereIn('id', $validated['recipients'])
                     ->whereNotNull('contact_number')
                     ->where('contact_number', '!=', '')
-                    ->pluck('contact_number', 'name')
-                    ->toArray();
+                    ->where('contact_number', '!=', '0')
+                    ->get();
+            }
+
+            // Build array with fullname as key for logging
+            foreach ($childRecords as $child) {
+                $mi = $child->middle_initial ? strtoupper($child->middle_initial).'.' : '';
+                $fullName = trim("{$child->first_name} {$mi} {$child->last_name}");
+                $recipients[$fullName] = $child->contact_number;
             }
 
             if (empty($recipients)) {
@@ -75,24 +86,24 @@ class SMSController extends Controller
                 try {
                     // Clean phone number: remove spaces and ensure proper format for Twilio
                     $cleanPhone = str_replace(' ', '', $phone);
-                    
+
                     // Log the attempt for debugging
                     \Log::info("Attempting to send SMS to {$name} at {$cleanPhone}");
-                    
+
                     $message = $client->messages->create($cleanPhone, [
                         'from' => $from,
-                        'body' => $validated['message']
+                        'body' => $validated['message'],
                     ]);
-                    
+
                     // Log success
                     \Log::info("SMS sent successfully to {$cleanPhone}. Message SID: {$message->sid}");
-                    
+
                     $sentCount++;
                 } catch (\Exception $e) {
                     $failedCount++;
                     $errorMsg = $e->getMessage();
                     $errors[] = "Failed to send to {$name}'s guardian ({$phone}): {$errorMsg}";
-                    
+
                     // Log the error
                     \Log::error("Failed to send SMS to {$phone}: {$errorMsg}");
                 }
@@ -101,14 +112,15 @@ class SMSController extends Controller
             if ($sentCount > 0 && $failedCount === 0) {
                 return back()->with('success', "SMS sent successfully to {$sentCount} recipient(s)!");
             } elseif ($sentCount > 0 && $failedCount > 0) {
-                return back()->with('warning', "SMS sent to {$sentCount} recipient(s), but failed for {$failedCount}. Errors: " . implode(', ', $errors));
+                return back()->with('warning', "SMS sent to {$sentCount} recipient(s), but failed for {$failedCount}. Errors: ".implode(', ', $errors));
             } else {
-                return back()->with('error', 'Failed to send SMS to all recipients. Errors: ' . implode(', ', $errors));
+                return back()->with('error', 'Failed to send SMS to all recipients. Errors: '.implode(', ', $errors));
             }
 
         } catch (\Exception $e) {
-            \Log::error('SMS Controller Error: ' . $e->getMessage());
-            return back()->with('error', 'Error sending SMS: ' . $e->getMessage());
+            \Log::error('SMS Controller Error: '.$e->getMessage());
+
+            return back()->with('error', 'Error sending SMS: '.$e->getMessage());
         }
     }
 
@@ -118,4 +130,3 @@ class SMSController extends Controller
         return redirect()->route('sms.index');
     }
 }
-

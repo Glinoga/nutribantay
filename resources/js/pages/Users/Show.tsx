@@ -10,7 +10,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Show({ user }) {
+type User = {
+    id: number;
+    name: string;
+    email: string;
+    role?: string;
+    barangay?: string;
+};
+
+export default function Show({ user }: { user: User }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />

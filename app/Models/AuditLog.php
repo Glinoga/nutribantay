@@ -35,7 +35,7 @@ class AuditLog extends Model
     public static function logAction(array $data): self
     {
         $user = Auth::user();
-        
+
         $logData = array_merge([
             'user_id' => $user?->id,
             'user_name' => $user?->name,

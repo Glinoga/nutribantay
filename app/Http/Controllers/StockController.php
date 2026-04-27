@@ -31,7 +31,7 @@ class StockController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-   public function create()
+    public function create()
     {
         return Inertia::render('Stocks/Form', [
             'stock' => null,

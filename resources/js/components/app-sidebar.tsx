@@ -5,36 +5,29 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, HeartPulse, LayoutGrid, UserCog, UserPen, Megaphone, MessageSquare } from 'lucide-react';
+import { Boxes, FileTextIcon, HeartPulse, LayoutGrid, MessageSquare, Mic2, ShieldCheck, Stethoscope } from 'lucide-react';
 import { route } from '@/lib/routes';
 import AppLogo from './app-logo';
 
-// Expanded type definition to catch roles wherever they might be attached
 type AuthProps = {
     auth?: {
         user?: {
             id: number;
             name: string;
             email: string;
-            roles?: string[]; // Check if roles are attached to user
+            roles?: string[];
         };
-        roles?: string[]; // Check if roles are at root of auth
+        roles?: string[];
     };
 };
 
 export function AppSidebar() {
     const { auth } = usePage<AuthProps>().props;
 
-    // 1. Consolidate roles from both potential locations (auth.roles or auth.user.roles)
     const userRoles = auth?.roles ?? auth?.user?.roles ?? [];
 
-    // 2. Debugging: Uncomment this to see exactly what roles are coming from the backend
-    // console.log('Current User Roles:', userRoles);
-
-    // 3. Helper to check roles case-insensitively and normalize format
     const hasRole = (roleToCheck: string) => {
         return userRoles.some((r) => {
-            // Normalize: remove spaces and underscores, make lowercase
             const normalizedUserRole = r.toLowerCase().replace(/[\s_]/g, '');
             const normalizedCheck = roleToCheck.toLowerCase();
             return normalizedUserRole === normalizedCheck;
@@ -44,44 +37,48 @@ export function AppSidebar() {
     const isAdmin = hasRole('admin');
     const isHealthworker = hasRole('healthworker');
 
-    // Base menu items available to everyone
     const mainNavItems: NavItem[] = [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-        { title: 'Child Profiles', href: '/children', icon: UserPen },
-        { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Child Profiles',
+            href: '/children',
+            icon: Stethoscope,
+        },
+        {
+            title: 'Announcements',
+            href: route('announcements.index'),
+            icon: Mic2,
+        },
     ];
 
-    // Admin-only menu
     if (isAdmin) {
         mainNavItems.push(
-            
-            { title: 'User Management', href: '/users', icon: UserCog },
-            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare }
-        ,
-            { title: 'Data Management', href: '/admin/database', icon: Database },
-            {
-                title: 'Audit Logs',
-                href: '/audit-logs',
-                icon: FileTextIcon, // or any appropriate icon
-            },
+            { title: 'User Management', href: '/users', icon: ShieldCheck },
+            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
+            { title: 'Data Management', href: '/admin/database', icon: Boxes },
+            { title: 'Audit Logs', href: '/audit-logs', icon: FileTextIcon },
         );
     }
 
-    // Healthworker-only menu
     if (isHealthworker) {
-        mainNavItems.push({ title: 'Stocks Management', href: '/stocks', icon: Boxes });
+        mainNavItems.push(
+            { title: 'Stocks Management', href: '/stocks', icon: Boxes },
+            { title: 'Health Logs', href: '/healthlogs', icon: HeartPulse },
+        );
     }
-    // Healthlog Management
-    // Logic updated: Allow if user is Healthworker OR Admin (Admins should usually see everything)
-    if (isHealthworker || isAdmin) {
-        mainNavItems.push({ title: 'Healthlog Management', href: '/healthlogs', icon: HeartPulse });
-    }
-
-    // Footer items (static)
-    const footerNavItems: NavItem[] = [];
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar
+            collapsible="icon"
+            className="border-r border-teal-100 dark:border-teal-900/50"
+            style={{
+                background: 'linear-gradient(180deg, hsl(180 100% 98%) 0%, hsl(160 96% 96%) 100%)',
+            }}
+        >
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -99,7 +96,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={[]} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

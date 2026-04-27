@@ -9,24 +9,16 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
-    }
-}
 
         $this->configureRateLimiting();
     }
@@ -35,8 +27,8 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('recommendations', function ($request) {
             $user = $request->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return null;
             }
 
@@ -44,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
                 return Limit::none();
             }
 
-            return Limit::perMinute(10)->by('recommendations:' . $user->id);
+            return Limit::perMinute(10)->by('recommendations:'.$user->id);
         });
     }
 }

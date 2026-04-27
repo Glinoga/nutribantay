@@ -10,6 +10,6 @@ class RegistrationCode extends Model
 
     protected static function booted()
     {
-        // 
+        //
     }
 }

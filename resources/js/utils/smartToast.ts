@@ -13,9 +13,9 @@ export const smartToast = {
      * @returns toast instance
      */
     success: (message: string) => {
-        const baseTime = 2500; // Base time for short messages
-        const readingTime = Math.max(message.length * 45, baseTime); // 45ms per character
-        const duration = Math.min(readingTime, 6000); // Cap at 6 seconds
+        const baseTime = 4000; // Base time for short messages
+        const readingTime = Math.max(message.length * 60, baseTime); // 60ms per character
+        const duration = Math.min(readingTime, 8000); // Cap at 8 seconds
         return toast.success(message, { duration });
     },
 
@@ -25,9 +25,9 @@ export const smartToast = {
      * @returns toast instance
      */
     error: (message: string) => {
-        const baseTime = 4000; // Longer base time for errors
-        const readingTime = Math.max(message.length * 60, baseTime); // 60ms per character
-        const duration = Math.min(readingTime, 10000); // Cap at 10 seconds
+        const baseTime = 5000; // Longer base time for errors
+        const readingTime = Math.max(message.length * 80, baseTime); // 80ms per character
+        const duration = Math.min(readingTime, 15000); // Cap at 15 seconds
         return toast.error(message, { duration });
     },
 

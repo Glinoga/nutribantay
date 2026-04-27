@@ -56,7 +56,7 @@ trait AuditableModel
     protected function auditUpdated()
     {
         // Only log if there are actual changes
-        if (!$this->isDirty()) {
+        if (! $this->isDirty()) {
             return;
         }
 
@@ -77,7 +77,7 @@ trait AuditableModel
     protected function auditDeleted()
     {
         $action = $this->isForceDeleting() ? 'permanently_deleted' : 'archived';
-        
+
         AuditLog::logAction([
             'action' => $action,
             'model_type' => class_basename($this),
@@ -142,7 +142,7 @@ trait AuditableModel
         }
 
         // Fallback to model type + ID
-        return class_basename($this) . ' #' . $this->getKey();
+        return class_basename($this).' #'.$this->getKey();
     }
 
     /**
@@ -191,7 +191,7 @@ trait AuditableModel
     protected function getOriginalAuditableAttributes(): array
     {
         $original = $this->getOriginal();
-        
+
         $excludedFields = array_merge(
             ['password', 'remember_token', 'created_at', 'updated_at', 'deleted_at'],
             $this->getAuditExclude()
@@ -210,7 +210,7 @@ trait AuditableModel
     protected function getChangedAuditableAttributes(): array
     {
         $changes = $this->getDirty();
-        
+
         $excludedFields = array_merge(
             ['password', 'remember_token', 'created_at', 'updated_at', 'deleted_at'],
             $this->getAuditExclude()

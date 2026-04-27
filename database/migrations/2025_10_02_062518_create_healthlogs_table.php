@@ -20,7 +20,7 @@ return new class extends Migration
 
             // Anthropometric data
             // Added age_in_months to freeze the age at the time of checkup
-            $table->integer('age_in_months')->nullable(); 
+            $table->integer('age_in_months')->nullable();
             $table->decimal('weight', 5, 2)->nullable();
             $table->decimal('height', 5, 2)->nullable();
             $table->decimal('bmi', 5, 2)->nullable();
@@ -33,7 +33,7 @@ return new class extends Migration
 
             // Nutrition & supplements
             // This can store the "Overall" status (e.g., if any of the above are bad)
-            $table->string('nutrition_status')->nullable(); 
+            $table->string('nutrition_status')->nullable();
             $table->string('micronutrient_powder')->nullable();
             $table->string('ruf')->nullable();
             $table->string('rusf')->nullable();

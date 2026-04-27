@@ -20,9 +20,9 @@ class GrowthStandard extends Model
 
     protected $casts = [
         'measure_value' => 'float',
-        'sd_neg_3'      => 'float',
-        'sd_neg_2'      => 'float',
-        'sd_plus_2'     => 'float',
-        'sd_plus_3'     => 'float',
+        'sd_neg_3' => 'float',
+        'sd_neg_2' => 'float',
+        'sd_plus_2' => 'float',
+        'sd_plus_3' => 'float',
     ];
 }

@@ -21,11 +21,11 @@ class AuditLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('user_name', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhere('model_type', 'like', "%{$search}%")
-                  ->orWhere('model_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('user_name', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('model_type', 'like', "%{$search}%")
+                    ->orWhere('model_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -47,7 +47,7 @@ class AuditLogController extends Controller
 
         // Restrict by barangay for non-admin users
         $user = auth()->user();
-        if ($user && !$user->hasRole('Admin')) {
+        if ($user && ! $user->hasRole('Admin')) {
             $query->byBarangay($user->barangay);
         }
 
@@ -100,11 +100,11 @@ class AuditLogController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhere('user_name', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%")
-                  ->orWhere('model_type', 'like', "%{$search}%")
-                  ->orWhere('model_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('user_name', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%")
+                    ->orWhere('model_type', 'like', "%{$search}%")
+                    ->orWhere('model_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -126,7 +126,7 @@ class AuditLogController extends Controller
 
         // Restrict by barangay for non-admin users
         $user = auth()->user();
-        if ($user && !$user->hasRole('Admin')) {
+        if ($user && ! $user->hasRole('Admin')) {
             $query->byBarangay($user->barangay);
         }
 
@@ -134,10 +134,10 @@ class AuditLogController extends Controller
 
         // Build CSV content
         $csv = "Timestamp,User,Action,Type,Model Name,Description,IP Address,Barangay\n";
-        
+
         foreach ($logs as $log) {
             $csv .= sprintf(
-                '"%s","%s","%s","%s","%s","%s","%s","%s"' . "\n",
+                '"%s","%s","%s","%s","%s","%s","%s","%s"'."\n",
                 $log->created_at->toIso8601String(),
                 $log->user_name ?? $log->user?->name ?? 'System',
                 $log->action,
@@ -149,7 +149,7 @@ class AuditLogController extends Controller
             );
         }
 
-        $filename = 'audit_logs_' . now()->format('Y_m_d_His') . '.csv';
+        $filename = 'audit_logs_'.now()->format('Y_m_d_His').'.csv';
 
         return response($csv, 200, [
             'Content-Type' => 'text/csv',

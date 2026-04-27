@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HealthLog;
+use App\Helpers\AIRecommender;
+use App\Helpers\GrowthHelper;
 use App\Models\Child;
+use App\Models\HealthLog;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Helpers\GrowthHelper;
-use App\Helpers\AIRecommender;
-use Carbon\Carbon;
 
 class HealthlogController extends Controller
 {
@@ -19,7 +19,7 @@ class HealthlogController extends Controller
         $query = HealthLog::with(['child', 'user']);
 
         // Non-admins restricted to their barangay
-        if (!$user->hasRole('Admin')) {
+        if (! $user->hasRole('Admin')) {
             $query->whereHas('child', function ($q) use ($user) {
                 $q->where('barangay', $user->barangay);
             });
@@ -41,7 +41,7 @@ class HealthlogController extends Controller
                 'middle_initial',
                 'last_name',
                 'sex',
-                'birthdate'
+                'birthdate',
             ]),
         ]);
     }
@@ -49,28 +49,28 @@ class HealthlogController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'child_id'  => 'required|exists:children,id',
-            'weight'    => 'nullable|numeric|min:0',
-            'height'    => 'nullable|numeric|min:0',
+            'child_id' => 'required|exists:children,id',
+            'weight' => 'nullable|numeric|min:0',
+            'height' => 'nullable|numeric|min:0',
 
             'micronutrient_powder' => 'nullable|string|max:255',
-            'ruf'                  => 'nullable|string|max:255',
-            'rusf'                 => 'nullable|string|max:255',
-            'complementary_food'   => 'nullable|string|max:255',
+            'ruf' => 'nullable|string|max:255',
+            'rusf' => 'nullable|string|max:255',
+            'complementary_food' => 'nullable|string|max:255',
 
             'vitamin_a' => 'nullable|boolean',
             'deworming' => 'nullable|boolean',
 
-            'vaccine_name'  => 'nullable|string|max:255',
-            'dose_number'   => 'nullable|numeric',
-            'date_given'    => 'nullable|date',
+            'vaccine_name' => 'nullable|string|max:255',
+            'dose_number' => 'nullable|numeric',
+            'date_given' => 'nullable|date',
             'next_due_date' => 'nullable|date',
-            'vaccine_status'=> 'nullable|string|max:255',
+            'vaccine_status' => 'nullable|string|max:255',
         ]);
 
         $validated['user_id'] = auth()->id();
 
-        $child  = Child::findOrFail($validated['child_id']);
+        $child = Child::findOrFail($validated['child_id']);
         $weight = $validated['weight'] ?? null;
         $height = $validated['height'] ?? null;
 
@@ -82,14 +82,13 @@ class HealthlogController extends Controller
                 $height
             );
 
-
             \Log::info('Growth evaluation', $evaluation);
 
-            $validated['bmi']              = $evaluation['bmi'];
-            $validated['age_in_months']    = $evaluation['age_months'];
-            $validated['status_wfa']       = $evaluation['status_wfa'];
-            $validated['status_lfa']       = $evaluation['status_lfa'];
-            $validated['status_wfl_wfh']   = $evaluation['status_wfl_wfh'];
+            $validated['bmi'] = $evaluation['bmi'];
+            $validated['age_in_months'] = $evaluation['age_months'];
+            $validated['status_wfa'] = $evaluation['status_wfa'];
+            $validated['status_lfa'] = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
             $age = Carbon::parse($child->birthdate)->age;
@@ -121,13 +120,13 @@ class HealthlogController extends Controller
     {
         return Inertia::render('Healthlog/Edit', [
             'healthlog' => $healthlog->load('child'),
-            'children'  => Child::all([
+            'children' => Child::all([
                 'id',
                 'first_name',
                 'middle_initial',
                 'last_name',
                 'sex',
-                'birthdate'
+                'birthdate',
             ]),
         ]);
     }
@@ -135,26 +134,26 @@ class HealthlogController extends Controller
     public function update(Request $request, HealthLog $healthlog)
     {
         $validated = $request->validate([
-            'child_id'  => 'required|exists:children,id',
-            'weight'    => 'nullable|numeric|min:0',
-            'height'    => 'nullable|numeric|min:0',
+            'child_id' => 'required|exists:children,id',
+            'weight' => 'nullable|numeric|min:0',
+            'height' => 'nullable|numeric|min:0',
 
             'micronutrient_powder' => 'nullable|string|max:255',
-            'ruf'                  => 'nullable|string|max:255',
-            'rusf'                 => 'nullable|string|max:255',
-            'complementary_food'   => 'nullable|string|max:255',
+            'ruf' => 'nullable|string|max:255',
+            'rusf' => 'nullable|string|max:255',
+            'complementary_food' => 'nullable|string|max:255',
 
             'vitamin_a' => 'nullable|boolean',
             'deworming' => 'nullable|boolean',
 
-            'vaccine_name'  => 'nullable|string|max:255',
-            'dose_number'   => 'nullable|numeric',
-            'date_given'    => 'nullable|date',
+            'vaccine_name' => 'nullable|string|max:255',
+            'dose_number' => 'nullable|numeric',
+            'date_given' => 'nullable|date',
             'next_due_date' => 'nullable|date',
-            'vaccine_status'=> 'nullable|string|max:255',
+            'vaccine_status' => 'nullable|string|max:255',
         ]);
 
-        $child  = Child::findOrFail($validated['child_id']);
+        $child = Child::findOrFail($validated['child_id']);
         $weight = $validated['weight'] ?? null;
         $height = $validated['height'] ?? null;
 
@@ -166,11 +165,11 @@ class HealthlogController extends Controller
                 $height
             );
 
-            $validated['bmi']              = $evaluation['bmi'];
-            $validated['age_in_months']    = $evaluation['age_months'];
-            $validated['status_wfa']       = $evaluation['status_wfa'];
-            $validated['status_lfa']       = $evaluation['status_lfa'];
-            $validated['status_wfl_wfh']   = $evaluation['status_wfl_wfh'];
+            $validated['bmi'] = $evaluation['bmi'];
+            $validated['age_in_months'] = $evaluation['age_months'];
+            $validated['status_wfa'] = $evaluation['status_wfa'];
+            $validated['status_lfa'] = $evaluation['status_lfa'];
+            $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
             $age = Carbon::parse($child->birthdate)->age;

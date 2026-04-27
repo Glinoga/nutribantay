@@ -9,7 +9,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Edit({ user }) {
+type User = {
+    id: number;
+    name: string;
+    email: string;
+    role?: string;
+    barangay?: string;
+};
+
+export default function Edit({ user }: { user: User }) {
     const { data, setData, errors, put, processing } = useForm({
         name: user.name || '',
         email: user.email || '',

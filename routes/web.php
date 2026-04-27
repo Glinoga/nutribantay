@@ -1,22 +1,18 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChildController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DatabaseMaintenanceController;
+use App\Http\Controllers\HealthlogController;
+use App\Http\Controllers\RegistrationCodeController;
+use App\Http\Controllers\SMSController;
+use App\Http\Controllers\SystemController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\RegistrationCodeController;
-use App\Http\Controllers\ChildController;
-use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\HealthlogController;
-use App\Http\Controllers\RecommendationController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\SystemController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\DatabaseMaintenanceController;
-use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\SMSController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,9 +34,9 @@ Route::get('/', function () {
         ->latest()
         ->take(3) // Only show 3 latest announcements
         ->get();
-    
+
     return Inertia::render('home', [
-        'announcements' => $announcements
+        'announcements' => $announcements,
     ]);
 })->name('home');
 
@@ -56,7 +52,7 @@ Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->na
 */
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/dashboard', fn() => Inertia::render('dashboard'))->name('dashboard');
+    Route::get('/dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
 
     Route::get('/dashboard', fn () => Inertia::render('dashboard'))->name('dashboard');
 
@@ -74,8 +70,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
     Route::resource('children', ChildController::class);
     Route::resource('announcements', AnnouncementController::class);
-        Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
+    Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
+    Route::get('/children/stats', [ChildController::class, 'stats'])->name('children.stats');
 
     /*
     |--------------------------------------------------------------------------
@@ -96,27 +93,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
             ->name('admin.database.index');
-    
+
         Route::post('/admin/database/backup', [DatabaseMaintenanceController::class, 'backup'])
             ->name('admin.database.backup');
-    
+
         Route::get('/admin/database/list', [DatabaseMaintenanceController::class, 'list'])
             ->name('admin.database.list');
-    
+
         Route::post('/admin/database/restore', [DatabaseMaintenanceController::class, 'restore'])
             ->name('admin.database.restore');
-    
+
         Route::get('/admin/database/download/{filename}', [DatabaseMaintenanceController::class, 'download'])
             ->name('admin.database.download');
-    
+
         Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
             ->name('admin.database.delete');
-        
+
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
-        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');        //Announcements
-        Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
-        Route::post('/admin/announcements/store',  [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');        // Announcements
+        Route::get('/admin/announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/admin/announcements/store', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
         // Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
@@ -127,10 +124,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::resource('categories', CategoryController::class);
 
-
         Route::resource('users', UserController::class);
     });
-
 
     /*
     |--------------------------------------------------------------------------
@@ -176,5 +171,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

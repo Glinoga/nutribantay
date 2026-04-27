@@ -136,7 +136,7 @@ export default function Show({ log }: Props) {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white">
-                                        {Object.keys(log.new_values).map((key) => (
+                                        {log.new_values && Object.keys(log.new_values).map((key) => (
                                             <tr key={key} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{key}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">
@@ -145,7 +145,7 @@ export default function Show({ log }: Props) {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className="rounded bg-green-100 px-2 py-1">{String(log.new_values[key])}</span>
+                                                    <span className="rounded bg-green-100 px-2 py-1">{String(log.new_values ? log.new_values[key] : '-')}</span>
                                                 </td>
                                             </tr>
                                         ))}

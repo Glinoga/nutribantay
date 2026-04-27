@@ -13,7 +13,7 @@ return new class extends Migration
     {
         // Only add softDeletes if the column doesn't already exist
         // (it may have been added in the original create_children_table migration)
-        if (!Schema::hasColumn('children', 'deleted_at')) {
+        if (! Schema::hasColumn('children', 'deleted_at')) {
             Schema::table('children', function (Blueprint $table) {
                 $table->softDeletes();
             });

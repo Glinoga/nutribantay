@@ -2,8 +2,27 @@ import AppLayout from "@/layouts/app-layout";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { useEffect } from "react";
 
-export default function Edit({ healthlog, children }: any) {
-  const { data, setData, put, processing, errors } = useForm({
+type HealthlogData = {
+  child_id: string;
+  weight: string;
+  height: string;
+  bmi: string;
+  nutrition_status: string;
+  micronutrient_powder: string;
+  ruf: string;
+  rusf: string;
+  complementary_food: string;
+  vitamin_a: boolean;
+  deworming: boolean;
+  vaccine_name: string;
+  dose_number: string;
+  date_given: string;
+  next_due_date: string;
+  vaccine_status: string;
+};
+
+export default function Edit({ healthlog, children }: { healthlog: any; children: any[] }) {
+  const { data, setData, put, processing, errors } = useForm<HealthlogData>({
     child_id: healthlog.child_id ?? "",
     weight: healthlog.weight ?? "",
     height: healthlog.height ?? "",

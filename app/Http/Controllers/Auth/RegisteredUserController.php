@@ -14,7 +14,6 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Role;
 
-
 class RegisteredUserController extends Controller
 {
     /**
@@ -31,50 +30,48 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-        'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        'barangay' => ['required', 'string', 'max:255'],
-        'registration_code' => ['required', 'string'],
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'barangay' => ['required', 'string', 'max:255'],
+            'registration_code' => ['required', 'string'],
+        ]);
 
-    // fetch the code (must exist, not expired, not used, and barangay must match)
-    $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
-        ->where('barangay', $request->barangay)
-        ->where(function ($q) {
-            $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
-        })
-        ->where('is_used', false)
-        ->first();
+        // fetch the code (must exist, not expired, not used, and barangay must match)
+        $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
+            ->where('barangay', $request->barangay)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->where('is_used', false)
+            ->first();
 
-    if (! $registrationCode) {
-        return back()->withErrors([
-            'registration_code' => 'The registration code is invalid, expired, or not for this barangay.',
-        ])->onlyInput('registration_code');
+        if (! $registrationCode) {
+            return back()->withErrors([
+                'registration_code' => 'The registration code is invalid, expired, or not for this barangay.',
+            ])->onlyInput('registration_code');
+        }
+
+        // create user
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'barangay' => $request->barangay,
+        ]);
+
+        // assign default role
+        $user->assignRole('Healthworker');
+
+        // consume the code → mark as used + delete it
+        $registrationCode->update(['is_used' => true]);
+        $registrationCode->delete();
+
+        event(new Registered($user));
+        Auth::login($user);
+
+        return redirect()->intended(route('dashboard', absolute: false));
     }
-
-    // create user
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'barangay' => $request->barangay,
-    ]);
-
-    // assign default role
-    $user->assignRole('Healthworker');
-
-    // consume the code → mark as used + delete it
-    $registrationCode->update(['is_used' => true]);
-    $registrationCode->delete();
-
-    event(new Registered($user));
-    Auth::login($user);
-
-    return redirect()->intended(route('dashboard', absolute: false));
-}
-
-
 }

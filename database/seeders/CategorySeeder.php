@@ -18,7 +18,7 @@ class CategorySeeder extends Seeder
             ['name' => 'News', 'color' => 'success'],
             ['name' => 'Updates', 'color' => 'info'],
         ];
-        
+
         foreach ($categories as $category) {
             Category::create([
                 'name' => $category['name'],

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Child extends Model
 {
-    use HasFactory, SoftDeletes, AuditableModel;
+    use AuditableModel, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'first_name',
@@ -43,23 +43,26 @@ class Child extends Model
     // Full name accessor: "Firstname M. Lastname"
     public function getFullnameAttribute()
     {
-        $mi = $this->middle_initial ? strtoupper($this->middle_initial) . '.' : '';
+        $mi = $this->middle_initial ? strtoupper($this->middle_initial).'.' : '';
+
         return trim("{$this->first_name} {$mi} {$this->last_name}");
     }
 
     // Lastname, Firstname (M.)
     public function getFormattedNameAttribute()
     {
-        $mi = $this->middle_initial ? strtoupper($this->middle_initial) . '.' : '';
+        $mi = $this->middle_initial ? strtoupper($this->middle_initial).'.' : '';
+
         return trim("{$this->last_name}, {$this->first_name} {$mi}");
     }
 
     // BMI accessor - calculates from weight and height
     public function getBmiAttribute()
     {
-        if (!$this->weight || !$this->height || $this->height <= 0) {
+        if (! $this->weight || ! $this->height || $this->height <= 0) {
             return null;
         }
+
         return round($this->weight / pow($this->height / 100, 2), 2);
     }
 
