@@ -51,12 +51,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | HEALTHLOG ROUTES (From Child Profile - Healthworker only)
+    | HEALTHLOG ROUTES (Child-centric only - Healthworker only)
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:Healthworker'])->group(function () {
         Route::get('/children/{child}/healthlogs/create', [HealthlogController::class, 'createForChild'])->name('children.healthlogs.create');
         Route::post('/children/{child}/healthlogs', [HealthlogController::class, 'storeForChild'])->name('children.healthlogs.store');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | HEALTHLOG EDIT/UPDATE/DELETE (Healthworker only)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Healthworker'])->group(function () {
+        Route::get('/healthlogs/{healthlog}/edit', [HealthlogController::class, 'edit'])->name('healthlogs.edit');
+        Route::put('/healthlogs/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
+        Route::delete('/healthlogs/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');
     });
 
     /*
@@ -104,53 +115,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', UserController::class);
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | HEALTHLOG ROUTES (Full Fix — Admin = view only, HW = full access)
-    |--------------------------------------------------------------------------
-    */
-
-    Route::prefix('healthlogs')->group(function () {
-
-        /*
-        |----------------------------------------------------------
-        | CREATE + STORE (Healthworker only)
-        |----------------------------------------------------------
-        */
-        Route::middleware(['role:Healthworker'])->group(function () {
-            Route::get('/create', [HealthlogController::class, 'create'])->name('healthlogs.create');
-            Route::post('/', [HealthlogController::class, 'store'])->name('healthlogs.store');
-            Route::get('/export', [HealthlogController::class, 'export'])->name('healthlogs.export');
-        });
-
-        /*
-        |----------------------------------------------------------
-        | EDIT + UPDATE + DELETE (Healthworker only)
-        |----------------------------------------------------------
-        */
-        Route::middleware(['role:Healthworker'])->group(function () {
-            Route::get('/{healthlog}/edit', [HealthlogController::class, 'edit'])->name('healthlogs.edit');
-            Route::put('/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
-            Route::delete('/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');
-        });
-
-        /*
-        |----------------------------------------------------------
-        | VIEW ROUTES (Admin + Healthworker)
-        | Must ALWAYS be last so it does NOT override /create
-        |----------------------------------------------------------
-        */
-        Route::middleware(['role:Admin|Healthworker'])->group(function () {
-            Route::get('/', [HealthlogController::class, 'index'])->name('healthlogs.index');
-            Route::get('/export', [HealthlogController::class, 'export'])->name('healthlogs.export');
-            Route::get('/{healthlog}', [HealthlogController::class, 'show'])->name('healthlogs.show');
-        });
-
-    });
-
+    Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
 });
-
-Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
 
 /*
 |--------------------------------------------------------------------------

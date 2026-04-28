@@ -35,7 +35,6 @@ class HealthLog extends Model
         'dose_number',
         'date_given',
         'next_due_date',
-        'vaccine_status',
 
         'recommendation',
     ];
@@ -56,15 +55,6 @@ class HealthLog extends Model
         'updated_at' => 'datetime',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | RELATIONSHIPS
-    |--------------------------------------------------------------------------
-    */
-
-    /**
-     * Get the child that this health log belongs to.
-     */
     public function child()
     {
         return $this->belongsTo(Child::class);
@@ -73,5 +63,25 @@ class HealthLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Auto-calculate vaccine status
+     */
+    public function getVaccineStatusAttribute($value)
+    {
+        if (!$this->vaccine_name) {
+            return null;
+        }
+
+        if ($this->date_given) {
+            return 'Completed';
+        }
+
+        if ($this->next_due_date && \Carbon\Carbon::parse($this->next_due_date)->isPast()) {
+            return 'Overdue';
+        }
+
+        return 'Pending';
     }
 }

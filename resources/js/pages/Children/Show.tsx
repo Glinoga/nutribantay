@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { Inertia } from '@inertiajs/inertia';
 import { Head, Link, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
@@ -25,6 +26,15 @@ type HealthLog = {
     status_wfl_wfh: string | null;
     vitamin_a: boolean;
     deworming: boolean;
+    micronutrient_powder: string | null;
+    ruf: string | null;
+    rusf: string | null;
+    complementary_food: string | null;
+    vaccine_name: string | null;
+    dose_number: number | null;
+    date_given: string | null;
+    next_due_date: string | null;
+    vaccine_status: string | null;
     created_at: string;
     user?: { name: string | null };
 };
@@ -56,6 +66,8 @@ export default function Show({ child }: { child: Child }) {
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
     const [logPage, setLogPage] = useState(1);
     const logsPerPage = 10;
+    const [recommendation, setRecommendation] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const { auth } = usePage<{ auth?: { roles?: string[]; user?: { roles?: string[] } } }>().props;
     const userRoles: string[] = auth?.roles ?? auth?.user?.roles ?? [];
@@ -92,6 +104,23 @@ export default function Show({ child }: { child: Child }) {
                     Inertia.reload({ only: ['child'] });
                 },
             });
+        }
+    };
+
+    const handleRecommendation = async () => {
+        setLoading(true);
+        setRecommendation(null);
+
+        try {
+            const response = await axios.post('/recommendations', {
+                child_id: child.id,
+            });
+            setRecommendation(response.data.recommendation);
+        } catch (error) {
+            console.error(error);
+            setRecommendation('⚠️ Unable to generate recommendation at this time.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -312,7 +341,7 @@ export default function Show({ child }: { child: Child }) {
                                         <th className="px-3 py-2 text-center">Vit A</th>
                                         <th className="px-3 py-2 text-center">Deworming</th>
                                         <th className="px-3 py-2 text-left">Created By</th>
-                                        {isHealthworker && <th className="px-3 py-2 text-center">Action</th>}
+                                        {isHealthworker && <th className="px-3 py-2 text-center">Edit</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -363,12 +392,35 @@ export default function Show({ child }: { child: Child }) {
                                                 <td className="px-3 py-2">{log.user?.name ?? '-'}</td>
                                                 {isHealthworker && (
                                                     <td className="px-3 py-2 text-center">
-                                                        <button
-                                                            onClick={() => deleteHealthLog(log.id)}
-                                                            className="text-xs text-red-600 hover:text-red-800"
+                                                        <select
+                                                            value={log.vaccine_status ?? 'Pending'}
+                                                            onChange={(e) => {
+                                                                if (confirm('Update vaccine status?')) {
+                                                                    Inertia.put(
+                                                                        `/healthlogs/${log.id}`,
+                                                                        {
+                                                                            vaccine_status: e.target.value,
+                                                                            _method: 'put',
+                                                                        },
+                                                                        {
+                                                                            preserveState: true,
+                                                                            preserveScroll: true,
+                                                                        },
+                                                                    );
+                                                                }
+                                                            }}
+                                                            className={`rounded px-2 py-1 text-xs ${
+                                                                (log.vaccine_status ?? 'Pending') === 'Completed'
+                                                                    ? 'bg-green-100 text-green-800'
+                                                                    : (log.vaccine_status ?? 'Pending') === 'Overdue'
+                                                                      ? 'bg-red-100 text-red-800'
+                                                                      : 'bg-yellow-100 text-yellow-800'
+                                                            } border-0`}
                                                         >
-                                                            Delete
-                                                        </button>
+                                                            <option value="Pending">Pending</option>
+                                                            <option value="Completed">Completed</option>
+                                                            <option value="Overdue">Overdue</option>
+                                                        </select>
                                                     </td>
                                                 )}
                                             </tr>
@@ -409,6 +461,92 @@ export default function Show({ child }: { child: Child }) {
                                 ) : null;
                             })()}
                         </div>
+                    </div>
+                )}
+
+                {/* Vaccine Records Section */}
+                <div className="mt-8">
+                    <h2 className="mb-4 text-xl font-bold">Vaccine Records</h2>
+                    {healthlogs.filter((log) => log.vaccine_name).length > 0 ? (
+                        <div className="overflow-x-auto rounded-lg bg-white shadow">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-3 py-2 text-left">Date Given</th>
+                                        <th className="px-3 py-2 text-left">Vaccine Name</th>
+                                        <th className="px-3 py-2 text-center">Dose</th>
+                                        <th className="px-3 py-2 text-left">Next Due Date</th>
+                                        <th className="px-3 py-2 text-center">Status</th>
+                                        {isHealthworker && <th className="px-3 py-2 text-center">Action</th>}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {healthlogs
+                                        .filter((log) => log.vaccine_name)
+                                        .map((log) => (
+                                            <tr key={log.id} className="border-t hover:bg-gray-50">
+                                                <td className="px-3 py-2">{log.date_given ? new Date(log.date_given).toLocaleDateString() : '-'}</td>
+                                                <td className="px-3 py-2 font-medium">{log.vaccine_name}</td>
+                                                <td className="px-3 py-2 text-center">{log.dose_number ?? '-'}</td>
+                                                <td className="px-3 py-2">
+                                                    {log.next_due_date ? new Date(log.next_due_date).toLocaleDateString() : '-'}
+                                                </td>
+                                                <td className="px-3 py-2 text-center">
+                                                    <span
+                                                        className={`inline-block rounded px-2 py-0.5 text-xs ${
+                                                            (log.vaccine_status || 'Pending') === 'Completed'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : (log.vaccine_status || 'Pending') === 'Overdue'
+                                                                  ? 'bg-red-100 text-red-800'
+                                                                  : 'bg-yellow-100 text-yellow-800'
+                                                        }`}
+                                                    >
+                                                        {log.vaccine_status || 'Pending'}
+                                                    </span>
+                                                </td>
+                                                {isHealthworker && (
+                                                    <td className="px-3 py-2 text-center">
+                                                        <Link href={`/healthlogs/${log.id}/edit`} className="text-sm text-blue-600 hover:underline">
+                                                            Edit
+                                                        </Link>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="rounded-lg bg-gray-100 p-6 text-center">
+                            <p className="text-gray-500">No vaccine records yet. Add a health log with vaccine information.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* AI Recommender Section */}
+                {isHealthworker && (
+                    <div className="mt-8 rounded-lg bg-green-50 p-6 shadow">
+                        <h2 className="mb-4 text-xl font-bold text-green-700">AI Nutrition Recommendation</h2>
+                        <p className="mb-4 text-sm text-gray-600">
+                            Generate personalized nutrition recommendations based on the child's latest health log.
+                        </p>
+
+                        <button
+                            onClick={handleRecommendation}
+                            disabled={loading || healthlogs.length === 0}
+                            className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            {loading ? 'Analyzing...' : 'Generate Recommendation'}
+                        </button>
+
+                        {healthlogs.length === 0 && <p className="mt-2 text-sm text-gray-500">Add a health log first to generate recommendations.</p>}
+
+                        {recommendation && (
+                            <div className="mt-4 rounded bg-white p-4 shadow-inner">
+                                <h3 className="mb-2 font-semibold">Recommendation:</h3>
+                                <p className="text-sm whitespace-pre-line">{recommendation}</p>
+                            </div>
+                        )}
                     </div>
                 )}
 

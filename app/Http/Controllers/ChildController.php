@@ -209,7 +209,7 @@ class ChildController extends Controller
                 'healthlogs' => $child->healthlogs()
                     ->with('user:id,name')
                     ->orderBy('created_at', 'asc')
-                    ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'status_wfa', 'status_lfa', 'status_wfl_wfh', 'vitamin_a', 'deworming', 'created_at', 'user_id'])
+                    ->get(['id', 'weight', 'height', 'bmi', 'nutrition_status', 'status_wfa', 'status_lfa', 'status_wfl_wfh', 'vitamin_a', 'deworming', 'micronutrient_powder', 'ruf', 'rusf', 'complementary_food', 'vaccine_name', 'dose_number', 'date_given', 'next_due_date', 'vaccine_status', 'created_at', 'user_id'])
                     ->map(fn ($log) => [
                         'id' => $log->id,
                         'weight' => $log->weight,
@@ -221,6 +221,15 @@ class ChildController extends Controller
                         'status_wfl_wfh' => $log->status_wfl_wfh,
                         'vitamin_a' => $log->vitamin_a,
                         'deworming' => $log->deworming,
+                        'micronutrient_powder' => $log->micronutrient_powder,
+                        'ruf' => $log->ruf,
+                        'rusf' => $log->rusf,
+                        'complementary_food' => $log->complementary_food,
+                        'vaccine_name' => $log->vaccine_name,
+                        'dose_number' => $log->dose_number,
+                        'date_given' => $log->date_given,
+                        'next_due_date' => $log->next_due_date,
+                        'vaccine_status' => $log->vaccine_status,
                         'created_at' => $log->created_at,
                         'user' => ['name' => $log->user?->name],
                     ]),
