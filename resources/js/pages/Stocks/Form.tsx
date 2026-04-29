@@ -16,7 +16,7 @@ export default function Form({ stock }: { stock: Stock | null }) {
         category: stock?.category ?? 'food',
     });
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             if (stock && stock.id) {
@@ -25,7 +25,7 @@ export default function Form({ stock }: { stock: Stock | null }) {
                 await axios.post('/stocks', form);
             }
             window.location.href = '/stocks';
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
             alert('Failed to save.');
         }

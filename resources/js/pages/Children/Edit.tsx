@@ -11,9 +11,11 @@ import { Toaster, toast } from 'react-hot-toast';
 
 interface Child {
     id: number;
-    name: string;
+    first_name: string;
+    middle_initial?: string;
+    last_name: string;
     sex: string;
-    age: number;
+    birthdate?: string;
     weight?: number;
     height?: number;
     barangay?: string;
@@ -27,9 +29,11 @@ export default function Edit({ child }: Props) {
     const [showModal, setShowModal] = useState(true);
 
     const { data, setData, put, processing, errors } = useForm({
-        name: child.name || '',
+        first_name: child.first_name || '',
+        middle_initial: child.middle_initial || '',
+        last_name: child.last_name || '',
         sex: child.sex || 'Male',
-        age: String(child.age || ''),
+        birthdate: child.birthdate || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
         barangay: child.barangay ?? '',
@@ -105,15 +109,34 @@ export default function Edit({ child }: Props) {
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="rounded-lg border bg-green-50 p-4" style={{ borderColor: greenPalette }}>
-                            <Label className="mb-2 block text-sm font-bold text-gray-800">Full Name</Label>
-                            <Input
-                                type="text"
-                                placeholder="Enter child's full name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
-                                style={{ borderColor: greenPalette }}
-                            />
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">Name</Label>
+                            <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                                <Input
+                                    type="text"
+                                    placeholder="First name"
+                                    value={data.first_name}
+                                    onChange={(e) => setData('first_name', e.target.value)}
+                                    className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
+                                    style={{ borderColor: greenPalette }}
+                                />
+                                <Input
+                                    type="text"
+                                    placeholder="M.I. (optional)"
+                                    maxLength={5}
+                                    value={data.middle_initial}
+                                    onChange={(e) => setData('middle_initial', e.target.value)}
+                                    className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
+                                    style={{ borderColor: greenPalette }}
+                                />
+                                <Input
+                                    type="text"
+                                    placeholder="Last name"
+                                    value={data.last_name}
+                                    onChange={(e) => setData('last_name', e.target.value)}
+                                    className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
+                                    style={{ borderColor: greenPalette }}
+                                />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -147,12 +170,11 @@ export default function Edit({ child }: Props) {
                         </div>
 
                         <div className="rounded-lg border bg-green-50 p-4" style={{ borderColor: greenPalette }}>
-                            <Label className="mb-2 block text-sm font-bold text-gray-800">Age</Label>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">Birthdate</Label>
                             <Input
-                                type="number"
-                                placeholder="Enter age"
-                                value={data.age}
-                                onChange={(e) => setData('age', e.target.value)}
+                                type="date"
+                                value={data.birthdate}
+                                onChange={(e) => setData('birthdate', e.target.value)}
                                 className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
                                 style={{ borderColor: greenPalette }}
                             />

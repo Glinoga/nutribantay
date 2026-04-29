@@ -43,10 +43,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->hasRole('Admin')) {
-            return Child::query()->where('barangay', $user->barangay);
-        }
-
+        // All users (including Admin) restricted to own barangay - matching commit bfcd512
         return Child::query()->where('barangay', $user->barangay);
     }
 

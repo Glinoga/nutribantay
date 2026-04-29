@@ -2,7 +2,6 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User',
@@ -10,7 +9,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Show({ user }) {
+type UserShowProps = {
+    user: {
+        name: string;
+        email: string;
+    };
+};
+
+export default function Show({ user }: UserShowProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />

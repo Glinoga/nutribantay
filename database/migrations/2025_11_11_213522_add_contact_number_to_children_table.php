@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('children', function (Blueprint $table) {
-            $table->string('contact_number')->nullable()->after('barangay');
-        });
+        // Guard: contact_number already exists in the original create migration.
+        // This check prevents a duplicate-column error on fresh installs / test runs.
+        if (! Schema::hasColumn('children', 'contact_number')) {
+            Schema::table('children', function (Blueprint $table) {
+                $table->string('contact_number')->nullable()->after('barangay');
+            });
+        }
     }
 
     /**

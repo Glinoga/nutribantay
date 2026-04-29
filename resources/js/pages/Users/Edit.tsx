@@ -9,8 +9,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Edit({ user, isSeededAdmin }: { user: any; isSeededAdmin?: boolean }) {
-    const { data, setData, errors, put, processing } = useForm({
+type UserEditProps = {
+    user: {
+        id: number;
+        name: string;
+        email?: string;
+        role?: string;
+        barangay?: string;
+    };
+    isSeededAdmin?: boolean;
+};
+
+type UserFormData = {
+    name: string;
+    email: string;
+    role: string;
+    barangay: string;
+};
+
+export default function Edit({ user, isSeededAdmin }: UserEditProps) {
+    const { data, setData, errors, put, processing } = useForm<UserFormData>({
         name: user.name || '',
         email: user.email || '',
         role: user.role || 'healthworker',

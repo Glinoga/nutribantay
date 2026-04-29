@@ -1,7 +1,7 @@
 declare global {
-  interface Window {
-    Ziggy: any;
-  }
+    interface Window {
+        Ziggy: Record<string, string | number | boolean>;
+    }
 }
 
 export {};

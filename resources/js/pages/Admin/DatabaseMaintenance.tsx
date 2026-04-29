@@ -67,12 +67,15 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                     text: response.data.message,
                 });
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Backup error:', error);
-
+            let message = '❌ Failed to create backup. Please try again.';
+            if (error instanceof Error) {
+                message = error.message;
+            }
             setMessage({
                 type: 'error',
-                text: error.response?.data?.message || '❌ Failed to create backup. Please try again.',
+                text: message,
             });
         } finally {
             setLoading(false);
@@ -127,11 +130,14 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             } else {
                 setMessage({ type: 'error', text: response.data.message });
             }
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || '❌ Failed to restore database.';
+        } catch (error: unknown) {
+            let message = '❌ Failed to restore database';
+            if (error instanceof Error) {
+                message = error.message;
+            }
 
             // Check if it's the SQLite incompatibility error
-            if (errorMessage.includes('SQLite')) {
+            if (message.includes('SQLite')) {
                 setMessage({
                     type: 'error',
                     text: '❌ This backup is incompatible (SQLite format). Please delete old backups and create new MySQL backups.',
@@ -139,7 +145,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             } else {
                 setMessage({
                     type: 'error',
-                    text: errorMessage,
+                    text: message,
                 });
             }
         } finally {
@@ -167,10 +173,14 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             } else {
                 setMessage({ type: 'error', text: response.data.message });
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            let message = '❌ Failed to delete backup.';
+            if (error instanceof Error) {
+                message = error.message;
+            }
             setMessage({
                 type: 'error',
-                text: error.response?.data?.message || '❌ Failed to delete backup.',
+                text: message,
             });
         }
     };

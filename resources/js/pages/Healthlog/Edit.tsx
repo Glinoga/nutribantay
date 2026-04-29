@@ -2,9 +2,47 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 
-export default function Edit({ healthlog }: any) {
-    const { data, setData, put, processing, errors } = useForm({
-        child_id: healthlog.child_id ?? '',
+type HealthLogForm = {
+    weight: string | number;
+    height: string | number;
+    bmi: string | number;
+    nutrition_status: string;
+    micronutrient_powder: string;
+    ruf: string;
+    rusf: string;
+    complementary_food: string;
+    vitamin_a: boolean;
+    deworming: boolean;
+    vaccine_name: string;
+    dose_number: string;
+    date_given: string;
+    next_due_date: string;
+};
+
+type HealthLog = {
+    id: number;
+    weight?: number | null;
+    height?: number | null;
+    bmi?: number | null;
+    nutrition_status?: string | null;
+    micronutrient_powder?: string | null;
+    ruf?: string | null;
+    rusf?: string | null;
+    complementary_food?: string | null;
+    vitamin_a?: boolean;
+    deworming?: boolean;
+    vaccine_name?: string | null;
+    dose_number?: string | null;
+    date_given?: string | null;
+    next_due_date?: string | null;
+    vaccine_status?: string | null;
+    child_id?: number;
+    child?: { fullname: string };
+};
+
+export default function Edit({ healthlog }: { healthlog: HealthLog }) {
+    const { data, setData, put, processing, errors } = useForm<HealthLogForm>({
+        // child_id is intentionally excluded — child-centric design, not editable
         weight: healthlog.weight ?? '',
         height: healthlog.height ?? '',
         bmi: healthlog.bmi ?? '',
@@ -25,8 +63,8 @@ export default function Edit({ healthlog }: any) {
 
     // Auto-calc BMI
     useEffect(() => {
-        const w = parseFloat(data.weight);
-        const h = parseFloat(data.height);
+        const w = parseFloat(String(data.weight ?? ''));
+        const h = parseFloat(String(data.height ?? ''));
 
         if (w > 0 && h > 0) {
             const bmiValue = w / Math.pow(h / 100, 2); // cm → meters

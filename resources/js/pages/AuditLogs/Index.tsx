@@ -12,8 +12,8 @@ type AuditLog = {
     model_id: number | null;
     model_name: string | null;
     description: string | null;
-    old_values: Record<string, any> | null;
-    new_values: Record<string, any> | null;
+    old_values: Record<string, string | number | boolean | null> | null;
+    new_values: Record<string, string | number | boolean | null> | null;
     ip_address: string | null;
     barangay: string | null;
     created_at: string;

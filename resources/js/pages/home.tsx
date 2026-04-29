@@ -27,6 +27,7 @@ interface Announcement {
 
 interface HomeProps {
     announcements: Announcement[];
+    maintenance?: string | null;
 }
 
 // get color class based on category
@@ -42,7 +43,7 @@ function getCategoryColorClass(categoryColor: string) {
     return colorMap[categoryColor] || 'bg-[var(--primary)]';
 }
 
-export default function Home({ announcements = [] }: HomeProps) {
+export default function Home({ announcements = [], maintenance = null }: HomeProps) {
     return (
         <GuestLayout title="Home">
             {/* Maintenance Message Banner */}

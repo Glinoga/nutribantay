@@ -22,8 +22,10 @@ class UserController extends Controller
             return redirect('/login');
         }
 
-        $query = User::with('roles')
-            ->where('barangay', $user->barangay); // only same barangay
+        $query = User::with('roles');
+
+        // Admin and Healthworker restricted to own barangay for security
+        $query->where('barangay', $user->barangay);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -57,9 +59,12 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        $archivedUsers = User::onlyTrashed()
-            ->where('barangay', $user->barangay) // restrict by barangay
-            ->get();
+        // Admin-only check (defense-in-depth, middleware should handle this)
+        if (! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $archivedUsers = User::onlyTrashed()->get();
 
         return Inertia::render('Users/Archived', [
             'users' => $archivedUsers,
@@ -206,8 +211,8 @@ class UserController extends Controller
         $user = auth()->user();
         $targetUser = User::findOrFail($id);
 
-        // Prevent admin from editing users in different barangays
-        if ($targetUser->barangay !== $user->barangay) {
+        // Prevent admin from editing users in different barangays (loose comparison for type safety)
+        if ((string) $targetUser->barangay !== (string) $user->barangay) {
             abort(403, 'You cannot edit users from other barangays.');
         }
 

@@ -115,8 +115,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 // Reset form fields but KEEP the code visible for admin to copy
                 setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
             }
-        } catch (err: any) {
-            setCreateError(err.response?.data?.message || 'Failed to create user');
+        } catch (err: unknown) {
+            let message = 'Failed to create user';
+            if (err instanceof Error) {
+                message = err.message;
+            }
+            setCreateError(message);
         } finally {
             setModalLoading(false);
         }
@@ -179,9 +183,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             const response = await axios.get('/registration-codes');
             console.log('Response:', response.data);
             setCodes(response.data.codes || response.data);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to fetch codes:', error);
-            const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message;
+            let errorMessage = 'Failed to load codes';
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
             alert('Failed to load codes: ' + errorMessage);
         } finally {
             setModalLoading(false);

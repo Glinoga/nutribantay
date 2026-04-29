@@ -137,42 +137,42 @@ class ChildController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
+            'first_name'     => 'required|string|max:255',
             'middle_initial' => 'nullable|string|max:5',
-            'last_name' => 'required|string|max:255',
-            'sex' => 'required|in:M,F,Male,Female',
-            'weight' => 'nullable|numeric|min:0|max:200',
-            'height' => 'nullable|numeric|min:0|max:250',
-            'birthdate' => 'nullable|date',
-            'address' => 'nullable|string|max:255',
+            'last_name'      => 'required|string|max:255',
+            'sex'            => 'required|in:M,F,Male,Female',
+            'birthdate'      => 'nullable|date',
+            'address'        => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
-            'contact_number' => 'nullable|string|max:50',
+            'weight'         => 'nullable|numeric|min:0|max:200',
+            'height'         => 'nullable|numeric|min:0|max:250',
         ]);
 
         $user = auth()->user();
 
-        // Format phone number: remove spaces and ensure it's stored consistently
-        $contactNumber = $request->contact_number;
-        if ($contactNumber) {
-            // Keep the formatted version with spaces as user entered it
-            $contactNumber = trim($contactNumber);
+        // ✅ Normalize sex
+        $validated['sex'] = in_array(strtoupper($validated['sex']), ['M', 'MALE']) ? 'Male' : 'Female';
+
+        // Format phone number
+        if (! empty($validated['contact_number'])) {
+            $validated['contact_number'] = trim($validated['contact_number']);
         }
 
-        // ✅ Normalize sex
-        $validated['sex'] = strtoupper($validated['sex']) === 'M' ? 'Male' : 'Female';
-
         Child::create([
-            'name'           => $request->name,
-            'sex'            => $request->sex,
-            'age'            => $request->age,
-            'weight'         => $request->weight,
-            'height'         => $request->height,
-            'contact_number' => $contactNumber,
+            'first_name'     => $validated['first_name'],
+            'middle_initial' => $validated['middle_initial'] ?? null,
+            'last_name'      => $validated['last_name'],
+            'sex'            => $validated['sex'],
+            'birthdate'      => $validated['birthdate'] ?? null,
+            'address'        => $validated['address'] ?? null,
+            'contact_number' => $validated['contact_number'] ?? null,
+            'weight'         => $validated['weight'] ?? null,
+            'height'         => $validated['height'] ?? null,
             'created_by'     => $user->id,
             'barangay'       => $user->barangay,
         ]);
 
-        return redirect()->back()->with('success', 'Note added successfully!');
+        return redirect()->route('children.index')->with('success', 'Child added successfully!');
     }
 
     public function destroyNote(Child $child, $noteId)
@@ -224,43 +224,274 @@ class ChildController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function edit($id)
+    public function edit(Child $child)
     {
-        $child = Child::findOrFail($id);
+        $user = auth()->user();
+
+        // Healthworker can only edit children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
 
         return Inertia::render('Children/Edit', [
             'child' => [
-                'id' => $child->id,
-                'name' => $child->name,
-                'sex' => $child->sex,
-                'age' => $child->age,
-                'weight' => $child->weight,
-                'height' => $child->height,
-            ]
+                'id'             => $child->id,
+                'first_name'     => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name'      => $child->last_name,
+                'sex'            => $child->sex,
+                'birthdate'      => $child->birthdate,
+                'barangay'       => $child->barangay,
+                'contact_number' => $child->contact_number,
+                'weight'         => $child->weight,
+                'height'         => $child->height,
+            ],
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Child $child)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'sex' => 'required|in:Male,Female',
-            'age' => 'required|integer|min:0',
-            'weight' => 'nullable|numeric|min:0|max:200',
-            'height' => 'nullable|numeric|min:0|max:250',
+        $user = auth()->user();
+
+        // Healthworker can only update children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'first_name'     => 'required|string|max:255',
+            'middle_initial' => 'nullable|string|max:5',
+            'last_name'      => 'required|string|max:255',
+            'sex'            => 'required|in:Male,Female',
+            'birthdate'      => 'nullable|date',
+            'barangay'       => 'nullable|string|max:255',
+            'contact_number' => 'nullable|string|max:50',
+            'weight'         => 'nullable|numeric|min:0|max:200',
+            'height'         => 'nullable|numeric|min:0|max:250',
         ]);
 
-        $child = Child::findOrFail($id);
-        $child->update($request->only(['name', 'sex', 'age', 'weight', 'height']));
+        $child->update(array_merge(
+            $request->only([
+                'first_name', 'middle_initial', 'last_name',
+                'sex', 'birthdate', 'barangay', 'contact_number',
+                'weight', 'height'
+            ]),
+            ['updated_by' => auth()->id()]
+        ));
 
-        return redirect()->route('children.index')->with('success', 'Child updated successfully!');
+        return redirect()->route('children.show', $child->id)->with('success', 'Child updated successfully!');
     }
 
-    public function destroy($id)
+    public function destroy(Child $child)
     {
-        $child = Child::findOrFail($id);
+        $user = auth()->user();
+
+        // Healthworker can only delete children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         $child->delete();
 
         return redirect()->route('children.index')->with('success', 'Child deleted successfully!');
+    }
+
+    /**
+     * Display the specified child with health logs and vaccine records.
+     */
+    public function show(Child $child)
+    {
+        $user = auth()->user();
+
+        // Healthworker can only view children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $child->load(['notes.author', 'creator', 'updater']);
+
+        return Inertia::render('Children/Show', [
+            'child' => [
+                'id'                 => $child->id,
+                'fullname'           => $child->fullname,
+                'first_name'         => $child->first_name,
+                'middle_initial'     => $child->middle_initial,
+                'last_name'          => $child->last_name,
+                'sex'                => $child->sex,
+                'age'                => $child->age,
+                'is_over_60_months' => $child->is_over_60_months,
+                'weight'             => $child->weight,
+                'height'             => $child->height,
+                'birthdate'          => $child->birthdate,
+                'address'            => $child->address,
+                'contact_number'     => $child->contact_number,
+                'barangay'          => $child->barangay,
+                'created_at'         => $child->created_at,
+                'updated_at'         => $child->updated_at,
+                'creator'            => ['name' => $child->creator?->name],
+                'updater'            => ['name' => $child->updater?->name],
+                'notes'              => $child->notes->map(fn ($note) => [
+                    'id'        => $note->id,
+                    'note'      => $note->note,
+                    'author'    => ['name' => $note->author?->name],
+                    'created_at' => $note->created_at,
+                ]),
+                'healthlogs' => $child->healthlogs()
+                    ->with('user:id,name')
+                    ->orderBy('created_at', 'asc')
+                    ->get([
+                        'id', 'weight', 'height', 'bmi', 'nutrition_status',
+                        'status_wfa', 'status_lfa', 'status_wfl_wfh',
+                        'vitamin_a', 'deworming',
+                        'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
+                        'vaccine_name', 'dose_number', 'date_given', 'next_due_date', 'vaccine_status',
+                        'created_at', 'user_id'
+                    ])
+                    ->map(fn ($log) => [
+                        'id'                  => $log->id,
+                        'weight'              => $log->weight,
+                        'height'              => $log->height,
+                        'bmi'                 => $log->bmi,
+                        'nutrition_status'    => $log->nutrition_status,
+                        'status_wfa'         => $log->status_wfa,
+                        'status_lfa'         => $log->status_lfa,
+                        'status_wfl_wfh'     => $log->status_wfl_wfh,
+                        'vitamin_a'          => $log->vitamin_a,
+                        'deworming'         => $log->deworming,
+                        'micronutrient_powder' => $log->micronutrient_powder,
+                        'ruf'                => $log->ruf,
+                        'rusf'               => $log->rusf,
+                        'complementary_food' => $log->complementary_food,
+                        'vaccine_name'       => $log->vaccine_name,
+                        'dose_number'        => $log->dose_number,
+                        'date_given'         => $log->date_given,
+                        'next_due_date'      => $log->next_due_date,
+                        'vaccine_status'     => $log->vaccine_status,
+                        'created_at'         => $log->created_at,
+                        'user'               => ['name' => $log->user?->name],
+                    ]),
+            ],
+        ]);
+    }
+
+    /**
+     * Restore a soft-deleted child.
+     */
+    public function restore($id)
+    {
+        $user = auth()->user();
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        // Healthworker can only restore children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $child->restore();
+
+        return redirect()->route('children.index')->with('success', 'Child restored successfully!');
+    }
+
+    /**
+     * Permanently delete a child.
+     */
+    public function forceDelete($id)
+    {
+        $user = auth()->user();
+        $child = Child::onlyTrashed()->findOrFail($id);
+
+        // Healthworker can only force-delete children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $child->forceDelete();
+
+        return redirect()->route('children.archived')->with('success', 'Child permanently deleted!');
+    }
+
+    /**
+     * Store a new note for a child.
+     */
+    public function storeNote(Request $request, Child $child)
+    {
+        $user = auth()->user();
+
+        // Healthworker can only add notes to children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'note' => 'required|string|max:1000',
+        ]);
+
+        $child->notes()->create([
+            'note'    => $request->note,
+            'user_id' => $user->id,
+        ]);
+
+        return redirect()->back()->with('success', 'Note added successfully!');
+    }
+
+    /**
+     * Import children from Excel/CSV.
+     */
+    public function import(Request $request)
+    {
+        $user = auth()->user();
+
+        $rows = $request->input('data');
+
+        if (! $rows || ! is_array($rows)) {
+            return back()->with('error', 'Invalid import data.');
+        }
+
+        $created = 0;
+        $skipped = 0;
+
+        foreach ($rows as $row) {
+            // Skip invalid rows
+            if (empty($row['first_name']) || empty($row['last_name']) || empty($row['sex'])) {
+                continue;
+            }
+
+            // Check for duplicates within same barangay
+            $existingChild = Child::where('barangay', $user->barangay)
+                ->where('first_name', $row['first_name'])
+                ->where('last_name', $row['last_name'])
+                ->where('birthdate', $row['birthdate'])
+                ->first();
+
+            if ($existingChild) {
+                $skipped++;
+                continue;
+            }
+
+            $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
+
+            Child::create([
+                'first_name'     => $row['first_name'],
+                'middle_initial' => $row['middle_initial'] ?? null,
+                'last_name'      => $row['last_name'],
+                'sex'            => $sex,
+                'weight'         => $row['weight'] ?? 0,
+                'height'         => $row['height'] ?? 0,
+                'birthdate'      => $row['birthdate'] ?? null,
+                'barangay'       => $user->barangay,
+                'created_by'     => $user->id,
+                'address'        => null,
+                'contact_number' => null,
+            ]);
+
+            $created++;
+        }
+
+        $message = "Import complete! {$created} children imported.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} duplicates skipped.";
+        }
+
+        return redirect('/children')->with('success', $message);
     }
 }

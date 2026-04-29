@@ -14,6 +14,13 @@ class HealthlogController extends Controller
 {
     public function createForChild(Child $child)
     {
+        $user = auth()->user();
+
+        // Healthworker can only create healthlogs for children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         return Inertia::render('Healthlog/Create', [
             'child' => [
                 'id' => $child->id,
@@ -26,6 +33,13 @@ class HealthlogController extends Controller
 
     public function storeForChild(Request $request, Child $child)
     {
+        $user = auth()->user();
+
+        // Healthworker can only add healthlogs for children in their barangay, Admin has full access
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'weight' => 'nullable|numeric|min:0',
             'height' => 'nullable|numeric|min:0',
@@ -96,6 +110,13 @@ class HealthlogController extends Controller
 
     public function edit(HealthLog $healthlog)
     {
+        $user = auth()->user();
+
+        // Healthworker can only edit healthlogs for children in their barangay, Admin has full access
+        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         return Inertia::render('Healthlog/Edit', [
             'healthlog' => $healthlog->load('child'),
         ]);
@@ -103,8 +124,14 @@ class HealthlogController extends Controller
 
     public function update(Request $request, HealthLog $healthlog)
     {
+        $user = auth()->user();
+
+        // Healthworker can only update healthlogs for children in their barangay, Admin has full access
+        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         $validated = $request->validate([
-            'child_id' => 'required|exists:children,id',
             'weight' => 'nullable|numeric|min:0',
             'height' => 'nullable|numeric|min:0',
 
@@ -124,7 +151,8 @@ class HealthlogController extends Controller
 
         // Note: vaccine_status is auto-calculated by the model accessor
 
-        $child = Child::findOrFail($validated['child_id']);
+        // Resolve child from the existing healthlog (child-centric: child_id is immutable)
+        $child = Child::findOrFail($healthlog->child_id);
         $weight = $validated['weight'] ?? null;
         $height = $validated['height'] ?? null;
 
@@ -161,6 +189,13 @@ class HealthlogController extends Controller
 
     public function destroy(HealthLog $healthlog)
     {
+        $user = auth()->user();
+
+        // Healthworker can only delete healthlogs for children in their barangay, Admin has full access
+        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
         $childId = $healthlog->child_id;
         $healthlog->delete();
 

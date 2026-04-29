@@ -1,7 +1,6 @@
 // Components
-import { store } from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
 import { logout } from '@/routes';
-import { Form, Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 import TextLink from '@/components/text-link';
@@ -9,6 +8,13 @@ import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const { post, processing } = useForm({});
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/email/verification-notification');
+    };
+
     return (
         <AuthLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you.">
             <Head title="Email verification" />
@@ -19,20 +25,16 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form {...store.form()} className="space-y-6 text-center">
-                {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Resend verification email
-                        </Button>
+            <form onSubmit={submit} className="space-y-6 text-center">
+                <Button disabled={processing} variant="secondary">
+                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    Resend verification email
+                </Button>
 
-                        <TextLink href={logout()} className="mx-auto block text-sm">
-                            Log out
-                        </TextLink>
-                    </>
-                )}
-            </Form>
+                <TextLink href={logout()} className="mx-auto block text-sm">
+                    Log out
+                </TextLink>
+            </form>
         </AuthLayout>
     );
 }

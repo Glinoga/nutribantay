@@ -1,11 +1,10 @@
-import { store } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { register } from '@/routes';
-import { Form, Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 interface LoginProps {
@@ -16,6 +15,17 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword, isMaintenanceMode, maintenance }: LoginProps) {
+    const { data, setData, post, processing, errors } = useForm({
+        login: '',
+        password: '',
+        remember: false,
+    });
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/login');
+    };
+
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
             <Head title="Log in" />
@@ -51,62 +61,60 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                         </div>
                     )}
 
-                    <Form {...store.form()} resetOnSuccess={['password']} className="flex flex-col gap-6">
-                        {({ processing, errors }) => (
-                            <>
-                                <div className="grid gap-4">
-                                    {/* Login (Code or Email) */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="login">Registration Code / Email</Label>
-                                        <Input
-                                            id="login"
-                                            type="text"
-                                            name="login"
-                                            required
-                                            autoFocus
-                                            tabIndex={1}
-                                            autoComplete="username"
-                                            placeholder="Enter your code or email"
-                                        />
-                                        <InputError message={errors.login} />
-                                    </div>
+                    <form onSubmit={submit} className="flex flex-col gap-6">
+                        <div className="grid gap-4">
+                            {/* Login (Code or Email) */}
+                            <div className="grid gap-2">
+                                <Label htmlFor="login">Registration Code / Email</Label>
+                                <Input
+                                    id="login"
+                                    type="text"
+                                    value={data.login}
+                                    onChange={(e) => setData('login', e.target.value)}
+                                    required
+                                    autoFocus
+                                    tabIndex={1}
+                                    autoComplete="username"
+                                    placeholder="Enter your code or email"
+                                />
+                                <InputError message={errors.login} />
+                            </div>
 
-                                    {/* Password */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="password">Password</Label>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            name="password"
-                                            required
-                                            tabIndex={2}
-                                            autoComplete="current-password"
-                                            placeholder="Enter your password"
-                                        />
-                                        <InputError message={errors.password} />
-                                    </div>
+                            {/* Password */}
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="current-password"
+                                    placeholder="Enter your password"
+                                />
+                                <InputError message={errors.password} />
+                            </div>
 
-                                    {/* Submit */}
-                                    <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" disabled={processing}>
-                                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                                        Log in
-                                    </Button>
-                                </div>
+                            {/* Submit */}
+                            <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-800" disabled={processing}>
+                                {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                Log in
+                            </Button>
+                        </div>
 
-                                {/* Footer */}
-                                <div className="mt-4 text-center text-sm text-gray-600">
-                                    Don't have an account?{' '}
-                                    <TextLink href={register()} className="font-medium">
-                                        Sign Up
-                                    </TextLink>{' '}
-                                    |{' '}
-                                    <a href="#" className="text-sm underline">
-                                        Terms & Conditions
-                                    </a>
-                                </div>
-                            </>
-                        )}
-                    </Form>
+                        {/* Footer */}
+                        <div className="mt-4 text-center text-sm text-gray-600">
+                            Don't have an account?{' '}
+                            <TextLink href={register()} className="font-medium">
+                                Sign Up
+                            </TextLink>{' '}
+                            |{' '}
+                            <a href="#" className="text-sm underline">
+                                Terms & Conditions
+                            </a>
+                        </div>
+                    </form>
 
                     {status && <div className="mt-4 text-center text-sm font-medium text-green-600">{status}</div>}
                 </div>

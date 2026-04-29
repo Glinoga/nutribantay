@@ -17,9 +17,11 @@ export default function ChildrenCreate() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        first_name: '',
+        middle_initial: '',
+        last_name: '',
         sex: 'Male',
-        age: '',
+        birthdate: '',
         weight: '',
         height: '',
         contact_number: '',
@@ -196,30 +198,61 @@ export default function ChildrenCreate() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Full Name */}
+                        {/* Name Fields */}
                         <div
                             className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
                             style={{ animationDelay: '0ms' }}
                         >
                             <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
                                 <User className="h-5 w-5 text-green-600" />
-                                Child's Full Name
+                                Child's Name
                                 <span className="text-red-500">*</span>
                             </Label>
-                            <Input
-                                type="text"
-                                placeholder="Enter child's full name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                onFocus={() => setFocusedField('name')}
-                                onBlur={() => setFocusedField(null)}
-                                className={`border-2 text-base font-medium transition-all ${
-                                    focusedField === 'name' ? 'input-focus' : 'border-gray-300'
-                                }`}
-                            />
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                                <div>
+                                    <Input
+                                        type="text"
+                                        placeholder="First name"
+                                        value={data.first_name}
+                                        onChange={(e) => setData('first_name', e.target.value)}
+                                        onFocus={() => setFocusedField('first_name')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className={`border-2 text-base font-medium transition-all ${
+                                            focusedField === 'first_name' ? 'input-focus' : 'border-gray-300'
+                                        }`}
+                                    />
+                                </div>
+                                <div>
+                                    <Input
+                                        type="text"
+                                        placeholder="Middle initial (optional)"
+                                        value={data.middle_initial}
+                                        onChange={(e) => setData('middle_initial', e.target.value)}
+                                        onFocus={() => setFocusedField('middle_initial')}
+                                        onBlur={() => setFocusedField(null)}
+                                        maxLength={5}
+                                        className={`border-2 text-base font-medium transition-all ${
+                                            focusedField === 'middle_initial' ? 'input-focus' : 'border-gray-300'
+                                        }`}
+                                    />
+                                </div>
+                                <div>
+                                    <Input
+                                        type="text"
+                                        placeholder="Last name"
+                                        value={data.last_name}
+                                        onChange={(e) => setData('last_name', e.target.value)}
+                                        onFocus={() => setFocusedField('last_name')}
+                                        onBlur={() => setFocusedField(null)}
+                                        className={`border-2 text-base font-medium transition-all ${
+                                            focusedField === 'last_name' ? 'input-focus' : 'border-gray-300'
+                                        }`}
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Sex & Age Grid */}
+                        {/* Sex & Birthdate Grid */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div
                                 className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
@@ -251,19 +284,16 @@ export default function ChildrenCreate() {
                             >
                                 <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
                                     <Calendar className="h-5 w-5 text-green-600" />
-                                    Age (years)
-                                    <span className="text-red-500">*</span>
+                                    Birthdate
                                 </Label>
                                 <Input
-                                    type="number"
-                                    placeholder="Enter age"
-                                    value={data.age}
-                                    onChange={(e) => setData('age', e.target.value)}
-                                    onFocus={() => setFocusedField('age')}
+                                    type="date"
+                                    value={data.birthdate}
+                                    onChange={(e) => setData('birthdate', e.target.value)}
+                                    onFocus={() => setFocusedField('birthdate')}
                                     onBlur={() => setFocusedField(null)}
-                                    min="0"
                                     className={`border-2 text-base font-medium transition-all ${
-                                        focusedField === 'age' ? 'input-focus' : 'border-gray-300'
+                                        focusedField === 'birthdate' ? 'input-focus' : 'border-gray-300'
                                     }`}
                                 />
                             </div>

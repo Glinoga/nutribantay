@@ -20,9 +20,9 @@ export const readExcel = async (file: File) => {
 
     for (const sheetName of workbook.SheetNames) {
         const tempSheet = workbook.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json<any[]>(tempSheet, { header: 1 });
+        const rows = XLSX.utils.sheet_to_json(tempSheet, { header: 1 }) as (string | number | null)[][];
 
-        const foundIndex = rows.findIndex((row) => row.includes && row.includes('Full Name of Child'));
+        const foundIndex = rows.findIndex((row) => Array.isArray(row) && row.some((cell) => cell === 'Full Name of Child'));
 
         if (foundIndex !== -1) {
             sheet = tempSheet;
@@ -37,7 +37,7 @@ export const readExcel = async (file: File) => {
         return [];
     }
 
-    const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1 });
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number | null)[][];
 
     const fullNameIdx = 3;
     const sexIdx = 5;
@@ -50,7 +50,7 @@ export const readExcel = async (file: File) => {
     const formatted = dataRows
         .filter((row) => {
             const fullName = row[fullNameIdx];
-            if (!fullName || typeof fullName !== 'string') return false;
+            if (typeof fullName !== 'string') return false;
             if (fullName.includes('Surname') || fullName.includes('(')) return false;
             return true;
         })

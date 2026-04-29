@@ -1,7 +1,7 @@
+import { Info } from 'lucide-react';
 import React from 'react';
 import toast from 'react-hot-toast';
-import { Info } from 'lucide-react';
- 
+
 /**
  * Smart toast notifications with dynamic duration based on content length
  * Provides better UX by giving users adequate time to read messages
@@ -63,10 +63,10 @@ export const smartToast = {
         const duration = Math.min(readingTime, 7000);
         return toast(message, {
             duration,
-            icon: React.createElement(Info, { 
-                size: 16, 
+            icon: React.createElement(Info, {
+                size: 16,
                 color: '#3B82F6',
-                strokeWidth: 2 
+                strokeWidth: 2,
             }),
             style: {
                 background: '#ffffff',
@@ -74,7 +74,7 @@ export const smartToast = {
                 border: '2px solid #3B82F6',
                 borderRadius: '15px',
                 boxShadow: '0 10px 25px -5px rgba(16, 72, 185, 0.2), 0 4px 6px -2px rgba(16, 114, 185, 0.1)',
-            }
+            },
         });
     },
 
@@ -89,15 +89,13 @@ export const smartToast = {
         messages: {
             loading: string;
             success: string | ((data: T) => string);
-            error: string | ((error: any) => string);
-        }
+            error: string | ((error: unknown) => string);
+        },
     ) => {
         return toast.promise(promise, {
             loading: messages.loading,
             success: (data) => {
-                const message = typeof messages.success === 'function'
-                    ? messages.success(data)
-                    : messages.success;
+                const message = typeof messages.success === 'function' ? messages.success(data) : messages.success;
 
                 // Use setTimeout to apply dynamic duration after toast is created
                 setTimeout(() => {
@@ -111,9 +109,7 @@ export const smartToast = {
                 return message;
             },
             error: (error) => {
-                const message = typeof messages.error === 'function'
-                    ? messages.error(error)
-                    : messages.error;
+                const message = typeof messages.error === 'function' ? messages.error(error) : messages.error;
 
                 // Use setTimeout to apply dynamic duration after toast is created
                 setTimeout(() => {
@@ -140,24 +136,20 @@ export const smartToast = {
         messages: {
             loading: string;
             success: string | ((data: T) => string);
-            error: string | ((error: any) => string);
-        }
+            error: string | ((error: unknown) => string);
+        },
     ) => {
         const loadingToast = toast.loading(messages.loading);
 
         try {
             const result = await promise;
-            const successMessage = typeof messages.success === 'function'
-                ? messages.success(result)
-                : messages.success;
+            const successMessage = typeof messages.success === 'function' ? messages.success(result) : messages.success;
 
             toast.dismiss(loadingToast);
             smartToast.success(successMessage);
             return result;
         } catch (error) {
-            const errorMessage = typeof messages.error === 'function'
-                ? messages.error(error)
-                : messages.error;
+            const errorMessage = typeof messages.error === 'function' ? messages.error(error) : messages.error;
 
             toast.dismiss(loadingToast);
             smartToast.error(errorMessage);
@@ -171,7 +163,7 @@ export const smartToast = {
      */
     dismiss: (toastId?: string) => {
         return toast.dismiss(toastId);
-    }
+    },
 };
 
 // Utility function to calculate reading time
