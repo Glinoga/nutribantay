@@ -1,4 +1,19 @@
 import GuestLayout from '@/layouts/guest-layout';
+import { route } from '@/lib/routes';
+import { useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
 
 const FAQs = [
     {
@@ -23,7 +38,33 @@ const FAQs = [
     }
 ];
 
+
+
+
 export default function Contact() {
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+        privacy: false,
+    });
+
+    const [submitted, setSubmitted] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('guest.contact.send'), {
+            onSuccess: () => {
+                reset();
+                setSubmitted(true);
+            },
+        });
+    };
+
     return (
         <GuestLayout title="Contact Us">
             {/* Hero Section */}
@@ -32,7 +73,7 @@ export default function Contact() {
                 <div className="absolute bottom-10 left-10 -z-10 h-48 w-48 rounded-full bg-[var(--secondary)] opacity-10 blur-3xl"></div>
                 <div className="absolute -top-10 -left-10 -z-10 h-40 w-40 rounded-full border border-[var(--primary)] opacity-20"></div>
                 <div className="absolute -bottom-10 -right-10 -z-10 h-60 w-60 rounded-full border border-[var(--secondary)] opacity-20"></div>
-                
+
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="grid items-center gap-12 md:grid-cols-2">
                         {/* Hero Content */}
@@ -47,12 +88,12 @@ export default function Contact() {
                                 <span className="text-[var(--text)]">Hear From You</span>
                             </h1>
                             <p className="mt-6 text-lg text-[var(--text-muted)]">
-                                Have questions about our nutrition programs or want to get involved? 
+                                Have questions about our nutrition programs or want to get involved?
                                 Our team is ready to assist you with any inquiries.
                             </p>
                             <div className="mt-8 flex flex-wrap gap-4 md:justify-start">
-                                <a 
-                                    href="#contact-form" 
+                                <a
+                                    href="#contact-form"
                                     className="group flex items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:shadow-lg"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -61,8 +102,8 @@ export default function Contact() {
                                     </svg>
                                     <span>Send a Message</span>
                                 </a>
-                                <a 
-                                    href="#faq" 
+                                <a
+                                    href="#faq"
                                     className="group flex items-center justify-center rounded-full border-2 border-[var(--secondary)] px-6 py-3 text-[var(--secondary)] transition-all hover:bg-[var(--secondary)] hover:text-white hover:shadow-lg"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -72,7 +113,7 @@ export default function Contact() {
                                 </a>
                             </div>
                         </div>
-                        
+
                         {/* Contact Cards */}
                         <div className="relative">
                             <div className="relative z-10 overflow-hidden rounded-2xl bg-white p-1 shadow-xl dark:bg-[var(--bg-light)]">
@@ -90,7 +131,7 @@ export default function Contact() {
                                             0912 345 6789
                                         </a>
                                     </div>
-                                    
+
                                     {/* Email Us Card */}
                                     <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)]text-[var(--secondary)]">
@@ -104,7 +145,7 @@ export default function Contact() {
                                             info@nutribantay.com
                                         </a>
                                     </div>
-                                    
+
                                     {/* Visit Us Card */}
                                     <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--success)]">
@@ -119,7 +160,7 @@ export default function Contact() {
                                             123 Main St, Caloocan City
                                         </span>
                                     </div>
-                                    
+
                                     {/* Office Hours Card */}
                                     <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--info)]">
@@ -135,7 +176,7 @@ export default function Contact() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Decorative elements */}
                             <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-20 blur-xl"></div>
                             <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-[var(--secondary)] opacity-20 blur-xl"></div>
@@ -161,7 +202,7 @@ export default function Contact() {
                                     <p className="mt-4 text-[var(--text-muted)]">
                                         Fill out the form and our team will get back to you as soon as possible. We're looking forward to hearing from you!
                                     </p>
-                                    
+
                                     <div className="mt-8 space-y-6">
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
@@ -176,7 +217,7 @@ export default function Contact() {
                                                 </p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -191,7 +232,7 @@ export default function Contact() {
                                                 </p>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -208,90 +249,115 @@ export default function Contact() {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Form */}
                             <div className="md:col-span-3">
                                 <div className="overflow-hidden rounded-2xl bg-[var(--bg-light)] p-8 shadow-sm">
-                                    <form className="space-y-6">
+                                    {submitted && (
+                                        <div className="mb-6 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                            <p>Thank you for your message! We will get back to you soon.</p>
+                                        </div>
+                                    )}
+                                    <form className="space-y-6" onSubmit={handleSubmit}>
                                         <div className="grid gap-6 md:grid-cols-2">
                                             <div>
                                                 <label htmlFor="first_name" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                     First Name <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input 
-                                                    type="text" 
-                                                    id="first_name" 
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    id="first_name"
+                                                    maxLength={50}
+                                                    value={data.first_name}
+                                                    onChange={e => setData('first_name', e.target.value)}
+                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
+                                                    required
                                                 />
                                             </div>
                                             <div>
                                                 <label htmlFor="last_name" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                     Last Name <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input 
-                                                    type="text" 
-                                                    id="last_name" 
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
-                                                    required 
+                                                <input
+                                                    type="text"
+                                                    id="last_name"
+                                                    maxLength={50}
+                                                    value={data.last_name}
+                                                    onChange={e => setData('last_name', e.target.value)}
+                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
+                                                    required
                                                 />
                                             </div>
                                         </div>
-                                        
+
                                         <div className="grid gap-6 md:grid-cols-2">
                                             <div>
                                                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                     Email Address <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input 
-                                                    type="email" 
-                                                    id="email" 
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
-                                                    required 
+                                                <input
+                                                    type="email"
+                                                    id="email"
+                                                    maxLength={50}
+                                                    value={data.email}
+                                                    onChange={e => setData('email', e.target.value)}
+                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
+                                                    required
                                                 />
                                             </div>
                                             <div>
                                                 <label htmlFor="phone" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                     Phone Number
                                                 </label>
-                                                <input 
-                                                    type="tel" 
-                                                    id="phone" 
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
+                                                <input
+                                                    type="tel"
+                                                    id="phone"
+                                                    maxLength={15}
+                                                    value={data.phone}
+                                                    onChange={e => setData('phone', e.target.value)}
+                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
                                                 />
                                             </div>
                                         </div>
-                                        
+
                                         <div>
                                             <label htmlFor="subject" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                 Subject <span className="text-[var(--danger)]">*</span>
                                             </label>
-                                            <input 
-                                                type="text" 
-                                                id="subject" 
-                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
-                                                required 
+                                            <input
+                                                type="text"
+                                                id="subject"
+                                                maxLength={100}
+                                                value={data.subject}
+                                                onChange={e => setData('subject', e.target.value)}
+                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
+                                                required
                                             />
                                         </div>
-                                        
+
                                         <div>
                                             <label htmlFor="message" className="mb-2 block text-sm font-medium text-[var(--text)]">
                                                 Message <span className="text-[var(--danger)]">*</span>
                                             </label>
-                                            <textarea 
-                                                id="message" 
-                                                rows={5} 
-                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]" 
+                                            <textarea
+                                                id="message"
+                                                rows={5}
+                                                minLength={20}
+                                                value={data.message}
+                                                onChange={e => setData('message', e.target.value)}
+                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-inset ring-[var(--border)] transition-all focus:ring-2 focus:ring-inset focus:ring-[var(--primary)]"
                                                 required
                                             ></textarea>
                                         </div>
-                                        
+
                                         <div className="flex items-start">
                                             <div className="flex h-5 items-center">
                                                 <input
                                                     id="privacy"
                                                     name="privacy"
                                                     type="checkbox"
+                                                    checked={data.privacy}
+                                                    onChange={e => setData('privacy', e.target.checked)}
                                                     className="h-4 w-4 rounded-xs border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
                                                     required
                                                 />
@@ -300,15 +366,17 @@ export default function Contact() {
                                                 <label htmlFor="privacy" className="text-[var(--text-muted)]">
                                                     I agree to the <a href="#" className="text-[var(--primary)] hover:underline">privacy policy</a> and consent to the processing of my personal data.
                                                 </label>
+                                                {errors.privacy && <p className="mt-1 text-sm text-[var(--danger)]">{errors.privacy}</p>}
                                             </div>
                                         </div>
-                                        
+
                                         <div>
-                                            <button 
+                                            <button
                                                 type="submit"
+                                                disabled={processing}
                                                 className="group inline-flex w-full items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 sm:w-auto"
                                             >
-                                                <span className="mr-2">Send Message</span>
+                                                <span className="mr-2">{processing ? 'Sending...' : 'Send Message'}</span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                                                 </svg>
@@ -336,25 +404,39 @@ export default function Contact() {
                             Our office is conveniently located in the heart of Caloocan City. Feel free to stop by during our business hours.
                         </p>
                     </div>
-                    
+
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-[var(--bg-light)]">
-                        {/* Map container - either Leaflet or Google Maps */}
-                        <div className="relative h-96 w-full">
-                            {/* Placeholder for the map */}
-                            <div className="absolute inset-0 bg-[var(--border)] bg-opacity-20 backdrop-blur-sm">
-                                <div className="flex h-full w-full items-center justify-center">
-                                    <div className="text-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                        </svg>
-                                        <p className="mt-4 text-lg font-medium text-[var(--text)]">Interactive Map</p>
-                                        <p className="text-[var(--text-muted)]">Map would be displayed here (Leaflet or Google Maps)</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                        {/* Leaflet Map */}
+                        <div className="relative h-[36rem] w-full">
+                            <MapContainer
+                                center={[14.6507, 120.9630]} // Caloocan City coordinates
+                                zoom={15}
+                                style={{ height: '100%', width: '100%' }}
+                                scrollWheelZoom={true}
+                                className="rounded-2xl"
+                            >
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
+                                <Marker position={[14.6507, 120.9630]}>
+                                    <Popup>
+                                        <div className="text-center p-2">
+                                            <h3 className="font-bold text-lg text-gray-800">NutriBantay Office</h3>
+                                            <p className="text-sm text-gray-600 mt-1">
+                                                Barangay Hall, 123 Main Street<br />
+                                                Caloocan City, Metro Manila
+                                            </p>
+                                            <p className="text-sm text-gray-600 mt-2">
+                                                <strong>Hours:</strong> Mon-Fri: 8AM - 5PM
+                                            </p>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            </MapContainer>
+
                             {/* Location information overlay */}
-                            <div className="absolute bottom-4 left-8 right-8 rounded-xl bg-white p-6 shadow-lg dark:bg-[var(--bg-light)]">
+                            <div className="absolute bottom-4 left-8 right-8 rounded-xl bg-white p-6 shadow-lg dark:bg-[var(--bg-light)] pointer-events-auto z-[1000]">
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                     <div>
                                         <h3 className="text-xl font-semibold text-[var(--text)]">NutriBantay Office</h3>
@@ -362,11 +444,11 @@ export default function Contact() {
                                             Barangay Hall, 123 Main Street, Caloocan City, Metro Manila
                                         </p>
                                     </div>
-                                    <a 
-                                        href="https://maps.google.com" 
-                                        target="_blank" 
+                                    <a
+                                        href="https://maps.google.com/maps?q=14.6507,120.9630"
+                                        target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:bg-opacity-90"
+                                        className="inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:bg-opacity-90 hover:shadow-lg"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707L15 4m0 13V4m0 0L9 7" clipRule="evenodd" />
@@ -394,33 +476,33 @@ export default function Contact() {
                             Find answers to commonly asked questions about our services and programs.
                         </p>
                     </div>
-                    
+
                     <div className="mx-auto grid max-w-4xl gap-6">
                         {/* FAQ Item 1 */}
                         {FAQs.map((faq) => (
-                        <div key={faq.id} className="overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-sm transition-all hover:shadow-md dark:bg-[var(--bg-light)]">
-                            <details className="group">
-                                <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
-                                    <span>{faq.question}</span>
-                                    <span className="ml-6 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-light)] text-[var(--primary)] transition-transform duration-500 ease-in-out group-open:rotate-180 dark:bg-[var(--bg)]">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </span>
-                                </summary>
-                                <div className="overflow-hidden transition-all duration-500 ease-in-out">
-                                    <div className="border-t border-[var(--border)] px-6 pb-6 pt-4">
-                                        <p className="text-[var(--text-muted)]">
-                                           {faq.answer}
-                                        </p>
+                            <div key={faq.id} className="overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-sm transition-all hover:shadow-md dark:bg-[var(--bg-light)]">
+                                <details className="group">
+                                    <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
+                                        <span>{faq.question}</span>
+                                        <span className="ml-6 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-light)] text-[var(--primary)] transition-transform duration-500 ease-in-out group-open:rotate-180 dark:bg-[var(--bg)]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </span>
+                                    </summary>
+                                    <div className="overflow-hidden transition-all duration-500 ease-in-out">
+                                        <div className="border-t border-[var(--border)] px-6 pb-6 pt-4">
+                                            <p className="text-[var(--text-muted)]">
+                                                {faq.answer}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </details>
-                        </div>
+                                </details>
+                            </div>
                         ))}
                     </div>
-                    
-                    
+
+
                     <div className="mt-10 text-center">
                         <p className="text-[var(--text-muted)]">
                             Still have questions? <a href="#contact-form" className="font-medium text-[var(--primary)] hover:underline">Contact our support team</a> for more information.
@@ -434,16 +516,16 @@ export default function Contact() {
                 <div className="absolute inset-0 z-0">
                     <svg className="absolute left-full top-0 h-full w-1/2 -translate-x-1/2 transform" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
                         <g transform="translate(0, 0)">
-                            <path d="M125,-160.4C159.9,-137.3,184.8,-98.2,188.9,-59C193.1,-19.8,176.6,19.6,153.8,52.6C131.1,85.5,102,112,69.1,135.7C36.2,159.4,-0.6,180.3,-41.3,180.5C-82,180.7,-126.7,160.3,-151.2,126.8C-175.7,93.3,-180,46.7,-174.8,4C-169.7,-38.7,-155.1,-77.3,-127.5,-100.5C-100,-123.7,-59.5,-131.3,-17.8,-146.7C23.9,-162,90.1,-183.4,125,-160.4Z" fill="var(--primary-dark)" opacity="0.1"/>
+                            <path d="M125,-160.4C159.9,-137.3,184.8,-98.2,188.9,-59C193.1,-19.8,176.6,19.6,153.8,52.6C131.1,85.5,102,112,69.1,135.7C36.2,159.4,-0.6,180.3,-41.3,180.5C-82,180.7,-126.7,160.3,-151.2,126.8C-175.7,93.3,-180,46.7,-174.8,4C-169.7,-38.7,-155.1,-77.3,-127.5,-100.5C-100,-123.7,-59.5,-131.3,-17.8,-146.7C23.9,-162,90.1,-183.4,125,-160.4Z" fill="var(--primary-dark)" opacity="0.1" />
                         </g>
                     </svg>
                     <svg className="absolute right-full top-0 h-full w-1/2 translate-x-1/2 transform" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
                         <g transform="translate(0, 0)">
-                            <path d="M137.1,-191.3C173.1,-154.1,194.2,-105.5,208.5,-55.8C222.7,-6.1,230.1,44.7,214.4,88.7C198.7,132.7,160,170,114.6,191C69.2,212,17.1,216.6,-35.5,209.7C-88.2,202.8,-141.5,184.4,-181.8,148.2C-222.1,112,-249.5,58,-245.1,7.2C-240.7,-43.6,-204.5,-91.2,-164.1,-129.6C-123.7,-168,-61.9,-197.2,-3.7,-192.9C54.5,-188.5,101.1,-228.5,137.1,-191.3Z" fill="var(--primary-light)" opacity="0.05"/>
+                            <path d="M137.1,-191.3C173.1,-154.1,194.2,-105.5,208.5,-55.8C222.7,-6.1,230.1,44.7,214.4,88.7C198.7,132.7,160,170,114.6,191C69.2,212,17.1,216.6,-35.5,209.7C-88.2,202.8,-141.5,184.4,-181.8,148.2C-222.1,112,-249.5,58,-245.1,7.2C-240.7,-43.6,-204.5,-91.2,-164.1,-129.6C-123.7,-168,-61.9,-197.2,-3.7,-192.9C54.5,-188.5,101.1,-228.5,137.1,-191.3Z" fill="var(--primary-light)" opacity="0.05" />
                         </g>
                     </svg>
                 </div>
-                
+
                 <div className="container relative z-10 mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl text-center">
                         <h2 className="text-3xl font-bold md:text-4xl">

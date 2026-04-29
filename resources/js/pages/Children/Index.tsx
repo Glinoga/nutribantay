@@ -1,10 +1,13 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { readExcel } from '@/utils/excel';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { FileSpreadsheet, Upload, X } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { X } from 'lucide-react';
 import { useState } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 type Child = {
     id: number;
@@ -39,12 +42,7 @@ type IndexProps = {
     flash?: { success?: string };
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Children Records',
-        href: '/children',
-    },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
 type AuthProps = {
     auth?: {
