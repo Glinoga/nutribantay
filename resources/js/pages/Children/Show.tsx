@@ -1,6 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { Inertia } from '@inertiajs/inertia';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { useState } from 'react';
@@ -87,21 +86,21 @@ export default function Show({ child }: { child: Child }) {
 
     const submitNote = (e: React.FormEvent) => {
         e.preventDefault();
-        Inertia.post(`/children/${child.id}/notes`, { note: newNote });
+        router.post(`/children/${child.id}/notes`, { note: newNote });
         setNewNote('');
     };
 
     const deleteNote = (noteId: number) => {
         if (confirm('Delete this note?')) {
-            Inertia.delete(`/children/${child.id}/notes/${noteId}`);
+            router.delete(`/children/${child.id}/notes/${noteId}`);
         }
     };
 
     const deleteHealthLog = (logId: number) => {
         if (confirm('Delete this health log?')) {
-            Inertia.delete(`/healthlogs/${logId}`, {
+            router.delete(`/healthlogs/${logId}`, {
                 onSuccess: () => {
-                    Inertia.reload({ only: ['child'] });
+                    router.reload({ only: ['child'] });
                 },
             });
         }
@@ -396,7 +395,7 @@ export default function Show({ child }: { child: Child }) {
                                                             value={log.vaccine_status ?? 'Pending'}
                                                             onChange={(e) => {
                                                                 if (confirm('Update vaccine status?')) {
-                                                                    Inertia.put(
+                                                                    router.put(
                                                                         `/healthlogs/${log.id}`,
                                                                         {
                                                                             vaccine_status: e.target.value,

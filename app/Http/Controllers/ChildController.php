@@ -36,6 +36,14 @@ class ChildController extends Controller
 
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
 
+        // Calculate stats for the current user's barangay
+        $stats = [
+            'total' => Child::where('barangay', $user->barangay)->count(),
+            'male' => Child::where('barangay', $user->barangay)->where('sex', 'Male')->count(),
+            'female' => Child::where('barangay', $user->barangay)->where('sex', 'Female')->count(),
+            'avgBMI' => number_format(Child::where('barangay', $user->barangay)->whereNotNull('weight')->whereNotNull('height')->get()->avg(fn ($c) => $c->bmi ?? 0) ?? 0, 1),
+        ];
+
         return Inertia::render('Children/Index', [
             'children' => $children->map(fn ($child) => [
                 'id' => $child->id,
@@ -65,6 +73,7 @@ class ChildController extends Controller
                 'from' => $children->firstItem(),
                 'to' => $children->lastItem(),
             ],
+            'stats' => $stats,
         ]);
     }
 

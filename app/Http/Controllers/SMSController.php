@@ -12,14 +12,15 @@ class SMSController extends Controller
     public function index()
     {
         // Get all children with contact numbers (caregiver/parent numbers) for the recipient list
-        $children = Child::select('id', 'name', 'contact_number')
+        $children = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
             ->whereNotNull('contact_number')
             ->where('contact_number', '!=', '')
             ->get()
             ->map(function ($child) {
+                $fullname = trim($child->first_name . ' ' . ($child->middle_initial ? $child->middle_initial . ' ' : '') . $child->last_name);
                 return [
                     'id' => $child->id,
-                    'name' => $child->name . ' (Child)',
+                    'name' => $fullname . ' (Child)',
                     'phone' => $child->contact_number
                 ];
             });
@@ -53,13 +54,21 @@ class SMSController extends Controller
             if ($validated['recipient_type'] === 'all') {
                 $recipients = Child::whereNotNull('contact_number')
                     ->where('contact_number', '!=', '')
-                    ->pluck('contact_number', 'name')
+                    ->get()
+                    ->mapWithKeys(function ($child) {
+                        $fullname = trim($child->first_name . ' ' . ($child->middle_initial ? $child->middle_initial . ' ' : '') . $child->last_name);
+                        return [$fullname => $child->contact_number];
+                    })
                     ->toArray();
             } else {
                 $recipients = Child::whereIn('id', $validated['recipients'])
                     ->whereNotNull('contact_number')
                     ->where('contact_number', '!=', '')
-                    ->pluck('contact_number', 'name')
+                    ->get()
+                    ->mapWithKeys(function ($child) {
+                        $fullname = trim($child->first_name . ' ' . ($child->middle_initial ? $child->middle_initial . ' ' : '') . $child->last_name);
+                        return [$fullname => $child->contact_number];
+                    })
                     ->toArray();
             }
 
