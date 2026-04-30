@@ -20,14 +20,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
-    const { data, setData, post, processing, errors, recentlySuccessful } = useForm({
+    const { data, setData, patch, processing, errors, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/settings/profile', { preserveScroll: true });
+        patch('/settings/profile', { preserveScroll: true });
     };
 
     return (
