@@ -71,6 +71,9 @@ export default function Show({ child }: { child: Child }) {
     const { auth } = usePage<{ auth?: { roles?: string[]; user?: { roles?: string[] } } }>().props;
     const userRoles: string[] = auth?.roles ?? auth?.user?.roles ?? [];
     const isHealthworker = userRoles.some((r: string) => r.toLowerCase().replace(/[\s_]/g, '') === 'healthworker');
+    const isAdmin = userRoles.some((r: string) => r.toLowerCase().replace(/[\s_]/g, '') === 'admin');
+    const canManageHealthlogs = isHealthworker;
+    const canViewAiRecommender = isHealthworker || isAdmin;
 
     // Helper function for status badge colors
     const getStatusBadgeClass = (status: string | null | undefined) => {
@@ -235,7 +238,7 @@ export default function Show({ child }: { child: Child }) {
                         Edit
                     </Link>
 
-                    {isHealthworker && (
+                    {canViewAiRecommender && (
                         <Link
                             href={`/children/${child.id}/healthlogs/create`}
                             className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
@@ -340,7 +343,7 @@ export default function Show({ child }: { child: Child }) {
                                         <th className="px-3 py-2 text-center">Vit A</th>
                                         <th className="px-3 py-2 text-center">Deworming</th>
                                         <th className="px-3 py-2 text-left">Created By</th>
-                                        {isHealthworker && <th className="px-3 py-2 text-center">Edit</th>}
+                                        {canManageHealthlogs && <th className="px-3 py-2 text-center">Edit</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -389,7 +392,7 @@ export default function Show({ child }: { child: Child }) {
                                                 <td className="px-3 py-2 text-center">{log.vitamin_a ? '✓' : '✗'}</td>
                                                 <td className="px-3 py-2 text-center">{log.deworming ? '✓' : '✗'}</td>
                                                 <td className="px-3 py-2">{log.user?.name ?? '-'}</td>
-                                                {isHealthworker && (
+                                                {canViewAiRecommender && (
                                                     <td className="px-3 py-2 text-center">
                                                         <select
                                                             value={log.vaccine_status ?? 'Pending'}
@@ -476,7 +479,7 @@ export default function Show({ child }: { child: Child }) {
                                         <th className="px-3 py-2 text-center">Dose</th>
                                         <th className="px-3 py-2 text-left">Next Due Date</th>
                                         <th className="px-3 py-2 text-center">Status</th>
-                                        {isHealthworker && <th className="px-3 py-2 text-center">Action</th>}
+                                        {canViewAiRecommender && <th className="px-3 py-2 text-center">Action</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -503,7 +506,7 @@ export default function Show({ child }: { child: Child }) {
                                                         {log.vaccine_status || 'Pending'}
                                                     </span>
                                                 </td>
-                                                {isHealthworker && (
+                                                {canViewAiRecommender && (
                                                     <td className="px-3 py-2 text-center">
                                                         <Link href={`/healthlogs/${log.id}/edit`} className="text-sm text-blue-600 hover:underline">
                                                             Edit
@@ -523,7 +526,7 @@ export default function Show({ child }: { child: Child }) {
                 </div>
 
                 {/* AI Recommender Section */}
-                {isHealthworker && (
+                {canManageHealthlogs && (
                     <div className="mt-8 rounded-lg bg-green-50 p-6 shadow">
                         <h2 className="mb-4 text-xl font-bold text-green-700">AI Nutrition Recommendation</h2>
                         <p className="mb-4 text-sm text-gray-600">
