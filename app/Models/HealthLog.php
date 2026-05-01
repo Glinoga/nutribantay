@@ -70,7 +70,7 @@ class HealthLog extends Model
      */
     public function getVaccineStatusAttribute($value)
     {
-        if (!$this->vaccine_name) {
+        if (! $this->vaccine_name) {
             return null;
         }
 

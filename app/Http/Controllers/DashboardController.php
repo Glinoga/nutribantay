@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Models\ChildVaccineDose;
 use App\Models\HealthLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -165,6 +166,52 @@ class DashboardController extends Controller
             'stunted' => $last6MonthsLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
         ];
 
+        // Vaccine follow-ups
+        $pendingDoses = ChildVaccineDose::whereNull('date_given')
+            ->whereNotNull('next_due_date')
+            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $barangay))
+            ->with([
+                'childVaccine.child:id,first_name,middle_initial,last_name,barangay',
+                'childVaccine.vaccine:id,name',
+            ])
+            ->get();
+
+        $overdueDoses = $pendingDoses->filter(fn ($dose) => $dose->next_due_date && $dose->next_due_date->isPast());
+
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        $dueThisMonth = $pendingDoses->filter(fn ($dose) => $dose->next_due_date
+            && $dose->next_due_date->between($startOfMonth, $endOfMonth));
+
+        $followUps = [];
+
+        foreach ($overdueDoses as $dose) {
+            $cv = $dose->childVaccine;
+            $followUps[] = [
+                'child_id' => $cv->child->id,
+                'child_name' => $cv->child->fullname,
+                'vaccine_name' => $cv->vaccine->name,
+                'dose_number' => $dose->dose_number,
+                'next_due_date' => $dose->next_due_date->format('Y-m-d'),
+                'status' => 'Overdue',
+            ];
+        }
+
+        foreach ($dueThisMonth as $dose) {
+            if ($overdueDoses->contains('id', $dose->id)) {
+                continue;
+            }
+            $cv = $dose->childVaccine;
+            $followUps[] = [
+                'child_id' => $cv->child->id,
+                'child_name' => $cv->child->fullname,
+                'vaccine_name' => $cv->vaccine->name,
+                'dose_number' => $dose->dose_number,
+                'next_due_date' => $dose->next_due_date->format('Y-m-d'),
+                'status' => 'Upcoming',
+            ];
+        }
+
         return Inertia::render('dashboard', [
             'stats' => [
                 'total_children' => $totalChildren,
@@ -204,6 +251,11 @@ class DashboardController extends Controller
                 'monthly_1year' => $monthlyTrend12,
                 'status_distribution' => $statusDistribution,
             ],
+            'vaccine_followups' => [
+                'overdue_count' => $overdueDoses->count(),
+                'due_this_month_count' => $dueThisMonth->count(),
+                'follow_ups' => $followUps,
+            ],
             'user_barangay' => $barangay,
             'is_admin' => $isAdmin,
         ]);
@@ -227,6 +279,81 @@ class DashboardController extends Controller
             ->get();
 
         return $this->exportCSV($healthlogs, $period);
+    }
+
+    private function getPeriodAwareTrends(string $period, string $barangay): array
+    {
+        $query = fn () => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay));
+
+        switch ($period) {
+            case 'daily':
+                $labels = [];
+                $counts = [];
+                for ($i = 6; $i >= 0; $i--) {
+                    $date = Carbon::now()->subDays($i);
+                    $labels[] = $date->format('M d');
+                    $counts[] = $query()->whereDate('created_at', $date)->count();
+                }
+                break;
+
+            case 'weekly':
+                $labels = [];
+                $counts = [];
+                for ($i = 3; $i >= 0; $i--) {
+                    $start = Carbon::now()->subWeeks($i)->startOfWeek();
+                    $end = $start->copy()->endOfWeek();
+                    $labels[] = $start->format('M d').' - '.$end->format('M d');
+                    $counts[] = $query()->whereBetween('created_at', [$start, $end])->count();
+                }
+                break;
+
+            case 'monthly':
+                $labels = [];
+                $counts = [];
+                for ($i = 5; $i >= 0; $i--) {
+                    $month = Carbon::now()->subMonths($i);
+                    $labels[] = $month->format('M Y');
+                    $counts[] = $query()
+                        ->whereYear('created_at', $month->year)
+                        ->whereMonth('created_at', $month->month)
+                        ->count();
+                }
+                break;
+
+            case 'yearly':
+            default:
+                $labels = [];
+                $counts = [];
+                for ($i = 2; $i >= 0; $i--) {
+                    $year = Carbon::now()->subYears($i);
+                    $labels[] = $year->format('Y');
+                    $counts[] = $query()->whereYear('created_at', $year->year)->count();
+                }
+                break;
+        }
+
+        $trendLogs = match ($period) {
+            'daily' => $query()->where('created_at', '>=', Carbon::now()->subDays(7))->get(),
+            'weekly' => $query()->where('created_at', '>=', Carbon::now()->subWeeks(4))->get(),
+            'monthly' => $query()->where('created_at', '>=', Carbon::now()->subMonths(6))->get(),
+            default => $query()->where('created_at', '>=', Carbon::now()->subYears(3))->get(),
+        };
+
+        $statusDistribution = [
+            'normal' => $trendLogs->where('nutrition_status', 'Normal')->count(),
+            'underweight' => $trendLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
+            'overweight' => $trendLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
+            'stunted' => $trendLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+        ];
+
+        $total = $trendLogs->count();
+
+        return [
+            'trend' => collect(array_map(fn ($l, $c) => ['label' => $l, 'count' => $c], $labels, $counts)),
+            'status_distribution' => $statusDistribution,
+            'vitamin_a_percentage' => $total > 0 ? round(($trendLogs->where('vitamin_a', true)->count() / $total) * 100, 1) : 0,
+            'deworming_percentage' => $total > 0 ? round(($trendLogs->where('deworming', true)->count() / $total) * 100, 1) : 0,
+        ];
     }
 
     public function printView(Request $request)
@@ -260,11 +387,15 @@ class DashboardController extends Controller
         $vitaminA = $healthlogs->where('vitamin_a', true)->count();
         $deworming = $healthlogs->where('deworming', true)->count();
 
+        // Get period-aware trend data for charts
+        $trends = $this->getPeriodAwareTrends($period, $barangay);
+
         return Inertia::render('DashboardPrint', [
             'period' => $period,
             'data' => [
                 'healthlogs' => $healthlogs->values()->map(fn ($log) => [
                     'child_name' => $log->child->fullname ?? '',
+                    'birthdate' => $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
                     'age' => $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),
                     'sex' => $log->child->sex ?? '',
                     'weight' => $log->weight,
@@ -273,6 +404,7 @@ class DashboardController extends Controller
                     'nutrition_status' => $log->nutrition_status ?? 'N/A',
                     'vitamin_a' => $log->vitamin_a ? 'Yes' : 'No',
                     'deworming' => $log->deworming ? 'Yes' : 'No',
+                    'micronutrient_powder' => $log->micronutrient_powder ? 'Yes' : 'No',
                     'last_visit' => $log->created_at ? Carbon::parse($log->created_at)->format('Y-m-d') : '',
                 ])->values()->all(),
                 'summary' => [
@@ -285,23 +417,61 @@ class DashboardController extends Controller
                 ],
                 'barangay' => $barangay,
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'trends' => [
+                    'trend' => $trends['trend']->values()->all(),
+                    'status_distribution' => $trends['status_distribution'],
+                    'vitamin_a_percentage' => $trends['vitamin_a_percentage'],
+                    'deworming_percentage' => $trends['deworming_percentage'],
+                ],
             ],
         ]);
     }
 
     private function exportCSV($healthlogs, string $period)
     {
+        $range = $this->getDateRange($period);
+        $user = auth()->user();
+        $barangay = $user->barangay;
+
+        // Compute summary stats
+        $latestLogs = $healthlogs->groupBy('child_id')->map(fn ($logs) => $logs->first());
+        $totalChildren = $latestLogs->count();
+        $normal = $latestLogs->where('nutrition_status', 'Normal')->count();
+        $underweight = $latestLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count();
+        $overweight = $latestLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count();
+        $stunted = $latestLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count();
+        $vitaminA = $latestLogs->where('vitamin_a', true)->count();
+        $deworming = $latestLogs->where('deworming', true)->count();
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="dashboard_'.$period.'_'.date('Y-m-d').'.csv"',
         ];
 
-        $callback = function () use ($healthlogs) {
+        $callback = function () use ($healthlogs, $period, $range, $totalChildren, $normal, $underweight, $overweight, $stunted, $vitaminA, $deworming, $barangay) {
             $handle = fopen('php://output', 'w');
 
-            // Header row
+            // Summary header rows
+            fputcsv($handle, ['Report Period', ucfirst($period)]);
+            fputcsv($handle, ['Barangay', $barangay]);
+            fputcsv($handle, ['Date Range', $range['start']->format('Y-m-d').' to '.$range['end']->format('Y-m-d')]);
+            fputcsv($handle, ['Generated', Carbon::now()->format('Y-m-d H:i:s')]);
+            fputcsv($handle, []);
+
+            fputcsv($handle, ['Summary', '']);
+            fputcsv($handle, ['Total Children', $totalChildren]);
+            fputcsv($handle, ['Normal', $normal]);
+            fputcsv($handle, ['Underweight', $underweight]);
+            fputcsv($handle, ['Overweight', $overweight]);
+            fputcsv($handle, ['Stunted', $stunted]);
+            fputcsv($handle, ['Vitamin A Given', $vitaminA]);
+            fputcsv($handle, ['Deworming Given', $deworming]);
+            fputcsv($handle, []);
+
+            // Data header row
             fputcsv($handle, [
                 'Child Name',
+                'Birthday',
                 'Age (Months)',
                 'Sex',
                 'Weight (kg)',
@@ -310,6 +480,7 @@ class DashboardController extends Controller
                 'Nutrition Status',
                 'Vitamin A',
                 'Deworming',
+                'MNP',
                 'Last Visit',
             ]);
 
@@ -317,6 +488,7 @@ class DashboardController extends Controller
             foreach ($healthlogs as $log) {
                 fputcsv($handle, [
                     $log->child->fullname ?? '',
+                    $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
                     $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),
                     $log->child->sex ?? '',
                     $log->weight ?? '',
@@ -325,6 +497,7 @@ class DashboardController extends Controller
                     $log->nutrition_status ?? 'N/A',
                     $log->vitamin_a ? 'Yes' : 'No',
                     $log->deworming ? 'Yes' : 'No',
+                    $log->micronutrient_powder ? 'Yes' : 'No',
                     $log->created_at ? Carbon::parse($log->created_at)->format('Y-m-d') : '',
                 ]);
             }

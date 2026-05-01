@@ -1,0 +1,196 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Child;
+use App\Models\ChildVaccine;
+use App\Models\ChildVaccineDose;
+use App\Models\Vaccine;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class ChildVaccineController extends Controller
+{
+    public function index(Child $child)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $childVaccines = ChildVaccine::where('child_id', $child->id)
+            ->with(['vaccine', 'doses.administeredBy:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $availableVaccines = Vaccine::whereNotIn(
+            'id',
+            $childVaccines->pluck('vaccine_id')
+        )->orderBy('name')->get();
+
+        return Inertia::render('Children/Vaccines', [
+            'child' => [
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'barangay' => $child->barangay,
+            ],
+            'child_vaccines' => $childVaccines->map(fn ($cv) => [
+                'id' => $cv->id,
+                'vaccine' => $cv->vaccine,
+                'progress' => $cv->progress,
+                'doses' => $cv->doses->map(fn ($dose) => [
+                    'id' => $dose->id,
+                    'dose_number' => $dose->dose_number,
+                    'date_given' => $dose->date_given?->format('Y-m-d'),
+                    'next_due_date' => $dose->next_due_date?->format('Y-m-d'),
+                    'remarks' => $dose->remarks,
+                    'dose_status' => $dose->dose_status,
+                    'administered_by' => $dose->administeredBy?->name,
+                ]),
+            ]),
+            'available_vaccines' => $availableVaccines->map(fn ($v) => [
+                'id' => $v->id,
+                'name' => $v->name,
+            ]),
+        ]);
+    }
+
+    public function store(Request $request, Child $child)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $request->validate([
+            'vaccine_id' => 'required|exists:vaccines,id',
+        ]);
+
+        $existing = ChildVaccine::where('child_id', $child->id)
+            ->where('vaccine_id', $request->vaccine_id)
+            ->first();
+
+        if ($existing) {
+            return back()->with('error', 'Vaccine is already assigned to this child.');
+        }
+
+        ChildVaccine::create([
+            'child_id' => $child->id,
+            'vaccine_id' => $request->vaccine_id,
+        ]);
+
+        return back()->with('success', 'Vaccine added to child.');
+    }
+
+    public function destroy(Child $child, ChildVaccine $childVaccine)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        if ($childVaccine->child_id !== $child->id) {
+            abort(404);
+        }
+
+        $childVaccine->delete();
+
+        return back()->with('success', 'Vaccine removed from child.');
+    }
+
+    public function recordDose(Request $request, Child $child, ChildVaccine $childVaccine)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        if ($childVaccine->child_id !== $child->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'dose_number' => 'required|integer|min:1',
+            'date_given' => 'nullable|date',
+            'next_due_date' => 'nullable|date',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $doseNumber = (int) $request->dose_number;
+
+        $duplicate = ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
+            ->where('dose_number', $doseNumber)
+            ->exists();
+
+        if ($duplicate) {
+            return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vaccine.']);
+        }
+
+        ChildVaccineDose::create([
+            'child_vaccine_id' => $childVaccine->id,
+            'dose_number' => $doseNumber,
+            'date_given' => $request->date_given ?: null,
+            'next_due_date' => $request->next_due_date ?: null,
+            'remarks' => $request->remarks,
+            'administered_by' => $user->id,
+        ]);
+
+        return back()->with('success', 'Dose recorded successfully.');
+    }
+
+    public function updateDose(Request $request, Child $child, ChildVaccine $childVaccine, ChildVaccineDose $dose)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        if ($childVaccine->child_id !== $child->id) {
+            abort(404);
+        }
+
+        if ($dose->child_vaccine_id !== $childVaccine->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'date_given' => 'nullable|date',
+            'next_due_date' => 'nullable|date',
+            'remarks' => 'nullable|string|max:1000',
+        ]);
+
+        $dose->update([
+            'date_given' => $request->date_given ?: null,
+            'next_due_date' => $request->next_due_date ?: null,
+            'remarks' => $request->remarks,
+        ]);
+
+        return back()->with('success', 'Dose updated successfully.');
+    }
+
+    public function destroyDose(Child $child, ChildVaccine $childVaccine, ChildVaccineDose $dose)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        if ($childVaccine->child_id !== $child->id) {
+            abort(404);
+        }
+
+        if ($dose->child_vaccine_id !== $childVaccine->id) {
+            abort(404);
+        }
+
+        $dose->delete();
+
+        return back()->with('success', 'Dose deleted.');
+    }
+}

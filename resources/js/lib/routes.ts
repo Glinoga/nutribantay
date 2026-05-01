@@ -12,6 +12,11 @@ export function route(name: string, params?: Record<string, string | number>): s
         'sms.index': '/admin/sendsms',
         'sms.send': '/admin/sendsms',
 
+        // Vaccine routes
+        'vaccines.index': '/vaccines',
+        'vaccines.create': '/vaccines/create',
+        'vaccines.edit': '/vaccines/{vaccine}/edit',
+
         home: '/',
         // Guest routes
         'guest.contact': '/guest/contact',

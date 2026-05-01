@@ -10,7 +10,7 @@ class Category extends Model
         'name',
         'slug',
         'color',
-        'description'
+        'description',
     ];
 
     public function announcements()
@@ -18,7 +18,7 @@ class Category extends Model
         return $this->hasMany(Announcement::class);
     }
 
-        public static function availableColors()
+    public static function availableColors()
     {
         return [
             'blue' => 'Blue',

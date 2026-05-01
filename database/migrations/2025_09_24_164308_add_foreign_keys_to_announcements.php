@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->dropColumn('category_id');
             }
         });
-        
+
         // Then add the category_id column with proper foreign key
         Schema::table('announcements', function (Blueprint $table) {
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->dropForeign(['category_id']);
             $table->dropColumn('category_id');
         });
-        
+
         Schema::table('announcements', function (Blueprint $table) {
             $table->string('category')->nullable();
         });

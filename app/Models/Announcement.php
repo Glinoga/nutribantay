@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Announcement extends Model
 {
@@ -15,7 +14,7 @@ class Announcement extends Model
         'category_id',
         'summary',
         'content',
-        'image'
+        'image',
     ];
 
     public function category()

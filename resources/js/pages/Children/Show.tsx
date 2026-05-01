@@ -26,7 +26,7 @@ type HealthLog = {
     vitamin_a: boolean;
     deworming: boolean;
     micronutrient_powder: string | null;
-    ruf: string | null;
+    rutf: string | null;
     rusf: string | null;
     complementary_food: string | null;
     vaccine_name: string | null;
@@ -67,6 +67,7 @@ export default function Show({ child }: { child: Child }) {
     const logsPerPage = 10;
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [selectedLog, setSelectedLog] = useState<HealthLog | null>(null);
 
     const { auth } = usePage<{ auth?: { roles?: string[]; user?: { roles?: string[] } } }>().props;
     const userRoles: string[] = auth?.roles ?? auth?.user?.roles ?? [];
@@ -238,7 +239,7 @@ export default function Show({ child }: { child: Child }) {
                         Edit
                     </Link>
 
-                    {canViewAiRecommender && (
+                    {canManageHealthlogs && (
                         <Link
                             href={`/children/${child.id}/healthlogs/create`}
                             className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
@@ -246,6 +247,10 @@ export default function Show({ child }: { child: Child }) {
                             Add Health Log
                         </Link>
                     )}
+
+                    <Link href={`/children/${child.id}/vaccines`} className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">
+                        Vaccine Tracker
+                    </Link>
 
                     <Link href="/children" className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
                         Back to List
@@ -342,6 +347,7 @@ export default function Show({ child }: { child: Child }) {
                                         <th className="px-3 py-2 text-center">Status WFL</th>
                                         <th className="px-3 py-2 text-center">Vit A</th>
                                         <th className="px-3 py-2 text-center">Deworming</th>
+                                        <th className="px-3 py-2 text-center">MNP</th>
                                         <th className="px-3 py-2 text-left">Created By</th>
                                         {canManageHealthlogs && <th className="px-3 py-2 text-center">Edit</th>}
                                     </tr>
@@ -356,7 +362,9 @@ export default function Show({ child }: { child: Child }) {
                                         return paginatedLogs.map((log) => (
                                             <tr key={log.id} className="border-t hover:bg-gray-50">
                                                 <td className="px-3 py-2">
-                                                    {log.created_at ? new Date(log.created_at).toLocaleDateString() : 'N/A'}
+                                                    <button onClick={() => setSelectedLog(log)} className="text-left text-blue-600 hover:underline">
+                                                        {log.created_at ? new Date(log.created_at).toLocaleDateString() : 'N/A'}
+                                                    </button>
                                                 </td>
                                                 <td className="px-3 py-2">{log.weight ?? '-'}</td>
                                                 <td className="px-3 py-2">{log.height ?? '-'}</td>
@@ -391,6 +399,7 @@ export default function Show({ child }: { child: Child }) {
                                                 </td>
                                                 <td className="px-3 py-2 text-center">{log.vitamin_a ? '✓' : '✗'}</td>
                                                 <td className="px-3 py-2 text-center">{log.deworming ? '✓' : '✗'}</td>
+                                                <td className="px-3 py-2 text-center">{log.micronutrient_powder ? '✓' : '✗'}</td>
                                                 <td className="px-3 py-2">{log.user?.name ?? '-'}</td>
                                                 {canViewAiRecommender && (
                                                     <td className="px-3 py-2 text-center">
@@ -466,10 +475,17 @@ export default function Show({ child }: { child: Child }) {
                     </div>
                 )}
 
-                {/* Vaccine Records Section */}
-                <div className="mt-8">
-                    <h2 className="mb-4 text-xl font-bold">Vaccine Records</h2>
-                    {healthlogs.filter((log) => log.vaccine_name).length > 0 ? (
+                {/* Vaccine Records Section (Legacy - Historical Only) */}
+                {healthlogs.filter((log) => log.vaccine_name).length > 0 && (
+                    <div className="mt-8">
+                        <h2 className="mb-4 text-xl font-bold">Historical Vaccine Records</h2>
+                        <p className="mb-2 text-sm text-gray-500">
+                            These records are from the old health log system.{' '}
+                            <Link href={`/children/${child.id}/vaccines`} className="text-blue-600 hover:underline">
+                                Use the Vaccine Tracker
+                            </Link>{' '}
+                            for current vaccine management.
+                        </p>
                         <div className="overflow-x-auto rounded-lg bg-white shadow">
                             <table className="w-full text-sm">
                                 <thead className="bg-gray-100">
@@ -479,7 +495,6 @@ export default function Show({ child }: { child: Child }) {
                                         <th className="px-3 py-2 text-center">Dose</th>
                                         <th className="px-3 py-2 text-left">Next Due Date</th>
                                         <th className="px-3 py-2 text-center">Status</th>
-                                        {canViewAiRecommender && <th className="px-3 py-2 text-center">Action</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -506,27 +521,16 @@ export default function Show({ child }: { child: Child }) {
                                                         {log.vaccine_status || 'Pending'}
                                                     </span>
                                                 </td>
-                                                {canViewAiRecommender && (
-                                                    <td className="px-3 py-2 text-center">
-                                                        <Link href={`/healthlogs/${log.id}/edit`} className="text-sm text-blue-600 hover:underline">
-                                                            Edit
-                                                        </Link>
-                                                    </td>
-                                                )}
                                             </tr>
                                         ))}
                                 </tbody>
                             </table>
                         </div>
-                    ) : (
-                        <div className="rounded-lg bg-gray-100 p-6 text-center">
-                            <p className="text-gray-500">No vaccine records yet. Add a health log with vaccine information.</p>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {/* AI Recommender Section */}
-                {canManageHealthlogs && (
+                {canViewAiRecommender && (
                     <div className="mt-8 rounded-lg bg-green-50 p-6 shadow">
                         <h2 className="mb-4 text-xl font-bold text-green-700">AI Nutrition Recommendation</h2>
                         <p className="mb-4 text-sm text-gray-600">
@@ -553,6 +557,192 @@ export default function Show({ child }: { child: Child }) {
                 )}
 
                 {/* Floating Notes Button */}
+                {/* Health Log Detail Modal */}
+                {selectedLog && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedLog(null)}>
+                        <div
+                            className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-4 flex items-center justify-between">
+                                <h2 className="text-xl font-bold">Health Log Details</h2>
+                                <button onClick={() => setSelectedLog(null)} className="rounded bg-gray-200 px-3 py-1 hover:bg-gray-300">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {/* Measurements */}
+                                <div>
+                                    <h3 className="mb-2 font-semibold text-gray-700">Measurements</h3>
+                                    <div className="grid grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Weight</p>
+                                            <p className="font-medium">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Height</p>
+                                            <p className="font-medium">{selectedLog.height ? `${selectedLog.height} cm` : 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">BMI</p>
+                                            <p className="font-medium">{selectedLog.bmi ?? 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Nutrition Status */}
+                                <div>
+                                    <h3 className="mb-2 font-semibold text-gray-700">Nutrition Status</h3>
+                                    <div className="grid grid-cols-4 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Overall</p>
+                                            <span
+                                                className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(selectedLog.nutrition_status)}`}
+                                            >
+                                                {selectedLog.nutrition_status ?? '-'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">WFA</p>
+                                            <span
+                                                className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(selectedLog.status_wfa)}`}
+                                            >
+                                                {selectedLog.status_wfa ?? '-'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">LFA</p>
+                                            <span
+                                                className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(selectedLog.status_lfa)}`}
+                                            >
+                                                {selectedLog.status_lfa ?? '-'}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">WFL/WFH</p>
+                                            <span
+                                                className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${getStatusBadgeClass(selectedLog.status_wfl_wfh)}`}
+                                            >
+                                                {selectedLog.status_wfl_wfh ?? '-'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Supplements */}
+                                <div>
+                                    <h3 className="mb-2 font-semibold text-gray-700">Supplements & Programs</h3>
+                                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Vitamin A:</span>
+                                            <span>{selectedLog.vitamin_a ? '✓ Yes' : '✗ No'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Deworming:</span>
+                                            <span>{selectedLog.deworming ? '✓ Yes' : '✗ No'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Micronutrient Powder (MNP):</span>
+                                            <span>{selectedLog.micronutrient_powder ? selectedLog.micronutrient_powder : '✗ No'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">Complementary Food:</span>
+                                            <span>{selectedLog.complementary_food ? selectedLog.complementary_food : '✗ No'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">RUTF (Severely Wasted):</span>
+                                            <span>{selectedLog.rutf ? selectedLog.rutf : '✗ No'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-medium">RUSF (Moderately Wasted):</span>
+                                            <span>{selectedLog.rusf ? selectedLog.rusf : '✗ No'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Vaccine */}
+                                <div>
+                                    <h3 className="mb-2 font-semibold text-gray-700">Vaccination</h3>
+                                    <div className="rounded-lg bg-gray-50 p-4">
+                                        {selectedLog.vaccine_name ? (
+                                            <div className="grid grid-cols-4 gap-4">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Vaccine Name</p>
+                                                    <p className="font-medium">{selectedLog.vaccine_name}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Dose Number</p>
+                                                    <p className="font-medium">{selectedLog.dose_number ?? '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Date Given</p>
+                                                    <p className="font-medium">
+                                                        {selectedLog.date_given ? new Date(selectedLog.date_given).toLocaleDateString() : '-'}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Next Due Date</p>
+                                                    <p className="font-medium">
+                                                        {selectedLog.next_due_date ? new Date(selectedLog.next_due_date).toLocaleDateString() : '-'}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Status</p>
+                                                    <span
+                                                        className={`mt-1 inline-block rounded px-2 py-0.5 text-xs ${
+                                                            (selectedLog.vaccine_status || 'Pending') === 'Completed'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : (selectedLog.vaccine_status || 'Pending') === 'Overdue'
+                                                                  ? 'bg-red-100 text-red-800'
+                                                                  : 'bg-yellow-100 text-yellow-800'
+                                                        }`}
+                                                    >
+                                                        {selectedLog.vaccine_status || 'Pending'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <p className="text-gray-500">No vaccine information recorded.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Metadata */}
+                                <div>
+                                    <h3 className="mb-2 font-semibold text-gray-700">Record Info</h3>
+                                    <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Created By</p>
+                                            <p className="font-medium">{selectedLog.user?.name ?? '-'}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm text-gray-500">Date Logged</p>
+                                            <p className="font-medium">
+                                                {selectedLog.created_at ? new Date(selectedLog.created_at).toLocaleString() : '-'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex gap-2">
+                                {canManageHealthlogs && (
+                                    <Link
+                                        href={`/healthlogs/${selectedLog.id}/edit`}
+                                        className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                                    >
+                                        Edit
+                                    </Link>
+                                )}
+                                <button onClick={() => setSelectedLog(null)} className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <button
                     className="fixed top-36 right-4 z-50 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                     onClick={() => setNotesOpen(!notesOpen)}

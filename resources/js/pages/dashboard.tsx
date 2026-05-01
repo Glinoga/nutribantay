@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
@@ -57,9 +57,25 @@ type TrendData = {
     };
 };
 
+type VaccineFollowup = {
+    child_id: number;
+    child_name: string;
+    vaccine_name: string;
+    dose_number: number;
+    next_due_date: string;
+    status: 'Overdue' | 'Upcoming';
+};
+
+type VaccineFollowups = {
+    overdue_count: number;
+    due_this_month_count: number;
+    follow_ups: VaccineFollowup[];
+};
+
 type DashboardProps = {
     stats: Stats;
     trends: TrendData;
+    vaccine_followups: VaccineFollowups;
     user_barangay: string;
     is_admin: boolean;
 };
@@ -71,7 +87,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ stats, trends, user_barangay, is_admin }: DashboardProps) {
+export default function Dashboard({ stats, trends, vaccine_followups, user_barangay }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
@@ -166,6 +182,96 @@ export default function Dashboard({ stats, trends, user_barangay, is_admin }: Da
                         <p className="text-4xl font-bold">{stats.total_children}</p>
                     </div>
                 </div>
+
+                {vaccine_followups.overdue_count > 0 || vaccine_followups.due_this_month_count > 0 ? (
+                    <div className="mb-6">
+                        <div className="rounded-lg border border-amber-200 bg-amber-50 shadow">
+                            <div className="flex items-center justify-between border-b border-amber-200 px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                    <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                                        />
+                                    </svg>
+                                    <div>
+                                        <h2 className="text-lg font-semibold text-amber-900">Vaccine Follow-ups Needed</h2>
+                                        <p className="text-sm text-amber-700">
+                                            {vaccine_followups.overdue_count > 0 && (
+                                                <span className="font-medium text-red-700">{vaccine_followups.overdue_count} overdue</span>
+                                            )}
+                                            {vaccine_followups.overdue_count > 0 && vaccine_followups.due_this_month_count > 0 && <span>, </span>}
+                                            {vaccine_followups.due_this_month_count > 0 && (
+                                                <span className="font-medium text-amber-700">
+                                                    {vaccine_followups.due_this_month_count} due this month
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Link
+                                        href="/children?vaccine_status=overdue"
+                                        className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+                                    >
+                                        View Overdue
+                                    </Link>
+                                    <Link
+                                        href="/children?vaccine_status=upcoming"
+                                        className="rounded bg-amber-600 px-4 py-2 text-sm text-white hover:bg-amber-700"
+                                    >
+                                        View Upcoming
+                                    </Link>
+                                </div>
+                            </div>
+                            {vaccine_followups.follow_ups.length > 0 && (
+                                <div className="max-h-64 overflow-y-auto">
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-amber-100/50">
+                                            <tr>
+                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Child</th>
+                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Vaccine</th>
+                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Dose #</th>
+                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Due Date</th>
+                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {vaccine_followups.follow_ups.slice(0, 10).map((fu, idx) => (
+                                                <tr key={idx} className="border-t border-amber-100">
+                                                    <td className="px-6 py-2">
+                                                        <Link href={`/children/${fu.child_id}`} className="text-blue-600 hover:underline">
+                                                            {fu.child_name}
+                                                        </Link>
+                                                    </td>
+                                                    <td className="px-6 py-2">{fu.vaccine_name}</td>
+                                                    <td className="px-6 py-2">{fu.dose_number}</td>
+                                                    <td className="px-6 py-2">{fu.next_due_date}</td>
+                                                    <td className="px-6 py-2">
+                                                        <span
+                                                            className={`rounded px-2 py-0.5 text-xs font-medium ${
+                                                                fu.status === 'Overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
+                                                            }`}
+                                                        >
+                                                            {fu.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    {vaccine_followups.follow_ups.length > 10 && (
+                                        <div className="border-t border-amber-100 px-6 py-2 text-center text-sm text-amber-600">
+                                            ...and {vaccine_followups.follow_ups.length - 10} more
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : null}
 
                 <div className="mb-6">
                     <h2 className="mb-3 text-lg font-semibold">Age Breakdown</h2>

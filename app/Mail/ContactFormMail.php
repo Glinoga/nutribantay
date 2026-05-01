@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -13,7 +12,9 @@ use Illuminate\Queue\SerializesModels;
 class ContactFormMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $data;
+
     private $emailUsername;
 
     /**
@@ -44,7 +45,7 @@ class ContactFormMail extends Mailable
         return new Content(
             view: 'emails.contact-form',
             with: [
-                'name' => $this->data['first_name'] . ' ' . $this->data['last_name'],
+                'name' => $this->data['first_name'].' '.$this->data['last_name'],
                 'email' => $this->data['email'],
                 'phone' => $this->data['phone'] ?? 'Not provided',
                 'subject' => $this->data['subject'],

@@ -8,7 +8,7 @@ type HealthLogForm = {
     bmi: string | number;
     nutrition_status: string;
     micronutrient_powder: string;
-    ruf: string;
+    rutf: string;
     rusf: string;
     complementary_food: string;
     vitamin_a: boolean;
@@ -26,7 +26,7 @@ type HealthLog = {
     bmi?: number | null;
     nutrition_status?: string | null;
     micronutrient_powder?: string | null;
-    ruf?: string | null;
+    rutf?: string | null;
     rusf?: string | null;
     complementary_food?: string | null;
     vitamin_a?: boolean;
@@ -49,7 +49,7 @@ export default function Edit({ healthlog }: { healthlog: HealthLog }) {
         nutrition_status: healthlog.nutrition_status ?? '',
 
         micronutrient_powder: healthlog.micronutrient_powder ?? '',
-        ruf: healthlog.ruf ?? '',
+        rutf: healthlog.rutf ?? '',
         rusf: healthlog.rusf ?? '',
         complementary_food: healthlog.complementary_food ?? '',
         vitamin_a: !!healthlog.vitamin_a,
@@ -148,12 +148,12 @@ export default function Edit({ healthlog }: { healthlog: HealthLog }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block font-medium">RUF</label>
-                            <input value={data.ruf} onChange={(e) => setData('ruf', e.target.value)} className="w-full rounded border px-3 py-2" />
+                            <label className="block font-medium">RUTF (Severely Wasted)</label>
+                            <input value={data.rutf} onChange={(e) => setData('rutf', e.target.value)} className="w-full rounded border px-3 py-2" />
                         </div>
 
                         <div>
-                            <label className="block font-medium">RUSF</label>
+                            <label className="block font-medium">RUSF (Moderately Wasted)</label>
                             <input value={data.rusf} onChange={(e) => setData('rusf', e.target.value)} className="w-full rounded border px-3 py-2" />
                         </div>
                     </div>

@@ -25,7 +25,7 @@ import {
     Users,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
@@ -46,6 +46,7 @@ type Child = {
     address?: string | null;
     barangay?: string | null;
     creator?: { name: string | null };
+    vaccine_alert?: 'overdue' | 'upcoming' | null;
 };
 
 type Pagination = {
@@ -62,6 +63,8 @@ type Stats = {
     male: number;
     female: number;
     avgBMI: string;
+    vaccine_overdue: number;
+    vaccine_upcoming: number;
 };
 
 type IndexProps = {
@@ -71,6 +74,7 @@ type IndexProps = {
     sex?: string;
     flash?: { success?: string };
     stats: Stats;
+    vaccine_status?: 'overdue' | 'upcoming' | null;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
@@ -82,10 +86,16 @@ type AuthProps = {
     };
 };
 
-export default function Index({ children, pagination, search = '', sex = '', flash, stats }: IndexProps) {
+export default function Index({ children, pagination, search = '', sex = '', flash, stats, vaccine_status = null }: IndexProps) {
     const { auth } = usePage<AuthProps>().props;
     const [searchQuery, setSearchQuery] = useState(search);
-    const [selectedSex, setSelectedSex] = useState(sex);
+
+    useEffect(() => {
+        setSearchQuery(search);
+    }, [search]);
+
+    const activeSex = sex || '';
+    const activeVaccine = vaccine_status || '';
 
     const roles = auth?.roles ?? [];
     const isHealthworker = roles.includes('Healthworker');
@@ -228,17 +238,34 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            router.get('/children', { search: searchQuery, sex: selectedSex === 'all' ? '' : selectedSex }, { replace: true });
+            const params: Record<string, string> = { search: searchQuery };
+            if (activeSex) params.sex = activeSex;
+            if (activeVaccine) params.vaccine_status = activeVaccine;
+            router.get('/children', params, { replace: true });
         }
     };
 
     const handleSexFilter = (sexValue: string) => {
-        setSelectedSex(sexValue);
-        router.get('/children', { search: searchQuery, sex: sexValue === 'all' ? '' : sexValue }, { replace: true });
+        const params: Record<string, string> = {};
+        if (sexValue !== 'all') params.sex = sexValue;
+        if (searchQuery) params.search = searchQuery;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
+        router.get('/children', params, { replace: true });
+    };
+
+    const handleVaccineFilter = (vaccineValue: string) => {
+        const params: Record<string, string> = {};
+        if (vaccineValue !== 'all') params.vaccine_status = vaccineValue;
+        if (searchQuery) params.search = searchQuery;
+        if (activeSex) params.sex = activeSex;
+        router.get('/children', params, { replace: true });
     };
 
     const handlePageClick = (page: number) => {
-        router.get('/children', { page, search: searchQuery, sex: selectedSex === 'all' ? '' : selectedSex }, { replace: true });
+        const params: Record<string, string | number> = { page, search: searchQuery };
+        if (activeSex) params.sex = activeSex;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
+        router.get('/children', params, { replace: true });
     };
 
     const getPageNumbers = () => {
@@ -408,7 +435,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 <button
                                     onClick={() => {
                                         setSearchQuery('');
-                                        router.get('/children', { search: '', sex: '' }, { replace: true });
+                                        router.get('/children', { search: '', sex: '', vaccine_status: '' }, { replace: true });
                                     }}
                                     className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                                 >
@@ -441,19 +468,23 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                     <div className="mb-4 flex flex-wrap gap-2">
                         <button
-                            onClick={() => handleSexFilter('all')}
+                            onClick={() => {
+                                const params: Record<string, string> = {};
+                                if (searchQuery) params.search = searchQuery;
+                                router.get('/children', params, { replace: true });
+                            }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                selectedSex === 'all'
+                                !activeSex && !activeVaccine
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                             }`}
                         >
-                            All ({children.length})
+                            All ({stats.total})
                         </button>
                         <button
                             onClick={() => handleSexFilter('Male')}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                selectedSex === 'Male'
+                                activeSex === 'Male'
                                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                             }`}
@@ -463,13 +494,37 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         <button
                             onClick={() => handleSexFilter('Female')}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                selectedSex === 'Female'
+                                activeSex === 'Female'
                                     ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                             }`}
                         >
                             Female ({stats.female})
                         </button>
+                        {stats.vaccine_overdue > 0 && (
+                            <button
+                                onClick={() => handleVaccineFilter('overdue')}
+                                className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    activeVaccine === 'overdue'
+                                        ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md'
+                                        : 'border border-red-200 bg-white text-red-700 hover:bg-red-50'
+                                }`}
+                            >
+                                Vaccine Overdue ({stats.vaccine_overdue})
+                            </button>
+                        )}
+                        {stats.vaccine_upcoming > 0 && (
+                            <button
+                                onClick={() => handleVaccineFilter('upcoming')}
+                                className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    activeVaccine === 'upcoming'
+                                        ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-md'
+                                        : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+                                }`}
+                            >
+                                Due Soon ({stats.vaccine_upcoming})
+                            </button>
+                        )}
                     </div>
 
                     {flash?.success && (
@@ -508,6 +563,17 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                             <div className="min-w-0">
                                                                 <p className="truncate text-sm font-bold text-gray-900">{child.fullname}</p>
                                                                 <p className="text-xs text-gray-500">ID: {child.id}</p>
+                                                                {child.vaccine_alert && (
+                                                                    <span
+                                                                        className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                                                                            child.vaccine_alert === 'overdue'
+                                                                                ? 'bg-red-100 text-red-700'
+                                                                                : 'bg-yellow-100 text-yellow-700'
+                                                                        }`}
+                                                                    >
+                                                                        {child.vaccine_alert === 'overdue' ? 'Vaccine Overdue' : 'Vaccine Due Soon'}
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>

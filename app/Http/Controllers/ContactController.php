@@ -33,6 +33,7 @@ class ContactController extends Controller
             'privacy' => 'required|accepted',
         ]);
         Mail::to($this->emailUsername)->send(new ContactFormMail($data));
+
         return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
     }
 }

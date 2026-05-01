@@ -1,22 +1,23 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChildController;
+use App\Http\Controllers\ChildVaccineController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseMaintenanceController;
 use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\RegistrationCodeController;
+use App\Http\Controllers\SMSController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\VaccineController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\AnnouncementController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\SMSController;
 
 // Guest Pages
 Route::get('/', function () {
@@ -29,9 +30,9 @@ Route::get('/', function () {
         ->latest()
         ->take(3) // Only show 3 latest announcements
         ->get();
-    
+
     return Inertia::render('home', [
-        'announcements' => $announcements
+        'announcements' => $announcements,
     ]);
 })->name('home');
 
@@ -90,6 +91,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | VACCINE CATALOG (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::resource('vaccines', VaccineController::class)->except(['show']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHILD VACCINE TRACKING (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::get('/children/{child}/vaccines', [ChildVaccineController::class, 'index'])->name('children.vaccines.index');
+        Route::post('/children/{child}/vaccines', [ChildVaccineController::class, 'store'])->name('children.vaccines.store');
+        Route::delete('/children/{child}/vaccines/{childVaccine}', [ChildVaccineController::class, 'destroy'])->name('children.vaccines.destroy');
+        Route::post('/children/{child}/vaccines/{childVaccine}/doses', [ChildVaccineController::class, 'recordDose'])->name('children.vaccines.doses.store');
+        Route::patch('/children/{child}/vaccines/{childVaccine}/doses/{dose}', [ChildVaccineController::class, 'updateDose'])->name('children.vaccines.doses.update');
+        Route::delete('/children/{child}/vaccines/{childVaccine}/doses/{dose}', [ChildVaccineController::class, 'destroyDose'])->name('children.vaccines.doses.destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | ADMIN ONLY
     |--------------------------------------------------------------------------
     */
@@ -128,21 +152,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
-        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');        //Announcements
-        Route::get('/admin/announcements',  [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
-        Route::post('/admin/announcements/store',  [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
-        // Route::get('/admin/announcements/create', [App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
-        Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
-        Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
-        Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
         Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
 
         Route::resource('categories', CategoryController::class);
 
-
         Route::resource('users', UserController::class);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | ANNOUNCEMENTS (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::get('/admin/announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/admin/announcements/store', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
 
     Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
@@ -162,5 +192,5 @@ Route::prefix('stocks')->middleware(['role:Admin|Healthworker'])->group(function
     Route::delete('/{stock}', [StockController::class, 'destroy'])->name('stocks.destroy');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

@@ -15,7 +15,7 @@ type HealthLogForm = {
     bmi: string;
     nutrition_status: string;
     micronutrient_powder: string;
-    ruf: string;
+    rutf: string;
     rusf: string;
     complementary_food: string;
     vitamin_a: boolean;
@@ -35,7 +35,7 @@ export default function Create({ child }: { child: Child }) {
         nutrition_status: '',
 
         micronutrient_powder: '',
-        ruf: '',
+        rutf: '',
         rusf: '',
         complementary_food: '',
         vitamin_a: false,
@@ -149,12 +149,12 @@ export default function Create({ child }: { child: Child }) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block font-medium">RUF</label>
-                            <input value={data.ruf} onChange={(e) => setData('ruf', e.target.value)} className="w-full rounded border px-3 py-2" />
+                            <label className="block font-medium">RUTF (Severely Wasted)</label>
+                            <input value={data.rutf} onChange={(e) => setData('rutf', e.target.value)} className="w-full rounded border px-3 py-2" />
                         </div>
 
                         <div>
-                            <label className="block font-medium">RUSF</label>
+                            <label className="block font-medium">RUSF (Moderately Wasted)</label>
                             <input value={data.rusf} onChange={(e) => setData('rusf', e.target.value)} className="w-full rounded border px-3 py-2" />
                         </div>
                     </div>

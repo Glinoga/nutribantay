@@ -9,21 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::table('announcements', function (Blueprint $table) {
-        if (!Schema::hasColumn('announcements', 'author')) {
-            $table->string('author')->nullable();
-        }
-    });
-}
+    public function up(): void
+    {
+        Schema::table('announcements', function (Blueprint $table) {
+            if (! Schema::hasColumn('announcements', 'author')) {
+                $table->string('author')->nullable();
+            }
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('announcements', function (Blueprint $table) {
-        if (Schema::hasColumn('announcements', 'author')) {
-            $table->dropColumn('author');
-        }
-    });
-}
+    public function down(): void
+    {
+        Schema::table('announcements', function (Blueprint $table) {
+            if (Schema::hasColumn('announcements', 'author')) {
+                $table->dropColumn('author');
+            }
+        });
+    }
 };

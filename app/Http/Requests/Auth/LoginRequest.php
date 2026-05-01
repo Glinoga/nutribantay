@@ -39,6 +39,7 @@ class LoginRequest extends FormRequest
             $user = User::where('registration_code_id', $code->id)->first();
             if ($user && Hash::check($password, $user->password)) {
                 $this->loginUser($user);
+
                 return;
             }
         }
@@ -47,6 +48,7 @@ class LoginRequest extends FormRequest
         $user = User::where('email', $login)->first();
         if ($user && Hash::check($password, $user->password)) {
             $this->loginUser($user);
+
             return;
         }
 

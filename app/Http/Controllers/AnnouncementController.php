@@ -6,8 +6,8 @@ use App\Models\Announcement;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class AnnouncementController extends Controller
 {
@@ -42,7 +42,7 @@ class AnnouncementController extends Controller
     public function guestShow(Announcement $announcement)
     {
         // Check if announcement is published and still active
-        if ($announcement->date > now()->toDateString() || 
+        if ($announcement->date > now()->toDateString() ||
             ($announcement->end_date && $announcement->end_date < now()->toDateString())) {
             abort(404);
         }
@@ -132,7 +132,6 @@ class AnnouncementController extends Controller
 
     //     return redirect()->route('announcements.index')->with('success', 'Announcement archived successfully.');
     // }
-
 
     public function destroy(Announcement $announcement)
     {

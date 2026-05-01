@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Models\ChildVaccineDose;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,6 +13,7 @@ class ChildController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        $now = Carbon::now();
 
         $query = Child::with(['creator', 'updater'])
             ->where('barangay', $user->barangay);
@@ -19,29 +22,83 @@ class ChildController extends Controller
         if ($request->search) {
             $search = $request->search;
 
-            // If search is a number, filter by age >= that number
             if (is_numeric($search)) {
                 $minBirthdate = now()->subMonths($search)->toDateString();
                 $query->where('birthdate', '<=', $minBirthdate);
             } else {
-                // Otherwise search by name/sex only
                 $query->where(function ($q) use ($search) {
                     $searchLower = strtolower($search);
                     $q->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);  // case-insensitive for sex
+                        ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
                 });
             }
         }
 
+        // Sex filter
+        if ($request->sex) {
+            $query->where('sex', $request->sex);
+        }
+
+        // Vaccine status filter - database level using subqueries
+        $vaccineStatus = $request->vaccine_status;
+
+        if ($vaccineStatus === 'overdue') {
+            $overdueChildIdsQuery = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
+            $query->whereIn('id', $overdueChildIdsQuery);
+        } elseif ($vaccineStatus === 'upcoming') {
+            $upcomingChildIdsQuery = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString());
+            $query->whereIn('id', $upcomingChildIdsQuery);
+        }
+
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
 
-        // Calculate stats for the current user's barangay
+        // Get all pending vaccine doses for this barangay (for stats and badges)
+        $pendingDoses = ChildVaccineDose::whereNull('date_given')
+            ->whereNotNull('next_due_date')
+            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->with(['childVaccine.child:id,barangay'])
+            ->get()
+            ->groupBy('childVaccine.child_id');
+
+        $overdueChildIds = collect([]);
+        $upcomingChildIds = collect([]);
+
+        foreach ($pendingDoses as $childId => $doses) {
+            $hasOverdue = $doses->some(fn ($dose) => $dose->next_due_date && $dose->next_due_date->lt($now));
+            if ($hasOverdue) {
+                $overdueChildIds->push($childId);
+            } else {
+                $upcomingChildIds->push($childId);
+            }
+        }
+
+        $overdueCount = $overdueChildIds->count();
+        $upcomingCount = $upcomingChildIds->count();
+
+        $avgBmi = Child::where('barangay', $user->barangay)
+            ->whereNotNull('weight')
+            ->whereNotNull('height')
+            ->where('weight', '>', 0)
+            ->where('height', '>', 0)
+            ->get()
+            ->avg(fn ($c) => $c->bmi ?? 0);
+
         $stats = [
             'total' => Child::where('barangay', $user->barangay)->count(),
             'male' => Child::where('barangay', $user->barangay)->where('sex', 'Male')->count(),
             'female' => Child::where('barangay', $user->barangay)->where('sex', 'Female')->count(),
-            'avgBMI' => number_format(Child::where('barangay', $user->barangay)->whereNotNull('weight')->whereNotNull('height')->get()->avg(fn ($c) => $c->bmi ?? 0) ?? 0, 1),
+            'avgBMI' => number_format($avgBmi ?? 0, 1),
+            'vaccine_overdue' => $overdueCount,
+            'vaccine_upcoming' => $upcomingCount,
         ];
 
         return Inertia::render('Children/Index', [
@@ -65,6 +122,9 @@ class ChildController extends Controller
                 'creator' => [
                     'name' => $child->creator?->name,
                 ],
+                'vaccine_alert' => $overdueChildIds->contains($child->id)
+                    ? 'overdue'
+                    : ($upcomingChildIds->contains($child->id) ? 'upcoming' : null),
             ]),
             'pagination' => [
                 'current_page' => $children->currentPage(),
@@ -74,6 +134,9 @@ class ChildController extends Controller
                 'to' => $children->lastItem(),
             ],
             'stats' => $stats,
+            'search' => $request->search,
+            'sex' => $request->sex,
+            'vaccine_status' => $vaccineStatus,
         ]);
     }
 
@@ -146,15 +209,15 @@ class ChildController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name'     => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
             'middle_initial' => 'nullable|string|max:5',
-            'last_name'      => 'required|string|max:255',
-            'sex'            => 'required|in:M,F,Male,Female',
-            'birthdate'      => 'nullable|date',
-            'address'        => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'sex' => 'required|in:M,F,Male,Female',
+            'birthdate' => 'nullable|date',
+            'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
-            'weight'         => 'nullable|numeric|min:0|max:200',
-            'height'         => 'nullable|numeric|min:0|max:250',
+            'weight' => 'nullable|numeric|min:0|max:200',
+            'height' => 'nullable|numeric|min:0|max:250',
         ]);
 
         $user = auth()->user();
@@ -168,17 +231,17 @@ class ChildController extends Controller
         }
 
         Child::create([
-            'first_name'     => $validated['first_name'],
+            'first_name' => $validated['first_name'],
             'middle_initial' => $validated['middle_initial'] ?? null,
-            'last_name'      => $validated['last_name'],
-            'sex'            => $validated['sex'],
-            'birthdate'      => $validated['birthdate'] ?? null,
-            'address'        => $validated['address'] ?? null,
+            'last_name' => $validated['last_name'],
+            'sex' => $validated['sex'],
+            'birthdate' => $validated['birthdate'] ?? null,
+            'address' => $validated['address'] ?? null,
             'contact_number' => $validated['contact_number'] ?? null,
-            'weight'         => $validated['weight'] ?? null,
-            'height'         => $validated['height'] ?? null,
-            'created_by'     => $user->id,
-            'barangay'       => $user->barangay,
+            'weight' => $validated['weight'] ?? null,
+            'height' => $validated['height'] ?? null,
+            'created_by' => $user->id,
+            'barangay' => $user->barangay,
         ]);
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');
@@ -244,16 +307,16 @@ class ChildController extends Controller
 
         return Inertia::render('Children/Edit', [
             'child' => [
-                'id'             => $child->id,
-                'first_name'     => $child->first_name,
+                'id' => $child->id,
+                'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,
-                'last_name'      => $child->last_name,
-                'sex'            => $child->sex,
-                'birthdate'      => $child->birthdate,
-                'barangay'       => $child->barangay,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'birthdate' => $child->birthdate,
+                'barangay' => $child->barangay,
                 'contact_number' => $child->contact_number,
-                'weight'         => $child->weight,
-                'height'         => $child->height,
+                'weight' => $child->weight,
+                'height' => $child->height,
             ],
         ]);
     }
@@ -268,22 +331,22 @@ class ChildController extends Controller
         }
 
         $validated = $request->validate([
-            'first_name'     => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
             'middle_initial' => 'nullable|string|max:5',
-            'last_name'      => 'required|string|max:255',
-            'sex'            => 'required|in:Male,Female',
-            'birthdate'      => 'nullable|date',
-            'barangay'       => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'sex' => 'required|in:Male,Female',
+            'birthdate' => 'nullable|date',
+            'barangay' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
-            'weight'         => 'nullable|numeric|min:0|max:200',
-            'height'         => 'nullable|numeric|min:0|max:250',
+            'weight' => 'nullable|numeric|min:0|max:200',
+            'height' => 'nullable|numeric|min:0|max:250',
         ]);
 
         $child->update(array_merge(
             $request->only([
                 'first_name', 'middle_initial', 'last_name',
                 'sex', 'birthdate', 'barangay', 'contact_number',
-                'weight', 'height'
+                'weight', 'height',
             ]),
             ['updated_by' => auth()->id()]
         ));
@@ -321,28 +384,28 @@ class ChildController extends Controller
 
         return Inertia::render('Children/Show', [
             'child' => [
-                'id'                 => $child->id,
-                'fullname'           => $child->fullname,
-                'first_name'         => $child->first_name,
-                'middle_initial'     => $child->middle_initial,
-                'last_name'          => $child->last_name,
-                'sex'                => $child->sex,
-                'age'                => $child->age,
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'age' => $child->age,
                 'is_over_60_months' => $child->is_over_60_months,
-                'weight'             => $child->weight,
-                'height'             => $child->height,
-                'birthdate'          => $child->birthdate,
-                'address'            => $child->address,
-                'contact_number'     => $child->contact_number,
-                'barangay'          => $child->barangay,
-                'created_at'         => $child->created_at,
-                'updated_at'         => $child->updated_at,
-                'creator'            => ['name' => $child->creator?->name],
-                'updater'            => ['name' => $child->updater?->name],
-                'notes'              => $child->notes->map(fn ($note) => [
-                    'id'        => $note->id,
-                    'note'      => $note->note,
-                    'author'    => ['name' => $note->author?->name],
+                'weight' => $child->weight,
+                'height' => $child->height,
+                'birthdate' => $child->birthdate,
+                'address' => $child->address,
+                'contact_number' => $child->contact_number,
+                'barangay' => $child->barangay,
+                'created_at' => $child->created_at,
+                'updated_at' => $child->updated_at,
+                'creator' => ['name' => $child->creator?->name],
+                'updater' => ['name' => $child->updater?->name],
+                'notes' => $child->notes->map(fn ($note) => [
+                    'id' => $note->id,
+                    'note' => $note->note,
+                    'author' => ['name' => $note->author?->name],
                     'created_at' => $note->created_at,
                 ]),
                 'healthlogs' => $child->healthlogs()
@@ -354,30 +417,30 @@ class ChildController extends Controller
                         'vitamin_a', 'deworming',
                         'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
                         'vaccine_name', 'dose_number', 'date_given', 'next_due_date', 'vaccine_status',
-                        'created_at', 'user_id'
+                        'created_at', 'user_id',
                     ])
                     ->map(fn ($log) => [
-                        'id'                  => $log->id,
-                        'weight'              => $log->weight,
-                        'height'              => $log->height,
-                        'bmi'                 => $log->bmi,
-                        'nutrition_status'    => $log->nutrition_status,
-                        'status_wfa'         => $log->status_wfa,
-                        'status_lfa'         => $log->status_lfa,
-                        'status_wfl_wfh'     => $log->status_wfl_wfh,
-                        'vitamin_a'          => $log->vitamin_a,
-                        'deworming'         => $log->deworming,
+                        'id' => $log->id,
+                        'weight' => $log->weight,
+                        'height' => $log->height,
+                        'bmi' => $log->bmi,
+                        'nutrition_status' => $log->nutrition_status,
+                        'status_wfa' => $log->status_wfa,
+                        'status_lfa' => $log->status_lfa,
+                        'status_wfl_wfh' => $log->status_wfl_wfh,
+                        'vitamin_a' => $log->vitamin_a,
+                        'deworming' => $log->deworming,
                         'micronutrient_powder' => $log->micronutrient_powder,
-                        'ruf'                => $log->ruf,
-                        'rusf'               => $log->rusf,
+                        'rutf' => $log->ruf,
+                        'rusf' => $log->rusf,
                         'complementary_food' => $log->complementary_food,
-                        'vaccine_name'       => $log->vaccine_name,
-                        'dose_number'        => $log->dose_number,
-                        'date_given'         => $log->date_given,
-                        'next_due_date'      => $log->next_due_date,
-                        'vaccine_status'     => $log->vaccine_status,
-                        'created_at'         => $log->created_at,
-                        'user'               => ['name' => $log->user?->name],
+                        'vaccine_name' => $log->vaccine_name,
+                        'dose_number' => $log->dose_number,
+                        'date_given' => $log->date_given,
+                        'next_due_date' => $log->next_due_date,
+                        'vaccine_status' => $log->vaccine_status,
+                        'created_at' => $log->created_at,
+                        'user' => ['name' => $log->user?->name],
                     ]),
             ],
         ]);
@@ -436,7 +499,7 @@ class ChildController extends Controller
         ]);
 
         $child->notes()->create([
-            'note'    => $request->note,
+            'note' => $request->note,
             'user_id' => $user->id,
         ]);
 
@@ -474,22 +537,23 @@ class ChildController extends Controller
 
             if ($existingChild) {
                 $skipped++;
+
                 continue;
             }
 
             $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
 
             Child::create([
-                'first_name'     => $row['first_name'],
+                'first_name' => $row['first_name'],
                 'middle_initial' => $row['middle_initial'] ?? null,
-                'last_name'      => $row['last_name'],
-                'sex'            => $sex,
-                'weight'         => $row['weight'] ?? 0,
-                'height'         => $row['height'] ?? 0,
-                'birthdate'      => $row['birthdate'] ?? null,
-                'barangay'       => $user->barangay,
-                'created_by'     => $user->id,
-                'address'        => null,
+                'last_name' => $row['last_name'],
+                'sex' => $sex,
+                'weight' => $row['weight'] ?? 0,
+                'height' => $row['height'] ?? 0,
+                'birthdate' => $row['birthdate'] ?? null,
+                'barangay' => $user->barangay,
+                'created_by' => $user->id,
+                'address' => null,
                 'contact_number' => null,
             ]);
 

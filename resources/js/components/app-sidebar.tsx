@@ -6,7 +6,7 @@ import { route } from '@/lib/routes';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, UserCog, UserPen } from 'lucide-react';
+import { Boxes, Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, ShieldCheck, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -48,6 +48,7 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
         { title: 'Child Profiles', href: '/children', icon: UserPen },
+        { title: 'Vaccines', href: route('vaccines.index'), icon: ShieldCheck },
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 

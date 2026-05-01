@@ -14,7 +14,7 @@ return new class extends Migration
                 ->constrained('registration_codes')
                 ->nullOnDelete();
         });
-        
+
         Schema::table('registration_codes', function (Blueprint $table) {
             $table->integer('code_number')->nullable()->after('is_used');
             $table->string('barangay', 255)->nullable()->change();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->dropForeign(['registration_code_id']);
             $table->dropColumn('registration_code_id');
         });
-        
+
         Schema::table('registration_codes', function (Blueprint $table) {
             $table->dropColumn('code_number');
         });

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('email')->nullable()->change();
-            
+
             // Drop unique index on email, then re-add without unique
             $table->dropUnique(['email']);
         });
