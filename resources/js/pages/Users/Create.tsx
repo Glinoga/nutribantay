@@ -70,7 +70,7 @@ export default function Create() {
                         name="password"
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
-                        placeholder="Enter password"
+                        placeholder="Min 10 characters with letters and numbers"
                         className="w-full rounded border px-4 py-2"
                         required
                     />

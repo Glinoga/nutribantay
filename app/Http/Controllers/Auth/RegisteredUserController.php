@@ -27,18 +27,20 @@ class RegisteredUserController extends Controller
             'registration_code' => ['required', 'string'],
         ]);
 
-        $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)
+        $affected = \App\Models\RegistrationCode::where('code', $request->registration_code)
+            ->where('is_used', false)
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
-            ->where('is_used', false)
-            ->first();
+            ->update(['is_used' => true]);
 
-        if (! $registrationCode) {
+        if ($affected === 0) {
             return back()->withErrors([
                 'registration_code' => 'The registration code is invalid, expired, or already used.',
             ])->onlyInput('registration_code');
         }
+
+        $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)->firstOrFail();
 
         $user = User::create([
             'name' => $request->name,
@@ -49,9 +51,6 @@ class RegisteredUserController extends Controller
         ]);
 
         $user->assignRole('Healthworker');
-
-        $registrationCode->update(['is_used' => true]);
-        $registrationCode->delete();
 
         return redirect()->route('login')->with('message', 'Your account has been created and is pending approval from the admin.');
     }
