@@ -6,6 +6,7 @@ use App\Helpers\AIRecommender;
 use App\Helpers\GrowthHelper;
 use App\Models\Child;
 use App\Models\HealthLog;
+use App\Models\Vaccine;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,13 +22,65 @@ class HealthlogController extends Controller
             abort(403);
         }
 
+        $allHealthLogs = $child->healthlogs()->orderBy('created_at', 'desc')->get();
+
+        $vaccines = Vaccine::orderBy('name')->get()->map(function ($v) {
+            return [
+                'id' => $v->id,
+                'name' => $v->name,
+                'description' => $v->description,
+            ];
+        })->toArray();
+
         return Inertia::render('Healthlog/Create', [
             'child' => [
                 'id' => $child->id,
                 'fullname' => $child->fullname,
                 'sex' => $child->sex,
                 'birthdate' => $child->birthdate,
+                'weight' => $child->weight,
+                'height' => $child->height,
             ],
+            'allHealthLogs' => $allHealthLogs->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'weight' => $log->weight,
+                    'height' => $log->height,
+                    'bmi' => $log->bmi,
+                    'nutrition_status' => $log->nutrition_status,
+                    'micronutrient_powder' => $log->micronutrient_powder,
+                    'rutf' => $log->rutf,
+                    'rusf' => $log->rusf,
+                    'complementary_food' => $log->complementary_food,
+                    'vitamin_a' => $log->vitamin_a,
+                    'deworming' => $log->deworming,
+                    'vaccine_name' => $log->vaccine_name,
+                    'dose_number' => $log->dose_number,
+                    'date_given' => $log->date_given,
+                    'next_due_date' => $log->next_due_date,
+                    'vaccine_status' => $log->vaccine_status,
+                    'created_at' => $log->created_at,
+                ];
+            })->toArray(),
+            'latestHealthLog' => $allHealthLogs->first() ? [
+                'weight' => $allHealthLogs->first()->weight,
+                'height' => $allHealthLogs->first()->height,
+                'bmi' => $allHealthLogs->first()->bmi,
+                'nutrition_status' => $allHealthLogs->first()->nutrition_status,
+                'micronutrient_powder' => $allHealthLogs->first()->micronutrient_powder,
+                'rutf' => $allHealthLogs->first()->rutf,
+                'rusf' => $allHealthLogs->first()->rusf,
+                'complementary_food' => $allHealthLogs->first()->complementary_food,
+                'vitamin_a' => $allHealthLogs->first()->vitamin_a,
+                'deworming' => $allHealthLogs->first()->deworming,
+                'vaccine_name' => $allHealthLogs->first()->vaccine_name,
+                'dose_number' => $allHealthLogs->first()->dose_number,
+                'date_given' => $allHealthLogs->first()->date_given,
+                'next_due_date' => $allHealthLogs->first()->next_due_date,
+                'vaccine_status' => $allHealthLogs->first()->vaccine_status,
+                'created_at' => $allHealthLogs->first()->created_at,
+            ] : null,
+            'vaccines' => $vaccines,
         ]);
     }
 
@@ -117,8 +170,18 @@ class HealthlogController extends Controller
             abort(403);
         }
 
+        $vaccines = Vaccine::orderBy('name')->get()->map(function ($v) {
+            return [
+                'id' => $v->id,
+                'name' => $v->name,
+                'description' => $v->description,
+            ];
+        })->toArray();
+
         return Inertia::render('Healthlog/Edit', [
             'healthlog' => $healthlog->load('child'),
+            'child_id' => $healthlog->child_id, // Explicitly pass child_id for reliable navigation
+            'vaccines' => $vaccines,
         ]);
     }
 
