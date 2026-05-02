@@ -1,14 +1,14 @@
-import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState, useEffect } from 'react';
-import { MessageSquare, Users, Send, CheckCircle2, AlertCircle, Sparkles, Mail, Phone, Zap, Search, X } from 'lucide-react';
-import { smartToast } from '@/utils/smartToast';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber } from '@/lib/phoneUtils';
+import { smartToast } from '@/utils/smartToast';
+import { Head, router, usePage } from '@inertiajs/react';
+import { CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface User {
     id: number;
@@ -18,22 +18,18 @@ interface User {
 
 interface SMSPageProps {
     users: User[];
+    credits: number;
 }
 
-export default function SMSIndex({ users }: SMSPageProps) {
+export default function SMSIndex({ users, credits }: SMSPageProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string; warning?: string } }>().props;
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
     const [recipientType, setRecipientType] = useState<'single' | 'multiple' | 'all'>('multiple');
     const [characterCount, setCharacterCount] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [message, setMessage] = useState('');
     const maxCharacters = 1600;
-
-    const { data, setData, post, processing, errors, reset } = useForm({
-        recipient_type: 'multiple',
-        recipients: [] as number[],
-        message: '',
-    });
 
     useEffect(() => {
         if (flash?.success) {
@@ -47,32 +43,29 @@ export default function SMSIndex({ users }: SMSPageProps) {
 
     const handleRecipientTypeChange = (value: 'single' | 'multiple' | 'all') => {
         setRecipientType(value);
-        setData('recipient_type', value);
         setSelectedUsers([]);
-        setData('recipients', []);
     };
 
     const handleUserSelect = (userId: number) => {
         let newSelection: number[];
-        
+
         if (recipientType === 'single') {
             newSelection = [userId];
         } else {
             if (selectedUsers.includes(userId)) {
-                newSelection = selectedUsers.filter(id => id !== userId);
+                newSelection = selectedUsers.filter((id) => id !== userId);
             } else {
                 newSelection = [...selectedUsers, userId];
             }
         }
-        
+
         setSelectedUsers(newSelection);
-        setData('recipients', newSelection);
     };
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const message = e.target.value;
-        setCharacterCount(message.length);
-        setData('message', message);
+        const messageText = e.target.value;
+        setCharacterCount(messageText.length);
+        setMessage(messageText);
         setIsTyping(true);
 
         // Reset typing indicator after 2 seconds
@@ -81,8 +74,8 @@ export default function SMSIndex({ users }: SMSPageProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        if (!data.message.trim()) {
+
+        if (!message.trim()) {
             smartToast.error('Please enter a message');
             return;
         }
@@ -93,18 +86,26 @@ export default function SMSIndex({ users }: SMSPageProps) {
         }
 
         const loadingToast = smartToast.loading('Sending SMS...');
-        
-        post('/admin/sendsms', {
-            onSuccess: () => {
-                smartToast.dismiss(loadingToast);
-                reset('message');
-                setSelectedUsers([]);
-                setCharacterCount(0);
+
+        router.post(
+            '/admin/sendsms',
+            {
+                recipient_type: recipientType,
+                recipients: selectedUsers,
+                message: message,
             },
-            onError: () => {
-                smartToast.dismiss(loadingToast);
-            }
-        });
+            {
+                onSuccess: () => {
+                    smartToast.dismiss(loadingToast);
+                    setMessage('');
+                    setSelectedUsers([]);
+                    setCharacterCount(0);
+                },
+                onError: () => {
+                    smartToast.dismiss(loadingToast);
+                },
+            },
+        );
     };
 
     const getRecipientCount = () => {
@@ -114,70 +115,72 @@ export default function SMSIndex({ users }: SMSPageProps) {
         return selectedUsers.length;
     };
 
-    const filteredUsers = users.filter(user => 
-        user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.phone.includes(searchQuery)
+    const filteredUsers = useMemo(
+        () => users.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.phone.includes(searchQuery)),
+        [users, searchQuery],
     );
 
     const selectAllFiltered = () => {
-        const filteredIds = filteredUsers.map(u => u.id);
+        const filteredIds = filteredUsers.map((u) => u.id);
         setSelectedUsers(filteredIds);
-        setData('recipients', filteredIds);
     };
 
     const deselectAll = () => {
         setSelectedUsers([]);
-        setData('recipients', []);
     };
 
     return (
         <AppLayout>
             <Head title="Send SMS" />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 sm:p-6 lg:p-8">
+            <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 p-4 sm:p-6 lg:p-8 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 {/* Animated Header with Gradient */}
-                <div className="mb-8 relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 rounded-3xl blur-3xl -z-10 animate-pulse"></div>
-                    
-                    <div className="relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/20">
+                <div className="relative mb-8">
+                    <div className="absolute inset-0 -z-10 animate-pulse rounded-3xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 blur-3xl"></div>
+
+                    <div className="relative rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl blur-lg opacity-50 animate-pulse"></div>
-                                    <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform duration-300">
+                                    <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-50 blur-lg"></div>
+                                    <div className="relative transform rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-4 shadow-lg transition-transform duration-300 hover:scale-110">
                                         <MessageSquare className="h-8 w-8 text-white" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
                                         SMS Messenger
                                     </h1>
-                                    <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2 mt-1">
+                                    <p className="mt-1 flex items-center gap-2 text-gray-600 dark:text-gray-300">
                                         <Sparkles className="h-4 w-4" />
                                         Send messages to guardians instantly
                                     </p>
                                 </div>
                             </div>
-                            
+
                             {/* Quick Stats */}
-                            <div className="hidden lg:flex items-center gap-4">
-                                <div className="text-center px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                            <div className="hidden items-center gap-4 lg:flex">
+                                <div className="rounded-xl bg-blue-50 px-4 py-2 text-center dark:bg-blue-900/20">
                                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{users.length}</div>
                                     <div className="text-xs text-gray-600 dark:text-gray-400">Total Users</div>
                                 </div>
-                                <div className="text-center px-4 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+                                <div className="rounded-xl bg-purple-50 px-4 py-2 text-center dark:bg-purple-900/20">
                                     <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{getRecipientCount()}</div>
                                     <div className="text-xs text-gray-600 dark:text-gray-400">Selected</div>
+                                </div>
+                                <div className="rounded-xl bg-green-50 px-4 py-2 text-center dark:bg-green-900/20">
+                                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{credits}</div>
+                                    <div className="text-xs text-gray-600 dark:text-gray-400">SMS Credits</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Recipients Panel */}
-                    <div className="lg:col-span-1 space-y-4">
-                        <Card className="overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
+                    <div className="space-y-4 lg:col-span-1">
+                        <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                             <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 py-4">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -187,17 +190,15 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                         </CardTitle>
                                         <CardDescription>Select who receives your message</CardDescription>
                                     </div>
-                                    <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        {getRecipientCount()}
-                                    </div>
+                                    <div className="rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white">{getRecipientCount()}</div>
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-4 space-y-4">
+                            <CardContent className="space-y-4 p-4">
                                 {/* Recipient Type Selector */}
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium">Send Mode</Label>
                                     <Select value={recipientType} onValueChange={handleRecipientTypeChange}>
-                                        <SelectTrigger className="border-2 hover:border-blue-500 transition-colors">
+                                        <SelectTrigger className="border-2 transition-colors hover:border-blue-500">
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -224,14 +225,14 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                 </div>
 
                                 {recipientType === 'all' ? (
-                                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 animate-pulse">
+                                    <div className="animate-pulse rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
                                         <div className="flex items-start gap-3">
-                                            <div className="bg-blue-600 p-2 rounded-lg">
+                                            <div className="rounded-lg bg-blue-600 p-2">
                                                 <Zap className="h-5 w-5 text-white" />
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-blue-900 dark:text-blue-100">Broadcast Mode</p>
-                                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                                                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
                                                     Your message will reach all {users.length} guardians with registered numbers
                                                 </p>
                                             </div>
@@ -241,18 +242,18 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                     <>
                                         {/* Search Bar */}
                                         <div className="relative">
-                                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                             <input
                                                 type="text"
                                                 placeholder="Search children/guardian..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full pl-10 pr-10 py-2 border-2 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
+                                                className="w-full rounded-lg border-2 py-2 pr-10 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                                             />
                                             {searchQuery && (
                                                 <button
                                                     onClick={() => setSearchQuery('')}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                                 >
                                                     <X className="h-4 w-4" />
                                                 </button>
@@ -271,84 +272,86 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                                 >
                                                     Select All
                                                 </Button>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={deselectAll}
-                                                    className="flex-1 text-xs"
-                                                >
+                                                <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
                                                     Clear All
                                                 </Button>
                                             </div>
                                         )}
 
                                         {/* User List */}
-                                        <div className="space-y-2 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                                        <div className="custom-scrollbar max-h-96 space-y-2 overflow-y-auto pr-2">
                                             {filteredUsers.length > 0 ? (
                                                 filteredUsers.map((user, index) => (
                                                     <div
                                                         key={user.id}
-                                                        className={`group relative overflow-hidden cursor-pointer rounded-xl transition-all duration-300 ${
+                                                        className={`group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ${
                                                             selectedUsers.includes(user.id)
-                                                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-[1.02]'
-                                                                : 'bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                                ? 'scale-[1.02] bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                                                                : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700'
                                                         }`}
                                                         onClick={() => handleUserSelect(user.id)}
                                                         style={{
                                                             animationDelay: `${index * 50}ms`,
-                                                            animation: 'slideIn 0.3s ease-out forwards'
+                                                            animation: 'slideIn 0.3s ease-out forwards',
                                                         }}
                                                     >
                                                         <div className="flex items-center gap-3 p-3">
                                                             {/* Checkbox */}
-                                                            <div className={`flex-shrink-0 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                                                                selectedUsers.includes(user.id)
-                                                                    ? 'bg-white border-white scale-110'
-                                                                    : 'border-gray-300 dark:border-gray-600 group-hover:border-blue-500'
-                                                            }`}>
+                                                            <div
+                                                                className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
+                                                                    selectedUsers.includes(user.id)
+                                                                        ? 'scale-110 border-white bg-white'
+                                                                        : 'border-gray-300 group-hover:border-blue-500 dark:border-gray-600'
+                                                                }`}
+                                                            >
                                                                 {selectedUsers.includes(user.id) && (
-                                                                    <CheckCircle2 className="h-4 w-4 text-blue-600 animate-bounce" />
+                                                                    <CheckCircle2 className="h-4 w-4 animate-bounce text-blue-600" />
                                                                 )}
                                                             </div>
 
                                                             {/* Avatar */}
-                                                            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-semibold text-lg transition-all duration-300 ${
-                                                                selectedUsers.includes(user.id)
-                                                                    ? 'bg-white text-blue-600'
-                                                                    : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
-                                                            }`}>
+                                                            <div
+                                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold transition-all duration-300 ${
+                                                                    selectedUsers.includes(user.id)
+                                                                        ? 'bg-white text-blue-600'
+                                                                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
+                                                                }`}
+                                                            >
                                                                 {user.name.charAt(0).toUpperCase()}
                                                             </div>
 
                                                             {/* User Info */}
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className={`font-medium truncate ${
-                                                                    selectedUsers.includes(user.id)
-                                                                        ? 'text-white'
-                                                                        : 'text-gray-900 dark:text-white'
-                                                                }`}>
+                                                            <div className="min-w-0 flex-1">
+                                                                <p
+                                                                    className={`truncate font-medium ${
+                                                                        selectedUsers.includes(user.id)
+                                                                            ? 'text-white'
+                                                                            : 'text-gray-900 dark:text-white'
+                                                                    }`}
+                                                                >
                                                                     {user.name}
                                                                 </p>
-                                                                <p className={`text-sm truncate ${
-                                                                    selectedUsers.includes(user.id)
-                                                                        ? 'text-blue-100'
-                                                                        : 'text-gray-500 dark:text-gray-400'
-                                                                }`}>
+                                                                <p
+                                                                    className={`truncate text-sm ${
+                                                                        selectedUsers.includes(user.id)
+                                                                            ? 'text-blue-100'
+                                                                            : 'text-gray-500 dark:text-gray-400'
+                                                                    }`}
+                                                                >
                                                                     {displayPhoneNumber(user.phone)}
                                                                 </p>
                                                             </div>
 
                                                             {/* Selection Indicator */}
                                                             {selectedUsers.includes(user.id) && (
-                                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+                                                                <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                                                             )}
                                                         </div>
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="text-center py-12">
-                                                    <Users className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+                                                <div className="py-12 text-center">
+                                                    <Users className="mx-auto mb-3 h-16 w-16 text-gray-300 dark:text-gray-600" />
                                                     <p className="text-gray-500 dark:text-gray-400">
                                                         {searchQuery ? 'No guardians found' : 'No guardians available'}
                                                     </p>
@@ -362,9 +365,9 @@ export default function SMSIndex({ users }: SMSPageProps) {
                     </div>
 
                     {/* Message Composer & Summary */}
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="space-y-4 lg:col-span-2">
                         {/* Message Composer */}
-                        <Card className="overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl">
+                        <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                             <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 py-4">
                                 <CardTitle className="flex items-center gap-2">
                                     <Mail className="h-5 w-5 text-purple-600" />
@@ -377,7 +380,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                     {/* Message Textarea */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium flex items-center gap-2">
+                                            <Label className="flex items-center gap-2 text-sm font-medium">
                                                 Your Message
                                                 {isTyping && (
                                                     <span className="flex items-center gap-1 text-xs text-blue-600">
@@ -386,36 +389,38 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                                     </span>
                                                 )}
                                             </Label>
-                                            <span className={`text-sm font-medium transition-colors ${
-                                                characterCount > maxCharacters 
-                                                    ? 'text-red-500 animate-pulse' 
-                                                    : characterCount > maxCharacters * 0.9
-                                                    ? 'text-orange-500'
-                                                    : 'text-gray-500'
-                                            }`}>
+                                            <span
+                                                className={`text-sm font-medium transition-colors ${
+                                                    characterCount > maxCharacters
+                                                        ? 'animate-pulse text-red-500'
+                                                        : characterCount > maxCharacters * 0.9
+                                                          ? 'text-orange-500'
+                                                          : 'text-gray-500'
+                                                }`}
+                                            >
                                                 {characterCount} / {maxCharacters}
                                             </span>
                                         </div>
-                                        
+
                                         <div className="relative">
                                             <Textarea
                                                 placeholder="Type your message here..."
-                                                value={data.message}
+                                                value={message}
                                                 onChange={handleMessageChange}
                                                 rows={8}
-                                                className="resize-none border-2 focus:border-purple-500 focus:ring-4 focus:ring-purple-200 transition-all text-base"
+                                                className="resize-none border-2 text-base transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
                                             />
-                                            
+
                                             {/* Character Progress Bar */}
-                                            <div className="absolute bottom-2 left-2 right-2">
-                                                <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                    <div 
-                                                        className={`h-full transition-all duration-300 rounded-full ${
+                                            <div className="absolute right-2 bottom-2 left-2">
+                                                <div className="h-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all duration-300 ${
                                                             characterCount > maxCharacters
                                                                 ? 'bg-red-500'
                                                                 : characterCount > maxCharacters * 0.9
-                                                                ? 'bg-orange-500'
-                                                                : 'bg-gradient-to-r from-blue-500 to-purple-600'
+                                                                  ? 'bg-orange-500'
+                                                                  : 'bg-gradient-to-r from-blue-500 to-purple-600'
                                                         }`}
                                                         style={{ width: `${Math.min((characterCount / maxCharacters) * 100, 100)}%` }}
                                                     ></div>
@@ -423,14 +428,7 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                             </div>
                                         </div>
 
-                                        {errors.message && (
-                                            <p className="text-sm text-red-500 flex items-center gap-1">
-                                                <AlertCircle className="h-4 w-4" />
-                                                {errors.message}
-                                            </p>
-                                        )}
-
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                        <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                                             <Sparkles className="h-3 w-3" />
                                             Messages over 160 characters split into multiple SMS
                                         </p>
@@ -440,29 +438,26 @@ export default function SMSIndex({ users }: SMSPageProps) {
                                     <div className="flex items-center gap-3">
                                         <Button
                                             type="submit"
-                                            disabled={processing || !data.message.trim() || (recipientType !== 'all' && selectedUsers.length === 0) || characterCount > maxCharacters}
-                                            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+                                            disabled={
+                                                !message.trim() ||
+                                                (recipientType !== 'all' && selectedUsers.length === 0) ||
+                                                characterCount > maxCharacters
+                                            }
+                                            className="group flex-1 bg-gradient-to-r from-blue-600 to-purple-600 py-6 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                                         >
-                                            <Send className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
-                                            {processing ? (
-                                                <span className="flex items-center gap-2">
-                                                    <span className="animate-spin">⏳</span>
-                                                    Sending...
-                                                </span>
-                                            ) : (
-                                                'Send Message'
-                                            )}
+                                            <Send className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                            {'Send Message'}
                                         </Button>
                                         <Button
                                             type="button"
                                             variant="outline"
                                             onClick={() => {
-                                                reset();
+                                                setMessage('');
                                                 setSelectedUsers([]);
                                                 setCharacterCount(0);
                                                 setSearchQuery('');
                                             }}
-                                            className="px-6 py-6 border-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            className="border-2 px-6 py-6 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             <X className="h-5 w-5" />
                                         </Button>
@@ -472,41 +467,35 @@ export default function SMSIndex({ users }: SMSPageProps) {
                         </Card>
 
                         {/* Summary Card */}
-                        <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
+                        <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
                             <CardContent className="p-6">
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
+                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                        <div className="mb-1 flex items-center gap-2 text-blue-600 dark:text-blue-400">
                                             <Users className="h-4 w-4" />
                                             <span className="text-xs font-medium">Recipients</span>
                                         </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                                            {getRecipientCount()}
-                                        </div>
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{getRecipientCount()}</div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-1">
+                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                        <div className="mb-1 flex items-center gap-2 text-purple-600 dark:text-purple-400">
                                             <Mail className="h-4 w-4" />
                                             <span className="text-xs font-medium">Characters</span>
                                         </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                                            {characterCount}
-                                        </div>
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{characterCount}</div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400 mb-1">
+                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                        <div className="mb-1 flex items-center gap-2 text-pink-600 dark:text-pink-400">
                                             <MessageSquare className="h-4 w-4" />
                                             <span className="text-xs font-medium">SMS Parts</span>
                                         </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                                            {Math.ceil(characterCount / 160) || 0}
-                                        </div>
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.ceil(characterCount / 160) || 0}</div>
                                     </div>
 
-                                    <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="flex items-center gap-2 text-white mb-1">
+                                    <div className="rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 p-4 shadow-md transition-shadow hover:shadow-lg">
+                                        <div className="mb-1 flex items-center gap-2 text-white">
                                             <Zap className="h-4 w-4" />
                                             <span className="text-xs font-medium">Total SMS</span>
                                         </div>

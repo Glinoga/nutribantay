@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -22,7 +23,7 @@ class SystemController extends Controller
         $value = $request->input('status') ? '1' : '0';
         Setting::set('maintenance_mode', $value);
 
-        \App\Models\AuditLog::logAction([
+        AuditLog::logAction([
             'action' => $value === '1' ? 'maintenance_enabled' : 'maintenance_disabled',
             'model_type' => 'System',
             'description' => $value === '1'

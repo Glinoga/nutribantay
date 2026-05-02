@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\RegistrationCode;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class RegisteredUserController extends Controller
             'registration_code' => ['required', 'string'],
         ]);
 
-        $affected = \App\Models\RegistrationCode::where('code', $request->registration_code)
+        $affected = RegistrationCode::where('code', $request->registration_code)
             ->where('is_used', false)
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
@@ -40,7 +41,7 @@ class RegisteredUserController extends Controller
             ])->onlyInput('registration_code');
         }
 
-        $registrationCode = \App\Models\RegistrationCode::where('code', $request->registration_code)->firstOrFail();
+        $registrationCode = RegistrationCode::where('code', $request->registration_code)->firstOrFail();
 
         $user = User::create([
             'name' => $request->name,

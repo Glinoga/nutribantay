@@ -40,7 +40,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
             <div className="relative z-10 flex w-11/12 max-w-5xl overflow-hidden rounded-2xl shadow-lg">
                 {/* Left Panel */}
                 <div className="flex w-1/2 items-center justify-center bg-black p-10 text-white">
-                    <h1 className="text-3xl leading-snug font-extrabold">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 1 IN CALOOCAN CITY</h1>
+                    <h1 className="text-3xl leading-snug font-extrabold">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY</h1>
                 </div>
 
                 {/* Right Panel */}

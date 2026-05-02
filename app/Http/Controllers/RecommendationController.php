@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AIRecommender;
 use App\Models\Child;
 use App\Models\Stock;
 use Carbon\Carbon;
@@ -252,7 +253,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
     private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, ?string $vitaminA = null, ?string $deworming = null): string
     {
         // Call the improved local recommender
-        return \App\Helpers\AIRecommender::getRecommendation(
+        return AIRecommender::getRecommendation(
             $status,
             $sex,
             $ageInMonths,

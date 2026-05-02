@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\AuditableModel;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -72,7 +73,7 @@ class Child extends Model
             return null;
         }
 
-        return floor(\Carbon\Carbon::parse($this->birthdate)->diffInMonths(\Carbon\Carbon::now()));
+        return floor(Carbon::parse($this->birthdate)->diffInMonths(Carbon::now()));
     }
 
     // Boolean flag - 60 months and above (no longer in 0-5 years bracket)

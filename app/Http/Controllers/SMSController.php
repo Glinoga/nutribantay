@@ -3,19 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Services\IprogsmsService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Twilio\Rest\Client;
 
 class SMSController extends Controller
 {
+    protected IprogsmsService $smsService;
+
+    public function __construct()
+    {
+        $this->smsService = new IprogsmsService;
+    }
+
     public function index()
     {
-        // Get all children with contact numbers (caregiver/parent numbers) for the recipient list
-        $children = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
+        $user = auth()->user();
+
+        // Get all children with contact numbers - Healthworkers limited to their barangay
+        $query = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
             ->whereNotNull('contact_number')
-            ->where('contact_number', '!=', '')
-            ->get()
+            ->where('contact_number', '!=', '');
+
+        // Healthworkers can only see children in their barangay
+        if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
+            $query->where('barangay', $user->barangay);
+        }
+
+        $children = $query->get()
             ->map(function ($child) {
                 $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
 
@@ -26,8 +41,20 @@ class SMSController extends Controller
                 ];
             });
 
+        // Get SMS credits
+        $credits = 0;
+        try {
+            $creditsResult = $this->smsService->checkCredits();
+            if ($creditsResult['success']) {
+                $credits = $creditsResult['credits'];
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Could not fetch SMS credits: '.$e->getMessage());
+        }
+
         return Inertia::render('SMS/index', [
-            'users' => $children, // Keep the prop name as 'users' for frontend compatibility
+            'users' => $children,
+            'credits' => $credits,
         ]);
     }
 
@@ -41,72 +68,71 @@ class SMSController extends Controller
         ]);
 
         try {
-            $sid = config('services.twilio.sid');
-            $token = config('services.twilio.token');
-            $from = config('services.twilio.phone_number');
+            $apiToken = config('services.iprogsms.api_token');
 
-            if (! $sid || ! $token || ! $from) {
-                return back()->with('error', 'Twilio configuration is missing. Please check your .env file for TWILIO_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER.');
+            if (! $apiToken) {
+                return back()->with('error', 'IPROG SMS configuration is missing. Please check your .env file for IPROGSMS_API_TOKEN.');
             }
 
-            $client = new Client($sid, $token);
+            $user = auth()->user();
+            $phones = [];
 
-            $recipients = [];
             if ($validated['recipient_type'] === 'all') {
-                $recipients = Child::whereNotNull('contact_number')
-                    ->where('contact_number', '!=', '')
-                    ->get()
-                    ->mapWithKeys(function ($child) {
-                        $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
+                $query = Child::whereNotNull('contact_number')
+                    ->where('contact_number', '!=', '');
 
-                        return [$fullname => $child->contact_number];
-                    })
+                // Healthworkers can only send to their barangay
+                if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
+                    $query->where('barangay', $user->barangay);
+                }
+
+                $phones = $query->pluck('contact_number')
                     ->toArray();
             } else {
-                $recipients = Child::whereIn('id', $validated['recipients'])
+                $query = Child::whereIn('id', $validated['recipients'])
                     ->whereNotNull('contact_number')
-                    ->where('contact_number', '!=', '')
-                    ->get()
-                    ->mapWithKeys(function ($child) {
-                        $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
+                    ->where('contact_number', '!=', '');
 
-                        return [$fullname => $child->contact_number];
-                    })
+                // Healthworkers can only send to their barangay
+                if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
+                    $query->where('barangay', $user->barangay);
+                }
+
+                $phones = $query->pluck('contact_number')
                     ->toArray();
             }
 
-            if (empty($recipients)) {
+            if (empty($phones)) {
                 return back()->with('error', 'No valid phone numbers found for the selected recipients.');
             }
+
+            // Remove duplicates and reindex
+            $phones = array_values(array_unique($phones));
 
             $sentCount = 0;
             $failedCount = 0;
             $errors = [];
 
-            foreach ($recipients as $name => $phone) {
-                try {
-                    // Clean phone number: remove spaces and ensure proper format for Twilio
-                    $cleanPhone = str_replace(' ', '', $phone);
-
-                    // Log the attempt for debugging
-                    \Log::info("Attempting to send SMS to {$name} at {$cleanPhone}");
-
-                    $message = $client->messages->create($cleanPhone, [
-                        'from' => $from,
-                        'body' => $validated['message'],
-                    ]);
-
-                    // Log success
-                    \Log::info("SMS sent successfully to {$cleanPhone}. Message SID: {$message->sid}");
-
+            // Use bulk endpoint for multiple recipients, single for one
+            if (count($phones) === 1) {
+                $result = $this->smsService->sendSms($phones[0], $validated['message']);
+                if ($result['success']) {
                     $sentCount++;
-                } catch (\Exception $e) {
+                    \Log::info("SMS sent successfully to {$phones[0]}");
+                } else {
                     $failedCount++;
-                    $errorMsg = $e->getMessage();
-                    $errors[] = "Failed to send to {$name}'s guardian ({$phone}): {$errorMsg}";
-
-                    // Log the error
-                    \Log::error("Failed to send SMS to {$phone}: {$errorMsg}");
+                    $errors[] = "Failed to send to {$phones[0]}: ".($result['error'] ?? 'Unknown error');
+                    \Log::error("Failed to send SMS to {$phones[0]}: ".($result['error'] ?? 'Unknown error'));
+                }
+            } else {
+                $result = $this->smsService->sendBulkSms($phones, $validated['message']);
+                if ($result['success']) {
+                    $sentCount = count($phones);
+                    \Log::info('Bulk SMS sent successfully to '.count($phones).' recipients');
+                } else {
+                    $failedCount = count($phones);
+                    $errors[] = 'Bulk SMS failed: '.($result['error'] ?? 'Unknown error');
+                    \Log::error('Bulk SMS failed: '.($result['error'] ?? 'Unknown error'));
                 }
             }
 
@@ -123,11 +149,5 @@ class SMSController extends Controller
 
             return back()->with('error', 'Error sending SMS: '.$e->getMessage());
         }
-    }
-
-    // Legacy method - keeping for backward compatibility
-    public function sendsms()
-    {
-        return redirect()->route('sms.index');
     }
 }

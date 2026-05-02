@@ -52,11 +52,10 @@ export function AppSidebar() {
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 
-    // Admin-only menu
+    // Admin-only menu (excluding shared items like SMS)
     if (isAdmin) {
         mainNavItems.push(
             { title: 'User Management', href: '/users', icon: UserCog },
-            { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
             { title: 'Data Management', href: '/admin/database', icon: Database },
             {
                 title: 'Audit Logs',
@@ -66,9 +65,10 @@ export function AppSidebar() {
         );
     }
 
-    // Healthworker-only menu
+    // Healthworker menu (includes shared Admin+Healthworker items)
     if (isHealthworker) {
         mainNavItems.push({ title: 'Stocks Management', href: '/stocks', icon: Boxes });
+        mainNavItems.push({ title: 'Send SMS', href: route('sms.index'), icon: MessageSquare });
     }
 
     // Footer items (static)

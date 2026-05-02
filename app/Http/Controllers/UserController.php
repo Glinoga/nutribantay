@@ -6,6 +6,7 @@ use App\Models\RegistrationCode;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -134,7 +135,7 @@ class UserController extends Controller
         }
 
         // Generate registration code (8 random characters like before)
-        $code = strtoupper(\Illuminate\Support\Str::random(8));
+        $code = strtoupper(Str::random(8));
 
         // Create registration code
         $registrationCode = RegistrationCode::create([

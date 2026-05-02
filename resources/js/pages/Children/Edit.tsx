@@ -19,6 +19,7 @@ interface Child {
     weight?: number;
     height?: number;
     barangay?: string;
+    contact_number?: string;
 }
 
 interface Props {
@@ -37,6 +38,7 @@ export default function Edit({ child }: Props) {
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
         barangay: child.barangay ?? '',
+        contact_number: child.contact_number ?? '',
     });
 
     const greenPalette = '#355e3b';
@@ -206,6 +208,19 @@ export default function Edit({ child }: Props) {
                                     style={{ borderColor: greenPalette }}
                                 />
                             </div>
+                        </div>
+
+                        <div className="rounded-lg border bg-green-50 p-4" style={{ borderColor: greenPalette }}>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">Contact Number</Label>
+                            <Input
+                                type="text"
+                                placeholder="e.g., 09171234567"
+                                value={data.contact_number}
+                                onChange={(e) => setData('contact_number', e.target.value)}
+                                className="rounded-lg border bg-green-50 text-sm font-bold text-gray-800"
+                                style={{ borderColor: greenPalette }}
+                                maxLength={11}
+                            />
                         </div>
 
                         <div className="mt-6 flex justify-center gap-6 border-t pt-6">

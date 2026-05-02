@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AuditLog;
 use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,7 +39,7 @@ class CleanOldBackups extends Command
             }
 
             $lastModified = Storage::disk('local')->lastModified($file);
-            $fileDate = \Carbon\Carbon::createFromTimestamp($lastModified);
+            $fileDate = Carbon::createFromTimestamp($lastModified);
 
             if ($fileDate->isBefore($cutoffDate)) {
                 $filename = basename($file);

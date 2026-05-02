@@ -16,12 +16,13 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VaccineController;
+use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // Guest Pages
 Route::get('/', function () {
-    $announcements = \App\Models\Announcement::with('category')
+    $announcements = Announcement::with('category')
         ->whereDate('date', '<=', now())
         ->where(function ($query) {
             $query->whereNull('end_date')
@@ -154,12 +155,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
         Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
-        Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
-        Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
-
         Route::resource('categories', CategoryController::class);
 
         Route::resource('users', UserController::class);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEND SMS (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
+        Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
     });
 
     /*
@@ -168,11 +176,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:Admin|Healthworker'])->group(function () {
-        Route::get('/admin/announcements', [App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
-        Route::post('/admin/announcements/store', [App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/admin/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/admin/announcements/store', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
-        Route::put('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
-        Route::delete('/admin/announcements/{announcement}', [App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+        Route::put('/admin/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('/admin/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
 
     Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');

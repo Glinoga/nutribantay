@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(CategorySeeder::class);
 
+        $this->call(AddPhoneNumbersSeeder::class);
+
         // Create admin account
         $admin = User::firstOrCreate(
             ['email' => 'nutribantay@gmail.com'],

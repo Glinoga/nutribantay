@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -78,7 +79,7 @@ class HealthLog extends Model
             return 'Completed';
         }
 
-        if ($this->next_due_date && \Carbon\Carbon::parse($this->next_due_date)->isPast()) {
+        if ($this->next_due_date && Carbon::parse($this->next_due_date)->isPast()) {
             return 'Overdue';
         }
 

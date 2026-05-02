@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RegistrationCode;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -75,7 +76,7 @@ class RegistrationCodeController extends Controller
 
             $codes = $query->get()->map(function ($code) {
                 $isUsed = $code->is_used;
-                $expiresAt = $code->expires_at ? \Carbon\Carbon::parse($code->expires_at) : null;
+                $expiresAt = $code->expires_at ? Carbon::parse($code->expires_at) : null;
                 $isExpired = $expiresAt && $expiresAt->isPast();
                 $status = $isUsed ? 'used' : ($isExpired ? 'expired' : 'active');
 
