@@ -179,7 +179,7 @@ OUTPUT FORMAT (Clean Version):
     - {$vitaminList}
  4. Food Restrictions (kung may)
  5. Disclaimer
- 6. Pinagkuhanan ng Datos
+ 6. Pinagkuhanan ng Datos: National Nutrition Council
 
 IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot.
 ";
