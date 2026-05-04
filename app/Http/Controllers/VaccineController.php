@@ -15,6 +15,16 @@ class VaccineController extends Controller
             ->orderBy('name')
             ->get();
 
+        $mostPopular = $vaccines->sortByDesc('child_vaccines_count')->first();
+
+        $stats = [
+            'total' => $vaccines->count(),
+            'total_children' => $vaccines->sum('child_vaccines_count'),
+            'most_popular' => $mostPopular?->name,
+            'most_popular_count' => $mostPopular?->child_vaccines_count ?? 0,
+            'recently_added' => $vaccines->where('created_at', '>=', now()->subDays(30))->count(),
+        ];
+
         return Inertia::render('Vaccines/Index', [
             'vaccines' => $vaccines->map(fn ($v) => [
                 'id' => $v->id,
@@ -24,6 +34,7 @@ class VaccineController extends Controller
                 'created_by' => $v->creator?->name,
                 'created_at' => $v->created_at->format('Y-m-d H:i:s'),
             ]),
+            'stats' => $stats,
         ]);
     }
 

@@ -1,18 +1,16 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { Megaphone, Search, X, Calendar, User, Filter, Plus, Edit2, Trash2, TrendingUp, Bell, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { Bell, Calendar, Edit2, Filter, Megaphone, Plus, Search, Sparkles, Trash2, TrendingUp, User, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useState, useMemo } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Announcements', href: '/admin/announcements' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: '/admin/announcements' }];
 
 // Initialize SweetAlert2 with React content
 const MySwal = withReactContent(Swal);
@@ -42,14 +40,18 @@ interface Announcement {
     updated_at: string;
 }
 
-export default function Index({ announcements, categories }: { 
-    announcements: Announcement[];
-    categories: Category[];
-}) {
+export default function Index({ announcements, categories }: { announcements: Announcement[]; categories: Category[] }) {
     const { delete: deleteForm, processing } = useForm();
-    
+
     // State for create form
-    const { data, setData, post, processing: createProcessing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        post,
+        processing: createProcessing,
+        errors,
+        reset,
+    } = useForm({
         title: '',
         date: '',
         end_date: '',
@@ -66,16 +68,14 @@ export default function Index({ announcements, categories }: {
 
     // Filter announcements based on search and category
     const filteredAnnouncements = useMemo(() => {
-        return announcements.filter(announcement => {
-            const matchesSearch = 
+        return announcements.filter((announcement) => {
+            const matchesSearch =
                 announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.author?.toLowerCase().includes(searchQuery.toLowerCase());
-            
-            const matchesCategory = 
-                selectedCategory === 'all' || 
-                announcement.category_id.toString() === selectedCategory;
-            
+
+            const matchesCategory = selectedCategory === 'all' || announcement.category_id.toString() === selectedCategory;
+
             return matchesSearch && matchesCategory;
         });
     }, [announcements, searchQuery, selectedCategory]);
@@ -84,14 +84,14 @@ export default function Index({ announcements, categories }: {
     const stats = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
-        const active = announcements.filter(a => {
+
+        const active = announcements.filter((a) => {
             const announcementDate = new Date(a.date);
             const endDate = a.end_date ? new Date(a.end_date) : null;
             return announcementDate <= today && (!endDate || endDate >= today);
         }).length;
 
-        const upcoming = announcements.filter(a => {
+        const upcoming = announcements.filter((a) => {
             const announcementDate = new Date(a.date);
             return announcementDate > today;
         }).length;
@@ -100,7 +100,7 @@ export default function Index({ announcements, categories }: {
             total: announcements.length,
             active,
             upcoming,
-            categories: categories.length
+            categories: categories.length,
         };
     }, [announcements, categories]);
 
@@ -108,64 +108,89 @@ export default function Index({ announcements, categories }: {
         MySwal.fire({
             title: 'Delete Announcement',
             html: (
-                <div className="text-left" style={{
-                    fontFamily: 'Montserrat, sans-serif',
-                    lineHeight: '1.6'
-                }}>
-                    <div style={{
-                        marginBottom: '1rem',
-                        padding: '1rem',
-                        borderRadius: '0.75rem',
-                        backgroundColor: 'hsl(9 21% 96%)',
-                        border: '1px solid hsl(9 21% 85%)',
-                        position: 'relative'
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '0.75rem'
-                        }}>
-                            <div style={{
-                                fontSize: '1rem',
-                                marginTop: '0.125rem'
-                            }}>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: 'hsl(0 84% 60%)'}}>
+                <div
+                    className="text-left"
+                    style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        lineHeight: '1.6',
+                    }}
+                >
+                    <div
+                        style={{
+                            marginBottom: '1rem',
+                            padding: '1rem',
+                            borderRadius: '0.75rem',
+                            backgroundColor: 'hsl(9 21% 96%)',
+                            border: '1px solid hsl(9 21% 85%)',
+                            position: 'relative',
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '0.75rem',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: '1rem',
+                                    marginTop: '0.125rem',
+                                }}
+                            >
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={{ color: 'hsl(0 84% 60%)' }}
+                                >
                                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                                     <line x1="12" y1="9" x2="12" y2="13"></line>
                                     <line x1="12" y1="17" x2="12.01" y2="17"></line>
                                 </svg>
                             </div>
                             <div style={{ flex: 1 }}>
-                                <p style={{
-                                    color: 'hsl(181 100% 2%)',
-                                    fontSize: '0.875rem',
-                                    fontWeight: '500',
-                                    marginBottom: '0.5rem',
-                                    margin: '0 0 0.5rem 0'
-                                }}>
+                                <p
+                                    style={{
+                                        color: 'hsl(181 100% 2%)',
+                                        fontSize: '0.875rem',
+                                        fontWeight: '500',
+                                        marginBottom: '0.5rem',
+                                        margin: '0 0 0.5rem 0',
+                                    }}
+                                >
                                     You are about to permanently delete:
                                 </p>
-                                <p style={{
-                                    color: 'hsl(180 100% 8%)',
-                                    fontSize: '1rem',
-                                    fontWeight: '600',
-                                    marginBottom: '0.5rem',
-                                    wordBreak: 'break-word',
-                                    margin: '0 0 0.5rem 0',
-                                    padding: '0.375rem 0.5rem',
-                                    backgroundColor: 'hsl(178 100% 98%)',
-                                    borderRadius: '0.375rem',
-                                    border: '1px solid hsl(178 21% 57%)'
-                                }}>
+                                <p
+                                    style={{
+                                        color: 'hsl(180 100% 8%)',
+                                        fontSize: '1rem',
+                                        fontWeight: '600',
+                                        marginBottom: '0.5rem',
+                                        wordBreak: 'break-word',
+                                        margin: '0 0 0.5rem 0',
+                                        padding: '0.375rem 0.5rem',
+                                        backgroundColor: 'hsl(178 100% 98%)',
+                                        borderRadius: '0.375rem',
+                                        border: '1px solid hsl(178 21% 57%)',
+                                    }}
+                                >
                                     "{announcement.title}"
                                 </p>
-                                <p style={{
-                                    color: 'hsl(9 21% 41%)',
-                                    fontSize: '0.75rem',
-                                    fontWeight: '500',
-                                    margin: '0',
-                                    fontStyle: 'italic'
-                                }}>
+                                <p
+                                    style={{
+                                        color: 'hsl(9 21% 41%)',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '500',
+                                        margin: '0',
+                                        fontStyle: 'italic',
+                                    }}
+                                >
                                     This action cannot be undone
                                 </p>
                             </div>
@@ -190,7 +215,7 @@ export default function Index({ announcements, categories }: {
                 cancelButton: 'modern-swal-safe-btn',
                 actions: 'modern-swal-actions',
                 icon: 'modern-swal-warning-icon',
-                htmlContainer: 'modern-swal-content'
+                htmlContainer: 'modern-swal-content',
             },
             didOpen: () => {
                 const style = document.createElement('style');
@@ -299,43 +324,47 @@ export default function Index({ announcements, categories }: {
                     }
                 `;
                 document.head.appendChild(style);
-            }
+            },
         }).then((result) => {
             if (result.isConfirmed) {
                 deleteForm(`/admin/announcements/${announcement.id}`, {
                     preserveScroll: true,
                     onSuccess: () => {
                         // Show success toast
-                        smartToast.success(
-                            `"${announcement.title}" has been deleted successfully!`
-                        );
+                        smartToast.success(`"${announcement.title}" has been deleted successfully!`);
 
                         // Show SweetAlert success message
                         MySwal.fire({
                             title: 'Successfully Deleted!',
                             html: (
-                                <div style={{
-                                    textAlign: 'center',
-                                    fontFamily: 'Montserrat, sans-serif'
-                                }}>
-                                    <div style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '64px',
-                                        height: '64px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'hsl(147 19% 36%)',
-                                        marginBottom: '1rem'
-                                    }}>
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        fontFamily: 'Montserrat, sans-serif',
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '64px',
+                                            height: '64px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'hsl(147 19% 36%)',
+                                            marginBottom: '1rem',
+                                        }}
+                                    >
                                         <span style={{ fontSize: '2rem', color: 'white' }}>✓</span>
                                     </div>
-                                    <p style={{
-                                        color: 'hsl(181 100% 2%)',
-                                        fontSize: '1rem',
-                                        lineHeight: '1.5',
-                                        margin: '0'
-                                    }}>
+                                    <p
+                                        style={{
+                                            color: 'hsl(181 100% 2%)',
+                                            fontSize: '1rem',
+                                            lineHeight: '1.5',
+                                            margin: '0',
+                                        }}
+                                    >
                                         The announcement has been permanently removed from your system.
                                     </p>
                                 </div>
@@ -347,7 +376,7 @@ export default function Index({ announcements, categories }: {
                             customClass: {
                                 popup: 'modern-swal-success-popup',
                                 title: 'modern-swal-success-title',
-                                htmlContainer: 'modern-swal-success-content'
+                                htmlContainer: 'modern-swal-success-content',
                             },
                             didOpen: () => {
                                 const style = document.createElement('style');
@@ -399,48 +428,54 @@ export default function Index({ announcements, categories }: {
                                     }
                                 `;
                                 document.head.appendChild(style);
-                            }
+                            },
                         });
                     },
                     onError: (errors) => {
                         // Show error toast
-                        smartToast.error(
-                            'Failed to delete announcement. Please try again.'
-                        );
+                        smartToast.error('Failed to delete announcement. Please try again.');
 
                         // Show SweetAlert error message
                         MySwal.fire({
                             title: 'Deletion Failed',
                             html: (
-                                <div style={{
-                                    textAlign: 'center',
-                                    fontFamily: 'Montserrat, sans-serif'
-                                }}>
-                                    <div style={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: '64px',
-                                        height: '64px',
-                                        borderRadius: '50%',
-                                        backgroundColor: 'hsl(9 21% 41%)',
-                                        marginBottom: '1rem'
-                                    }}>
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        fontFamily: 'Montserrat, sans-serif',
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '64px',
+                                            height: '64px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'hsl(9 21% 41%)',
+                                            marginBottom: '1rem',
+                                        }}
+                                    >
                                         <span style={{ fontSize: '2rem', color: 'white' }}>✕</span>
                                     </div>
-                                    <p style={{
-                                        color: 'hsl(181 100% 2%)',
-                                        fontSize: '1rem',
-                                        lineHeight: '1.5',
-                                        margin: '0 0 1rem 0'
-                                    }}>
+                                    <p
+                                        style={{
+                                            color: 'hsl(181 100% 2%)',
+                                            fontSize: '1rem',
+                                            lineHeight: '1.5',
+                                            margin: '0 0 1rem 0',
+                                        }}
+                                    >
                                         Something went wrong while trying to delete the announcement.
                                     </p>
-                                    <p style={{
-                                        color: 'hsl(179 40% 22%)',
-                                        fontSize: '0.875rem',
-                                        margin: '0'
-                                    }}>
+                                    <p
+                                        style={{
+                                            color: 'hsl(179 40% 22%)',
+                                            fontSize: '0.875rem',
+                                            margin: '0',
+                                        }}
+                                    >
                                         Please try again or contact support if the problem persists.
                                     </p>
                                 </div>
@@ -455,7 +490,7 @@ export default function Index({ announcements, categories }: {
                                 title: 'modern-swal-error-title',
                                 confirmButton: 'modern-swal-error-btn',
                                 icon: 'modern-swal-error-icon',
-                                htmlContainer: 'modern-swal-error-content'
+                                htmlContainer: 'modern-swal-error-content',
                             },
                             didOpen: () => {
                                 const style = document.createElement('style');
@@ -495,9 +530,9 @@ export default function Index({ announcements, categories }: {
                                     }
                                 `;
                                 document.head.appendChild(style);
-                            }
+                            },
                         });
-                    }
+                    },
                 });
             }
         });
@@ -518,18 +553,18 @@ export default function Index({ announcements, categories }: {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.success('Announcement created successfully!');
-                
+
                 // Reset form and close modal
                 reset();
                 setImagePreview(null);
-                
+
                 // Close SweetAlert
                 MySwal.close();
             },
             onError: (errors) => {
                 const errorMessage = Object.values(errors).flat().join(', ');
                 smartToast.error(`Failed to create announcement: ${errorMessage}`);
-            }
+            },
         });
     };
 
@@ -564,7 +599,7 @@ export default function Index({ announcements, categories }: {
                                     onfocus="this.style.borderColor='hsl(147 19% 36%)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.1)'"
                                     onblur="this.style.borderColor='hsl(178 21% 85%)'; this.style.boxShadow='none'">
                                 <option value="">Select category</option>
-                                ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('')}
+                                ${categories.map((cat) => `<option value="${cat.id}">${cat.name}</option>`).join('')}
                             </select>
                         </div>
                         
@@ -662,7 +697,7 @@ export default function Index({ announcements, categories }: {
                 confirmButton: 'modern-swal-create-confirm-btn',
                 cancelButton: 'modern-swal-create-cancel-btn',
                 actions: 'modern-swal-create-actions',
-                htmlContainer: 'modern-swal-create-content'
+                htmlContainer: 'modern-swal-create-content',
             },
             didOpen: () => {
                 // Add global image preview handler
@@ -783,7 +818,7 @@ export default function Index({ announcements, categories }: {
                 const summary = (document.getElementById('swal-summary') as HTMLTextAreaElement)?.value;
                 const content = (document.getElementById('swal-content') as HTMLTextAreaElement)?.value;
                 const imageFile = (document.getElementById('swal-image') as HTMLInputElement)?.files?.[0];
-                
+
                 // Validate required fields
                 if (!title?.trim()) {
                     smartToast.error('Please enter an announcement title');
@@ -802,7 +837,7 @@ export default function Index({ announcements, categories }: {
                 const selectedDate = new Date(date);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                
+
                 if (selectedDate < today) {
                     smartToast.error('Please enter a valid start date (cannot be in the past)');
                     return false; // Keep modal open
@@ -816,7 +851,7 @@ export default function Index({ announcements, categories }: {
                     smartToast.error('Please enter content');
                     return false; // Keep modal open
                 }
-                
+
                 // Update form data only if validation passes
                 setData({
                     title: title || '',
@@ -826,34 +861,34 @@ export default function Index({ announcements, categories }: {
                     end_date: end_date || '',
                     summary: summary || '',
                     content: content || '',
-                    image: imageFile || null
+                    image: imageFile || null,
                 });
-                
+
                 return true; // Allow modal to close and proceed
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                handleFormSubmit();
-            } else if (result.isDismissed) {
-                console.log('Create modal cancelled');
-                reset();
-                setImagePreview(null);
-            }
-        }).catch((error) => {
-            console.error('SweetAlert2 error:', error);
-        });
+            },
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    handleFormSubmit();
+                } else if (result.isDismissed) {
+                    console.log('Create modal cancelled');
+                    reset();
+                    setImagePreview(null);
+                }
+            })
+            .catch((error) => {
+                console.error('SweetAlert2 error:', error);
+            });
     };
 
     const handleEdit = (announcement: Announcement) => {
-        smartToast.success(
-            `Opening "${announcement.title}" for editing...`
-        );
+        smartToast.success(`Opening "${announcement.title}" for editing...`);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Announcements" />
-            
+
             <style>{`
                 @keyframes slideIn {
                     from {
@@ -940,9 +975,9 @@ export default function Index({ announcements, categories }: {
             `}</style>
 
             {/* Modern Gradient Header */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 pb-16 pt-8">
+            <div className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-8 pb-16">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(168,85,247,0.1),transparent_50%)]" />
-                
+
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Header Content */}
                     <div className="mb-8 text-center">
@@ -950,7 +985,7 @@ export default function Index({ announcements, categories }: {
                             <Megaphone className="h-6 w-6 text-blue-600" />
                             <span className="text-sm font-semibold text-gray-700">Announcement Management</span>
                         </div>
-                        
+
                         <h1 className="mb-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
                             Manage Announcements
                         </h1>
@@ -961,7 +996,7 @@ export default function Index({ announcements, categories }: {
 
                     {/* Stats Cards */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card group cursor-pointer rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur-xl border border-blue-100">
+                        <div className="stat-card group cursor-pointer rounded-2xl border border-blue-100 bg-white/80 p-6 shadow-lg backdrop-blur-xl">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Total</p>
@@ -973,7 +1008,7 @@ export default function Index({ announcements, categories }: {
                             </div>
                         </div>
 
-                        <div className="stat-card group cursor-pointer rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur-xl border border-green-100">
+                        <div className="stat-card group cursor-pointer rounded-2xl border border-green-100 bg-white/80 p-6 shadow-lg backdrop-blur-xl">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Active</p>
@@ -985,7 +1020,7 @@ export default function Index({ announcements, categories }: {
                             </div>
                         </div>
 
-                        <div className="stat-card group cursor-pointer rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur-xl border border-purple-100">
+                        <div className="stat-card group cursor-pointer rounded-2xl border border-purple-100 bg-white/80 p-6 shadow-lg backdrop-blur-xl">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Upcoming</p>
@@ -997,7 +1032,7 @@ export default function Index({ announcements, categories }: {
                             </div>
                         </div>
 
-                        <div className="stat-card group cursor-pointer rounded-2xl bg-white/80 p-6 shadow-lg backdrop-blur-xl border border-pink-100">
+                        <div className="stat-card group cursor-pointer rounded-2xl border border-pink-100 bg-white/80 p-6 shadow-lg backdrop-blur-xl">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-gray-600">Categories</p>
@@ -1014,18 +1049,18 @@ export default function Index({ announcements, categories }: {
                     <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         {/* Search Bar */}
                         <div className="relative flex-1 lg:max-w-md">
-                            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                            <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search announcements..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full rounded-full border-2 border-gray-200 bg-white/80 py-3 pl-12 pr-12 backdrop-blur-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20"
+                                className="w-full rounded-full border-2 border-gray-200 bg-white/80 py-3 pr-12 pl-12 backdrop-blur-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:outline-none"
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-gray-100 transition-colors"
+                                    className="absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 transition-colors hover:bg-gray-100"
                                 >
                                     <X className="h-4 w-4 text-gray-400" />
                                 </button>
@@ -1083,14 +1118,14 @@ export default function Index({ announcements, categories }: {
                                 key={announcement.id}
                                 className="announcement-card group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all hover:shadow-2xl"
                                 style={{
-                                    animationDelay: `${index * 50}ms`
+                                    animationDelay: `${index * 50}ms`,
                                 }}
                             >
                                 {/* Color Accent */}
-                                <div 
+                                <div
                                     className="absolute inset-x-0 top-0 h-1.5"
                                     style={{
-                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`
+                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`,
                                     }}
                                 />
 
@@ -1115,11 +1150,11 @@ export default function Index({ announcements, categories }: {
                                 {/* Content */}
                                 <div className="p-6">
                                     {/* Category Badge */}
-                                    <Badge 
+                                    <Badge
                                         className="mb-3 font-semibold shadow-sm"
                                         style={{
                                             backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                            color: 'white'
+                                            color: 'white',
                                         }}
                                     >
                                         {announcement.category.name}
@@ -1148,9 +1183,7 @@ export default function Index({ announcements, categories }: {
                                     <div className="mb-4 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
 
                                     {/* Summary */}
-                                    <p className="mb-6 line-clamp-3 text-gray-700">
-                                        {announcement.summary}
-                                    </p>
+                                    <p className="mb-6 line-clamp-3 text-gray-700">{announcement.summary}</p>
 
                                     {/* Actions */}
                                     <div className="flex gap-3">
@@ -1191,12 +1224,12 @@ export default function Index({ announcements, categories }: {
                             {searchQuery || selectedCategory !== 'all' ? 'No matching announcements' : 'No announcements yet'}
                         </h3>
                         <p className="mb-6 max-w-md text-center text-gray-600">
-                            {searchQuery || selectedCategory !== 'all' 
-                                ? 'Try adjusting your search or filter to find what you\'re looking for.'
+                            {searchQuery || selectedCategory !== 'all'
+                                ? "Try adjusting your search or filter to find what you're looking for."
                                 : 'Get started by creating your first announcement to keep your community informed.'}
                         </p>
                         {!searchQuery && selectedCategory === 'all' && (
-                            <Button 
+                            <Button
                                 onClick={handleCreateNew}
                                 className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
                             >

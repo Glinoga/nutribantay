@@ -1,7 +1,15 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
+import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, Shield, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
@@ -104,8 +112,8 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
             {
                 label: 'Health Logs',
                 data: trendData.map((t) => t.count),
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                borderColor: '#0891B2',
+                backgroundColor: 'rgba(8, 145, 178, 0.5)',
                 tension: 0.3,
             },
         ],
@@ -117,7 +125,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
             {
                 label: 'Health Logs',
                 data: trendData.map((t) => t.count),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                backgroundColor: 'rgba(8, 145, 178, 0.7)',
             },
         ],
     };
@@ -132,8 +140,8 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                     trends.status_distribution.overweight,
                     trends.status_distribution.stunted,
                 ],
-                backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
-                borderColor: ['rgb(34, 197, 94)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
+                backgroundColor: ['rgba(5, 150, 105, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
+                borderColor: ['rgb(5, 150, 105)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
                 borderWidth: 1,
             },
         ],
@@ -143,344 +151,429 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
-            <div className="p-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Dashboard</h1>
-                        <p className="text-gray-600">Barangay: {user_barangay}</p>
-                    </div>
-                    <button onClick={() => setShowPrintModal(true)} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                        Export / Print
-                    </button>
-                </div>
-
-                <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Daily Stats</h2>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Children Registered Today</p>
-                            <p className="text-2xl font-bold">{stats.daily.children_registered}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Health Logs Today</p>
-                            <p className="text-2xl font-bold">{stats.daily.healthlogs}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">This Week</p>
-                            <p className="text-2xl font-bold">{stats.weekly.healthlogs}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">This Month</p>
-                            <p className="text-2xl font-bold">{stats.monthly.healthlogs}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <div className="rounded-lg bg-blue-600 p-6 text-white">
-                        <p className="text-sm opacity-80">Total Children Registered</p>
-                        <p className="text-4xl font-bold">{stats.total_children}</p>
-                    </div>
-                </div>
-
-                {vaccine_followups.overdue_count > 0 || vaccine_followups.due_this_month_count > 0 ? (
-                    <div className="mb-6">
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 shadow">
-                            <div className="flex items-center justify-between border-b border-amber-200 px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                    <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                                        />
-                                    </svg>
-                                    <div>
-                                        <h2 className="text-lg font-semibold text-amber-900">Vaccine Follow-ups Needed</h2>
-                                        <p className="text-sm text-amber-700">
-                                            {vaccine_followups.overdue_count > 0 && (
-                                                <span className="font-medium text-red-700">{vaccine_followups.overdue_count} overdue</span>
-                                            )}
-                                            {vaccine_followups.overdue_count > 0 && vaccine_followups.due_this_month_count > 0 && <span>, </span>}
-                                            {vaccine_followups.due_this_month_count > 0 && (
-                                                <span className="font-medium text-amber-700">
-                                                    {vaccine_followups.due_this_month_count} due this month
-                                                </span>
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Link
-                                        href="/children?vaccine_status=overdue"
-                                        className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
-                                    >
-                                        View Overdue
-                                    </Link>
-                                    <Link
-                                        href="/children?vaccine_status=upcoming"
-                                        className="rounded bg-amber-600 px-4 py-2 text-sm text-white hover:bg-amber-700"
-                                    >
-                                        View Upcoming
-                                    </Link>
-                                </div>
+            <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-100 p-6 font-sans">
+                <div className="mx-auto max-w-7xl">
+                    {/* Header Section */}
+                    <div className="mb-8">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-3xl font-bold text-cyan-900">Dashboard</h1>
+                                <p className="mt-1 flex items-center gap-2 text-cyan-700">
+                                    <Shield className="h-4 w-4 text-cyan-600" />
+                                    Barangay: {user_barangay}
+                                </p>
                             </div>
-                            {vaccine_followups.follow_ups.length > 0 && (
-                                <div className="max-h-64 overflow-y-auto">
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-amber-100/50">
-                                            <tr>
-                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Child</th>
-                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Vaccine</th>
-                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Dose #</th>
-                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Due Date</th>
-                                                <th className="px-6 py-2 text-left font-medium text-amber-800">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {vaccine_followups.follow_ups.slice(0, 10).map((fu, idx) => (
-                                                <tr key={idx} className="border-t border-amber-100">
-                                                    <td className="px-6 py-2">
-                                                        <Link href={`/children/${fu.child_id}`} className="text-blue-600 hover:underline">
-                                                            {fu.child_name}
-                                                        </Link>
-                                                    </td>
-                                                    <td className="px-6 py-2">{fu.vaccine_name}</td>
-                                                    <td className="px-6 py-2">{fu.dose_number}</td>
-                                                    <td className="px-6 py-2">{fu.next_due_date}</td>
-                                                    <td className="px-6 py-2">
-                                                        <span
-                                                            className={`rounded px-2 py-0.5 text-xs font-medium ${
-                                                                fu.status === 'Overdue' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                                                            }`}
-                                                        >
-                                                            {fu.status}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    {vaccine_followups.follow_ups.length > 10 && (
-                                        <div className="border-t border-amber-100 px-6 py-2 text-center text-sm text-amber-600">
-                                            ...and {vaccine_followups.follow_ups.length - 10} more
+                            <Dialog open={showPrintModal} onOpenChange={setShowPrintModal}>
+                                <DialogTrigger asChild>
+                                    <Button className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Export / Print
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Export / Print Report</DialogTitle>
+                                    </DialogHeader>
+                                    <p className="mb-4 text-cyan-700">Select time period for export:</p>
+
+                                    <RadioGroup value={printPeriod} onValueChange={setPrintPeriod} className="mb-6 space-y-3">
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="daily" id="daily" />
+                                            <Label htmlFor="daily" className="cursor-pointer">
+                                                Daily
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="weekly" id="weekly" />
+                                            <Label htmlFor="weekly" className="cursor-pointer">
+                                                Weekly
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="monthly" id="monthly" />
+                                            <Label htmlFor="monthly" className="cursor-pointer">
+                                                Monthly
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="yearly" id="yearly" />
+                                            <Label htmlFor="yearly" className="cursor-pointer">
+                                                Yearly
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+
+                                    <div className="flex gap-2">
+                                        <Button
+                                            onClick={handlePrint}
+                                            className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
+                                        >
+                                            <Printer className="mr-2 h-4 w-4" />
+                                            Print View
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                window.location.href = `/dashboard/export?period=${printPeriod}`;
+                                            }}
+                                            className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white transition-all duration-200 hover:from-emerald-700 hover:to-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                                        >
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Export CSV
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                        <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                            <CardHeader className="pb-2">
+                                <CardDescription className="flex items-center gap-2">
+                                    <Baby className="h-4 w-4 text-cyan-600" />
+                                    Children Today
+                                </CardDescription>
+                                <CardTitle className="text-3xl text-cyan-900">{stats.daily.children_registered}</CardTitle>
+                            </CardHeader>
+                        </Card>
+
+                        <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                            <CardHeader className="pb-2">
+                                <CardDescription className="flex items-center gap-2">
+                                    <Activity className="h-4 w-4 text-cyan-500" />
+                                    Health Logs Today
+                                </CardDescription>
+                                <CardTitle className="text-3xl text-cyan-900">{stats.daily.healthlogs}</CardTitle>
+                            </CardHeader>
+                        </Card>
+
+                        <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                            <CardHeader className="pb-2">
+                                <CardDescription className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-cyan-600" />
+                                    This Week
+                                </CardDescription>
+                                <CardTitle className="text-3xl text-cyan-900">{stats.weekly.healthlogs}</CardTitle>
+                            </CardHeader>
+                        </Card>
+
+                        <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                            <CardHeader className="pb-2">
+                                <CardDescription className="flex items-center gap-2">
+                                    <TrendingUp className="h-4 w-4 text-cyan-500" />
+                                    This Month
+                                </CardDescription>
+                                <CardTitle className="text-3xl text-cyan-900">{stats.monthly.healthlogs}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                    </div>
+
+                    {/* Total Children Card */}
+                    <div className="mb-8">
+                        <Card className="border-0 bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-lg">
+                            <CardHeader>
+                                <CardDescription className="text-cyan-100">Total Children Registered</CardDescription>
+                                <CardTitle className="text-5xl font-bold">{stats.total_children}</CardTitle>
+                            </CardHeader>
+                        </Card>
+                    </div>
+
+                    {/* Vaccine Follow-ups Alert */}
+                    {vaccine_followups.overdue_count > 0 || vaccine_followups.due_this_month_count > 0 ? (
+                        <div className="mb-8">
+                            <Alert className="border-amber-200 bg-amber-50" role="alert" aria-live="assertive">
+                                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                                <AlertTitle className="text-amber-900">Vaccine Follow-ups Needed</AlertTitle>
+                                <AlertDescription className="text-amber-700">
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                        {vaccine_followups.overdue_count > 0 && (
+                                            <Badge className="cursor-pointer bg-red-100 text-red-800 transition-all duration-200 hover:bg-red-200">
+                                                {vaccine_followups.overdue_count} overdue
+                                            </Badge>
+                                        )}
+                                        {vaccine_followups.due_this_month_count > 0 && (
+                                            <Badge className="cursor-pointer bg-amber-100 text-amber-800 transition-all duration-200 hover:bg-amber-200">
+                                                {vaccine_followups.due_this_month_count} due this month
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <div className="mt-4 flex gap-2">
+                                        <Link href="/children?vaccine_status=overdue">
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                aria-label="View overdue vaccine follow-ups"
+                                            >
+                                                View Overdue
+                                            </Button>
+                                        </Link>
+                                        <Link href="/children?vaccine_status=upcoming">
+                                            <Button
+                                                size="sm"
+                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                aria-label="View upcoming vaccine follow-ups"
+                                            >
+                                                View Upcoming
+                                            </Button>
+                                        </Link>
+                                    </div>
+
+                                    {vaccine_followups.follow_ups.length > 0 && (
+                                        <div
+                                            className="mt-4 max-h-64 overflow-y-auto rounded-lg border border-amber-200"
+                                            role="region"
+                                            aria-label="Vaccine follow-ups table"
+                                        >
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-sm">
+                                                    <thead className="sticky top-0 bg-amber-100/50">
+                                                        <tr>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Child</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Vaccine</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Dose</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Due Date</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {vaccine_followups.follow_ups.slice(0, 10).map((fu, idx) => (
+                                                            <tr
+                                                                key={idx}
+                                                                className="border-t border-amber-100 transition-colors hover:bg-amber-50/50"
+                                                            >
+                                                                <td className="px-4 py-2">
+                                                                    <Link
+                                                                        href={`/children/${fu.child_id}`}
+                                                                        className="cursor-pointer rounded text-cyan-600 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
+                                                                    >
+                                                                        {fu.child_name}
+                                                                    </Link>
+                                                                </td>
+                                                                <td className="px-4 py-2 text-cyan-700">{fu.vaccine_name}</td>
+                                                                <td className="px-4 py-2 text-cyan-700">{fu.dose_number}</td>
+                                                                <td className="px-4 py-2 text-cyan-700">{fu.next_due_date}</td>
+                                                                <td className="px-4 py-2">
+                                                                    <Badge
+                                                                        className={
+                                                                            fu.status === 'Overdue'
+                                                                                ? 'cursor-pointer bg-red-100 text-red-800'
+                                                                                : 'cursor-pointer bg-yellow-100 text-yellow-800'
+                                                                        }
+                                                                    >
+                                                                        {fu.status}
+                                                                    </Badge>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            {vaccine_followups.follow_ups.length > 10 && (
+                                                <div className="border-t border-amber-200 px-4 py-2 text-center text-sm text-amber-600">
+                                                    ...and {vaccine_followups.follow_ups.length - 10} more
+                                                </div>
+                                            )}
                                         </div>
                                     )}
-                                </div>
-                            )}
+                                </AlertDescription>
+                            </Alert>
                         </div>
-                    </div>
-                ) : null}
+                    ) : null}
 
-                <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Age Breakdown</h2>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">0-5 months</p>
-                            <p className="text-2xl font-bold">{stats.age_breakdown['0to5']}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">6-11 months</p>
-                            <p className="text-2xl font-bold">{stats.age_breakdown['6to11']}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">12-35 months</p>
-                            <p className="text-2xl font-bold">{stats.age_breakdown['12to35']}</p>
-                        </div>
-                        <div className="rounded-lg bg-orange-100 p-4 shadow">
-                            <p className="text-sm text-orange-600">36+ months</p>
-                            <p className="text-2xl font-bold text-orange-600">{stats.age_breakdown['36plus']}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Nutrition Status (This Year)</h2>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-lg bg-green-100 p-4 shadow">
-                            <p className="text-sm text-green-600">Normal</p>
-                            <p className="text-2xl font-bold text-green-600">{stats.nutrition_status.normal}</p>
-                        </div>
-                        <div className="rounded-lg bg-yellow-100 p-4 shadow">
-                            <p className="text-sm text-yellow-600">Underweight</p>
-                            <p className="text-2xl font-bold text-yellow-600">{stats.nutrition_status.underweight}</p>
-                        </div>
-                        <div className="rounded-lg bg-red-100 p-4 shadow">
-                            <p className="text-sm text-red-600">Overweight</p>
-                            <p className="text-2xl font-bold text-red-600">{stats.nutrition_status.overweight}</p>
-                        </div>
-                        <div className="rounded-lg bg-orange-100 p-4 shadow">
-                            <p className="text-sm text-orange-600">Stunted</p>
-                            <p className="text-2xl font-bold text-orange-600">{stats.nutrition_status.stunted}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Coverage</h2>
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Vitamin A Given</p>
-                            <p className="text-2xl font-bold">{stats.vitamin_a.given}</p>
-                            <p className="text-sm text-gray-500">({stats.vitamin_a.percentage}%)</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Deworming Given</p>
-                            <p className="text-2xl font-bold">{stats.deworming.given}</p>
-                            <p className="text-sm text-gray-500">({stats.deworming.percentage}%)</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Total Measured</p>
-                            <p className="text-2xl font-bold">{stats.vitamin_a.total}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <p className="text-sm text-gray-500">Health Logs This Year</p>
-                            <p className="text-2xl font-bold">{stats.yearly.healthlogs}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Trend Charts Section */}
-                <div className="mb-6">
-                    <h2 className="mb-3 text-lg font-semibold">Trends</h2>
-
-                    <div className="mb-4 flex gap-2">
-                        <button
-                            onClick={() => setTrendRange('6months')}
-                            className={`rounded px-4 py-2 ${trendRange === '6months' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-                        >
-                            Last 6 Months
-                        </button>
-                        <button
-                            onClick={() => setTrendRange('1year')}
-                            className={`rounded px-4 py-2 ${trendRange === '1year' ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-                        >
-                            Last Year
-                        </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <h3 className="mb-2 font-semibold">Health Logs Over Time</h3>
-                            <Line
-                                data={lineChartData}
-                                options={{
-                                    responsive: true,
-                                    plugins: {
-                                        legend: { position: 'bottom' },
-                                    },
-                                }}
-                            />
-                        </div>
-
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <h3 className="mb-2 font-semibold">Monthly Comparison</h3>
-                            <Bar
-                                data={barChartData}
-                                options={{
-                                    responsive: true,
-                                    plugins: {
-                                        legend: { position: 'bottom' },
-                                    },
-                                }}
-                            />
+                    {/* Age Breakdown */}
+                    <div className="mb-8">
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Age Breakdown</h2>
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>0-5 months</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['0to5']}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>6-11 months</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-500">{stats.age_breakdown['6to11']}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>12-35 months</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['12to35']}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription className="text-orange-600">36+ months</CardDescription>
+                                    <CardTitle className="text-3xl text-orange-600">{stats.age_breakdown['36plus']}</CardTitle>
+                                </CardHeader>
+                            </Card>
                         </div>
                     </div>
 
-                    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div className="rounded-lg bg-white p-4 shadow">
-                            <h3 className="mb-2 font-semibold">Nutrition Status Distribution (Last 6 Months)</h3>
-                            {trends.status_distribution.normal +
-                                trends.status_distribution.underweight +
-                                trends.status_distribution.overweight +
-                                trends.status_distribution.stunted >
-                            0 ? (
-                                <Doughnut
-                                    data={doughnutData}
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'bottom' },
-                                        },
-                                    }}
-                                />
-                            ) : (
-                                <p className="text-gray-500">No nutrition status data available.</p>
-                            )}
+                    {/* Nutrition Status */}
+                    <div className="mb-8">
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Nutrition Status (This Year)</h2>
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                            <Card className="min-h-[44px] cursor-pointer border-green-200 bg-green-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription className="text-green-600">Normal</CardDescription>
+                                    <CardTitle className="text-3xl text-green-600">{stats.nutrition_status.normal}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer border-yellow-200 bg-yellow-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription className="text-yellow-600">Underweight</CardDescription>
+                                    <CardTitle className="text-3xl text-yellow-600">{stats.nutrition_status.underweight}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer border-red-200 bg-red-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription className="text-red-600">Overweight</CardDescription>
+                                    <CardTitle className="text-3xl text-red-600">{stats.nutrition_status.overweight}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription className="text-orange-600">Stunted</CardDescription>
+                                    <CardTitle className="text-3xl text-orange-600">{stats.nutrition_status.stunted}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                        </div>
+                    </div>
+
+                    {/* Coverage Stats */}
+                    <div className="mb-8">
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Coverage</h2>
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Vitamin A Given</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900">{stats.vitamin_a.given}</CardTitle>
+                                    <CardDescription className="text-sm text-cyan-700">({stats.vitamin_a.percentage}%)</CardDescription>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Deworming Given</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900">{stats.deworming.given}</CardTitle>
+                                    <CardDescription className="text-sm text-cyan-700">({stats.deworming.percentage}%)</CardDescription>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Total Measured</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900">{stats.vitamin_a.total}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Health Logs This Year</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900">{stats.yearly.healthlogs}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                        </div>
+                    </div>
+
+                    {/* Trend Charts */}
+                    <div className="mb-8">
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Trends</h2>
+
+                        <div className="mb-4 flex gap-2">
+                            <Button
+                                onClick={() => setTrendRange('6months')}
+                                variant={trendRange === '6months' ? 'default' : 'outline'}
+                                className={
+                                    trendRange === '6months'
+                                        ? 'cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2'
+                                        : 'cursor-pointer hover:border-cyan-300 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2'
+                                }
+                            >
+                                Last 6 Months
+                            </Button>
+                            <Button
+                                onClick={() => setTrendRange('1year')}
+                                variant={trendRange === '1year' ? 'default' : 'outline'}
+                                className={
+                                    trendRange === '1year'
+                                        ? 'cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2'
+                                        : 'cursor-pointer hover:border-cyan-300 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2'
+                                }
+                            >
+                                Last Year
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2" role="region" aria-label="Health trends charts">
+                            <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardTitle className="text-lg text-cyan-900">Health Logs Over Time</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Line
+                                        data={lineChartData}
+                                        options={{
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'bottom' },
+                                            },
+                                        }}
+                                        aria-label="Line chart showing health logs over time"
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardTitle className="text-lg text-cyan-900">Monthly Comparison</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Bar
+                                        data={barChartData}
+                                        options={{
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'bottom' },
+                                            },
+                                        }}
+                                        aria-label="Bar chart showing monthly health log comparison"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2" role="region" aria-label="Nutrition status distribution chart">
+                            <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardTitle className="text-lg text-cyan-900">Nutrition Status Distribution</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {trends.status_distribution.normal +
+                                        trends.status_distribution.underweight +
+                                        trends.status_distribution.overweight +
+                                        trends.status_distribution.stunted >
+                                    0 ? (
+                                        <Doughnut
+                                            data={doughnutData}
+                                            options={{
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: { position: 'bottom' },
+                                                },
+                                            }}
+                                            aria-label="Doughnut chart showing nutrition status distribution"
+                                        />
+                                    ) : (
+                                        <p className="py-8 text-center text-cyan-700">No nutrition status data available.</p>
+                                    )}
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {showPrintModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="w-full max-w-md rounded-lg bg-white p-6">
-                        <h2 className="mb-4 text-xl font-bold">Export / Print</h2>
-                        <p className="mb-4 text-gray-600">Select time period for export:</p>
-
-                        <div className="mb-4 space-y-2">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="period"
-                                    value="daily"
-                                    checked={printPeriod === 'daily'}
-                                    onChange={() => setPrintPeriod('daily')}
-                                />
-                                <span>Daily</span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="period"
-                                    value="weekly"
-                                    checked={printPeriod === 'weekly'}
-                                    onChange={() => setPrintPeriod('weekly')}
-                                />
-                                <span>Weekly</span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="period"
-                                    value="monthly"
-                                    checked={printPeriod === 'monthly'}
-                                    onChange={() => setPrintPeriod('monthly')}
-                                />
-                                <span>Monthly</span>
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    name="period"
-                                    value="yearly"
-                                    checked={printPeriod === 'yearly'}
-                                    onChange={() => setPrintPeriod('yearly')}
-                                />
-                                <span>Yearly</span>
-                            </label>
-                        </div>
-
-                        <div className="flex gap-2">
-                            <button onClick={handlePrint} className="flex-1 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                                Print View
-                            </button>
-                            <button
-                                onClick={() => {
-                                    window.location.href = `/dashboard/export?period=${printPeriod}`;
-                                }}
-                                className="flex-1 rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-                            >
-                                Export CSV
-                            </button>
-                            <button onClick={() => setShowPrintModal(false)} className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </AppLayout>
     );
 }

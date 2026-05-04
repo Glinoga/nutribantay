@@ -1,22 +1,13 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-    SelectSeparator,
-} from '@/components/ui/select';
-import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus, Syringe } from 'lucide-react';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus, Syringe } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type HealthLogForm = {
@@ -69,9 +60,7 @@ type EditProps = {
     vaccines?: Vaccine[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children Records', href: '/children' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
 export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }: EditProps) {
     const [showSuccess, setShowSuccess] = useState(false);
@@ -100,7 +89,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
     // Check on mount if existing vaccine_name matches any vaccine in catalog
     useEffect(() => {
         if (healthlog.vaccine_name && vaccines && vaccines.length > 0) {
-            const match = vaccines.find(v => v.name === healthlog.vaccine_name);
+            const match = vaccines.find((v) => v.name === healthlog.vaccine_name);
             setIsOtherVaccine(!match);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +100,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
         const w = parseFloat(String(data.weight ?? ''));
         const h = parseFloat(String(data.height ?? ''));
 
-        if (w >0 && h >0) {
+        if (w > 0 && h > 0) {
             const bmiValue = w / Math.pow(h / 100, 2); // cm → meters
             setData('bmi', bmiValue.toFixed(2));
         } else {
@@ -177,7 +166,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <div className="mb-6 text-center fade-in-up">
+                    <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
                             <Heart className="h-5 w-5 text-teal-600" />
                             <span className="text-sm font-semibold text-teal-700">Edit Health Log</span>
@@ -192,13 +181,14 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                     </div>
 
                     {/* Data Correction Message */}
-                    <div className="mb-6 fade-in-up rounded-xl border-2 border-amber-200 bg-amber-50 p-4" style={{ animationDelay: '0.1s' }}>
+                    <div className="fade-in-up mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 p-4" style={{ animationDelay: '0.1s' }}>
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600" />
                             <div className="flex-1">
                                 <h3 className="font-bold text-amber-900">For Data Correction Only</h3>
                                 <p className="mt-1 text-sm text-amber-800">
-                                    This page is only for correcting incorrect data that was previously entered. If you want to add a new health log record for this child, please use the button below instead.
+                                    This page is only for correcting incorrect data that was previously entered. If you want to add a new health log
+                                    record for this child, please use the button below instead.
                                 </p>
                                 {childId && (
                                     <Link href={`/children/${childId}/healthlogs/create`}>
@@ -214,7 +204,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
 
                     {/* Success Message */}
                     {showSuccess && (
-                        <div className="mb-6 fade-in-up rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800">
+                        <div className="fade-in-up mb-6 rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800">
                             <div className="flex items-center gap-2">
                                 <Check className="h-5 w-5 text-green-600" />
                                 <span className="font-medium">Health log updated successfully!</span>
@@ -222,9 +212,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                         </div>
                     )}
 
-                    <form onSubmit={submit} className="space-y-6 fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <form onSubmit={submit} className="fade-in-up space-y-6" style={{ animationDelay: '0.2s' }}>
                         {/* Measurements Section */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <div className="flex items-center gap-2">
                                     <Calculator className="h-5 w-5 text-teal-600" />
@@ -233,7 +223,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
                                 <div>
-                                    <Label htmlFor="weight" className="text-gray-700">Weight (kg)</Label>
+                                    <Label htmlFor="weight" className="text-gray-700">
+                                        Weight (kg)
+                                    </Label>
                                     <Input
                                         id="weight"
                                         type="number"
@@ -247,7 +239,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="height" className="text-gray-700">Height (cm)</Label>
+                                    <Label htmlFor="height" className="text-gray-700">
+                                        Height (cm)
+                                    </Label>
                                     <Input
                                         id="height"
                                         type="number"
@@ -261,7 +255,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="bmi" className="text-gray-700">BMI (auto-calculated)</Label>
+                                    <Label htmlFor="bmi" className="text-gray-700">
+                                        BMI (auto-calculated)
+                                    </Label>
                                     <Input
                                         id="bmi"
                                         type="text"
@@ -275,12 +271,14 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                         </div>
 
                         {/* Nutrition Status */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-lg font-bold text-gray-900">Nutrition Status</h2>
                             </div>
                             <div className="p-6">
-                                <Label htmlFor="nutrition_status" className="text-gray-700">Nutrition Status</Label>
+                                <Label htmlFor="nutrition_status" className="text-gray-700">
+                                    Nutrition Status
+                                </Label>
                                 <Input
                                     id="nutrition_status"
                                     type="text"
@@ -293,13 +291,15 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                         </div>
 
                         {/* Supplementary Programs */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-lg font-bold text-gray-900">Supplementary Programs</h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="micronutrient_powder" className="text-gray-700">Micronutrient Powder (MNP)</Label>
+                                    <Label htmlFor="micronutrient_powder" className="text-gray-700">
+                                        Micronutrient Powder (MNP)
+                                    </Label>
                                     <Input
                                         id="micronutrient_powder"
                                         type="text"
@@ -311,7 +311,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="complementary_food" className="text-gray-700">Complementary Food</Label>
+                                    <Label htmlFor="complementary_food" className="text-gray-700">
+                                        Complementary Food
+                                    </Label>
                                     <Input
                                         id="complementary_food"
                                         type="text"
@@ -323,7 +325,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rutf" className="text-gray-700">RUTF (Severely Wasted)</Label>
+                                    <Label htmlFor="rutf" className="text-gray-700">
+                                        RUTF (Severely Wasted)
+                                    </Label>
                                     <Input
                                         id="rutf"
                                         type="text"
@@ -335,7 +339,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rusf" className="text-gray-700">RUSF (Moderately Wasted)</Label>
+                                    <Label htmlFor="rusf" className="text-gray-700">
+                                        RUSF (Moderately Wasted)
+                                    </Label>
                                     <Input
                                         id="rusf"
                                         type="text"
@@ -355,7 +361,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                             id="vitamin_a"
                                             checked={data.vitamin_a}
                                             onCheckedChange={(checked) => setData('vitamin_a', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
                                         />
                                         <span className="text-sm font-medium text-gray-700">Vitamin A Supplementation</span>
                                     </label>
@@ -365,7 +371,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                             id="deworming"
                                             checked={data.deworming}
                                             onCheckedChange={(checked) => setData('deworming', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
                                         />
                                         <span className="text-sm font-medium text-gray-700">Deworming</span>
                                     </label>
@@ -374,7 +380,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                         </div>
 
                         {/* Vaccination Section */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <div className="flex items-center gap-2">
                                     <Syringe className="h-5 w-5 text-teal-600" />
@@ -383,9 +389,11 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="vaccine_name" className="text-gray-700">Vaccine Name</Label>
+                                    <Label htmlFor="vaccine_name" className="text-gray-700">
+                                        Vaccine Name
+                                    </Label>
                                     <Select
-                                        value={isOtherVaccine ? 'other' : (data.vaccine_name || '')}
+                                        value={isOtherVaccine ? 'other' : data.vaccine_name || ''}
                                         onValueChange={(value) => {
                                             if (value === 'other') {
                                                 setIsOtherVaccine(true);
@@ -401,14 +409,15 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                         <SelectContent className="max-h-60">
                                             <SelectGroup>
                                                 <SelectLabel>Vaccine Catalog</SelectLabel>
-                                                {vaccines && vaccines.map((vaccine) => (
-                                                    <SelectItem key={vaccine.id} value={vaccine.name}>
-                                                        <div className="flex flex-col">
-                                                            <span className="font-medium">{vaccine.name}</span>
-                                                            <span className="text-xs text-muted-foreground">{vaccine.description}</span>
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
+                                                {vaccines &&
+                                                    vaccines.map((vaccine) => (
+                                                        <SelectItem key={vaccine.id} value={vaccine.name}>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium">{vaccine.name}</span>
+                                                                <span className="text-xs text-muted-foreground">{vaccine.description}</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    ))}
                                             </SelectGroup>
                                             <SelectSeparator />
                                             <SelectItem value="other">
@@ -421,7 +430,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
 
                                     {/* Free-text input for "Other" option */}
                                     {isOtherVaccine && (
-                                        <div className="mt-2 fade-in-up">
+                                        <div className="fade-in-up mt-2">
                                             <Input
                                                 id="vaccine_name_other"
                                                 type="text"
@@ -436,7 +445,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="dose_number" className="text-gray-700">Dose Number</Label>
+                                    <Label htmlFor="dose_number" className="text-gray-700">
+                                        Dose Number
+                                    </Label>
                                     <Input
                                         id="dose_number"
                                         type="number"
@@ -448,7 +459,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="date_given" className="text-gray-700">Date Given</Label>
+                                    <Label htmlFor="date_given" className="text-gray-700">
+                                        Date Given
+                                    </Label>
                                     <Input
                                         id="date_given"
                                         type="date"
@@ -459,7 +472,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="next_due_date" className="text-gray-700">Next Due Date</Label>
+                                    <Label htmlFor="next_due_date" className="text-gray-700">
+                                        Next Due Date
+                                    </Label>
                                     <Input
                                         id="next_due_date"
                                         type="date"
@@ -472,7 +487,9 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
 
                             {/* Vaccine Status */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
-                                <Label htmlFor="vaccine_status" className="text-gray-700">Vaccine Status (Auto)</Label>
+                                <Label htmlFor="vaccine_status" className="text-gray-700">
+                                    Vaccine Status (Auto)
+                                </Label>
                                 <Input
                                     id="vaccine_status"
                                     type="text"
@@ -485,7 +502,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex flex-wrap gap-3 fade-in-up" style={{ animationDelay: '0.3s' }}>
+                        <div className="fade-in-up flex flex-wrap gap-3" style={{ animationDelay: '0.3s' }}>
                             <Button
                                 type="submit"
                                 disabled={processing}

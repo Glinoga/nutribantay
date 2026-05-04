@@ -1,11 +1,11 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Edit2, Plus, Syringe, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
@@ -77,9 +77,7 @@ const getTodayDate = () => {
     return today.toISOString().split('T')[0];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children Records', href: '/children' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
 export default function Vaccines({ child, child_vaccines, available_vaccines }: ChildVaccinesProps) {
     const [selectedVaccineId, setSelectedVaccineId] = useState<number | null>(null);
@@ -211,7 +209,13 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
     };
 
     return (
-        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: `/children/${child.id}` }, { title: 'Vaccines', href: `/children/${child.id}/vaccines` }]}>
+        <AppLayout
+            breadcrumbs={[
+                ...breadcrumbs,
+                { title: child.fullname, href: `/children/${child.id}` },
+                { title: 'Vaccines', href: `/children/${child.id}/vaccines` },
+            ]}
+        >
             <Head title={`Vaccines - ${child.fullname}`} />
 
             <style>{`
@@ -256,7 +260,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <div className="mb-6 text-center fade-in-up">
+                    <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
                             <Syringe className="h-5 w-5 text-teal-600" />
                             <span className="text-sm font-semibold text-teal-700">Vaccine Tracker</span>
@@ -271,7 +275,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mb-6 flex flex-wrap gap-3 fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
                         <Link href={`/children/${child.id}`}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg">
                                 <X className="h-4 w-4" />
@@ -289,13 +293,19 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                     {/* Add Vaccine Section */}
                     {available_vaccines.length > 0 && (
-                        <div className="mb-6 fade-in-up rounded-xl border-0 bg-white p-6 shadow-md transition-all hover:shadow-lg" style={{ animationDelay: '0.3s' }}>
+                        <div
+                            className="fade-in-up mb-6 rounded-xl border-0 bg-white p-6 shadow-md transition-all hover:shadow-lg"
+                            style={{ animationDelay: '0.3s' }}
+                        >
                             <div className="mb-4 flex items-center gap-2">
                                 <Plus className="h-5 w-5 text-teal-600" />
                                 <h2 className="text-xl font-bold text-gray-900">Add Vaccine to Child</h2>
                             </div>
                             <form onSubmit={handleAddVaccine} className="flex gap-3">
-                                <Select value={selectedVaccineId ? String(selectedVaccineId) : ''} onValueChange={(val) => setSelectedVaccineId(Number(val))}>
+                                <Select
+                                    value={selectedVaccineId ? String(selectedVaccineId) : ''}
+                                    onValueChange={(val) => setSelectedVaccineId(Number(val))}
+                                >
                                     <SelectTrigger className="flex-1">
                                         <SelectValue placeholder="Select a vaccine..." />
                                     </SelectTrigger>
@@ -323,7 +333,11 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     {child_vaccines.length > 0 ? (
                         <div className="space-y-6">
                             {child_vaccines.map((cv, idx) => (
-                                <div key={cv.id} className="vaccine-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg" style={{ animationDelay: `${0.4 + idx * 0.1}s` }}>
+                                <div
+                                    key={cv.id}
+                                    className="vaccine-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg"
+                                    style={{ animationDelay: `${0.4 + idx * 0.1}s` }}
+                                >
                                     <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
@@ -333,9 +347,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                 <div>
                                                     <h2 className="text-lg font-bold text-gray-900">{cv.vaccine.name}</h2>
                                                     <div className="mt-1 flex items-center gap-2">
-                                                        <Badge className={getProgressBadgeClass(cv.progress.status)}>
-                                                            {cv.progress.status}
-                                                        </Badge>
+                                                        <Badge className={getProgressBadgeClass(cv.progress.status)}>{cv.progress.status}</Badge>
                                                         <span className="text-sm text-gray-500">
                                                             ({cv.progress.completed}/{cv.progress.total} doses)
                                                         </span>
@@ -351,11 +363,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                     <Plus className="mr-1.5 h-3.5 w-3.5" />
                                                     Record Dose
                                                 </Button>
-                                                <Button
-                                                    onClick={() => handleDeleteVaccine(cv)}
-                                                    size="sm"
-                                                    variant="destructive"
-                                                >
+                                                <Button onClick={() => handleDeleteVaccine(cv)} size="sm" variant="destructive">
                                                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                                                     Remove
                                                 </Button>
@@ -379,14 +387,15 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                 </thead>
                                                 <tbody>
                                                     {cv.doses.map((dose, doseIdx) => (
-                                                        <tr key={dose.id} className={`border-t transition-colors hover:bg-teal-50/50 ${doseIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                                        <tr
+                                                            key={dose.id}
+                                                            className={`border-t transition-colors hover:bg-teal-50/50 ${doseIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                        >
                                                             <td className="px-4 py-3 font-medium text-gray-900">{dose.dose_number}</td>
                                                             <td className="px-4 py-3 text-gray-900">{dose.date_given ?? '-'}</td>
                                                             <td className="px-4 py-3 text-gray-900">{dose.next_due_date ?? '-'}</td>
                                                             <td className="px-4 py-3">
-                                                                <Badge className={getDoseBadgeClass(dose.dose_status)}>
-                                                                    {dose.dose_status}
-                                                                </Badge>
+                                                                <Badge className={getDoseBadgeClass(dose.dose_status)}>{dose.dose_status}</Badge>
                                                             </td>
                                                             <td className="px-4 py-3 text-gray-900">{dose.administered_by ?? '-'}</td>
                                                             <td className="px-4 py-3">

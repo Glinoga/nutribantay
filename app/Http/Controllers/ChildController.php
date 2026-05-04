@@ -51,11 +51,20 @@ class ChildController extends Controller
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
             $query->whereIn('id', $overdueChildIdsQuery);
         } elseif ($vaccineStatus === 'upcoming') {
+            // Only show children with upcoming doses who have NO overdue doses
             $upcomingChildIdsQuery = ChildVaccineDose::select('cv.child_id')
                 ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
                 ->whereNull('child_vaccine_doses.date_given')
                 ->whereNotNull('child_vaccine_doses.next_due_date')
-                ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString());
+                ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString())
+                ->whereNotIn('cv.child_id', function ($q) use ($now) {
+                    $q->select('cv2.child_id')
+                        ->from('child_vaccine_doses as cvd2')
+                        ->join('child_vaccines as cv2', 'cvd2.child_vaccine_id', '=', 'cv2.id')
+                        ->whereNull('cvd2.date_given')
+                        ->whereNotNull('cvd2.next_due_date')
+                        ->where('cvd2.next_due_date', '<', $now->toDateString());
+                });
             $query->whereIn('id', $upcomingChildIdsQuery);
         }
 

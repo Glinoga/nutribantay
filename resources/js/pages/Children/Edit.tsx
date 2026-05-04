@@ -5,10 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import smartToast from '@/utils/smartToast';
 import { Head, router, useForm } from '@inertiajs/react';
 import { OctagonAlert } from 'lucide-react';
 import { useState } from 'react';
-import smartToast from '@/utils/smartToast';
 
 interface Child {
     id: number;
@@ -27,9 +27,7 @@ interface Props {
     child: Child;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children Records', href: '/children' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
 export default function Edit({ child }: Props) {
     const [showModal, setShowModal] = useState(true);
@@ -75,7 +73,13 @@ export default function Edit({ child }: Props) {
     };
 
     return (
-        <AppLayout breadcrumbs={[...breadcrumbs, { title: `${child.first_name} ${child.last_name}`, href: `/children/${child.id}` }, { title: 'Edit', href: `/children/${child.id}/edit` }]}>
+        <AppLayout
+            breadcrumbs={[
+                ...breadcrumbs,
+                { title: `${child.first_name} ${child.last_name}`, href: `/children/${child.id}` },
+                { title: 'Edit', href: `/children/${child.id}/edit` },
+            ]}
+        >
             <Head title="Edit Child Record" />
 
             <style>{`
@@ -101,7 +105,7 @@ export default function Edit({ child }: Props) {
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <div className="mb-6 text-center fade-in-up">
+                    <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
                             <OctagonAlert className="h-5 w-5 text-teal-600" />
                             <span className="text-sm font-semibold text-teal-700">Edit Record</span>
@@ -112,7 +116,9 @@ export default function Edit({ child }: Props) {
                                 Edit Child Record
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">Update information for {child.first_name} {child.last_name}</p>
+                        <p className="mx-auto max-w-xl text-gray-600">
+                            Update information for {child.first_name} {child.last_name}
+                        </p>
                     </div>
 
                     <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -123,9 +129,7 @@ export default function Edit({ child }: Props) {
                                 setShowModal(isOpen);
                             }}
                         >
-                            <DialogContent
-                                className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-2 border-teal-100 bg-white shadow-lg"
-                            >
+                            <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-2 border-teal-100 bg-white shadow-lg">
                                 <DialogHeader>
                                     <DialogTitle className="mb-6 w-full text-center text-3xl font-extrabold text-teal-600">
                                         Edit Child Record

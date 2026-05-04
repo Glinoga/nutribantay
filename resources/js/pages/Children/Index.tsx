@@ -7,6 +7,7 @@ import smartToast from '@/utils/smartToast';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Activity,
+    AlertTriangle,
     Baby,
     Calendar,
     ChevronLeft,
@@ -501,27 +502,34 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         >
                             Female ({stats.female})
                         </button>
+
+                        <div className="mx-2 h-6 w-px bg-gray-300" aria-hidden="true" />
+
                         {stats.vaccine_overdue > 0 && (
                             <button
                                 onClick={() => handleVaccineFilter('overdue')}
-                                className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                     activeVaccine === 'overdue'
                                         ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md'
                                         : 'border border-red-200 bg-white text-red-700 hover:bg-red-50'
                                 }`}
+                                aria-pressed={activeVaccine === 'overdue'}
                             >
-                                Vaccine Overdue ({stats.vaccine_overdue})
+                                <AlertTriangle className="h-3.5 w-3.5" />
+                                Overdue ({stats.vaccine_overdue})
                             </button>
                         )}
                         {stats.vaccine_upcoming > 0 && (
                             <button
                                 onClick={() => handleVaccineFilter('upcoming')}
-                                className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                     activeVaccine === 'upcoming'
                                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-md'
                                         : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
                                 }`}
+                                aria-pressed={activeVaccine === 'upcoming'}
                             >
+                                <Calendar className="h-3.5 w-3.5" />
                                 Due Soon ({stats.vaccine_upcoming})
                             </button>
                         )}
@@ -565,13 +573,23 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                                 <p className="text-xs text-gray-500">ID: {child.id}</p>
                                                                 {child.vaccine_alert && (
                                                                     <span
-                                                                        className={`mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                                                                        className={`mt-0.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ${
                                                                             child.vaccine_alert === 'overdue'
                                                                                 ? 'bg-red-100 text-red-700'
                                                                                 : 'bg-yellow-100 text-yellow-700'
                                                                         }`}
                                                                     >
-                                                                        {child.vaccine_alert === 'overdue' ? 'Vaccine Overdue' : 'Vaccine Due Soon'}
+                                                                        {child.vaccine_alert === 'overdue' ? (
+                                                                            <>
+                                                                                <AlertTriangle className="h-3 w-3" />
+                                                                                Vaccine Overdue
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <Calendar className="h-3 w-3" />
+                                                                                Vaccine Due Soon
+                                                                            </>
+                                                                        )}
                                                                     </span>
                                                                 )}
                                                             </div>

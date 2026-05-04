@@ -1,19 +1,19 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import axios from 'axios';
-import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import smartToast from '@/utils/smartToast';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { AlertTriangle, Check, ClipboardList, Edit2, Lightbulb, OctagonAlert, Plus, Syringe, Trash2, TrendingUp, X } from 'lucide-react';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import smartToast from '@/utils/smartToast';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
@@ -72,9 +72,7 @@ type Child = {
     healthlogs?: HealthLog[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children Records', href: '/children' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
 export default function Show({ child }: { child: Child }) {
     const [notesOpen, setNotesOpen] = useState(false);
@@ -324,7 +322,7 @@ export default function Show({ child }: { child: Child }) {
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <div className="mb-6 text-center fade-in-up">
+                    <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
                             <ClipboardList className="h-5 w-5 text-teal-600" />
                             <span className="text-sm font-semibold text-teal-700">Child Profile</span>
@@ -339,10 +337,10 @@ export default function Show({ child }: { child: Child }) {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="mb-6 flex flex-wrap gap-3 fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
                         <button
                             onClick={() => setShowEditModal(true)}
-                            className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg cursor-pointer"
+                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
                         >
                             <Edit2 className="h-4 w-4" />
                             Edit Record
@@ -373,7 +371,7 @@ export default function Show({ child }: { child: Child }) {
                     </div>
 
                     {/* Child Details Card */}
-                    <div className="mb-8 fade-in-up" style={{ animationDelay: '0.3s' }}>
+                    <div className="fade-in-up mb-8" style={{ animationDelay: '0.3s' }}>
                         <div className="overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-xl font-bold text-gray-900">Child Information</h2>
@@ -402,13 +400,17 @@ export default function Show({ child }: { child: Child }) {
                                     <div className="rounded-lg bg-gray-50 p-3">
                                         <p className="text-xs font-medium text-gray-500">Created at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900">
-                                            {child.created_at ? `by ${child.creator?.name ?? 'Unknown'} on ${new Date(child.created_at).toLocaleString()}` : 'N/A'}
+                                            {child.created_at
+                                                ? `by ${child.creator?.name ?? 'Unknown'} on ${new Date(child.created_at).toLocaleString()}`
+                                                : 'N/A'}
                                         </p>
                                     </div>
                                     <div className="rounded-lg bg-gray-50 p-3">
                                         <p className="text-xs font-medium text-gray-500">Last updated at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900">
-                                            {child.updated_at ? `by ${child.updater?.name ?? 'Unknown'} on ${new Date(child.updated_at).toLocaleString()}` : 'N/A'}
+                                            {child.updated_at
+                                                ? `by ${child.updater?.name ?? 'Unknown'} on ${new Date(child.updated_at).toLocaleString()}`
+                                                : 'N/A'}
                                         </p>
                                     </div>
                                 </div>
@@ -418,7 +420,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Trend Charts Section */}
                     {healthlogs.length > 0 && (
-                        <div className="mb-8 fade-in-up" style={{ animationDelay: '0.4s' }}>
+                        <div className="fade-in-up mb-8" style={{ animationDelay: '0.4s' }}>
                             <div className="mb-4 flex items-center gap-2">
                                 <TrendingUp className="h-6 w-6 text-teal-600" />
                                 <h2 className="text-2xl font-bold text-gray-900">Growth Trends</h2>
@@ -448,7 +450,10 @@ export default function Show({ child }: { child: Child }) {
                             </div>
 
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                                <div className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg" style={{ animationDelay: '0.5s' }}>
+                                <div
+                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg"
+                                    style={{ animationDelay: '0.5s' }}
+                                >
                                     <h3 className="mb-2 font-semibold text-gray-900">Weight, Height & BMI Over Time</h3>
                                     <Line
                                         data={lineChartData}
@@ -468,9 +473,13 @@ export default function Show({ child }: { child: Child }) {
                                     />
                                 </div>
 
-                                <div className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg" style={{ animationDelay: '0.6s' }}>
+                                <div
+                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg"
+                                    style={{ animationDelay: '0.6s' }}
+                                >
                                     <h3 className="mb-2 font-semibold text-gray-900">Nutrition Status Distribution</h3>
-                                    {nutritionCounts.normal + nutritionCounts.underweight + nutritionCounts.overweight + nutritionCounts.stunted > 0 ? (
+                                    {nutritionCounts.normal + nutritionCounts.underweight + nutritionCounts.overweight + nutritionCounts.stunted >
+                                    0 ? (
                                         <Doughnut
                                             data={doughnutData}
                                             options={{
@@ -491,14 +500,14 @@ export default function Show({ child }: { child: Child }) {
                     )}
 
                     {healthlogs.length === 0 && (
-                        <div className="mt-8 fade-in-up rounded-xl bg-gray-100 p-6 text-center" style={{ animationDelay: '0.4s' }}>
+                        <div className="fade-in-up mt-8 rounded-xl bg-gray-100 p-6 text-center" style={{ animationDelay: '0.4s' }}>
                             <p className="text-gray-500">No health logs yet. Add a health log to see growth trends.</p>
                         </div>
                     )}
 
                     {/* Health Log Records Table */}
                     {healthlogs.length > 0 && (
-                        <div className="mb-8 fade-in-up" style={{ animationDelay: '0.5s' }}>
+                        <div className="fade-in-up mb-8" style={{ animationDelay: '0.5s' }}>
                             <div className="mb-4 flex items-center gap-2">
                                 <ClipboardList className="h-6 w-6 text-teal-600" />
                                 <h2 className="text-2xl font-bold text-gray-900">Health Log Records</h2>
@@ -520,7 +529,9 @@ export default function Show({ child }: { child: Child }) {
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Deworming</th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">MNP</th>
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Created By</th>
-                                            {canManageHealthlogs && <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Actions</th>}
+                                            {canManageHealthlogs && (
+                                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Actions</th>
+                                            )}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -531,9 +542,15 @@ export default function Show({ child }: { child: Child }) {
                                             const paginatedLogs = sortedLogs.slice((logPage - 1) * logsPerPage, logPage * logsPerPage);
 
                                             return paginatedLogs.map((log, idx) => (
-                                                <tr key={log.id} className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                                <tr
+                                                    key={log.id}
+                                                    className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                >
                                                     <td className="px-4 py-3">
-                                                        <button onClick={() => setSelectedLog(log)} className="cursor-pointer text-left font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline">
+                                                        <button
+                                                            onClick={() => setSelectedLog(log)}
+                                                            className="cursor-pointer text-left font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
+                                                        >
                                                             {log.created_at ? new Date(log.created_at).toLocaleDateString() : 'N/A'}
                                                         </button>
                                                     </td>
@@ -541,22 +558,30 @@ export default function Show({ child }: { child: Child }) {
                                                     <td className="px-4 py-3 text-gray-900">{log.height ?? '-'}</td>
                                                     <td className="px-4 py-3 text-gray-900">{log.bmi ?? '-'}</td>
                                                     <td className="px-4 py-3">
-                                                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.nutrition_status)}`}>
+                                                        <span
+                                                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.nutrition_status)}`}
+                                                        >
                                                             {log.nutrition_status ?? '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_wfa)}`}>
+                                                        <span
+                                                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_wfa)}`}
+                                                        >
                                                             {log.status_wfa ?? '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_lfa)}`}>
+                                                        <span
+                                                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_lfa)}`}
+                                                        >
                                                             {log.status_lfa ?? '-'}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
-                                                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_wfl_wfh)}`}>
+                                                        <span
+                                                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.status_wfl_wfh)}`}
+                                                        >
                                                             {log.status_wfl_wfh ?? '-'}
                                                         </span>
                                                     </td>
@@ -643,14 +668,17 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Vaccine Records Section (Legacy) */}
                     {healthlogs.filter((log) => log.vaccine_name).length > 0 && (
-                        <div className="mb-8 fade-in-up" style={{ animationDelay: '0.6s' }}>
+                        <div className="fade-in-up mb-8" style={{ animationDelay: '0.6s' }}>
                             <div className="mb-4 flex items-center gap-2">
                                 <Syringe className="h-6 w-6 text-teal-600" />
                                 <h2 className="text-2xl font-bold text-gray-900">Historical Vaccine Records</h2>
                             </div>
                             <p className="mb-4 text-sm text-gray-600">
                                 These records are from the old health log system.{' '}
-                                <Link href={`/children/${child.id}/vaccines`} className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline">
+                                <Link
+                                    href={`/children/${child.id}/vaccines`}
+                                    className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
+                                >
                                     Use the Vaccine Tracker
                                 </Link>{' '}
                                 for current vaccine management.
@@ -670,7 +698,10 @@ export default function Show({ child }: { child: Child }) {
                                         {healthlogs
                                             .filter((log) => log.vaccine_name)
                                             .map((log, idx) => (
-                                                <tr key={log.id} className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                                                <tr
+                                                    key={log.id}
+                                                    className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                >
                                                     <td className="px-4 py-3 text-gray-900">
                                                         {log.date_given ? new Date(log.date_given).toLocaleDateString() : '-'}
                                                     </td>
@@ -702,7 +733,10 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* AI Recommender Section */}
                     {canViewAiRecommender && (
-                        <div className="mb-8 fade-in-up rounded-xl border-0 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-md" style={{ animationDelay: '0.7s' }}>
+                        <div
+                            className="fade-in-up mb-8 rounded-xl border-0 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-md"
+                            style={{ animationDelay: '0.7s' }}
+                        >
                             <div className="mb-4 flex items-center gap-2">
                                 <Lightbulb className="h-6 w-6 text-teal-600" />
                                 <h2 className="text-2xl font-bold text-gray-900">AI Nutrition Recommendation</h2>
@@ -719,12 +753,14 @@ export default function Show({ child }: { child: Child }) {
                                 {loading ? 'Analyzing...' : 'Generate Recommendation'}
                             </button>
 
-                            {healthlogs.length === 0 && <p className="mt-2 text-sm text-gray-500">Add a health log first to generate recommendations.</p>}
+                            {healthlogs.length === 0 && (
+                                <p className="mt-2 text-sm text-gray-500">Add a health log first to generate recommendations.</p>
+                            )}
 
                             {recommendation && (
                                 <div className="mt-4 rounded-lg bg-white p-4 shadow-inner">
                                     <h3 className="mb-2 font-semibold text-gray-900">Recommendation:</h3>
-                                    <p className="whitespace-pre-line text-sm text-gray-700">{recommendation}</p>
+                                    <p className="text-sm whitespace-pre-line text-gray-700">{recommendation}</p>
                                 </div>
                             )}
                         </div>
@@ -733,10 +769,16 @@ export default function Show({ child }: { child: Child }) {
                     {/* Health Log Detail Modal */}
                     {selectedLog && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedLog(null)}>
-                            <div className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                            <div
+                                className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <div className="mb-4 flex items-center justify-between">
                                     <h2 className="text-xl font-bold text-gray-900">Health Log Details</h2>
-                                    <button onClick={() => setSelectedLog(null)} className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                                    <button
+                                        onClick={() => setSelectedLog(null)}
+                                        className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                                    >
                                         <X className="h-5 w-5" />
                                     </button>
                                 </div>
@@ -766,14 +808,24 @@ export default function Show({ child }: { child: Child }) {
                                         <h3 className="mb-2 font-semibold text-gray-700">Nutrition Status</h3>
                                         <div className="grid grid-cols-4 gap-4 rounded-lg bg-gray-50 p-4">
                                             {[
-                                                { label: 'Overall', value: selectedLog.nutrition_status, class: getStatusBadgeClass(selectedLog.nutrition_status) },
+                                                {
+                                                    label: 'Overall',
+                                                    value: selectedLog.nutrition_status,
+                                                    class: getStatusBadgeClass(selectedLog.nutrition_status),
+                                                },
                                                 { label: 'WFA', value: selectedLog.status_wfa, class: getStatusBadgeClass(selectedLog.status_wfa) },
                                                 { label: 'LFA', value: selectedLog.status_lfa, class: getStatusBadgeClass(selectedLog.status_lfa) },
-                                                { label: 'WFL/WFH', value: selectedLog.status_wfl_wfh, class: getStatusBadgeClass(selectedLog.status_wfl_wfh) },
+                                                {
+                                                    label: 'WFL/WFH',
+                                                    value: selectedLog.status_wfl_wfh,
+                                                    class: getStatusBadgeClass(selectedLog.status_wfl_wfh),
+                                                },
                                             ].map((item, idx) => (
                                                 <div key={idx}>
                                                     <p className="text-sm text-gray-500">{item.label}</p>
-                                                    <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.class}`}>
+                                                    <span
+                                                        className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.class}`}
+                                                    >
                                                         {item.value ?? '-'}
                                                     </span>
                                                 </div>
@@ -802,7 +854,9 @@ export default function Show({ child }: { child: Child }) {
                                                             <X className="h-4 w-4 text-red-600" />
                                                         )
                                                     ) : (
-                                                        <span className="text-gray-900">{item.value || <X className="inline h-4 w-4 text-red-600" />}</span>
+                                                        <span className="text-gray-900">
+                                                            {item.value || <X className="inline h-4 w-4 text-red-600" />}
+                                                        </span>
                                                     )}
                                                 </div>
                                             ))}
@@ -818,8 +872,18 @@ export default function Show({ child }: { child: Child }) {
                                                     {[
                                                         { label: 'Vaccine Name', value: selectedLog.vaccine_name },
                                                         { label: 'Dose Number', value: selectedLog.dose_number },
-                                                        { label: 'Date Given', value: selectedLog.date_given ? new Date(selectedLog.date_given).toLocaleDateString() : null },
-                                                        { label: 'Next Due Date', value: selectedLog.next_due_date ? new Date(selectedLog.next_due_date).toLocaleDateString() : null },
+                                                        {
+                                                            label: 'Date Given',
+                                                            value: selectedLog.date_given
+                                                                ? new Date(selectedLog.date_given).toLocaleDateString()
+                                                                : null,
+                                                        },
+                                                        {
+                                                            label: 'Next Due Date',
+                                                            value: selectedLog.next_due_date
+                                                                ? new Date(selectedLog.next_due_date).toLocaleDateString()
+                                                                : null,
+                                                        },
                                                     ].map((item, idx) => (
                                                         <div key={idx}>
                                                             <p className="text-sm text-gray-500">{item.label}</p>
@@ -874,7 +938,10 @@ export default function Show({ child }: { child: Child }) {
                                             </button>
                                         </Link>
                                     )}
-                                    <button onClick={() => setSelectedLog(null)} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50">
+                                    <button
+                                        onClick={() => setSelectedLog(null)}
+                                        className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
+                                    >
                                         Close
                                     </button>
                                 </div>
@@ -898,7 +965,10 @@ export default function Show({ child }: { child: Child }) {
                     >
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-xl font-bold text-gray-900">Notes</h2>
-                            <button onClick={() => setNotesOpen(false)} className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                            <button
+                                onClick={() => setNotesOpen(false)}
+                                className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                            >
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
@@ -939,219 +1009,230 @@ export default function Show({ child }: { child: Child }) {
                             <p className="text-gray-500">No notes yet.</p>
                         )}
                     </div>
-                    </div>
                 </div>
+            </div>
 
-                {/* Edit Modal */}
-                <Dialog open={showEditModal} onOpenChange={(isOpen) => {
+            {/* Edit Modal */}
+            <Dialog
+                open={showEditModal}
+                onOpenChange={(isOpen) => {
                     if (!isOpen) handleEditClose();
                     setShowEditModal(isOpen);
-                }}>
-                    <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-0 bg-white shadow-2xl">
-                        <DialogHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                            <DialogTitle className="text-center text-2xl font-bold text-gray-900">
-                                Edit Child Record
-                            </DialogTitle>
-                            <DialogDescription className="mt-2 text-center text-sm text-gray-600">
-                                <span className="inline-flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
-                                    <AlertTriangle className="h-4 w-4" />
-                                    Only edit if you entered wrong data. Otherwise, create a health log.
-                                </span>
-                            </DialogDescription>
-                        </DialogHeader>
+                }}
+            >
+                <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-0 bg-white shadow-2xl">
+                    <DialogHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                        <DialogTitle className="text-center text-2xl font-bold text-gray-900">Edit Child Record</DialogTitle>
+                        <DialogDescription className="mt-2 text-center text-sm text-gray-600">
+                            <span className="inline-flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
+                                <AlertTriangle className="h-4 w-4" />
+                                Only edit if you entered wrong data. Otherwise, create a health log.
+                            </span>
+                        </DialogDescription>
+                    </DialogHeader>
 
-                        {/* Confirmation Alert */}
-                        <div className="mx-6 mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                            <div className="flex items-start gap-3">
-                                <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+                    {/* Confirmation Alert */}
+                    <div className="mx-6 mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                        <div className="flex items-start gap-3">
+                            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+                            <div>
+                                <h4 className="font-semibold text-amber-800">Confirmation Required</h4>
+                                <p className="mt-1 text-sm text-amber-700">
+                                    Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
+                                    health measurements, please{' '}
+                                    <Link href={`/children/${child.id}/healthlogs/create`} className="font-semibold text-teal-600 hover:underline">
+                                        create a health log
+                                    </Link>{' '}
+                                    instead.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {Object.keys(errors).length > 0 && (
+                        <div className="mx-6 mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                            <div className="flex items-center gap-2">
+                                <OctagonAlert className="h-5 w-5 flex-shrink-0" />
                                 <div>
-                                    <h4 className="font-semibold text-amber-800">Confirmation Required</h4>
-                                    <p className="mt-1 text-sm text-amber-700">
-                                        Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>.
-                                        For new health measurements, please <Link href={`/children/${child.id}/healthlogs/create`} className="font-semibold text-teal-600 hover:underline">create a health log</Link> instead.
-                                    </p>
+                                    {Object.entries(errors).map(([field, msg]) => (
+                                        <p key={field} className="text-sm">
+                                            {msg}
+                                        </p>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleEditSubmit} className="space-y-4 px-6 pb-6">
+                        {/* Name Fields */}
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                <h3 className="text-lg font-bold text-gray-900">Name</h3>
+                            </div>
+                            <div className="p-6">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                    <div>
+                                        <Label className="block text-sm font-medium text-gray-700">First Name</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="First name"
+                                            value={data.first_name}
+                                            onChange={(e) => setData('first_name', e.target.value)}
+                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label className="block text-sm font-medium text-gray-700">M.I. (Optional)</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="M.I. (optional)"
+                                            maxLength={5}
+                                            value={data.middle_initial}
+                                            onChange={(e) => setData('middle_initial', e.target.value)}
+                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label className="block text-sm font-medium text-gray-700">Last Name</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Last name"
+                                            value={data.last_name}
+                                            onChange={(e) => setData('last_name', e.target.value)}
+                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {Object.keys(errors).length > 0 && (
-                            <div className="mx-6 mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-                                <div className="flex items-center gap-2">
-                                    <OctagonAlert className="h-5 w-5 flex-shrink-0" />
-                                    <div>
-                                        {Object.entries(errors).map(([field, msg]) => (
-                                            <p key={field} className="text-sm">{msg}</p>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleEditSubmit} className="space-y-4 px-6 pb-6">
-                            {/* Name Fields */}
+                        {/* Sex & Barangay */}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                                 <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Name</h3>
+                                    <h3 className="text-lg font-bold text-gray-900">Sex</h3>
                                 </div>
                                 <div className="p-6">
-                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                        <div>
-                                            <Label className="block text-sm font-medium text-gray-700">First Name</Label>
-                                            <Input
-                                                type="text"
-                                                placeholder="First name"
-                                                value={data.first_name}
-                                                onChange={(e) => setData('first_name', e.target.value)}
-                                                className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label className="block text-sm font-medium text-gray-700">M.I. (Optional)</Label>
-                                            <Input
-                                                type="text"
-                                                placeholder="M.I. (optional)"
-                                                maxLength={5}
-                                                value={data.middle_initial}
-                                                onChange={(e) => setData('middle_initial', e.target.value)}
-                                                className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label className="block text-sm font-medium text-gray-700">Last Name</Label>
-                                            <Input
-                                                type="text"
-                                                placeholder="Last name"
-                                                value={data.last_name}
-                                                onChange={(e) => setData('last_name', e.target.value)}
-                                                className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                            />
-                                        </div>
-                                    </div>
+                                    <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
+                                        <SelectTrigger className="w-full rounded-lg border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
+                                            <SelectValue placeholder="Select sex" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Male" className="font-medium">
+                                                Male
+                                            </SelectItem>
+                                            <SelectItem value="Female" className="font-medium">
+                                                Female
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
 
-                            {/* Sex & Barangay */}
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                        <h3 className="text-lg font-bold text-gray-900">Sex</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                            <SelectTrigger className="w-full rounded-lg border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
-                                                <SelectValue placeholder="Select sex" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Male" className="font-medium">Male</SelectItem>
-                                                <SelectItem value="Female" className="font-medium">Female</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                        <h3 className="text-lg font-bold text-gray-900">Barangay</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Input
-                                            type="text"
-                                            value={data.barangay}
-                                            readOnly
-                                            className="w-full cursor-not-allowed rounded-lg border-gray-200 bg-gray-100 text-sm font-medium text-gray-600"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Birthdate */}
                             <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                                 <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Birthdate</h3>
-                                </div>
-                                <div className="p-6">
-                                    <Input
-                                        type="date"
-                                        value={data.birthdate}
-                                        onChange={(e) => setData('birthdate', e.target.value)}
-                                        className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Weight & Height */}
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                        <h3 className="text-lg font-bold text-gray-900">Weight (kg)</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Input
-                                            type="number"
-                                            step="0.1"
-                                            placeholder="Enter weight"
-                                            value={data.weight}
-                                            onChange={(e) => setData('weight', e.target.value)}
-                                            className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                        <h3 className="text-lg font-bold text-gray-900">Height (cm)</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Input
-                                            type="number"
-                                            step="0.1"
-                                            placeholder="Enter height"
-                                            value={data.height}
-                                            onChange={(e) => setData('height', e.target.value)}
-                                            className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Contact Number */}
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Contact Number</h3>
+                                    <h3 className="text-lg font-bold text-gray-900">Barangay</h3>
                                 </div>
                                 <div className="p-6">
                                     <Input
                                         type="text"
-                                        placeholder="e.g., 09171234567"
-                                        value={data.contact_number}
-                                        onChange={(e) => setData('contact_number', e.target.value)}
+                                        value={data.barangay}
+                                        readOnly
+                                        className="w-full cursor-not-allowed rounded-lg border-gray-200 bg-gray-100 text-sm font-medium text-gray-600"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Birthdate */}
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                <h3 className="text-lg font-bold text-gray-900">Birthdate</h3>
+                            </div>
+                            <div className="p-6">
+                                <Input
+                                    type="date"
+                                    value={data.birthdate}
+                                    onChange={(e) => setData('birthdate', e.target.value)}
+                                    className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Weight & Height */}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                    <h3 className="text-lg font-bold text-gray-900">Weight (kg)</h3>
+                                </div>
+                                <div className="p-6">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="Enter weight"
+                                        value={data.weight}
+                                        onChange={(e) => setData('weight', e.target.value)}
                                         className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                        maxLength={11}
                                     />
                                 </div>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="flex items-center justify-center gap-4 border-t border-gray-100 pt-6">
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
-                                >
-                                    {processing ? 'Saving...' : 'Save Changes'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={handleEditClose}
-                                    variant="outline"
-                                    className="rounded-lg px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
-                                >
-                                    Cancel
-                                </Button>
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                    <h3 className="text-lg font-bold text-gray-900">Height (cm)</h3>
+                                </div>
+                                <div className="p-6">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="Enter height"
+                                        value={data.height}
+                                        onChange={(e) => setData('height', e.target.value)}
+                                        className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    />
+                                </div>
                             </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            </AppLayout>
+                        </div>
+
+                        {/* Contact Number */}
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                <h3 className="text-lg font-bold text-gray-900">Contact Number</h3>
+                            </div>
+                            <div className="p-6">
+                                <Input
+                                    type="text"
+                                    placeholder="e.g., 09171234567"
+                                    value={data.contact_number}
+                                    onChange={(e) => setData('contact_number', e.target.value)}
+                                    className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    maxLength={11}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex items-center justify-center gap-4 border-t border-gray-100 pt-6">
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                            >
+                                {processing ? 'Saving...' : 'Save Changes'}
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleEditClose}
+                                variant="outline"
+                                className="rounded-lg px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+        </AppLayout>
     );
 }

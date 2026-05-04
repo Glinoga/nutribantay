@@ -1,7 +1,7 @@
+import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowLeft, Calendar, Share2, User } from 'lucide-react';
 
 // Define interface for the announcement
 interface Category {
@@ -32,12 +32,12 @@ interface ShowAnnouncementProps {
 // get color class based on category
 function getCategoryColorClass(categoryColor: string) {
     const colorMap: Record<string, string> = {
-        'primary': 'var(--primary)',
-        'secondary': 'var(--secondary)',
-        'success': 'var(--success)',
-        'danger': 'var(--danger)',
-        'warning': 'var(--warning)',
-        'info': 'var(--info)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        success: 'var(--success)',
+        danger: 'var(--danger)',
+        warning: 'var(--warning)',
+        info: 'var(--info)',
     };
 
     return colorMap[categoryColor] || 'var(--primary)';
@@ -48,7 +48,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         });
     };
 
@@ -69,7 +69,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
     return (
         <GuestLayout title={announcement.title}>
             <Head title={announcement.title} />
-            
+
             {/* Header Section */}
             <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-12">
                 <div className="container mx-auto px-6 lg:px-8">
@@ -77,7 +77,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                     <div className="mb-8">
                         <Link
                             href="/guest/announcements"
-                            className="inline-flex items-center text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
+                            className="inline-flex items-center text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
                         >
                             <ArrowLeft size={20} className="mr-2" />
                             Back to Announcements
@@ -86,7 +86,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
 
                     {/* Category Badge */}
                     <div className="mb-4">
-                        <span 
+                        <span
                             className="inline-block rounded-full px-4 py-2 text-sm font-medium text-white"
                             style={{ backgroundColor: getCategoryColorClass(announcement.category.color) }}
                         >
@@ -95,9 +95,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                     </div>
 
                     {/* Title */}
-                    <h1 className="mb-6 text-3xl font-bold leading-tight text-[var(--text)] md:text-4xl lg:text-5xl">
-                        {announcement.title}
-                    </h1>
+                    <h1 className="mb-6 text-3xl leading-tight font-bold text-[var(--text)] md:text-4xl lg:text-5xl">{announcement.title}</h1>
 
                     {/* Meta Information */}
                     <div className="flex flex-wrap items-center gap-6 text-[var(--text-muted)]">
@@ -113,7 +111,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                         )}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-2 text-[var(--primary)] hover:text-[var(--primary)]/80 transition-colors"
+                            className="flex items-center gap-2 text-[var(--primary)] transition-colors hover:text-[var(--primary)]/80"
                         >
                             <Share2 size={18} />
                             <span>Share</span>
@@ -123,32 +121,26 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
             </section>
 
             {/* Content Section */}
-            <section className="py-16 bg-white dark:bg-[var(--bg)]">
+            <section className="bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
                         {/* Featured Image */}
                         {announcement.image && (
                             <div className="mb-12 overflow-hidden rounded-2xl shadow-lg">
-                                <img
-                                    src={`/storage/${announcement.image}`}
-                                    alt={announcement.title}
-                                    className="h-[400px] w-full object-cover"
-                                />
+                                <img src={`/storage/${announcement.image}`} alt={announcement.title} className="h-[400px] w-full object-cover" />
                             </div>
                         )}
 
                         {/* Summary */}
                         <div className="mb-8 rounded-2xl bg-[var(--bg-light)] p-8">
                             <h2 className="mb-4 text-xl font-semibold text-[var(--text)]">Summary</h2>
-                            <p className="text-lg leading-relaxed text-[var(--text-muted)]">
-                                {announcement.summary}
-                            </p>
+                            <p className="text-lg leading-relaxed text-[var(--text-muted)]">{announcement.summary}</p>
                         </div>
 
                         {/* Content */}
                         <div className="prose prose-lg max-w-none">
-                            <div 
-                                className="text-[var(--text)] leading-relaxed whitespace-pre-line"
+                            <div
+                                className="leading-relaxed whitespace-pre-line text-[var(--text)]"
                                 style={{ fontSize: '1.125rem', lineHeight: '1.75' }}
                             >
                                 {announcement.content}
@@ -158,24 +150,16 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                         {/* End Date Notice */}
                         {announcement.end_date && (
                             <div className="mt-12 rounded-2xl border border-[var(--warning)] bg-[var(--warning)]/10 p-6">
-                                <h3 className="mb-2 font-semibold text-[var(--warning)]">
-                                    📅 Event Duration
-                                </h3>
-                                <p className="text-[var(--text-muted)]">
-                                    This announcement is valid until {formatDate(announcement.end_date)}
-                                </p>
+                                <h3 className="mb-2 font-semibold text-[var(--warning)]">📅 Event Duration</h3>
+                                <p className="text-[var(--text-muted)]">This announcement is valid until {formatDate(announcement.end_date)}</p>
                             </div>
                         )}
 
                         {/* Action Buttons */}
                         <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-[var(--bg-light)] p-8 text-center md:flex-row">
                             <div className="mr-0 md:mr-6">
-                                <h3 className="mb-2 text-xl font-semibold text-[var(--text)]">
-                                    Stay Connected
-                                </h3>
-                                <p className="text-[var(--text-muted)]">
-                                    Don't miss our latest updates and announcements
-                                </p>
+                                <h3 className="mb-2 text-xl font-semibold text-[var(--text)]">Stay Connected</h3>
+                                <p className="text-[var(--text-muted)]">Don't miss our latest updates and announcements</p>
                             </div>
                             <div className="flex gap-4">
                                 <Link href="/guest/announcements">
@@ -184,9 +168,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                                     </Button>
                                 </Link>
                                 <Link href="/guest/contact">
-                                    <Button className="rounded-full">
-                                        Contact Us
-                                    </Button>
+                                    <Button className="rounded-full">Contact Us</Button>
                                 </Link>
                             </div>
                         </div>

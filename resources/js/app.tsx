@@ -3,32 +3,30 @@ import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
 import { Toaster } from 'react-hot-toast';
+import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
-    title: (title) => title ? `${title} - ${appName}` : appName,
+    title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
         const pages = import.meta.glob('./pages/**/*.tsx');
-        
+
         // Try to find the exact page first
         const exactPath = `./pages/${name}.tsx`;
         if (pages[exactPath]) {
             return resolvePageComponent(exactPath, pages);
         }
-        
+
         // If exact match is not found, try case-insensitive search
         const lowerCasePath = exactPath.toLowerCase();
-        const matchingPath = Object.keys(pages).find(
-            path => path.toLowerCase() === lowerCasePath
-        );
-        
+        const matchingPath = Object.keys(pages).find((path) => path.toLowerCase() === lowerCasePath);
+
         if (matchingPath) {
             return resolvePageComponent(matchingPath, pages);
         }
-        
+
         throw new Error(`Page not found: ${exactPath}`);
     },
     setup({ el, App, props }) {
@@ -36,7 +34,7 @@ createInertiaApp({
         root.render(
             <>
                 <App {...props} />
-                <Toaster 
+                <Toaster
                     position="top-right"
                     containerStyle={{
                         top: 24,
@@ -86,7 +84,7 @@ createInertiaApp({
                             },
                         },
                         loading: {
-                            duration: Infinity, 
+                            duration: Infinity,
                             style: {
                                 background: '#ffffff',
                                 color: '#374151',
@@ -101,7 +99,7 @@ createInertiaApp({
                         },
                     }}
                 />
-            </>
+            </>,
         );
     },
     progress: {

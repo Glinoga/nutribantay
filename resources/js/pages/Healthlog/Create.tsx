@@ -1,17 +1,8 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-    SelectSeparator,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
@@ -75,22 +66,26 @@ type HealthLogForm = {
     vaccine_status: string;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children Records', href: '/children' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
-export default function Create({ child, latestHealthLog, allHealthLogs, vaccines = [] }: { child: Child; latestHealthLog?: LatestHealthLog; allHealthLogs?: AllHealthLogs; vaccines?: Vaccine[] }) {
+export default function Create({
+    child,
+    latestHealthLog,
+    allHealthLogs,
+    vaccines = [],
+}: {
+    child: Child;
+    latestHealthLog?: LatestHealthLog;
+    allHealthLogs?: AllHealthLogs;
+    vaccines?: Vaccine[];
+}) {
     const [showSuccess, setShowSuccess] = useState(false);
-    const [selectedRecord, setSelectedRecord] = useState<HealthLogRecord | null>(
-        latestHealthLog || null
-    );
+    const [selectedRecord, setSelectedRecord] = useState<HealthLogRecord | null>(latestHealthLog || null);
     const [showRecordSelector, setShowRecordSelector] = useState(false);
     const [isOtherVaccine, setIsOtherVaccine] = useState(false);
 
     // Use allHealthLogs or fallback to single record in array
-    const records = allHealthLogs && allHealthLogs.length > 0
-        ? allHealthLogs
-        : (latestHealthLog ? [latestHealthLog] : []);
+    const records = allHealthLogs && allHealthLogs.length > 0 ? allHealthLogs : latestHealthLog ? [latestHealthLog] : [];
 
     const { data, setData, post, processing, errors } = useForm<HealthLogForm>({
         weight: '',
@@ -113,7 +108,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
     // Check on mount if existing vaccine_name matches any vaccine in catalog
     useEffect(() => {
         if (data.vaccine_name && vaccines.length > 0) {
-            const match = vaccines.find(v => v.name === data.vaccine_name);
+            const match = vaccines.find((v) => v.name === data.vaccine_name);
             setIsOtherVaccine(!match);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,7 +119,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
         const w = parseFloat(data.weight);
         const h = parseFloat(data.height);
 
-        if (w >0 && h >0) {
+        if (w > 0 && h > 0) {
             const bmiValue = w / Math.pow(h / 100, 2); // cm → meters
             setData('bmi', bmiValue.toFixed(2));
         } else {
@@ -146,7 +141,13 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
     };
 
     return (
-        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: `/children/${child.id}` }, { title: 'Add Health Log', href: `/children/${child.id}/healthlogs/create` }]}>
+        <AppLayout
+            breadcrumbs={[
+                ...breadcrumbs,
+                { title: child.fullname, href: `/children/${child.id}` },
+                { title: 'Add Health Log', href: `/children/${child.id}/healthlogs/create` },
+            ]}
+        >
             <Head title={`Add Health Log - ${child.fullname}`} />
 
             <style>{`
@@ -192,7 +193,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
-                    <div className="mb-6 text-center fade-in-up">
+                    <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
                             <Heart className="h-5 w-5 text-teal-600" />
                             <span className="text-sm font-semibold text-teal-700">Health Log</span>
@@ -208,7 +209,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                     {/* Success Message */}
                     {showSuccess && (
-                        <div className="mb-6 fade-in-up rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800">
+                        <div className="fade-in-up mb-6 rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800">
                             <div className="flex items-center gap-2">
                                 <Check className="h-5 w-5 text-green-600" />
                                 <span className="font-medium">Health log added successfully! Redirecting...</span>
@@ -216,7 +217,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         </div>
                     )}
 
-                    <form onSubmit={submit} className="space-y-6 fade-in-up" style={{ animationDelay: '0.2s' }}>
+                    <form onSubmit={submit} className="fade-in-up space-y-6" style={{ animationDelay: '0.2s' }}>
                         {/* Child Info Card */}
                         <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
@@ -267,7 +268,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 {showRecordSelector && (
-                                    <div className="p-4 max-h-60 overflow-y-auto">
+                                    <div className="max-h-60 overflow-y-auto p-4">
                                         <div className="space-y-2">
                                             {records.map((record, index) => (
                                                 <div
@@ -276,15 +277,11 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                                         setSelectedRecord(record);
                                                         setShowRecordSelector(false);
                                                     }}
-                                                    className={`
-                                                        cursor-pointer rounded-lg border-l-4 p-3 transition-all duration-200
-                                                        hover:bg-[#22D3EE]/10
-                                                        focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0891B2]
-                                                        ${selectedRecord?.id === record.id || (!selectedRecord && index === 0)
+                                                    className={`cursor-pointer rounded-lg border-l-4 p-3 transition-all duration-200 hover:bg-[#22D3EE]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0891B2] ${
+                                                        selectedRecord?.id === record.id || (!selectedRecord && index === 0)
                                                             ? 'border-[#0891B2] bg-[#ECFEFF] ring-2 ring-[#0891B2]/20'
                                                             : 'border-transparent hover:border-[#22D3EE]/50'
-                                                        }
-                                                    `}
+                                                    } `}
                                                     tabIndex={0}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter' || e.key === ' ') {
@@ -300,15 +297,12 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                                             <p className="text-sm font-medium text-[#164E63]">
                                                                 {record.created_at
                                                                     ? new Date(record.created_at).toLocaleDateString('en-US', {
-                                                                        month: 'short',
-                                                                        day: 'numeric',
-                                                                        year: 'numeric'
-                                                                    })
-                                                                    : 'Unknown Date'
-                                                                }
-                                                                {index === 0 && (
-                                                                    <span className="ml-2 text-xs text-teal-600">(Latest)</span>
-                                                                )}
+                                                                          month: 'short',
+                                                                          day: 'numeric',
+                                                                          year: 'numeric',
+                                                                      })
+                                                                    : 'Unknown Date'}
+                                                                {index === 0 && <span className="ml-2 text-xs text-teal-600">(Latest)</span>}
                                                             </p>
                                                             <p className="text-xs text-gray-500">
                                                                 Weight: {record.weight ?? 'N/A'} kg | Height: {record.height ?? 'N/A'} cm
@@ -331,26 +325,29 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                         {/* Previous Record */}
                         {selectedRecord && (
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section fade-in-up" style={{ animationDelay: '0.15s' }}>
+                            <div
+                                className="form-section fade-in-up rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg"
+                                style={{ animationDelay: '0.15s' }}
+                            >
                                 <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                     <h2 className="text-lg font-bold text-gray-900">Previous Record</h2>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="mt-1 text-xs text-gray-500">
                                         Record from: {selectedRecord.created_at ? new Date(selectedRecord.created_at).toLocaleDateString() : 'N/A'}
                                         {records.length > 1 && (
                                             <button
                                                 type="button"
                                                 onClick={() => setShowRecordSelector(true)}
-                                                className="ml-2 text-teal-600 hover:underline text-xs cursor-pointer"
+                                                className="ml-2 cursor-pointer text-xs text-teal-600 hover:underline"
                                             >
                                                 (Switch Record)
                                             </button>
                                         )}
                                     </p>
                                 </div>
-                                <div className="p-6 space-y-4">
+                                <div className="space-y-4 p-6">
                                     {/* Measurements */}
                                     <div>
-                                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Measurements</h3>
+                                        <h3 className="mb-2 text-sm font-semibold text-gray-700">Measurements</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                             <div className="rounded-lg bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">Weight (kg)</p>
@@ -370,7 +367,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                     {/* Nutrition Status */}
                                     {selectedRecord.nutrition_status && (
                                         <div>
-                                            <h3 className="text-sm font-semibold text-gray-700 mb-2">Nutrition Status</h3>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700">Nutrition Status</h3>
                                             <div className="rounded-lg bg-gray-50 p-3">
                                                 <p className="font-semibold text-gray-900">{selectedRecord.nutrition_status}</p>
                                             </div>
@@ -379,7 +376,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                                     {/* Supplementary Programs */}
                                     <div>
-                                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Supplementary Programs</h3>
+                                        <h3 className="mb-2 text-sm font-semibold text-gray-700">Supplementary Programs</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             {selectedRecord.micronutrient_powder && (
                                                 <div className="rounded-lg bg-gray-50 p-3">
@@ -419,7 +416,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                     {/* Vaccination */}
                                     {selectedRecord.vaccine_name && (
                                         <div>
-                                            <h3 className="text-sm font-semibold text-gray-700 mb-2">Vaccination</h3>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700">Vaccination</h3>
                                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                 <div className="rounded-lg bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Vaccine Name</p>
@@ -438,18 +435,22 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                                 <div className="rounded-lg bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Next Due Date</p>
                                                     <p className="mt-1 font-semibold text-gray-900">
-                                                        {selectedRecord.next_due_date ? new Date(selectedRecord.next_due_date).toLocaleDateString() : 'N/A'}
+                                                        {selectedRecord.next_due_date
+                                                            ? new Date(selectedRecord.next_due_date).toLocaleDateString()
+                                                            : 'N/A'}
                                                     </p>
                                                 </div>
                                                 <div className="rounded-lg bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Status</p>
-                                                    <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                                        selectedRecord.vaccine_status === 'Completed'
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : selectedRecord.vaccine_status === 'Overdue'
-                                                            ? 'bg-red-100 text-red-800'
-                                                            : 'bg-yellow-100 text-yellow-800'
-                                                    }`}>
+                                                    <span
+                                                        className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                                            selectedRecord.vaccine_status === 'Completed'
+                                                                ? 'bg-green-100 text-green-800'
+                                                                : selectedRecord.vaccine_status === 'Overdue'
+                                                                  ? 'bg-red-100 text-red-800'
+                                                                  : 'bg-yellow-100 text-yellow-800'
+                                                        }`}
+                                                    >
                                                         {selectedRecord.vaccine_status || 'Pending'}
                                                     </span>
                                                 </div>
@@ -461,7 +462,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         )}
 
                         {/* Measurements Section */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <div className="flex items-center gap-2">
                                     <Calculator className="h-5 w-5 text-teal-600" />
@@ -470,7 +471,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
                                 <div>
-                                    <Label htmlFor="weight" className="text-gray-700">Weight (kg)</Label>
+                                    <Label htmlFor="weight" className="text-gray-700">
+                                        Weight (kg)
+                                    </Label>
                                     <Input
                                         id="weight"
                                         type="number"
@@ -484,7 +487,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="height" className="text-gray-700">Height (cm)</Label>
+                                    <Label htmlFor="height" className="text-gray-700">
+                                        Height (cm)
+                                    </Label>
                                     <Input
                                         id="height"
                                         type="number"
@@ -498,7 +503,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="bmi" className="text-gray-700">BMI (auto-calculated)</Label>
+                                    <Label htmlFor="bmi" className="text-gray-700">
+                                        BMI (auto-calculated)
+                                    </Label>
                                     <Input
                                         id="bmi"
                                         type="text"
@@ -512,12 +519,14 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         </div>
 
                         {/* Nutrition Status */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-lg font-bold text-gray-900">Nutrition Status</h2>
                             </div>
                             <div className="p-6">
-                                <Label htmlFor="nutrition_status" className="text-gray-700">Nutrition Status</Label>
+                                <Label htmlFor="nutrition_status" className="text-gray-700">
+                                    Nutrition Status
+                                </Label>
                                 <Input
                                     id="nutrition_status"
                                     type="text"
@@ -530,13 +539,15 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         </div>
 
                         {/* Supplementary Programs */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-lg font-bold text-gray-900">Supplementary Programs</h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="micronutrient_powder" className="text-gray-700">Micronutrient Powder (MNP)</Label>
+                                    <Label htmlFor="micronutrient_powder" className="text-gray-700">
+                                        Micronutrient Powder (MNP)
+                                    </Label>
                                     <Input
                                         id="micronutrient_powder"
                                         type="text"
@@ -548,7 +559,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="complementary_food" className="text-gray-700">Complementary Food</Label>
+                                    <Label htmlFor="complementary_food" className="text-gray-700">
+                                        Complementary Food
+                                    </Label>
                                     <Input
                                         id="complementary_food"
                                         type="text"
@@ -560,7 +573,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rutf" className="text-gray-700">RUTF (Severely Wasted)</Label>
+                                    <Label htmlFor="rutf" className="text-gray-700">
+                                        RUTF (Severely Wasted)
+                                    </Label>
                                     <Input
                                         id="rutf"
                                         type="text"
@@ -572,7 +587,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rusf" className="text-gray-700">RUSF (Moderately Wasted)</Label>
+                                    <Label htmlFor="rusf" className="text-gray-700">
+                                        RUSF (Moderately Wasted)
+                                    </Label>
                                     <Input
                                         id="rusf"
                                         type="text"
@@ -592,7 +609,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                             id="vitamin_a"
                                             checked={data.vitamin_a}
                                             onCheckedChange={(checked) => setData('vitamin_a', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
                                         />
                                         <span className="text-sm font-medium text-gray-700">Vitamin A Supplementation</span>
                                     </label>
@@ -602,7 +619,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                             id="deworming"
                                             checked={data.deworming}
                                             onCheckedChange={(checked) => setData('deworming', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
                                         />
                                         <span className="text-sm font-medium text-gray-700">Deworming</span>
                                     </label>
@@ -611,7 +628,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         </div>
 
                         {/* Vaccination Section */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg form-section">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <div className="flex items-center gap-2">
                                     <Syringe className="h-5 w-5 text-teal-600" />
@@ -620,9 +637,11 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="vaccine_name" className="text-gray-700">Vaccine Name</Label>
+                                    <Label htmlFor="vaccine_name" className="text-gray-700">
+                                        Vaccine Name
+                                    </Label>
                                     <Select
-                                        value={isOtherVaccine ? 'other' : (data.vaccine_name || '')}
+                                        value={isOtherVaccine ? 'other' : data.vaccine_name || ''}
                                         onValueChange={(value) => {
                                             if (value === 'other') {
                                                 setIsOtherVaccine(true);
@@ -658,7 +677,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                                     {/* Free-text input for "Other" option */}
                                     {isOtherVaccine && (
-                                        <div className="mt-2 fade-in-up">
+                                        <div className="fade-in-up mt-2">
                                             <Input
                                                 id="vaccine_name_other"
                                                 type="text"
@@ -673,7 +692,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="dose_number" className="text-gray-700">Dose Number</Label>
+                                    <Label htmlFor="dose_number" className="text-gray-700">
+                                        Dose Number
+                                    </Label>
                                     <Input
                                         id="dose_number"
                                         type="number"
@@ -685,7 +706,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="date_given" className="text-gray-700">Date Given</Label>
+                                    <Label htmlFor="date_given" className="text-gray-700">
+                                        Date Given
+                                    </Label>
                                     <Input
                                         id="date_given"
                                         type="date"
@@ -696,7 +719,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="next_due_date" className="text-gray-700">Next Due Date</Label>
+                                    <Label htmlFor="next_due_date" className="text-gray-700">
+                                        Next Due Date
+                                    </Label>
                                     <Input
                                         id="next_due_date"
                                         type="date"
@@ -709,7 +734,9 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
 
                             {/* Vaccine Status */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
-                                <Label htmlFor="vaccine_status" className="text-gray-700">Vaccine Status (Auto)</Label>
+                                <Label htmlFor="vaccine_status" className="text-gray-700">
+                                    Vaccine Status (Auto)
+                                </Label>
                                 <Input
                                     id="vaccine_status"
                                     type="text"
@@ -722,7 +749,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex gap-3 fade-in-up" style={{ animationDelay: '0.3s' }}>
+                        <div className="fade-in-up flex gap-3" style={{ animationDelay: '0.3s' }}>
                             <Button
                                 type="submit"
                                 disabled={processing}
@@ -731,12 +758,7 @@ export default function Create({ child, latestHealthLog, allHealthLogs, vaccines
                                 {processing ? 'Saving...' : 'Save Health Log'}
                             </Button>
 
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => window.history.back()}
-                                className="px-8 py-5 text-lg font-bold"
-                            >
+                            <Button type="button" variant="outline" onClick={() => window.history.back()} className="px-8 py-5 text-lg font-bold">
                                 Cancel & Go Back
                             </Button>
 

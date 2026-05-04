@@ -1,22 +1,15 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { router } from "@inertiajs/react";
-import React, { useState } from "react";
-import { Head, useForm } from "@inertiajs/react";
-import { Megaphone, OctagonAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { Head, router, useForm } from '@inertiajs/react';
+import { Megaphone, OctagonAlert } from 'lucide-react';
+import React, { useState } from 'react';
 
 // Types
 interface Category {
@@ -47,19 +40,17 @@ interface EditProps {
 
 export default function Edit({ announcement, categories }: EditProps) {
     const { data, setData, put, processing, errors } = useForm({
-        title: announcement.title || "",
-        date: announcement.date || "",
-        end_date: announcement.end_date || "",
-        category_id: announcement.category_id ? announcement.category_id.toString() : "",
-        author: announcement.author || "",
-        summary: announcement.summary || "",
-        content: announcement.content || "",
+        title: announcement.title || '',
+        date: announcement.date || '',
+        end_date: announcement.end_date || '',
+        category_id: announcement.category_id ? announcement.category_id.toString() : '',
+        author: announcement.author || '',
+        summary: announcement.summary || '',
+        content: announcement.content || '',
         image: null as File | null,
     });
 
-    const [preview, setPreview] = useState<string | null>(
-        announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null)
-    );
+    const [preview, setPreview] = useState<string | null>(announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null));
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -76,23 +67,23 @@ export default function Edit({ announcement, categories }: EditProps) {
         const loadingToast = smartToast.loading('Updating announcement...');
 
         const formData = new FormData();
-        formData.append("title", data.title);
-        formData.append("date", data.date);
-        formData.append("end_date", data.end_date || "");
-        formData.append("category_id", data.category_id);
-        formData.append("author", data.author || "");
-        formData.append("summary", data.summary);
-        formData.append("content", data.content);
+        formData.append('title', data.title);
+        formData.append('date', data.date);
+        formData.append('end_date', data.end_date || '');
+        formData.append('category_id', data.category_id);
+        formData.append('author', data.author || '');
+        formData.append('summary', data.summary);
+        formData.append('content', data.content);
 
         if (data.image) {
-            formData.append("image", data.image); 
+            formData.append('image', data.image);
         }
 
         // Important: tell Laravel this is a PUT request
-        formData.append("_method", "PUT");
+        formData.append('_method', 'PUT');
 
         // Use router.post instead of put()
-        router.post(route("announcements.update", { announcement: announcement.id }), formData, {
+        router.post(route('announcements.update', { announcement: announcement.id }), formData, {
             forceFormData: true, // ✅ required for files
             preserveScroll: true,
             onSuccess: () => {
@@ -110,7 +101,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                 } else {
                     smartToast.error('Failed to update announcement. Please try again.');
                 }
-            }
+            },
         });
     };
 
@@ -122,30 +113,30 @@ export default function Edit({ announcement, categories }: EditProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Announcement" />
-            <div className="m-4 border rounded-lg p-4">
+            <div className="m-4 rounded-lg border p-4">
                 {/* Display errors */}
                 {Object.keys(errors).length > 0 && (
-                    <div className="mb-4 p-4 border border-red-600 bg-red-100 text-red-700 rounded">
-                        <OctagonAlert className="inline-block mr-2" size={24} />
+                    <div className="mb-4 rounded border border-red-600 bg-red-100 p-4 text-red-700">
+                        <OctagonAlert className="mr-2 inline-block" size={24} />
                         <ul className="list-disc pl-5">
                             {Object.entries(errors).map(([field, message]) => (
-                                <li key={field} className="text-sm">{message}</li>
+                                <li key={field} className="text-sm">
+                                    {message}
+                                </li>
                             ))}
                         </ul>
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} encType="multipart/form-data">
-                    <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <h1 className="mb-4 flex items-center gap-2 text-2xl font-bold">
                         <Megaphone size={24} />
                         Edit Announcement
                     </h1>
 
                     {/* Title */}
-                    <div className="w-auto p-4 border rounded-lg mb-2">
-                        <Label className="mb-2 block font-medium text-gray-700">
-                            Announcement Title
-                        </Label>
+                    <div className="mb-2 w-auto rounded-lg border p-4">
+                        <Label className="mb-2 block font-medium text-gray-700">Announcement Title</Label>
                         <Input
                             type="text"
                             className="w-full"
@@ -156,13 +147,10 @@ export default function Edit({ announcement, categories }: EditProps) {
                     </div>
 
                     {/* Category + Author */}
-                    <div className="w-auto mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="border rounded-lg p-4">
+                    <div className="mb-2 grid w-auto grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="rounded-lg border p-4">
                             <Label className="block font-medium text-gray-700">Category</Label>
-                            <Select
-                                value={data.category_id}
-                                onValueChange={(value) => setData('category_id', value)}
-                            >
+                            <Select value={data.category_id} onValueChange={(value) => setData('category_id', value)}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
@@ -174,17 +162,19 @@ export default function Edit({ announcement, categories }: EditProps) {
                                             </SelectItem>
                                         ))
                                     ) : (
-                                        <SelectItem value="0" disabled>No categories available</SelectItem>
+                                        <SelectItem value="0" disabled>
+                                            No categories available
+                                        </SelectItem>
                                     )}
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        <div className="border rounded-lg p-4">
+                        <div className="rounded-lg border p-4">
                             <Label className="block font-medium text-gray-700">Author</Label>
                             <Input
                                 type="text"
-                                className="w-full mt-2"
+                                className="mt-2 w-full"
                                 placeholder="Enter author name"
                                 value={data.author}
                                 onChange={(e) => setData('author', e.target.value)}
@@ -193,29 +183,19 @@ export default function Edit({ announcement, categories }: EditProps) {
                     </div>
 
                     {/* Dates */}
-                    <div className="w-auto mb-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="border rounded-lg p-4">
+                    <div className="mb-2 grid w-auto grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="rounded-lg border p-4">
                             <Label className="block font-medium text-gray-700">Date</Label>
-                            <Input
-                                type="date"
-                                className="w-full mt-2"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
-                            />
+                            <Input type="date" className="mt-2 w-full" value={data.date} onChange={(e) => setData('date', e.target.value)} />
                         </div>
-                        <div className="border rounded-lg p-4">
+                        <div className="rounded-lg border p-4">
                             <Label className="block font-medium text-gray-700">End Date</Label>
-                            <Input
-                                type="date"
-                                className="w-full mt-2"
-                                value={data.end_date}
-                                onChange={(e) => setData('end_date', e.target.value)}
-                            />
+                            <Input type="date" className="mt-2 w-full" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} />
                         </div>
                     </div>
 
                     {/* Summary */}
-                    <div className="w-auto p-4 border rounded-lg mb-2">
+                    <div className="mb-2 w-auto rounded-lg border p-4">
                         <Label className="mb-2 block font-medium text-gray-700">Summary</Label>
                         <Textarea
                             className="w-full"
@@ -226,7 +206,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                     </div>
 
                     {/* Content */}
-                    <div className="w-auto p-4 border rounded-lg mb-2">
+                    <div className="mb-2 w-auto rounded-lg border p-4">
                         <Label className="mb-2 block font-medium text-gray-700">Content</Label>
                         <Textarea
                             className="w-full"
@@ -237,15 +217,9 @@ export default function Edit({ announcement, categories }: EditProps) {
                     </div>
 
                     {/* Image Upload */}
-                    <div className="w-auto p-4 border rounded-lg mb-2">
+                    <div className="mb-2 w-auto rounded-lg border p-4">
                         <Label className="mb-2 block font-medium text-gray-700">Upload Image</Label>
-                        {preview && (
-                            <img
-                                src={preview}
-                                alt="Preview"
-                                className="mt-2 mb-4 rounded-lg border max-h-64"
-                            />
-                        )}
+                        {preview && <img src={preview} alt="Preview" className="mt-2 mb-4 max-h-64 rounded-lg border" />}
                         <Input type="file" accept="image/*" onChange={handleImageChange} />
                     </div>
 
@@ -253,10 +227,10 @@ export default function Edit({ announcement, categories }: EditProps) {
                         {processing ? 'Saving...' : 'Update Announcement'}
                     </Button>
 
-                    <Button 
+                    <Button
                         type="button"
-                        className="ml-2 bg-[var(--Fsecondary)] text-[var(--popover)] shadow-xs hover:bg-[var(--Fsecondary)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--red)] focus:ring-offset-2 disabled:opacity-50"  
-                        disabled={processing} 
+                        className="ml-2 bg-[var(--Fsecondary)] text-[var(--popover)] shadow-xs hover:bg-[var(--Fsecondary)]/90 focus:ring-2 focus:ring-[var(--red)] focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                        disabled={processing}
                         onClick={() => {
                             smartToast.info('Edit cancelled');
                             router.visit(route('announcements.index'));

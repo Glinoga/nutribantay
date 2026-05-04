@@ -1,7 +1,18 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Calendar, Clock, Edit2, Plus, Search, Shield, Syringe, Trash2, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+
+const MySwal = withReactContent(Swal);
 
 type Vaccine = {
     id: number;
@@ -12,9 +23,22 @@ type Vaccine = {
     created_at: string;
 };
 
+type Stats = {
+    total: number;
+    total_children: number;
+    most_popular: string | null;
+    most_popular_count: number;
+    recently_added: number;
+};
+
+type IndexProps = {
+    vaccines: Vaccine[];
+    stats: Stats;
+};
+
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Vaccines', href: '/vaccines' }];
 
-export default function Index({ vaccines }: { vaccines: Vaccine[] }) {
+export default function Index({ vaccines, stats }: IndexProps) {
     const [showModal, setShowModal] = useState(false);
     const [editingVaccine, setEditingVaccine] = useState<Vaccine | null>(null);
     const [search, setSearch] = useState('');
@@ -23,6 +47,8 @@ export default function Index({ vaccines }: { vaccines: Vaccine[] }) {
         name: '',
         description: '',
     });
+
+    const flash = usePage<{ flash?: { success?: string } }>().props.flash;
 
     const filteredVaccines = vaccines.filter(
         (v) => v.name.toLowerCase().includes(search.toLowerCase()) || (v.description ?? '').toLowerCase().includes(search.toLowerCase()),
@@ -56,10 +82,40 @@ export default function Index({ vaccines }: { vaccines: Vaccine[] }) {
         setShowModal(true);
     };
 
+    const openCreate = () => {
+        setEditingVaccine(null);
+        reset();
+        setShowModal(true);
+    };
+
     const closeModal = () => {
         setShowModal(false);
         setEditingVaccine(null);
         reset();
+    };
+
+    const handleDelete = (vaccine: Vaccine) => {
+        MySwal.fire({
+            title: `Remove "${vaccine.name}"?`,
+            html: `
+                <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
+                    <p style="font-size: 0.875rem; color: hsl(0 84% 50%); margin: 0; line-height: 1.5;">
+                        This action cannot be undone. All child associations will be removed.
+                    </p>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'hsl(0 84% 60%)',
+            cancelButtonColor: 'hsl(142 76% 36%)',
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'Cancel',
+            background: 'hsl(178 100% 98%)',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete(`/vaccines/${vaccine.id}`);
+            }
+        });
     };
 
     useEffect(() => {
@@ -67,129 +123,273 @@ export default function Index({ vaccines }: { vaccines: Vaccine[] }) {
             setEditingVaccine(null);
             reset();
         }
-    }, [showModal]);
+    }, [showModal, reset]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Vaccine Catalog" />
 
-            <div className="p-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Vaccine Catalog</h1>
-                        <p className="text-gray-600">Manage available vaccines for child vaccination tracking.</p>
+            <style>{`
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .vaccine-card {
+                    animation: slideIn 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+
+                .stat-card {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                    opacity: 0;
+                }
+
+                .stat-card:nth-child(1) { animation-delay: 0.1s; }
+                .stat-card:nth-child(2) { animation-delay: 0.2s; }
+                .stat-card:nth-child(3) { animation-delay: 0.3s; }
+                .stat-card:nth-child(4) { animation-delay: 0.4s; }
+            `}</style>
+
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)]" />
+
+                <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="fade-in-up mb-6 text-center">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
+                            <Shield className="h-5 w-5 text-teal-600" />
+                            <span className="text-sm font-semibold text-teal-700">Vaccine Catalog</span>
+                        </div>
+
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                                Manage Vaccines
+                            </span>
+                        </h1>
+                        <p className="mx-auto max-w-xl text-gray-600">
+                            Manage available vaccines for child vaccination tracking and immunization records
+                        </p>
                     </div>
-                    <button onClick={() => setShowModal(true)} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                        Add Vaccine
-                    </button>
-                </div>
 
-                <div className="mb-4">
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search vaccines..."
-                        className="w-full max-w-md rounded border px-4 py-2"
-                    />
-                </div>
+                    <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Total Vaccines</p>
+                                    <p className="text-2xl font-bold text-teal-600">{stats.total}</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <Syringe className="h-5 w-5 text-teal-500" />
+                                </div>
+                            </div>
+                        </div>
 
-                <div className="overflow-x-auto rounded-lg bg-white shadow">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th className="px-4 py-3 text-left">Name</th>
-                                <th className="px-4 py-3 text-left">Description</th>
-                                <th className="px-4 py-3 text-center">Children</th>
-                                <th className="px-4 py-3 text-left">Added By</th>
-                                <th className="px-4 py-3 text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredVaccines.length > 0 ? (
-                                filteredVaccines.map((v) => (
-                                    <tr key={v.id} className="border-t hover:bg-gray-50">
-                                        <td className="px-4 py-3 font-medium">{v.name}</td>
-                                        <td className="px-4 py-3">{v.description ?? '-'}</td>
-                                        <td className="px-4 py-3 text-center">{v.children_count}</td>
-                                        <td className="px-4 py-3">{v.created_by ?? '-'}</td>
-                                        <td className="px-4 py-3 text-center">
-                                            <div className="flex justify-center gap-2">
-                                                <button onClick={() => openEdit(v)} className="text-sm text-blue-600 hover:underline">
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        if (confirm(`Delete vaccine "${v.name}"? This will also remove it from all children.`)) {
-                                                            router.delete(`/vaccines/${v.id}`);
-                                                        }
-                                                    }}
-                                                    className="text-sm text-red-600 hover:underline"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                                        {search ? 'No vaccines match your search.' : 'No vaccines yet. Add one to get started.'}
-                                    </td>
-                                </tr>
+                        <div className="stat-card rounded-xl border border-blue-100/50 bg-white p-4 shadow-md">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Children Vaccinated</p>
+                                    <p className="text-2xl font-bold text-blue-600">{stats.total_children}</p>
+                                </div>
+                                <div className="rounded-full bg-blue-50 p-2.5">
+                                    <Users className="h-5 w-5 text-blue-500" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="stat-card rounded-xl border border-purple-100/50 bg-white p-4 shadow-md">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Most Popular</p>
+                                    <p className="text-lg font-bold text-purple-600">{stats.most_popular ?? '-'}</p>
+                                    {stats.most_popular_count > 0 && <p className="text-xs text-gray-500">{stats.most_popular_count} children</p>}
+                                </div>
+                                <div className="rounded-full bg-purple-50 p-2.5">
+                                    <Shield className="h-5 w-5 text-purple-500" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white p-4 shadow-md">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Recently Added</p>
+                                    <p className="text-2xl font-bold text-green-600">{stats.recently_added}</p>
+                                    <p className="text-xs text-gray-500">Last 30 days</p>
+                                </div>
+                                <div className="rounded-full bg-green-50 p-2.5">
+                                    <Clock className="h-5 w-5 text-green-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {flash?.success && (
+                        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
+                    )}
+
+                    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="relative max-w-md flex-1">
+                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search vaccines by name or description..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                            />
+                            {search && (
+                                <button
+                                    onClick={() => setSearch('')}
+                                    className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1 text-gray-400 hover:text-gray-600"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
                             )}
-                        </tbody>
-                    </table>
+                        </div>
+
+                        <Button
+                            onClick={openCreate}
+                            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600"
+                        >
+                            <Plus className="mr-1.5 h-4 w-4" />
+                            Add Vaccine
+                        </Button>
+                    </div>
+
+                    {filteredVaccines.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <div className="mb-4 rounded-full bg-gray-100 p-4">
+                                <Syringe className="h-12 w-12 text-gray-400" />
+                            </div>
+                            <p className="text-lg font-medium text-gray-900">{search ? 'No vaccines match your search.' : 'No vaccines yet'}</p>
+                            <p className="text-sm text-gray-500">
+                                {search ? 'Try adjusting your search terms.' : 'Add a vaccine using the button above to get started.'}
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {filteredVaccines.map((vaccine, index) => (
+                                <div key={vaccine.id} className="vaccine-card group" style={{ animationDelay: `${index * 50}ms` }}>
+                                    <div className="h-full rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-xl">
+                                        <div className="p-4">
+                                            <div className="mb-3 flex items-start gap-3">
+                                                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 text-sm font-bold shadow-sm">
+                                                    <Syringe className="h-5 w-5 text-teal-600" />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate text-sm font-bold text-gray-900">{vaccine.name}</p>
+                                                    <p className="text-xs text-gray-500">ID: {vaccine.id}</p>
+                                                </div>
+                                            </div>
+
+                                            {vaccine.description && <p className="mb-3 line-clamp-2 text-xs text-gray-600">{vaccine.description}</p>}
+
+                                            <div className="mb-3 flex items-center gap-2">
+                                                <Badge className="bg-teal-50 text-teal-700 hover:bg-teal-100">
+                                                    <Users className="mr-1 h-3 w-3" />
+                                                    {vaccine.children_count} {vaccine.children_count === 1 ? 'child' : 'children'}
+                                                </Badge>
+                                            </div>
+
+                                            <div className="space-y-1.5 text-xs text-gray-500">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+                                                    <span className="truncate">{vaccine.created_by ?? 'Unknown'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex border-t border-gray-100">
+                                            <button
+                                                onClick={() => openEdit(vaccine)}
+                                                className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
+                                            >
+                                                <Edit2 className="h-3.5 w-3.5" />
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(vaccine)}
+                                                className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 border-l border-gray-100 py-2.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={closeModal}>
-                    <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="mb-4 text-xl font-bold">{editingVaccine ? 'Edit Vaccine' : 'Add Vaccine'}</h2>
+            <Dialog open={showModal} onOpenChange={(open) => !open && closeModal()}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold">{editingVaccine ? 'Edit Vaccine' : 'Add Vaccine'}</DialogTitle>
+                        <DialogDescription>
+                            {editingVaccine ? 'Update the vaccine details below.' : 'Add a new vaccine to the catalog.'}
+                        </DialogDescription>
+                    </DialogHeader>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block font-medium">Vaccine Name</label>
-                                <input
-                                    type="text"
-                                    value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
-                                    className="w-full rounded border px-3 py-2"
-                                    placeholder="e.g., BCG, Pentavalent"
-                                />
-                                {errors.name && <p className="text-red-600">{errors.name}</p>}
-                            </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="vaccine-name">Vaccine Name</Label>
+                            <Input
+                                id="vaccine-name"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                placeholder="e.g., BCG, Pentavalent, Measles"
+                                className={errors.name ? 'border-red-500' : ''}
+                            />
+                            {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
+                        </div>
 
-                            <div>
-                                <label className="block font-medium">Description (optional)</label>
-                                <textarea
-                                    value={data.description}
-                                    onChange={(e) => setData('description', e.target.value)}
-                                    className="w-full rounded border px-3 py-2"
-                                    rows={3}
-                                    placeholder="Optional description..."
-                                />
-                                {errors.description && <p className="text-red-600">{errors.description}</p>}
-                            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="vaccine-description">Description (optional)</Label>
+                            <Textarea
+                                id="vaccine-description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Optional description of the vaccine..."
+                                rows={3}
+                                className={errors.description ? 'border-red-500' : ''}
+                            />
+                            {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
+                        </div>
 
-                            <div className="flex gap-2">
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="flex-1 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {processing ? 'Saving...' : editingVaccine ? 'Update' : 'Add'}
-                                </button>
-                                <button type="button" onClick={closeModal} className="rounded bg-gray-200 px-4 py-2 hover:bg-gray-300">
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                        <DialogFooter>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:from-teal-600 hover:to-cyan-600 disabled:opacity-50"
+                            >
+                                {processing ? 'Saving...' : editingVaccine ? 'Update' : 'Add Vaccine'}
+                            </Button>
+                            <Button type="button" variant="outline" onClick={closeModal}>
+                                Cancel
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
