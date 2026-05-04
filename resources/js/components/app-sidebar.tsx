@@ -1,7 +1,7 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { route } from '@/lib/routes';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
@@ -16,9 +16,9 @@ type AuthProps = {
             id: number;
             name: string;
             email: string;
-            roles?: string[]; // Check if roles are attached to user
+            roles?: string[];
         };
-        roles?: string[]; // Check if roles are at root of auth
+        roles?: string[];
     };
 };
 
@@ -28,13 +28,9 @@ export function AppSidebar() {
     // 1. Consolidate roles from both potential locations (auth.roles or auth.user.roles)
     const userRoles = auth?.roles ?? auth?.user?.roles ?? [];
 
-    // 2. Debugging: Uncomment this to see exactly what roles are coming from the backend
-    // console.log('Current User Roles:', userRoles);
-
-    // 3. Helper to check roles case-insensitively and normalize format
+    // 2. Helper to check roles case-insensitively and normalize format
     const hasRole = (roleToCheck: string) => {
         return userRoles.some((r) => {
-            // Normalize: remove spaces and underscores, make lowercase
             const normalizedUserRole = r.toLowerCase().replace(/[\s_]/g, '');
             const normalizedCheck = roleToCheck.toLowerCase();
             return normalizedUserRole === normalizedCheck;
@@ -52,24 +48,22 @@ export function AppSidebar() {
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
     ];
 
-    // Admin-only menu (excluding shared items like SMS)
-    if (isAdmin) {
-        mainNavItems.push(
-            { title: 'User Management', href: '/users', icon: UserCog },
-            { title: 'Data Management', href: '/admin/database', icon: Database },
-            {
-                title: 'Audit Logs',
-                href: '/audit-logs',
-                icon: FileTextIcon, // or any appropriate icon
-            },
-        );
-    }
+    // Admin-only menu items
+    const adminNavItems: NavItem[] = isAdmin
+        ? [
+              { title: 'User Management', href: '/users', icon: UserCog },
+              { title: 'Data Management', href: '/admin/database', icon: Database },
+              { title: 'Audit Logs', href: '/audit-logs', icon: FileTextIcon },
+          ]
+        : [];
 
-    // Healthworker menu (includes shared Admin+Healthworker items)
-    if (isHealthworker) {
-        mainNavItems.push({ title: 'Stocks Management', href: '/stocks', icon: Boxes });
-        mainNavItems.push({ title: 'Send SMS', href: route('sms.index'), icon: MessageSquare });
-    }
+    // Healthworker menu items
+    const healthworkerNavItems: NavItem[] = isHealthworker
+        ? [
+              { title: 'Stocks Management', href: '/stocks', icon: Boxes },
+              { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
+          ]
+        : [];
 
     // Footer items (static)
     const footerNavItems: NavItem[] = [];
@@ -79,8 +73,12 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                        <SidebarMenuButton
+                            size="lg"
+                            asChild
+                            className="transition-all duration-200 hover:bg-sidebar-accent"
+                        >
+                            <Link href={dashboard()} prefetch className="flex items-center gap-2">
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -88,12 +86,35 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
-                <NavMain items={mainNavItems} />
+            <SidebarContent className="gap-1">
+                <SidebarGroup>
+                    <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+                        Main
+                    </SidebarGroupLabel>
+                    <NavMain items={mainNavItems} />
+                </SidebarGroup>
+
+                {adminNavItems.length > 0 && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+                            Administration
+                        </SidebarGroupLabel>
+                        <NavMain items={adminNavItems} />
+                    </SidebarGroup>
+                )}
+
+                {healthworkerNavItems.length > 0 && (
+                    <SidebarGroup>
+                        <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+                            Health Worker
+                        </SidebarGroupLabel>
+                        <NavMain items={healthworkerNavItems} />
+                    </SidebarGroup>
+                )}
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            <SidebarFooter className="mt-auto">
+                <NavFooter items={footerNavItems} />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
