@@ -32,53 +32,32 @@ class DatabaseMaintenanceController extends Controller
         try {
             \Log::info('=== Starting manual backup from web interface ===');
 
-            // Method 1: Try using Artisan::call with output capture
-            $exitCode = Artisan::call('backup:run', [
+            // Use spatie backup package
+            \Artisan::call('backup:run', [
                 '--only-db' => true,
-                '--disable-notifications' => true,
             ]);
 
-            $output = Artisan::output();
+            $output = \Artisan::output();
+            \Log::info('Backup command output: ' . $output);
 
-            \Log::info('Artisan exitCode: '.$exitCode);
-            \Log::info('Artisan output: '.$output);
+            // Get the latest backup file (spatie stores in storage/app/private/{APP_NAME}/)
+            $backupPath = storage_path('app/private/NutriBantay');
+            $latestBackup = null;
+            $latestTime = 0;
 
-            // Check if backup was actually created by looking for new files
-            $backupPath = 'Laravel';
-            $beforeBackup = collect(Storage::disk('local')->files($backupPath))
-                ->filter(fn ($file) => pathinfo($file, PATHINFO_EXTENSION) === 'zip')
-                ->sortByDesc(fn ($file) => Storage::disk('local')->lastModified($file))
-                ->first();
+            if (is_dir($backupPath)) {
+                foreach (glob($backupPath . '/*.zip') as $file) {
+                    $mtime = filemtime($file);
+                    if ($mtime > $latestTime) {
+                        $latestTime = $mtime;
+                        $latestBackup = $file;
+                    }
+                }
+            }
 
-            \Log::info('Most recent backup before: '.($beforeBackup ?? 'none'));
-
-            // Wait a moment for file to be written
-            sleep(2);
-
-            $afterBackup = collect(Storage::disk('local')->files($backupPath))
-                ->filter(fn ($file) => pathinfo($file, PATHINFO_EXTENSION) === 'zip')
-                ->sortByDesc(fn ($file) => Storage::disk('local')->lastModified($file))
-                ->first();
-
-            \Log::info('Most recent backup after: '.($afterBackup ?? 'none'));
-
-            // Check for success indicators
-            $successIndicators = [
-                stripos($output, 'Backup completed') !== false,
-                stripos($output, 'successfully') !== false,
-                $exitCode === 0,
-                $afterBackup !== $beforeBackup, // New file was created
-            ];
-
-            $successCount = count(array_filter($successIndicators));
-
-            \Log::info('Success indicators: '.$successCount.' of '.count($successIndicators));
-
-            if ($successCount >= 2) {
-                // Get the new backup details
-                $newBackupSize = Storage::disk('local')->size($afterBackup);
-                $newBackupDate = Storage::disk('local')->lastModified($afterBackup);
-                $filename = basename($afterBackup);
+            if ($latestBackup && $latestTime > time() - 300) { // Created within last 5 minutes
+                $filename = basename($latestBackup);
+                $size = filesize($latestBackup);
 
                 // Log the backup creation in audit log
                 AuditLog::logAction([
@@ -87,27 +66,24 @@ class DatabaseMaintenanceController extends Controller
                     'description' => "Database backup created: {$filename}",
                     'new_values' => [
                         'filename' => $filename,
-                        'size' => $this->formatBytes($newBackupSize),
-                        'timestamp' => date('Y-m-d H:i:s', $newBackupDate),
+                        'size' => $this->formatBytes($size),
+                        'timestamp' => date('Y-m-d H:i:s', $latestTime),
                     ],
                 ]);
 
-                return response()->json([
-                    'success' => true,
-                    'message' => '✅ Database backup created successfully!',
-                    'timestamp' => date('Y-m-d H:i:s', $newBackupDate),
-                    'size' => $this->formatBytes($newBackupSize),
-                    'filename' => $filename,
-                ]);
+                return back()->with('success', "✅ Database backup created successfully! Backup: {$filename}");
             }
 
-            // If we got here, something might be wrong
-            // Try alternative method: exec() with full path
-            return $this->backupViaExec();
+            // If we got here, check if the command output indicates success
+            if (strpos($output, 'Backup completed') !== false || strpos($output, 'successfully') !== false) {
+                return back()->with('success', '✅ Database backup created successfully!');
+            }
+
+            return back()->with('warning', 'Backup command executed but status unclear. Please check storage/app/private/NutriBantay/ folder.');
 
         } catch (\Exception $e) {
-            \Log::error('Database backup failed (Exception): '.$e->getMessage());
-            \Log::error('Stack trace: '.$e->getTraceAsString());
+            \Log::error('Database backup failed: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
 
             // Log the failed backup attempt
             AuditLog::logAction([
@@ -116,105 +92,7 @@ class DatabaseMaintenanceController extends Controller
                 'description' => "Database backup failed: {$e->getMessage()}",
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => '❌ Backup failed: '.$e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Alternative backup method using exec()
-     */
-    private function backupViaExec()
-    {
-        \Log::info('Trying backup via exec() method...');
-
-        try {
-            // Get the PHP and artisan paths
-            $phpPath = PHP_BINARY; // Full path to current PHP executable
-            $artisanPath = base_path('artisan');
-
-            // Build command
-            $command = sprintf(
-                '"%s" "%s" backup:run --only-db --disable-notifications 2>&1',
-                $phpPath,
-                $artisanPath
-            );
-
-            \Log::info('Executing command: '.$command);
-
-            // Execute command
-            $output = [];
-            $returnVar = 0;
-            exec($command, $output, $returnVar);
-
-            $outputString = implode("\n", $output);
-
-            \Log::info('Exec return code: '.$returnVar);
-            \Log::info('Exec output: '.$outputString);
-
-            // Check if successful
-            if ($returnVar === 0 ||
-                stripos($outputString, 'Backup completed') !== false ||
-                stripos($outputString, 'successfully') !== false) {
-
-                // Get latest backup file
-                $backupPath = 'Laravel';
-                $latestBackup = collect(Storage::disk('local')->files($backupPath))
-                    ->filter(fn ($file) => pathinfo($file, PATHINFO_EXTENSION) === 'zip')
-                    ->sortByDesc(fn ($file) => Storage::disk('local')->lastModified($file))
-                    ->first();
-
-                if ($latestBackup) {
-                    $backupSize = Storage::disk('local')->size($latestBackup);
-                    $backupDate = Storage::disk('local')->lastModified($latestBackup);
-                    $filename = basename($latestBackup);
-
-                    // Log the backup creation
-                    AuditLog::logAction([
-                        'action' => 'backup_created',
-                        'model_type' => 'System',
-                        'description' => "Database backup created: {$filename}",
-                        'new_values' => [
-                            'filename' => $filename,
-                            'size' => $this->formatBytes($backupSize),
-                            'timestamp' => date('Y-m-d H:i:s', $backupDate),
-                            'method' => 'exec',
-                        ],
-                    ]);
-
-                    return response()->json([
-                        'success' => true,
-                        'message' => '✅ Database backup created successfully!',
-                        'timestamp' => date('Y-m-d H:i:s', $backupDate),
-                        'size' => $this->formatBytes($backupSize),
-                        'filename' => $filename,
-                        'method' => 'exec',
-                    ]);
-                }
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => '⚠️ Backup command executed but status unclear. Please check storage.',
-                'output' => $outputString,
-            ], 500);
-
-        } catch (\Exception $e) {
-            \Log::error('Backup via exec failed: '.$e->getMessage());
-
-            // Log the failed backup
-            AuditLog::logAction([
-                'action' => 'backup_failed',
-                'model_type' => 'System',
-                'description' => "Database backup failed (exec method): {$e->getMessage()}",
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => '❌ Backup failed: '.$e->getMessage(),
-            ], 500);
+            return back()->with('error', '❌ Backup failed: ' . $e->getMessage());
         }
     }
 
@@ -225,8 +103,7 @@ class DatabaseMaintenanceController extends Controller
     {
         $backups = $this->getBackupsList();
 
-        return response()->json([
-            'success' => true,
+        return Inertia::render('Admin/DatabaseMaintenance', [
             'backups' => $backups,
         ]);
     }
@@ -244,17 +121,14 @@ class DatabaseMaintenanceController extends Controller
         try {
             $backupFile = $request->input('backup_file');
 
-            // Build the full path - backups are in Laravel folder
-            $fullPath = 'Laravel/'.basename($backupFile);
+            // Build the full path - backups are stored in {APP_NAME} folder (NutriBantay)
+            $fullPath = 'NutriBantay/'.basename($backupFile);
 
             // Verify backup file exists
             if (! Storage::disk('local')->exists($fullPath)) {
                 \Log::error("Backup file not found at: {$fullPath}");
 
-                return response()->json([
-                    'success' => false,
-                    'message' => '❌ Backup file not found.',
-                ], 404);
+                return back()->with('error', '❌ Backup file not found.');
             }
 
             // Step 1: Create pre-restore backup
@@ -329,10 +203,7 @@ class DatabaseMaintenanceController extends Controller
                 ],
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => '✅ Database restored successfully! A pre-restore backup was created automatically.',
-            ]);
+            return back()->with('success', '✅ Database restored successfully! A pre-restore backup was created automatically.');
 
         } catch (\Exception $e) {
             \Log::error('Database restore failed: '.$e->getMessage());
@@ -353,10 +224,7 @@ class DatabaseMaintenanceController extends Controller
                 $this->recursiveDelete($extractPath);
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => '❌ Restore failed: '.$e->getMessage(),
-            ], 500);
+            return back()->with('error', '❌ Restore failed: '.$e->getMessage());
         }
     }
 
@@ -427,7 +295,7 @@ class DatabaseMaintenanceController extends Controller
      */
     public function download($filename)
     {
-        $path = 'Laravel/'.$filename;
+        $path = 'NutriBantay/'.$filename;
 
         if (! Storage::disk('local')->exists($path)) {
             abort(404, 'Backup file not found.');
@@ -449,10 +317,7 @@ class DatabaseMaintenanceController extends Controller
             $backupFile = $request->input('backup_file');
 
             if (! Storage::disk('local')->exists($backupFile)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => '❌ Backup file not found.',
-                ], 404);
+                return back()->with('error', '❌ Backup file not found.');
             }
 
             $filename = basename($backupFile);
@@ -469,18 +334,12 @@ class DatabaseMaintenanceController extends Controller
                 ],
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => '✅ Backup deleted successfully.',
-            ]);
+            return back()->with('success', '✅ Backup deleted successfully.');
 
         } catch (\Exception $e) {
             \Log::error('Backup deletion failed: '.$e->getMessage());
 
-            return response()->json([
-                'success' => false,
-                'message' => '❌ Delete failed: '.$e->getMessage(),
-            ], 500);
+            return back()->with('error', '❌ Delete failed: '.$e->getMessage());
         }
     }
 
@@ -491,8 +350,8 @@ class DatabaseMaintenanceController extends Controller
     {
         $backups = [];
 
-        // Backups are stored in the Laravel folder
-        $backupPath = 'Laravel';
+        // Backups are stored in the {APP_NAME} folder (NutriBantay)
+        $backupPath = 'NutriBantay';
 
         if (Storage::disk('local')->exists($backupPath)) {
             $files = Storage::disk('local')->files($backupPath);
@@ -509,7 +368,7 @@ class DatabaseMaintenanceController extends Controller
 
                 $backups[] = [
                     'filename' => $filename,
-                    'path' => $file,  // This will be 'Laravel/filename.zip'
+                    'path' => $backupPath.'/'.$filename,  // This will be 'NutriBantay/filename.zip'
                     'size' => $this->formatBytes($size),
                     'size_bytes' => $size,
                     'date' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),

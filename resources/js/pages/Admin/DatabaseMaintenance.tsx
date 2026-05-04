@@ -1,8 +1,23 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import axios from 'axios';
-import { useState } from 'react';
+import { smartToast } from '@/utils/smartToast';
+import { Head, router } from '@inertiajs/react';
+import { Database, Download, Loader2, RefreshCw, Trash2, UploadCloud, AlertTriangle, CheckCircle2, HardDrive, FileText } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 type Backup = {
     filename: string;
@@ -14,10 +29,7 @@ type Backup = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Database Maintenance',
-        href: '/admin/database',
-    },
+    { title: 'Database Maintenance', href: '/admin/database' },
 ];
 
 interface Props {
@@ -27,175 +39,155 @@ interface Props {
 export default function DatabaseMaintenance({ backups: initialBackups }: Props) {
     const [backups, setBackups] = useState<Backup[]>(initialBackups);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-    // Restore confirmation state
-    const [showRestoreModal, setShowRestoreModal] = useState(false);
-    const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
-    const [confirmationText, setConfirmationText] = useState('');
     const [restoring, setRestoring] = useState(false);
 
-    const handleBackup = async () => {
+    // Restore confirmation state
+    const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+    const [selectedRestoreBackup, setSelectedRestoreBackup] = useState<Backup | null>(null);
+    const [confirmationText, setConfirmationText] = useState('');
+
+    // Delete confirmation state
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [selectedDeleteBackup, setSelectedDeleteBackup] = useState<Backup | null>(null);
+
+    const totalBackupsSize = useMemo(() => {
+        return backups.reduce((sum, b) => sum + b.size_bytes, 0);
+    }, [backups]);
+
+    const formatTotalSize = (bytes: number) => {
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let size = bytes;
+        let unitIndex = 0;
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        return `${size.toFixed(2)} ${units[unitIndex]}`;
+    };
+
+    const handleBackup = () => {
         if (loading) return;
 
         setLoading(true);
-        setMessage(null);
+        const loadingToast = smartToast.loading('Creating database backup...');
 
-        try {
-            const response = await axios.post('/admin/database/backup');
-
-            if (response.data.success) {
-                setMessage({
-                    type: 'success',
-                    text: response.data.message,
-                });
-
-                // Show additional details if available
-                if (response.data.filename) {
-                    console.log('Backup created:', response.data.filename);
-                    console.log('Size:', response.data.size);
-                    console.log('Time:', response.data.timestamp);
-                }
-
-                // Refresh backup list after 2 seconds to ensure file is ready
-                setTimeout(async () => {
-                    await refreshBackupList();
-                }, 2000);
-            } else {
-                setMessage({
-                    type: 'error',
-                    text: response.data.message,
-                });
-            }
-        } catch (error: unknown) {
-            console.error('Backup error:', error);
-            let message = '❌ Failed to create backup. Please try again.';
-            if (error instanceof Error) {
-                message = error.message;
-            }
-            setMessage({
-                type: 'error',
-                text: message,
-            });
-        } finally {
-            setLoading(false);
-        }
+        router.post(
+            '/admin/database/backup',
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    smartToast.dismiss(loadingToast);
+                    smartToast.success('Database backup created successfully!');
+                    refreshBackupList();
+                },
+                onError: () => {
+                    smartToast.dismiss(loadingToast);
+                    smartToast.error('Failed to create backup. Please try again.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            },
+        );
     };
 
-    const refreshBackupList = async () => {
-        try {
-            const response = await axios.get('/admin/database/list');
-            if (response.data.success) {
-                setBackups(response.data.backups);
-            }
-        } catch (error) {
-            console.error('Failed to refresh backup list:', error);
-        }
+    const refreshBackupList = () => {
+        router.get(
+            '/admin/database/list',
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    if (page.props.backups) {
+                        setBackups(page.props.backups as Backup[]);
+                    }
+                },
+            },
+        );
     };
 
-    const openRestoreModal = (backup: Backup) => {
-        setSelectedBackup(backup);
+    const openRestoreDialog = (backup: Backup) => {
+        setSelectedRestoreBackup(backup);
         setConfirmationText('');
-        setShowRestoreModal(true);
+        setShowRestoreDialog(true);
     };
 
-    const closeRestoreModal = () => {
-        setShowRestoreModal(false);
-        setSelectedBackup(null);
+    const closeRestoreDialog = () => {
+        setShowRestoreDialog(false);
+        setSelectedRestoreBackup(null);
         setConfirmationText('');
     };
 
-    const handleRestore = async () => {
-        if (!selectedBackup || confirmationText !== 'RESTORE DATABASE') {
+    const handleRestore = () => {
+        if (!selectedRestoreBackup || confirmationText !== 'RESTORE DATABASE') {
             return;
         }
 
         setRestoring(true);
-        setMessage(null);
+        const loadingToast = smartToast.loading('Restoring database...');
 
-        try {
-            const response = await axios.post('/admin/database/restore', {
-                backup_file: selectedBackup.path,
+        router.post(
+            '/admin/database/restore',
+            {
+                backup_file: selectedRestoreBackup.path,
                 confirmation: confirmationText,
-            });
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    smartToast.dismiss(loadingToast);
+                    smartToast.success('Database restored successfully!');
+                    closeRestoreDialog();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                },
+                onError: (errors) => {
+                    smartToast.dismiss(loadingToast);
+                    const errorMsg = errors?.message || 'Failed to restore database';
+                    if (typeof errorMsg === 'string' && errorMsg.includes('SQLite')) {
+                        smartToast.error('This backup is incompatible (SQLite format). Please delete old backups and create new ones.');
+                    } else {
+                        smartToast.error(errorMsg);
+                    }
+                },
+                onFinish: () => {
+                    setRestoring(false);
+                },
+            },
+        );
+    };
 
-            if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
-                closeRestoreModal();
+    const openDeleteDialog = (backup: Backup) => {
+        setSelectedDeleteBackup(backup);
+        setShowDeleteDialog(true);
+    };
 
-                // Optionally reload page after successful restore
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            } else {
-                setMessage({ type: 'error', text: response.data.message });
-            }
-        } catch (error: unknown) {
-            let message = '❌ Failed to restore database';
-            if (error instanceof Error) {
-                message = error.message;
-            }
+    const closeDeleteDialog = () => {
+        setShowDeleteDialog(false);
+        setSelectedDeleteBackup(null);
+    };
 
-            // Check if it's the SQLite incompatibility error
-            if (message.includes('SQLite')) {
-                setMessage({
-                    type: 'error',
-                    text: '❌ This backup is incompatible (SQLite format). Please delete old backups and create new MySQL backups.',
-                });
-            } else {
-                setMessage({
-                    type: 'error',
-                    text: message,
-                });
-            }
-        } finally {
-            setRestoring(false);
-        }
+    const handleDelete = () => {
+        if (!selectedDeleteBackup) return;
+
+        router.delete('/admin/database/delete', {
+            data: { backup_file: selectedDeleteBackup.path },
+            preserveScroll: true,
+            onSuccess: () => {
+                smartToast.success('Backup deleted successfully!');
+                refreshBackupList();
+                closeDeleteDialog();
+            },
+            onError: () => {
+                smartToast.error('Failed to delete backup. Please try again.');
+            },
+        });
     };
 
     const handleDownload = (backup: Backup) => {
         window.location.href = `/admin/database/download/${backup.filename}`;
-    };
-
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedDeleteBackup, setSelectedDeleteBackup] = useState<Backup | null>(null);
-
-    const confirmDelete = (backup: Backup) => {
-        setSelectedDeleteBackup(backup);
-        setShowDeleteModal(true);
-    };
-
-    const closeDeleteModal = () => {
-        setShowDeleteModal(false);
-        setSelectedDeleteBackup(null);
-    };
-
-    const handleDelete = async () => {
-        if (!selectedDeleteBackup) return;
-
-        try {
-            const response = await axios.delete('/admin/database/delete', {
-                data: { backup_file: selectedDeleteBackup.path },
-            });
-
-            if (response.data.success) {
-                setMessage({ type: 'success', text: response.data.message });
-                await refreshBackupList();
-            } else {
-                setMessage({ type: 'error', text: response.data.message });
-            }
-        } catch (error: unknown) {
-            let message = '❌ Failed to delete backup.';
-            if (error instanceof Error) {
-                message = error.message;
-            }
-            setMessage({
-                type: 'error',
-                text: message,
-            });
-        } finally {
-            closeDeleteModal();
-        }
     };
 
     return (
@@ -205,166 +197,231 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             <div className="m-4">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Database Maintenance</h1>
+                        <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+                            <Database className="h-7 w-7 text-blue-600" />
+                            Database Maintenance
+                        </h1>
                         <p className="mt-1 text-sm text-gray-600">Backup and restore your database</p>
                     </div>
+                    <Button onClick={refreshBackupList} variant="outline" className="gap-2">
+                        <RefreshCw className="h-4 w-4" />
+                        Refresh
+                    </Button>
                 </div>
 
-                {/* Message Alert */}
-                {message && (
-                    <div
-                        className={`mb-6 rounded-lg p-4 ${
-                            message.type === 'success'
-                                ? 'border border-green-200 bg-green-50 text-green-800'
-                                : 'border border-red-200 bg-red-50 text-red-800'
-                        }`}
-                    >
-                        <p className="font-medium">{message.text}</p>
-                    </div>
-                )}
+                {/* Stats Card */}
+                <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Backups</CardTitle>
+                            <HardDrive className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{backups.length}</div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Size</CardTitle>
+                            <FileText className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{formatTotalSize(totalBackupsSize)}</div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Latest Backup</CardTitle>
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">
+                                {backups.length > 0 ? new Date(backups[0].timestamp * 1000).toLocaleDateString() : 'None'}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Backup Section */}
-                <div className="mb-8 rounded-lg bg-white p-6 shadow">
-                    <h2 className="mb-4 text-xl font-semibold">Create Database Backup</h2>
-                    <p className="mb-4 text-sm text-gray-600">
-                        Create a complete backup of your database. This backup can be used to restore your data if needed.
-                    </p>
-
-                    <button
-                        onClick={handleBackup}
-                        disabled={loading}
-                        className={`rounded-lg px-6 py-3 font-medium text-white transition ${
-                            loading ? 'cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
-                    >
-                        {loading ? (
-                            <span className="flex items-center">
-                                <svg className="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    />
-                                </svg>
-                                Creating Backup...
-                            </span>
-                        ) : (
-                            '📦 Run Backup Now'
-                        )}
-                    </button>
-                </div>
+                <Card className="mb-8">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <UploadCloud className="h-5 w-5 text-blue-600" />
+                            Create Database Backup
+                        </CardTitle>
+                        <CardDescription>Create a complete backup of your database. This backup can be used to restore your data if needed.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button onClick={handleBackup} disabled={loading} className="gap-2">
+                            {loading ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Creating Backup...
+                                </>
+                            ) : (
+                                <>
+                                    <UploadCloud className="h-4 w-4" />
+                                    Run Backup Now
+                                </>
+                            )}
+                        </Button>
+                    </CardContent>
+                </Card>
 
                 {/* Backup List Section */}
-                <div className="rounded-lg bg-white p-6 shadow">
-                    <div className="mb-4 flex items-center justify-between">
-                        <h2 className="text-xl font-semibold">Available Backups</h2>
-                        <button onClick={refreshBackupList} className="rounded bg-gray-200 px-4 py-2 text-sm hover:bg-gray-300">
-                            🔄 Refresh
-                        </button>
-                    </div>
-
-                    {backups.length === 0 ? (
-                        <p className="py-8 text-center text-gray-500">No backups available. Create your first backup above.</p>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Filename</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Size</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Created</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
-                                    {backups.map((backup) => (
-                                        <tr key={backup.filename} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{backup.filename}</td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{backup.size}</td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{backup.date}</td>
-                                            <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                                <button
-                                                    onClick={() => handleDownload(backup)}
-                                                    className="mr-2 rounded bg-green-600 px-3 py-1 text-white hover:bg-green-700"
-                                                    title="Download backup"
-                                                >
-                                                    ⬇️ Download
-                                                </button>
-                                                <button
-                                                    onClick={() => openRestoreModal(backup)}
-                                                    className="mr-2 rounded bg-yellow-600 px-3 py-1 text-white hover:bg-yellow-700"
-                                                    title="Restore from this backup"
-                                                >
-                                                    ↩️ Restore
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(backup)}
-                                                    className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
-                                                    title="Delete backup"
-                                                >
-                                                    🗑️ Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <HardDrive className="h-5 w-5 text-blue-600" />
+                            Available Backups
+                        </CardTitle>
+                        <CardDescription>Manage your existing database backups</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {backups.length === 0 ? (
+                            <div className="py-8 text-center">
+                                <HardDrive className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+                                <p className="text-gray-500">No backups available. Create your first backup above.</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[40%]">Filename</TableHead>
+                                            <TableHead>Size</TableHead>
+                                            <TableHead>Created</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {backups.map((backup) => (
+                                            <TableRow key={backup.filename} className="hover:bg-gray-50">
+                                                <TableCell className="font-medium">{backup.filename}</TableCell>
+                                                <TableCell>{backup.size}</TableCell>
+                                                <TableCell>{backup.date}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            onClick={() => handleDownload(backup)}
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="gap-1 border-green-200 text-green-700 hover:bg-green-50"
+                                                        >
+                                                            <Download className="h-3 w-3" />
+                                                            Download
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => openRestoreDialog(backup)}
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="gap-1 border-yellow-200 text-yellow-700 hover:bg-yellow-50"
+                                                        >
+                                                            <UploadCloud className="h-3 w-3" />
+                                                            Restore
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => openDeleteDialog(backup)}
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="gap-1"
+                                                        >
+                                                            <Trash2 className="h-3 w-3" />
+                                                            Delete
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
 
-            {/* Restore Confirmation Modal */}
-            {showRestoreModal && selectedBackup && (
-                <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-                    <div className="max-w-lg rounded-lg bg-white p-6 shadow-xl">
-                        <h3 className="mb-4 text-xl font-bold text-red-600">⚠️ CRITICAL WARNING</h3>
+            {/* Restore Confirmation Dialog */}
+            <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+                            <AlertTriangle className="h-5 w-5" />
+                            CRITICAL WARNING
+                        </AlertDialogTitle>
+                        <AlertDialogDescription asChild>
+                            <div className="space-y-3">
+                                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">
+                                    <p className="mb-2 font-semibold">This action is IRREVERSIBLE and will:</p>
+                                    <ul className="ml-4 list-disc space-y-1">
+                                        <li>Completely replace your current database</li>
+                                        <li>Erase ALL existing data</li>
+                                        <li>Restore data from: <strong>{selectedRestoreBackup?.filename}</strong></li>
+                                        <li>Create an automatic pre-restore backup</li>
+                                    </ul>
+                                </div>
+                                <p className="text-sm text-gray-700">
+                                    To confirm, type <span className="font-mono font-semibold text-red-600">RESTORE DATABASE</span> below:
+                                </p>
+                                <Input
+                                    type="text"
+                                    value={confirmationText}
+                                    onChange={(e) => setConfirmationText(e.target.value)}
+                                    placeholder="RESTORE DATABASE"
+                                    className="font-mono focus:border-red-500"
+                                    disabled={restoring}
+                                />
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={closeRestoreDialog} disabled={restoring}>
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleRestore}
+                            disabled={confirmationText !== 'RESTORE DATABASE' || restoring}
+                            className="gap-2 bg-red-600 hover:bg-red-700"
+                        >
+                            {restoring ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Restoring...
+                                </>
+                            ) : (
+                                <>
+                                    <UploadCloud className="h-4 w-4" />
+                                    Restore Database
+                                </>
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
-                        <div className="mb-6 rounded bg-red-50 p-4 text-sm">
-                            <p className="mb-2 font-semibold text-red-800">This action is IRREVERSIBLE and will:</p>
-                            <ul className="ml-4 list-disc space-y-1 text-red-700">
-                                <li>Completely replace your current database</li>
-                                <li>Erase ALL existing data</li>
-                                <li>
-                                    Restore data from: <strong>{selectedBackup.filename}</strong>
-                                </li>
-                                <li>Create an automatic pre-restore backup</li>
-                            </ul>
-                        </div>
-
-                        <p className="mb-4 text-sm text-gray-700">
-                            To confirm, type <strong className="font-mono text-red-600">RESTORE DATABASE</strong> below:
-                        </p>
-
-                        <input
-                            type="text"
-                            value={confirmationText}
-                            onChange={(e) => setConfirmationText(e.target.value)}
-                            placeholder="RESTORE DATABASE"
-                            className="mb-6 w-full rounded border border-gray-300 px-4 py-2 font-mono focus:border-red-500 focus:outline-none"
-                            disabled={restoring}
-                        />
-
-                        <div className="flex justify-end space-x-3">
-                            <button
-                                onClick={closeRestoreModal}
-                                disabled={restoring}
-                                className="rounded bg-gray-300 px-4 py-2 hover:bg-gray-400 disabled:opacity-50"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleRestore}
-                                disabled={confirmationText !== 'RESTORE DATABASE' || restoring}
-                                className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                {restoring ? 'Restoring...' : 'Restore Database'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+                            <Trash2 className="h-5 w-5" />
+                            Delete Backup
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete the backup <strong>{selectedDeleteBackup?.filename}</strong>? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 gap-2">
+                            <Trash2 className="h-4 w-4" />
+                            Delete Backup
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }
