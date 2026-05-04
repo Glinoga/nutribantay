@@ -112,6 +112,7 @@ class SMSController extends Controller
             $sentCount = 0;
             $failedCount = 0;
             $errors = [];
+            $failedPhones = [];
 
             // Use bulk endpoint for multiple recipients, single for one
             if (count($phones) === 1) {
@@ -121,16 +122,28 @@ class SMSController extends Controller
                     \Log::info("SMS sent successfully to {$phones[0]}");
                 } else {
                     $failedCount++;
+                    $failedPhones[] = $phones[0];
                     $errors[] = "Failed to send to {$phones[0]}: ".($result['error'] ?? 'Unknown error');
                     \Log::error("Failed to send SMS to {$phones[0]}: ".($result['error'] ?? 'Unknown error'));
                 }
             } else {
                 $result = $this->smsService->sendBulkSms($phones, $validated['message']);
-                if ($result['success']) {
+
+                if (isset($result['sent_phones']) && isset($result['failed_phones'])) {
+                    // New structured response with individual results
+                    $sentCount = count($result['sent_phones']);
+                    $failedCount = count($result['failed_phones']);
+                    $failedPhones = $result['failed_phones'];
+
+                    if ($failedCount > 0) {
+                        $errors[] = 'Some messages failed to send.';
+                    }
+                } elseif ($result['success']) {
                     $sentCount = count($phones);
                     \Log::info('Bulk SMS sent successfully to '.count($phones).' recipients');
                 } else {
                     $failedCount = count($phones);
+                    $failedPhones = $phones;
                     $errors[] = 'Bulk SMS failed: '.($result['error'] ?? 'Unknown error');
                     \Log::error('Bulk SMS failed: '.($result['error'] ?? 'Unknown error'));
                 }
@@ -139,7 +152,9 @@ class SMSController extends Controller
             if ($sentCount > 0 && $failedCount === 0) {
                 return back()->with('success', "SMS sent successfully to {$sentCount} recipient(s)!");
             } elseif ($sentCount > 0 && $failedCount > 0) {
-                return back()->with('warning', "SMS sent to {$sentCount} recipient(s), but failed for {$failedCount}. Errors: ".implode(', ', $errors));
+                $failedPhonesStr = implode(', ', array_slice($failedPhones, 0, 5));
+                $extra = count($failedPhones) > 5 ? ' and '.(count($failedPhones) - 5).' more' : '';
+                return back()->with('warning', "SMS sent to {$sentCount} recipient(s), but failed for {$failedCount}: {$failedPhonesStr}{$extra}");
             } else {
                 return back()->with('error', 'Failed to send SMS to all recipients. Errors: '.implode(', ', $errors));
             }

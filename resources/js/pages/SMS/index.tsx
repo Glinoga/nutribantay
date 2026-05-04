@@ -1,4 +1,14 @@
 import { Button } from '@/components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,7 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber } from '@/lib/phoneUtils';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
-import { CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 interface User {
@@ -29,6 +39,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [message, setMessage] = useState('');
+    const [isSending, setIsSending] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [lastFormData, setLastFormData] = useState<{ recipientType: string; recipients: number[]; message: string } | null>(null);
     const maxCharacters = 1600;
 
     useEffect(() => {
@@ -68,44 +81,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
         setMessage(messageText);
         setIsTyping(true);
 
-        // Reset typing indicator after 2 seconds
         setTimeout(() => setIsTyping(false), 2000);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!message.trim()) {
-            smartToast.error('Please enter a message');
-            return;
-        }
-
-        if (recipientType !== 'all' && selectedUsers.length === 0) {
-            smartToast.error('Please select at least one recipient');
-            return;
-        }
-
-        const loadingToast = smartToast.loading('Sending SMS...');
-
-        router.post(
-            '/admin/sendsms',
-            {
-                recipient_type: recipientType,
-                recipients: selectedUsers,
-                message: message,
-            },
-            {
-                onSuccess: () => {
-                    smartToast.dismiss(loadingToast);
-                    setMessage('');
-                    setSelectedUsers([]);
-                    setCharacterCount(0);
-                },
-                onError: () => {
-                    smartToast.dismiss(loadingToast);
-                },
-            },
-        );
     };
 
     const getRecipientCount = () => {
@@ -129,6 +105,80 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
         setSelectedUsers([]);
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!message.trim()) {
+            smartToast.error('Please enter a message');
+            return;
+        }
+
+        if (recipientType !== 'all' && selectedUsers.length === 0) {
+            smartToast.error('Please select at least one recipient');
+            return;
+        }
+
+        // Store form data for potential retry
+        setLastFormData({
+            recipientType,
+            recipients: selectedUsers,
+            message,
+        });
+
+        // Show confirmation dialog
+        setShowConfirmDialog(true);
+    };
+
+    const confirmSend = () => {
+        setShowConfirmDialog(false);
+        setIsSending(true);
+
+        const loadingToast = smartToast.loading('Sending SMS...');
+
+        router.post(
+            '/admin/sendsms',
+            {
+                recipient_type: recipientType,
+                recipients: selectedUsers,
+                message: message,
+            },
+            {
+                onSuccess: () => {
+                    smartToast.dismiss(loadingToast);
+                    setIsSending(false);
+                    setMessage('');
+                    setSelectedUsers([]);
+                    setCharacterCount(0);
+                    setLastFormData(null);
+                },
+                onError: () => {
+                    smartToast.dismiss(loadingToast);
+                    setIsSending(false);
+                    // Keep form data for retry - show retry option
+                    smartToast.error('Failed to send SMS. Please try again.');
+                },
+            },
+        );
+    };
+
+    const handleRetry = () => {
+        if (lastFormData) {
+            setRecipientType(lastFormData.recipientType as 'single' | 'multiple' | 'all');
+            setSelectedUsers(lastFormData.recipients);
+            setMessage(lastFormData.message);
+            setCharacterCount(lastFormData.message.length);
+            // Trigger send again
+            setTimeout(() => {
+                const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+                handleSubmit(fakeEvent);
+            }, 100);
+        }
+    };
+
+    const cancelSend = () => {
+        setShowConfirmDialog(false);
+    };
+
     return (
         <AppLayout>
             <Head title="Send SMS" />
@@ -136,21 +186,19 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
             <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 p-4 sm:p-6 lg:p-8 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
                 {/* Animated Header with Gradient */}
                 <div className="relative mb-8">
-                    <div className="absolute inset-0 -z-10 animate-pulse rounded-3xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 blur-3xl"></div>
+                    <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 blur-3xl"></div>
 
                     <div className="relative rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="relative">
-                                    <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-50 blur-lg"></div>
-                                    <div className="relative transform rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-4 shadow-lg transition-transform duration-300 hover:scale-110">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-50 blur-lg"></div>
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-4 shadow-lg">
                                         <MessageSquare className="h-8 w-8 text-white" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
-                                        SMS Messenger
-                                    </h1>
+                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">SMS Messenger</h1>
                                     <p className="mt-1 flex items-center gap-2 text-gray-600 dark:text-gray-300">
                                         <Sparkles className="h-4 w-4" />
                                         Send messages to guardians instantly
@@ -225,7 +273,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
 
                                 {recipientType === 'all' ? (
-                                    <div className="animate-pulse rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
+                                    <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
                                         <div className="flex items-start gap-3">
                                             <div className="rounded-lg bg-blue-600 p-2">
                                                 <Zap className="h-5 w-5 text-white" />
@@ -263,13 +311,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                         {/* Quick Actions */}
                                         {recipientType === 'multiple' && filteredUsers.length > 0 && (
                                             <div className="flex gap-2">
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={selectAllFiltered}
-                                                    className="flex-1 text-xs"
-                                                >
+                                                <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs">
                                                     Select All
                                                 </Button>
                                                 <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
@@ -304,17 +346,13 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                                         : 'border-gray-300 group-hover:border-blue-500 dark:border-gray-600'
                                                                 }`}
                                                             >
-                                                                {selectedUsers.includes(user.id) && (
-                                                                    <CheckCircle2 className="h-4 w-4 animate-bounce text-blue-600" />
-                                                                )}
+                                                                {selectedUsers.includes(user.id) && <CheckCircle2 className="h-4 w-4 text-blue-600" />}
                                                             </div>
 
                                                             {/* Avatar */}
                                                             <div
-                                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold transition-all duration-300 ${
-                                                                    selectedUsers.includes(user.id)
-                                                                        ? 'bg-white text-blue-600'
-                                                                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
+                                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
+                                                                    selectedUsers.includes(user.id) ? 'bg-white text-blue-600' : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
                                                                 }`}
                                                             >
                                                                 {user.name.charAt(0).toUpperCase()}
@@ -322,39 +360,20 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                                                             {/* User Info */}
                                                             <div className="min-w-0 flex-1">
-                                                                <p
-                                                                    className={`truncate font-medium ${
-                                                                        selectedUsers.includes(user.id)
-                                                                            ? 'text-white'
-                                                                            : 'text-gray-900 dark:text-white'
-                                                                    }`}
-                                                                >
+                                                                <p className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
                                                                     {user.name}
                                                                 </p>
-                                                                <p
-                                                                    className={`truncate text-sm ${
-                                                                        selectedUsers.includes(user.id)
-                                                                            ? 'text-blue-100'
-                                                                            : 'text-gray-500 dark:text-gray-400'
-                                                                    }`}
-                                                                >
+                                                                <p className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                                                                     {displayPhoneNumber(user.phone)}
                                                                 </p>
                                                             </div>
-
-                                                            {/* Selection Indicator */}
-                                                            {selectedUsers.includes(user.id) && (
-                                                                <div className="animate-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 ))
                                             ) : (
                                                 <div className="py-12 text-center">
                                                     <Users className="mx-auto mb-3 h-16 w-16 text-gray-300 dark:text-gray-600" />
-                                                    <p className="text-gray-500 dark:text-gray-400">
-                                                        {searchQuery ? 'No guardians found' : 'No guardians available'}
-                                                    </p>
+                                                    <p className="text-gray-500 dark:text-gray-400">{searchQuery ? 'No guardians found' : 'No guardians available'}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -402,31 +421,13 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             </span>
                                         </div>
 
-                                        <div className="relative">
-                                            <Textarea
-                                                placeholder="Type your message here..."
-                                                value={message}
-                                                onChange={handleMessageChange}
-                                                rows={8}
-                                                className="resize-none border-2 text-base transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
-                                            />
-
-                                            {/* Character Progress Bar */}
-                                            <div className="absolute right-2 bottom-2 left-2">
-                                                <div className="h-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                                                    <div
-                                                        className={`h-full rounded-full transition-all duration-300 ${
-                                                            characterCount > maxCharacters
-                                                                ? 'bg-red-500'
-                                                                : characterCount > maxCharacters * 0.9
-                                                                  ? 'bg-orange-500'
-                                                                  : 'bg-gradient-to-r from-blue-500 to-purple-600'
-                                                        }`}
-                                                        style={{ width: `${Math.min((characterCount / maxCharacters) * 100, 100)}%` }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Textarea
+                                            placeholder="Type your message here..."
+                                            value={message}
+                                            onChange={handleMessageChange}
+                                            rows={8}
+                                            className="resize-none border-2 text-base transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
+                                        />
 
                                         <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                                             <Sparkles className="h-3 w-3" />
@@ -439,14 +440,24 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                         <Button
                                             type="submit"
                                             disabled={
+                                                isSending ||
                                                 !message.trim() ||
                                                 (recipientType !== 'all' && selectedUsers.length === 0) ||
                                                 characterCount > maxCharacters
                                             }
                                             className="group flex-1 bg-gradient-to-r from-blue-600 to-purple-600 py-6 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
                                         >
-                                            <Send className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                            {'Send Message'}
+                                            {isSending ? (
+                                                <>
+                                                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                    Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Send className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                                    Send Message
+                                                </>
+                                            )}
                                         </Button>
                                         <Button
                                             type="button"
@@ -457,6 +468,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                 setCharacterCount(0);
                                                 setSearchQuery('');
                                             }}
+                                            disabled={isSending}
                                             className="border-2 px-6 py-6 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             <X className="h-5 w-5" />
@@ -465,6 +477,26 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </form>
                             </CardContent>
                         </Card>
+
+                        {/* Retry Section - shown when last send failed */}
+                        {lastFormData && !showConfirmDialog && (
+                            <Card className="border-2 border-red-200 bg-red-50 shadow-lg dark:border-red-800 dark:bg-red-900/20">
+                                <CardContent className="p-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                                            <div>
+                                                <p className="font-semibold text-red-900 dark:text-red-100">Last send failed</p>
+                                                <p className="text-sm text-red-700 dark:text-red-300">Your message and recipients are still available</p>
+                                            </div>
+                                        </div>
+                                        <Button onClick={handleRetry} variant="destructive" size="sm">
+                                            Retry Send
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* Summary Card */}
                         <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
@@ -509,6 +541,69 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                     </div>
                 </div>
             </div>
+
+            {/* Confirmation Dialog */}
+            <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <Send className="h-5 w-5 text-blue-600" />
+                            Confirm SMS Send
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Please review the details before sending:
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="space-y-3 py-4">
+                        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                            <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Recipients</p>
+                            <p className="text-sm text-gray-900 dark:text-white">
+                                {recipientType === 'all' ? (
+                                    <span className="font-semibold text-blue-600">{users.length} recipients (Broadcast)</span>
+                                ) : (
+                                    <span className="font-semibold text-blue-600">{selectedUsers.length} recipient(s) selected</span>
+                                )}
+                            </p>
+                        </div>
+
+                        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                            <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Message</p>
+                            <p className="line-clamp-3 text-sm text-gray-900 dark:text-white">{message}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                                <p className="text-xs text-gray-600 dark:text-gray-400">SMS Parts</p>
+                                <p className="text-xl font-bold text-blue-600">{Math.ceil(characterCount / 160) || 0}</p>
+                            </div>
+                            <div className="rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
+                                <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
+                                <p className="text-xl font-bold text-purple-600">
+                                    {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
+                                </p>
+                            </div>
+                        </div>
+
+                        {credits > 0 && getRecipientCount() * (Math.ceil(characterCount / 160) || 0) > credits && (
+                            <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
+                                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                                <p className="text-sm text-amber-800 dark:text-amber-200">
+                                    Warning: You may not have enough credits. Required: {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}, Available: {credits}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={cancelSend}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmSend} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                            <Send className="mr-2 h-4 w-4" />
+                            Confirm Send
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             <style>{`
                 @keyframes slideIn {

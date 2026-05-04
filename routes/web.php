@@ -183,6 +183,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::middleware(['role:Admin|Healthworker'])->group(function () {
         Route::get('/admin/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::get('/admin/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
         Route::post('/admin/announcements/store', [AnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');

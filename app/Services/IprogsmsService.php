@@ -62,8 +62,9 @@ class IprogsmsService
 
     /**
      * Send bulk SMS (comma-separated numbers)
+     * Includes retry logic for failed numbers
      */
-    public function sendBulkSms(array $phones, string $message): array
+    public function sendBulkSms(array $phones, string $message, int $maxRetries = 2): array
     {
         $normalizedPhones = array_map([$this, 'normalizePhoneNumber'], $phones);
         $phoneString = implode(',', $normalizedPhones);
@@ -76,11 +77,56 @@ class IprogsmsService
 
         $body = $response->json();
 
+        // If bulk fails, try individual sends with retry
+        if (! $response->successful()) {
+            return $this->sendIndividualWithRetry($normalizedPhones, $message, $maxRetries);
+        }
+
         return [
-            'success' => $response->successful(),
+            'success' => true,
             'phones' => $normalizedPhones,
             'response' => $body,
-            'error' => $response->successful() ? null : ($body['message'] ?? 'Unknown error'),
+            'error' => null,
+            'failed_phones' => [],
+        ];
+    }
+
+    /**
+     * Send individual SMS with retry logic
+     */
+    protected function sendIndividualWithRetry(array $phones, string $message, int $maxRetries = 2): array
+    {
+        $sent = [];
+        $failed = [];
+
+        foreach ($phones as $phone) {
+            $success = false;
+
+            for ($attempt = 0; $attempt <= $maxRetries; $attempt++) {
+                $result = $this->sendSms($phone, $message);
+
+                if ($result['success']) {
+                    $sent[] = $phone;
+                    $success = true;
+                    break;
+                }
+
+                if ($attempt < $maxRetries) {
+                    sleep(1); // Brief pause before retry
+                }
+            }
+
+            if (! $success) {
+                $failed[] = $phone;
+            }
+        }
+
+        return [
+            'success' => count($failed) === 0,
+            'phones' => $phones,
+            'sent_phones' => $sent,
+            'failed_phones' => $failed,
+            'error' => count($failed) > 0 ? 'Some messages failed to send' : null,
         ];
     }
 
