@@ -2,7 +2,41 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
+import { smartToast } from '@/utils/smartToast';
 
 type User = {
     id: number;
@@ -42,8 +76,8 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [search, setSearch] = useState(filters.search || '');
     const [loading, setLoading] = useState(false);
 
-    // Modal state
-    const [showModal, setShowModal] = useState(false);
+    // Modal states
+    const [showCodeModal, setShowCodeModal] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
     const [codeSearch, setCodeSearch] = useState('');
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -56,9 +90,17 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [generatedCode, setGeneratedCode] = useState('');
     const [generatedPassword, setGeneratedPassword] = useState('');
     const [copiedLogin, setCopiedLogin] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
 
     // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
+
+    // Confirmation dialogs
+    const [approveUserId, setApproveUserId] = useState<number | null>(null);
+    const [rejectUserId, setRejectUserId] = useState<number | null>(null);
+    const [archiveUserId, setArchiveUserId] = useState<number | null>(null);
+    const [deleteCodeId, setDeleteCodeId] = useState<number | null>(null);
+    const [maintenanceConfirm, setMaintenanceConfirm] = useState(false);
 
     // Show barangay dropdown ONLY for nutribantay@gmail.com when creating Admin role
     const showBarangayDropdown = isSeededAdmin && newUser.role === 'Admin';
@@ -89,7 +131,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             return;
         }
 
-        setModalLoading(true);
+        setCreateLoading(true);
         setCreateError('');
 
         try {
@@ -103,16 +145,15 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             setGeneratedCode(res.data.code || '');
             setGeneratedPassword(res.data.password || '');
             setCreateSuccess('User created successfully!');
-            setModalLoading(false);
+            setCreateLoading(false);
 
             if (closeAfter) {
                 setShowCreateModal(false);
                 setCreateSuccess('');
                 setGeneratedCode('');
                 setGeneratedPassword('');
-                window.location.reload();
+                router.reload();
             } else {
-                // Reset form fields but KEEP the code visible for admin to copy
                 setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
             }
         } catch (err: unknown) {
@@ -121,8 +162,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 message = err.message;
             }
             setCreateError(message);
-        } finally {
-            setModalLoading(false);
+            setCreateLoading(false);
         }
     };
 
@@ -134,24 +174,26 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     }, []);
 
     const toggleMaintenance = async () => {
+        setMaintenanceConfirm(true);
+    };
+
+    const confirmMaintenanceToggle = async () => {
         try {
             const newStatus = !maintenance;
             const res = await axios.post('/maintenance/toggle', { status: newStatus });
             setMaintenance(res.data.status);
+            setMaintenanceConfirm(false);
 
             if (res.data.status) {
-                alert(
-                    '✅ Maintenance mode ENABLED\n\n' +
-                        '• All Healthworker users will be logged out on their next request\n' +
-                        '• They will be redirected to the home page\n' +
-                        '• Only Admin users can access the system',
+                smartToast.success(
+                    'Maintenance mode ENABLED - All Healthworker users will be logged out on their next request',
                 );
             } else {
-                alert('✅ Maintenance mode DISABLED\n\nAll users can now access the system normally.');
+                smartToast.success('Maintenance mode DISABLED - All users can now access the system normally');
             }
         } catch (err) {
             console.error(err);
-            alert('❌ Failed to update maintenance mode. Please try again.');
+            smartToast.error('Failed to update maintenance mode. Please try again.');
         }
     };
 
@@ -161,35 +203,29 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             const response = await axios.post('/registration-codes/generate', { count });
             setCodes(response.data.codes);
 
-            // If modal is open, refresh the list
-            if (showModal) {
+            if (showCodeModal) {
                 const modalResponse = await axios.get('/registration-codes');
-                setCodes(modalResponse.data.codes);
+                setCodes(modalResponse.data.codes || modalResponse.data);
             }
 
-            alert(`Successfully generated ${response.data.codes.length} code(s)!`);
+            smartToast.success(`Successfully generated ${response.data.codes.length} code(s)!`);
         } catch (error) {
             console.error(error);
-            alert('Failed to generate admin codes.');
+            smartToast.error('Failed to generate admin codes.');
         } finally {
             setLoading(false);
         }
     };
 
     const openCodeModal = async () => {
-        setShowModal(true);
+        setShowCodeModal(true);
         setModalLoading(true);
         try {
             const response = await axios.get('/registration-codes');
-            console.log('Response:', response.data);
             setCodes(response.data.codes || response.data);
         } catch (error: unknown) {
             console.error('Failed to fetch codes:', error);
-            let errorMessage = 'Failed to load codes';
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            }
-            alert('Failed to load codes: ' + errorMessage);
+            smartToast.error('Failed to load codes');
         } finally {
             setModalLoading(false);
         }
@@ -209,22 +245,27 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         const codeList = filteredCodes.map((c) => c.code).join('\n');
         try {
             await navigator.clipboard.writeText(codeList);
-            alert('All codes copied to clipboard!');
+            smartToast.success('All codes copied to clipboard!');
         } catch (err) {
             console.error('Failed to copy:', err);
         }
     };
 
     const deleteCode = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this code?')) return;
+        setDeleteCodeId(id);
+    };
 
+    const confirmDeleteCode = async () => {
+        if (!deleteCodeId) return;
         try {
-            await axios.delete(`/registration-codes/${id}`);
-            setCodes(codes.filter((c) => c.id !== id));
-            alert('Code deleted successfully.');
+            await axios.delete(`/registration-codes/${deleteCodeId}`);
+            setCodes(codes.filter((c) => c.id !== deleteCodeId));
+            smartToast.success('Code deleted successfully.');
         } catch (error) {
             console.error('Failed to delete code:', error);
-            alert('Failed to delete code.');
+            smartToast.error('Failed to delete code.');
+        } finally {
+            setDeleteCodeId(null);
         }
     };
 
@@ -233,19 +274,52 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'active':
-                return 'bg-green-100 text-green-800';
+                return <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>;
             case 'used':
-                return 'bg-gray-100 text-gray-800';
+                return <Badge variant="secondary">Used</Badge>;
             case 'expired':
-                return 'bg-red-100 text-red-800';
+                return <Badge variant="destructive">Expired</Badge>;
             default:
-                return 'bg-gray-100 text-gray-800';
+                return <Badge variant="outline">{status}</Badge>;
         }
     };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get('/users', { search }, { preserveState: true });
+    };
+
+    const handleApprove = async (userId: number) => {
+        try {
+            await router.post(`/users/${userId}/approve`);
+            smartToast.success('User approved successfully!');
+        } catch (err) {
+            smartToast.error('Failed to approve user.');
+        } finally {
+            setApproveUserId(null);
+        }
+    };
+
+    const handleReject = async (userId: number) => {
+        try {
+            await router.post(`/users/${userId}/reject`);
+            smartToast.success('User rejected.');
+        } catch (err) {
+            smartToast.error('Failed to reject user.');
+        } finally {
+            setRejectUserId(null);
+        }
+    };
+
+    const handleArchive = async (userId: number) => {
+        try {
+            await router.delete(`/users/${userId}`);
+            smartToast.success('User archived successfully.');
+        } catch (err) {
+            smartToast.error('Failed to archive user.');
+        } finally {
+            setArchiveUserId(null);
+        }
     };
 
     return (
@@ -255,384 +329,522 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             {/* Header */}
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
-                <div className="flex space-x-2">
-                    <button
-                        onClick={() => {
-                            setCreateSuccess('');
-                            setCreateError('');
-                            setGeneratedCode('');
-                            setGeneratedPassword('');
-                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
-                            setShowCreateModal(true);
-                        }}
-                        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    >
+                <div className="flex gap-2">
+                    <Button onClick={() => {
+                        setCreateSuccess('');
+                        setCreateError('');
+                        setGeneratedCode('');
+                        setGeneratedPassword('');
+                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                        setShowCreateModal(true);
+                    }}>
                         Create User
-                    </button>
-                    <Link href="/users/archived" className="rounded bg-gray-700 px-4 py-2 text-white hover:bg-gray-800">
-                        View Archived Users
-                    </Link>
+                    </Button>
+                    <Button variant="secondary" asChild>
+                        <Link href="/users/archived">View Archived Users</Link>
+                    </Button>
                 </div>
             </div>
 
             {/* Maintenance Toggle */}
             <div className="m-4">
-                <button onClick={toggleMaintenance} className={`rounded px-4 py-2 ${maintenance ? 'bg-red-600' : 'bg-green-600'} text-white`}>
+                <Button
+                    onClick={toggleMaintenance}
+                    variant={maintenance ? 'destructive' : 'default'}
+                    className={maintenance ? '' : 'bg-green-600 hover:bg-green-700'}
+                >
                     {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
-                </button>
+                </Button>
             </div>
 
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="m-4 flex items-center space-x-2">
-                <input
+            <form onSubmit={handleSearch} className="m-4 flex items-center gap-2">
+                <Input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search by ID, Name, Email, or Role"
-                    className="w-64 rounded border px-3 py-2"
+                    className="w-64"
                 />
-                <button type="submit" className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                    Search
-                </button>
+                <Button type="submit">Search</Button>
             </form>
 
             {/* Admin Codes Section */}
-            <div className="m-4 mb-6 rounded border p-4">
+            <div className="m-4 mb-6 rounded-lg border p-4">
                 <h2 className="mb-2 text-lg font-semibold">Admin Codes</h2>
-                <div className="mb-3 flex items-center space-x-2">
-                    <label htmlFor="count" className="text-gray-700">
+                <div className="mb-3 flex items-center gap-2">
+                    <Label htmlFor="count" className="text-gray-700">
                         Number of Codes:
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                         id="count"
                         type="number"
                         min="1"
                         value={count}
                         onChange={(e) => setCount(Number(e.target.value))}
-                        className="w-20 rounded border px-2 py-1"
+                        className="w-20"
                     />
-                    <button
+                    <Button
                         onClick={generateAdminCodes}
                         disabled={loading}
-                        className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+                        variant="default"
                     >
-                        {loading ? 'Generating...' : 'Generate'}
-                    </button>
-                    <button onClick={openCodeModal} className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
+                        {loading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Generating...
+                            </>
+                        ) : (
+                            'Generate'
+                        )}
+                    </Button>
+                    <Button onClick={openCodeModal} variant="secondary">
                         View All Codes
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Users Table */}
-            <table className="min-w-full overflow-hidden rounded border">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="border px-4 py-2 text-left">ID</th>
-                        <th className="border px-4 py-2 text-left">Name</th>
-                        <th className="border px-4 py-2 text-left">Code</th>
-                        <th className="border px-4 py-2 text-left">Email</th>
-                        <th className="border px-4 py-2 text-left">Role</th>
-                        <th className="border px-4 py-2 text-left">Status</th>
-                        <th className="border px-4 py-2 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user) => (
-                        <tr key={user.id} className="hover:bg-gray-100">
-                            <td className="border px-4 py-2">{user.id}</td>
-                            <td className="border px-4 py-2">{user.name}</td>
-                            <td className="border px-4 py-2 font-mono">{user.registration_code || '-'}</td>
-                            <td className="border px-4 py-2">{user.email || '-'}</td>
-                            <td className="border px-4 py-2">{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</td>
-                            <td className="border px-4 py-2">
-                                {user.status === 'pending' && (
-                                    <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">Pending</span>
-                                )}
-                                {user.status === 'approved' && (
-                                    <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">Approved</span>
-                                )}
-                                {user.status === 'rejected' && (
-                                    <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Rejected</span>
-                                )}
-                                {!user.status && <span className="text-gray-500">-</span>}
-                            </td>
-                            <td className="border px-4 py-2">
-                                {user.status === 'pending' && (
-                                    <>
-                                        <button
-                                            onClick={() => {
-                                                if (confirm('Approve this user?')) {
-                                                    router.post(`/users/${user.id}/approve`);
-                                                }
-                                            }}
-                                            className="mr-1 rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600"
+            <div className="m-4 rounded-lg border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Code</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {users.map((user) => (
+                            <TableRow key={user.id} className="hover:bg-muted/50">
+                                <TableCell>{user.id}</TableCell>
+                                <TableCell>{user.name}</TableCell>
+                                <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
+                                <TableCell>{user.email || '-'}</TableCell>
+                                <TableCell>
+                                    {user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}
+                                </TableCell>
+                                <TableCell>
+                                    {user.status === 'pending' && (
+                                        <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
+                                            Pending
+                                        </Badge>
+                                    )}
+                                    {user.status === 'approved' && (
+                                        <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                                            Approved
+                                        </Badge>
+                                    )}
+                                    {user.status === 'rejected' && (
+                                        <Badge variant="destructive">
+                                            Rejected
+                                        </Badge>
+                                    )}
+                                    {!user.status && <span className="text-muted-foreground">-</span>}
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex gap-1">
+                                        {user.status === 'pending' && (
+                                            <>
+                                                <Button
+                                                    size="sm"
+                                                    variant="default"
+                                                    className="bg-green-600 hover:bg-green-700"
+                                                    onClick={() => setApproveUserId(user.id)}
+                                                >
+                                                    Approve
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    onClick={() => setRejectUserId(user.id)}
+                                                >
+                                                    Reject
+                                                </Button>
+                                            </>
+                                        )}
+                                        <Button size="sm" variant="secondary" asChild>
+                                            <Link href={`/users/${user.id}`}>View</Link>
+                                        </Button>
+                                        <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
+                                            <Link href={`/users/${user.id}/edit`}>Edit</Link>
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={() => setArchiveUserId(user.id)}
                                         >
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                if (confirm('Reject this user?')) {
-                                                    router.post(`/users/${user.id}/reject`);
-                                                }
-                                            }}
-                                            className="mr-1 rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
-                                        >
-                                            Reject
-                                        </button>
-                                    </>
-                                )}
-                                <Link
-                                    href={`/users/${user.id}`}
-                                    className="mr-1 rounded bg-gray-500 px-2 py-1 text-xs text-white transition hover:bg-gray-600"
-                                >
-                                    View
-                                </Link>
-                                <Link
-                                    href={`/users/${user.id}/edit`}
-                                    className="mr-1 rounded bg-green-500 px-2 py-1 text-xs text-white transition hover:bg-green-600"
-                                >
-                                    Edit
-                                </Link>
-                                <button
-                                    onClick={() => {
-                                        if (confirm('Archive this user?')) {
-                                            router.delete(`/users/${user.id}`);
-                                        }
-                                    }}
-                                    className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
-                                >
-                                    Archive
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+                                            Archive
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* Approve Confirmation Dialog */}
+            <AlertDialog open={!!approveUserId} onOpenChange={() => setApproveUserId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Approve User</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to approve this user? They will be able to access the system.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => approveUserId && handleApprove(approveUserId)}
+                            className="bg-green-600 hover:bg-green-700"
+                        >
+                            Approve
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Reject Confirmation Dialog */}
+            <AlertDialog open={!!rejectUserId} onOpenChange={() => setRejectUserId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Reject User</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to reject this user? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => rejectUserId && handleReject(rejectUserId)}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Reject
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Archive Confirmation Dialog */}
+            <AlertDialog open={!!archiveUserId} onOpenChange={() => setArchiveUserId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Archive User</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to archive this user? They will be moved to the archived users list.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => archiveUserId && handleArchive(archiveUserId)}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Archive
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Maintenance Toggle Confirmation */}
+            <AlertDialog open={maintenanceConfirm} onOpenChange={setMaintenanceConfirm}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {maintenance ? (
+                                <>
+                                    This will <strong>disable</strong> maintenance mode. All users will be able to access the system normally.
+                                </>
+                            ) : (
+                                <>
+                                    This will <strong>enable</strong> maintenance mode. All Healthworker users will be logged out on their next request and redirected to the home page. Only Admin users can access the system.
+                                </>
+                            )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmMaintenanceToggle}>
+                            Confirm
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Codes Modal */}
-            {showModal && (
-                <>
-                    {/* Backdrop with blur */}
-                    <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowModal(false)} />
-
-                    {/* Modal Container */}
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="max-h-[80vh] w-full max-w-4xl rounded-lg bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-                            <div className="mb-4 flex items-center justify-between">
-                                <h2 className="text-xl font-bold">Registration Codes</h2>
-                                <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">
-                                    ✕ Close
-                                </button>
-                            </div>
-
-                            {/* Search and Actions */}
-                            <div className="mb-4 flex items-center justify-between">
-                                <input
-                                    type="text"
-                                    value={codeSearch}
-                                    onChange={(e) => setCodeSearch(e.target.value)}
-                                    placeholder="Search codes..."
-                                    className="w-64 rounded border px-3 py-2"
-                                />
-                                <button onClick={copyAllCodes} className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-                                    Copy All
-                                </button>
-                            </div>
-
-                            {/* Codes Table */}
-                            {modalLoading ? (
-                                <div className="py-8 text-center">Loading...</div>
-                            ) : (
-                                <div className="max-h-96 overflow-y-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="sticky top-0 bg-gray-50">
-                                            <tr>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Barangay</th>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Expires</th>
-                                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-200">
-                                            {filteredCodes.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                                                        No codes found.
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                filteredCodes.map((code) => (
-                                                    <tr key={code.id} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-2 font-mono text-sm">{code.code}</td>
-                                                        <td className="px-4 py-2">{code.barangay}</td>
-                                                        <td className="px-4 py-2 text-sm">
-                                                            {code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}
-                                                        </td>
-                                                        <td className="px-4 py-2">
-                                                            <button
-                                                                onClick={() => copyToClipboard(code.code)}
-                                                                className="mr-2 rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600"
-                                                            >
-                                                                {copiedCode === code.code ? 'Copied!' : 'Copy'}
-                                                            </button>
-                                                            {code.status !== 'active' && (
-                                                                <button
-                                                                    onClick={() => deleteCode(code.id)}
-                                                                    className="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-
-                            <div className="mt-4 text-sm text-gray-500">Total: {filteredCodes.length} code(s)</div>
-                        </div>
+            <Dialog open={showCodeModal} onOpenChange={setShowCodeModal}>
+                <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Registration Codes</DialogTitle>
+                        <DialogDescription>
+                            View and manage registration codes for admin users.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="mb-4 flex items-center justify-between">
+                        <Input
+                            type="text"
+                            value={codeSearch}
+                            onChange={(e) => setCodeSearch(e.target.value)}
+                            placeholder="Search codes..."
+                            className="w-64"
+                        />
+                        <Button onClick={copyAllCodes} variant="default">
+                            Copy All
+                        </Button>
                     </div>
-                </>
-            )}
+                    {modalLoading ? (
+                        <div className="py-8 text-center">
+                            <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Code</TableHead>
+                                    <TableHead>Barangay</TableHead>
+                                    <TableHead>Expires</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredCodes.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                                            No codes found.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredCodes.map((code) => (
+                                        <TableRow key={code.id} className="hover:bg-muted/50">
+                                            <TableCell className="font-mono">{code.code}</TableCell>
+                                            <TableCell>{code.barangay}</TableCell>
+                                            <TableCell>
+                                                {code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}
+                                            </TableCell>
+                                            <TableCell>{getStatusBadge(code.status)}</TableCell>
+                                            <TableCell>
+                                                <div className="flex gap-1">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="default"
+                                                        onClick={() => copyToClipboard(code.code)}
+                                                    >
+                                                        {copiedCode === code.code ? 'Copied!' : 'Copy'}
+                                                    </Button>
+                                                    {(code.status === 'used' || code.status === 'expired') && (
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            onClick={() => setDeleteCodeId(code.id)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
+                    <div className="mt-4 text-sm text-muted-foreground">
+                        Total: {filteredCodes.length} code(s)
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Code Confirmation */}
+            <AlertDialog open={!!deleteCodeId} onOpenChange={() => setDeleteCodeId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Code</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this code? This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDeleteCode}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Create User Modal */}
-            {showCreateModal && (
-                <>
-                    <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setShowCreateModal(false)} />
-                    <div className="fixed inset-0 z-50 flex items-center justify-center">
-                        <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-                            <h2 className="mb-4 text-xl font-bold">Create User</h2>
+            <Dialog open={showCreateModal} onOpenChange={(open) => {
+                if (!open) {
+                    setShowCreateModal(false);
+                    setCreateSuccess('');
+                    setCreateError('');
+                    setGeneratedCode('');
+                    setGeneratedPassword('');
+                }
+            }}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Create User</DialogTitle>
+                        <DialogDescription>
+                            Create a new user with registration code.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div>
+                            <Label htmlFor="name">Name</Label>
+                            <Input
+                                id="name"
+                                type="text"
+                                value={newUser.name}
+                                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                                placeholder="Full name"
+                                required
+                            />
+                        </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium">Name</label>
-                                    <input
-                                        type="text"
-                                        value={newUser.name}
-                                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                                        className="w-full rounded border px-3 py-2"
-                                        placeholder="Full name"
-                                    />
-                                </div>
+                        <div>
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={newUser.email}
+                                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                                placeholder="Email address"
+                            />
+                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium">Email</label>
-                                    <input
-                                        type="email"
-                                        value={newUser.email}
-                                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                                        className="w-full rounded border px-3 py-2"
-                                        placeholder="Email address"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium">Password</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={newUser.password}
-                                            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                                            className="flex-1 rounded border px-3 py-2"
-                                            placeholder="Password"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={generatePassword}
-                                            className="rounded bg-gray-200 px-3 py-2 text-sm hover:bg-gray-300"
-                                        >
-                                            Generate
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium">Role</label>
-                                    <select
-                                        value={newUser.role}
-                                        onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
-                                        className="w-full rounded border px-3 py-2"
-                                    >
-                                        <option value="Healthworker">Healthworker</option>
-                                        <option value="Admin">Admin</option>
-                                    </select>
-                                </div>
-
-                                {showBarangayDropdown && (
-                                    <div>
-                                        <label className="block text-sm font-medium">Barangay</label>
-                                        <input
-                                            type="text"
-                                            value={newUser.barangay}
-                                            onChange={(e) => setNewUser({ ...newUser, barangay: e.target.value })}
-                                            placeholder="Enter barangay"
-                                            className="w-full rounded border px-3 py-2"
-                                        />
-                                    </div>
-                                )}
-
-                                {createError && <div className="text-sm text-red-600">{createError}</div>}
-                                {createSuccess && generatedCode && (
-                                    <div className="rounded bg-green-100 p-3 text-sm">
-                                        <p className="mb-2 font-medium text-green-800">User created successfully!</p>
-                                        <div className="flex items-center justify-between gap-2">
-                                            <div>
-                                                <p className="text-xs text-green-600">Code - Password:</p>
-                                                <p className="font-mono text-lg font-bold text-green-900">
-                                                    {generatedCode} - {generatedPassword}
-                                                </p>
-                                            </div>
-                                            <button
-                                                onClick={copyCredentials}
-                                                className="rounded bg-green-600 px-3 py-1 text-sm text-white hover:bg-green-700"
-                                            >
-                                                {copiedLogin ? 'Copied!' : 'Copy'}
-                                            </button>
-                                        </div>
-                                        <p className="mt-1 text-xs text-green-600">Give these credentials to the healthworker</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-6 flex justify-end gap-2">
-                                <button
-                                    onClick={() => {
-                                        // Reset all states when closing
-                                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
-                                        setCreateSuccess('');
-                                        setCreateError('');
-                                        setGeneratedCode('');
-                                        setGeneratedPassword('');
-                                        setShowCreateModal(false);
-                                        window.location.reload();
-                                    }}
-                                    className="rounded border px-4 py-2 hover:bg-gray-50"
+                        <div>
+                            <Label htmlFor="password">Password</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="password"
+                                    type="text"
+                                    value={newUser.password}
+                                    onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                    placeholder="Password"
+                                    required
+                                />
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    onClick={generatePassword}
                                 >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => handleCreateUser(false)}
-                                    disabled={modalLoading}
-                                    className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 disabled:opacity-50"
-                                >
-                                    {modalLoading ? 'Creating...' : 'Create & Add Another'}
-                                </button>
-                                <button
-                                    onClick={() => handleCreateUser(true)}
-                                    disabled={modalLoading}
-                                    className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-                                >
-                                    {modalLoading ? 'Creating...' : 'Create'}
-                                </button>
+                                    Generate
+                                </Button>
                             </div>
                         </div>
+
+                        <div>
+                            <Label htmlFor="role">Role</Label>
+                            <select
+                                id="role"
+                                value={newUser.role}
+                                onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
+                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                required
+                            >
+                                <option value="Healthworker">Healthworker</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+
+                        {showBarangayDropdown && (
+                            <div>
+                                <Label htmlFor="barangay">Barangay</Label>
+                                <Input
+                                    id="barangay"
+                                    type="text"
+                                    value={newUser.barangay}
+                                    onChange={(e) => setNewUser({ ...newUser, barangay: e.target.value })}
+                                    placeholder="Enter barangay"
+                                />
+                            </div>
+                        )}
+
+                        {createError && (
+                            <div className="text-sm text-destructive">{createError}</div>
+                        )}
+
+                        {createSuccess && generatedCode && (
+                            <div className="rounded-lg bg-green-50 p-3 text-sm">
+                                <p className="mb-2 font-medium text-green-800">User created successfully!</p>
+                                <div className="flex items-center justify-between gap-2">
+                                    <div>
+                                        <p className="text-xs text-green-600">Code - Password:</p>
+                                        <p className="font-mono text-lg font-bold text-green-900">
+                                            {generatedCode} - {generatedPassword}
+                                        </p>
+                                    </div>
+                                    <Button
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700"
+                                        onClick={copyCredentials}
+                                    >
+                                        {copiedLogin ? 'Copied!' : 'Copy'}
+                                    </Button>
+                                </div>
+                                <p className="mt-1 text-xs text-green-600">Give these credentials to the healthworker</p>
+                            </div>
+                        )}
                     </div>
-                </>
-            )}
+
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                                setCreateSuccess('');
+                                setCreateError('');
+                                setGeneratedCode('');
+                                setGeneratedPassword('');
+                                setShowCreateModal(false);
+                                router.reload();
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            onClick={() => handleCreateUser(false)}
+                            disabled={createLoading}
+                        >
+                            {createLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                'Create & Add Another'
+                            )}
+                        </Button>
+                        <Button
+                            onClick={() => handleCreateUser(true)}
+                            disabled={createLoading}
+                        >
+                            {createLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                'Create'
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

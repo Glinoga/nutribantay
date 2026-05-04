@@ -1,6 +1,17 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -27,77 +38,94 @@ export default function Create() {
             <Head title="Users" />
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Create User</h1>
-                <Link href="/users" className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
-                    Back
-                </Link>
+                <Button variant="secondary" asChild>
+                    <Link href="/users">Back</Link>
+                </Button>
             </div>
-            <form onSubmit={submit} className="mx-4 mt-8 max-w-xl">
+            <form onSubmit={submit} className="mx-4 mt-8 max-w-xl space-y-6">
                 {/* Name */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Name</label>
-                    <input
+                <div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
                         type="text"
-                        name="name"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Enter full name"
-                        className="w-full rounded border px-4 py-2"
                         required
                     />
-                    {errors.name && <div className="mt-1 text-sm text-red-600">{errors.name}</div>}
+                    {errors.name && (
+                        <p className="mt-1 text-sm text-destructive">{errors.name}</p>
+                    )}
                 </div>
 
                 {/* Email */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Email</label>
-                    <input
+                <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
                         type="email"
-                        name="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="Enter email address"
-                        className="w-full rounded border px-4 py-2"
                         required
                     />
-                    {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
+                    {errors.email && (
+                        <p className="mt-1 text-sm text-destructive">{errors.email}</p>
+                    )}
                 </div>
 
                 {/* Password */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Password</label>
-                    <input
+                <div>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        id="password"
                         type="password"
-                        name="password"
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         placeholder="Min 10 characters with letters and numbers"
-                        className="w-full rounded border px-4 py-2"
                         required
                     />
-                    {errors.password && <div className="mt-1 text-sm text-red-600">{errors.password}</div>}
+                    {errors.password && (
+                        <p className="mt-1 text-sm text-destructive">{errors.password}</p>
+                    )}
                 </div>
 
                 {/* Role Dropdown */}
-                <div className="mb-6">
-                    <label className="mb-1 block font-medium">Role</label>
-                    <select
-                        name="role"
+                <div>
+                    <Label htmlFor="role">Role</Label>
+                    <Select
                         value={data.role}
-                        onChange={(e) => setData('role', e.target.value)}
-                        className="w-full rounded border px-4 py-2"
+                        onValueChange={(value) => setData('role', value)}
                         required
                     >
-                        <option value="">Select Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="healthworker">Health Worker</option>
-                    </select>
-                    {errors.role && <div className="mt-1 text-sm text-red-600">{errors.role}</div>}
+                        <SelectTrigger id="role" className="w-full">
+                            <SelectValue placeholder="Select Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="healthworker">Health Worker</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    {errors.role && (
+                        <p className="mt-1 text-sm text-destructive">{errors.role}</p>
+                    )}
                 </div>
 
-                <div className="flex justify-end">
-                    <button type="submit" className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700" disabled={processing}>
-                        {processing ? 'Saving...' : 'Save User'}
-                    </button>
+                <div className="flex justify-end gap-2">
+                    <Button variant="outline" asChild>
+                        <Link href="/users">Cancel</Link>
+                    </Button>
+                    <Button type="submit" disabled={processing}>
+                        {processing ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            'Save User'
+                        )}
+                    </Button>
                 </div>
             </form>
         </AppLayout>

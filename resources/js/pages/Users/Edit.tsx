@@ -1,6 +1,17 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,73 +59,99 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
             <Head title="Users" />
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Edit User</h1>
-                <Link href="/users" className="rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700">
-                    Back
-                </Link>
+                <Button variant="secondary" asChild>
+                    <Link href="/users">Back</Link>
+                </Button>
             </div>
-            <form onSubmit={submit} className="mx-4 mt-8 max-w-xl">
+            <form onSubmit={submit} className="mx-4 mt-8 max-w-xl space-y-6">
                 {/* Name */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Name</label>
-                    <input
+                <div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
                         type="text"
-                        name="name"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Enter full name"
-                        className="w-full rounded border px-4 py-2"
                         required
                     />
-                    {errors.name && <div className="mt-1 text-sm text-red-600">{errors.name}</div>}
+                    {errors.name && (
+                        <p className="mt-1 text-sm text-destructive">{errors.name}</p>
+                    )}
                 </div>
 
                 {/* Email */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Email (optional)</label>
-                    <input
+                <div>
+                    <Label htmlFor="email">Email (optional)</Label>
+                    <Input
+                        id="email"
                         type="email"
-                        name="email"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="Enter email address"
-                        className="w-full rounded border px-4 py-2"
                     />
-                    {errors.email && <div className="mt-1 text-sm text-red-600">{errors.email}</div>}
+                    {errors.email && (
+                        <p className="mt-1 text-sm text-destructive">{errors.email}</p>
+                    )}
                 </div>
 
                 {/* Role Dropdown */}
-                <div className="mb-6">
-                    <label className="mb-1 block font-medium">Role</label>
-                    <select
-                        name="role"
+                <div>
+                    <Label htmlFor="role">Role</Label>
+                    <Select
                         value={data.role}
-                        onChange={(e) => setData('role', e.target.value)}
-                        className="w-full rounded border px-4 py-2"
+                        onValueChange={(value) => setData('role', value)}
                     >
-                        <option value="healthworker">Health Worker</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                    {errors.role && <div className="mt-1 text-sm text-red-600">{errors.role}</div>}
+                        <SelectTrigger id="role" className="w-full">
+                            <SelectValue placeholder="Select Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="healthworker">Health Worker</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    {errors.role && (
+                        <p className="mt-1 text-sm text-destructive">{errors.role}</p>
+                    )}
                 </div>
 
                 {/* Barangay */}
-                <div className="mb-4">
-                    <label className="mb-1 block font-medium">Barangay</label>
-                    <input
+                <div>
+                    <Label htmlFor="barangay">Barangay</Label>
+                    <Input
+                        id="barangay"
                         type="text"
-                        name="barangay"
                         value={data.barangay.replace(/^Barangay\s*/i, '')}
+                        onChange={(e) => setData('barangay', e.target.value)}
+                        placeholder="Enter barangay"
                         readOnly={!canEditBarangay}
-                        className={`w-full rounded border px-4 py-2 ${!canEditBarangay ? 'cursor-not-allowed bg-gray-100' : ''}`}
+                        className={!canEditBarangay ? 'cursor-not-allowed bg-muted' : ''}
                     />
-                    {errors.barangay && <div className="mt-1 text-sm text-red-600">{errors.barangay}</div>}
+                    {errors.barangay && (
+                        <p className="mt-1 text-sm text-destructive">{errors.barangay}</p>
+                    )}
+                    {!canEditBarangay && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Only the main admin can edit this field.
+                        </p>
+                    )}
                 </div>
 
                 {/* Save Button */}
-                <div className="flex justify-end">
-                    <button type="submit" className="rounded bg-blue-600 px-6 py-2 text-white transition hover:bg-blue-700" disabled={processing}>
-                        {processing ? 'Saving...' : 'Save User'}
-                    </button>
+                <div className="flex justify-end gap-2">
+                    <Button variant="outline" asChild>
+                        <Link href="/users">Cancel</Link>
+                    </Button>
+                    <Button type="submit" disabled={processing}>
+                        {processing ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            'Save User'
+                        )}
+                    </Button>
                 </div>
             </form>
         </AppLayout>
