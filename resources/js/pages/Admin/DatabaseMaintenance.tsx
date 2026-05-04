@@ -299,7 +299,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                                                     ↩️ Restore
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(backup)}
+                                                    onClick={() => confirmDelete(backup)}
                                                     className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
                                                     title="Delete backup"
                                                 >
