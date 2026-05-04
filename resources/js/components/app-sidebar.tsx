@@ -1,7 +1,17 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from '@/components/ui/sidebar';
 import { route } from '@/lib/routes';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
@@ -46,6 +56,7 @@ export function AppSidebar() {
         { title: 'Child Profiles', href: '/children', icon: UserPen },
         { title: 'Vaccines', href: route('vaccines.index'), icon: ShieldCheck },
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
+        { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
     ];
 
     // Admin-only menu items
@@ -58,12 +69,7 @@ export function AppSidebar() {
         : [];
 
     // Healthworker menu items
-    const healthworkerNavItems: NavItem[] = isHealthworker
-        ? [
-              { title: 'Stocks Management', href: '/stocks', icon: Boxes },
-              { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
-          ]
-        : [];
+    const healthworkerNavItems: NavItem[] = isHealthworker ? [{ title: 'Stocks Management', href: '/stocks', icon: Boxes }] : [];
 
     // Footer items (static)
     const footerNavItems: NavItem[] = [];
@@ -73,11 +79,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton
-                            size="lg"
-                            asChild
-                            className="transition-all duration-200 hover:bg-sidebar-accent"
-                        >
+                        <SidebarMenuButton size="lg" asChild className="transition-all duration-200 hover:bg-sidebar-accent">
                             <Link href={dashboard()} prefetch className="flex items-center gap-2">
                                 <AppLogo />
                             </Link>
@@ -88,15 +90,13 @@ export function AppSidebar() {
 
             <SidebarContent className="gap-1">
                 <SidebarGroup>
-                    <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
-                        Main
-                    </SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-sidebar-foreground/60 uppercase">Main</SidebarGroupLabel>
                     <NavMain items={mainNavItems} />
                 </SidebarGroup>
 
                 {adminNavItems.length > 0 && (
                     <SidebarGroup>
-                        <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+                        <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-sidebar-foreground/60 uppercase">
                             Administration
                         </SidebarGroupLabel>
                         <NavMain items={adminNavItems} />
@@ -105,7 +105,7 @@ export function AppSidebar() {
 
                 {healthworkerNavItems.length > 0 && (
                     <SidebarGroup>
-                        <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">
+                        <SidebarGroupLabel className="text-xs font-semibold tracking-wider text-sidebar-foreground/60 uppercase">
                             Health Worker
                         </SidebarGroupLabel>
                         <NavMain items={healthworkerNavItems} />

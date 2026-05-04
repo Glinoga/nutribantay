@@ -64,8 +64,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/children/export', [ChildController::class, 'export'])
         ->name('children.export')
         ->middleware(['role:Admin|Healthworker']);
+    Route::get('/children/print', [ChildController::class, 'print'])
+        ->name('children.print')
+        ->middleware(['role:Admin|Healthworker']);
     Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
     Route::resource('children', ChildController::class);
+    Route::get('/children/{child}/print', [ChildController::class, 'showPrint'])
+        ->name('children.show.print')
+        ->middleware(['role:Admin|Healthworker']);
     Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
 

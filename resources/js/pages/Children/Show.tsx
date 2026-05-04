@@ -9,7 +9,21 @@ import smartToast from '@/utils/smartToast';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { AlertTriangle, Check, ClipboardList, Edit2, Lightbulb, OctagonAlert, Plus, Syringe, Trash2, TrendingUp, X } from 'lucide-react';
+import {
+    AlertTriangle,
+    Check,
+    ClipboardList,
+    Download,
+    Edit2,
+    Lightbulb,
+    OctagonAlert,
+    Plus,
+    Printer,
+    Syringe,
+    Trash2,
+    TrendingUp,
+    X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 import Swal from 'sweetalert2';
@@ -84,6 +98,7 @@ export default function Show({ child }: { child: Child }) {
     const [loading, setLoading] = useState(false);
     const [selectedLog, setSelectedLog] = useState<HealthLog | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showExportDialog, setShowExportDialog] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({
         first_name: child.first_name || '',
@@ -344,6 +359,14 @@ export default function Show({ child }: { child: Child }) {
                         >
                             <Edit2 className="h-4 w-4" />
                             Edit Record
+                        </button>
+
+                        <button
+                            onClick={() => setShowExportDialog(true)}
+                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-400 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-cyan-700 hover:to-cyan-500 hover:shadow-lg"
+                        >
+                            <Download className="h-4 w-4" />
+                            Export / Print
                         </button>
 
                         {canManageHealthlogs && (
@@ -1233,6 +1256,44 @@ export default function Show({ child }: { child: Child }) {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            {showExportDialog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowExportDialog(false)}>
+                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="mb-4 flex items-center justify-between">
+                            <h2 className="text-lg font-semibold text-gray-900">Export / Print</h2>
+                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <p className="mb-4 text-sm text-cyan-700">
+                            Export or print <strong>{child.fullname}</strong>'s profile
+                        </p>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={() => {
+                                    setShowExportDialog(false);
+                                    window.location.href = `/children/${child.id}/print`;
+                                }}
+                                className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white hover:from-cyan-700 hover:to-cyan-500"
+                            >
+                                <Printer className="mr-2 h-4 w-4" />
+                                Print View
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setShowExportDialog(false);
+                                    window.location.href = `/children/${child.id}/export`;
+                                }}
+                                className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600"
+                            >
+                                <Download className="mr-2 h-4 w-4" />
+                                Export CSV
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

@@ -176,6 +176,7 @@ class ChildController extends Controller
     public function export(Request $request)
     {
         $user = auth()->user();
+        $now = Carbon::now();
 
         $query = Child::query();
 
@@ -189,12 +190,60 @@ class ChildController extends Controller
             if ($user->hasRole('Admin')) {
                 $query->where('barangay', $request->barangay);
             } else {
-                // Healthworker still limited to their own
                 $query->where('barangay', $user->barangay);
             }
         }
 
-        // ✅ Age filters (calculated from birthdate in months)
+        //  Search filter (matches index)
+        if ($request->search) {
+            $search = $request->search;
+            if (is_numeric($search)) {
+                $minBirthdate = now()->subMonths($search)->toDateString();
+                $query->where('birthdate', '<=', $minBirthdate);
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $searchLower = strtolower($search);
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
+                });
+            }
+        }
+
+        //  Sex filter
+        if ($request->sex) {
+            $query->where('sex', $request->sex);
+        }
+
+        //  Vaccine status filter
+        $vaccineStatus = $request->vaccine_status;
+
+        if ($vaccineStatus === 'overdue') {
+            $overdueChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
+                ->pluck('cv.child_id');
+            $query->whereIn('id', $overdueChildIds);
+        } elseif ($vaccineStatus === 'upcoming') {
+            $overdueChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
+                ->pluck('cv.child_id');
+            $upcomingChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString())
+                ->whereNotIn('cv.child_id', $overdueChildIds)
+                ->pluck('cv.child_id');
+            $query->whereIn('id', $upcomingChildIds);
+        }
+
+        //  Age filters
         if ($request->age_min) {
             $minBirthdate = now()->subMonths($request->age_min)->toDateString();
             $query->where('birthdate', '<=', $minBirthdate);
@@ -273,7 +322,7 @@ class ChildController extends Controller
 
     public function exportCSV($children)
     {
-        $filename = 'children_export.csv';
+        $filename = 'children_export_'.now()->format('Y-m-d').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -285,17 +334,29 @@ class ChildController extends Controller
 
             fputcsv($file, [
                 'Full Name',
-                'Age',
+                'Age (months)',
+                'Sex',
+                'Birthdate',
                 'Barangay',
+                'Weight (kg)',
+                'Height (cm)',
                 'BMI',
+                'Address',
+                'Contact Number',
             ]);
 
             foreach ($children as $child) {
                 fputcsv($file, [
                     $child->fullname,
                     $child->age,
+                    $child->sex,
+                    $child->birthdate?->format('Y-m-d'),
                     $child->barangay,
+                    $child->weight,
+                    $child->height,
                     $child->bmi,
+                    $child->address,
+                    $child->contact_number,
                 ]);
             }
 
@@ -575,5 +636,139 @@ class ChildController extends Controller
         }
 
         return redirect('/children')->with('success', $message);
+    }
+
+    /**
+     * Print view for filtered children list.
+     */
+    public function print(Request $request)
+    {
+        $user = auth()->user();
+        $now = Carbon::now();
+
+        $query = Child::query();
+
+        if (! $user->hasRole('Admin')) {
+            $query->where('barangay', $user->barangay);
+        }
+
+        if ($request->barangay && $user->hasRole('Admin')) {
+            $query->where('barangay', $request->barangay);
+        }
+
+        if ($request->search) {
+            $search = $request->search;
+            if (is_numeric($search)) {
+                $minBirthdate = now()->subMonths($search)->toDateString();
+                $query->where('birthdate', '<=', $minBirthdate);
+            } else {
+                $query->where(function ($q) use ($search) {
+                    $searchLower = strtolower($search);
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
+                });
+            }
+        }
+
+        if ($request->sex) {
+            $query->where('sex', $request->sex);
+        }
+
+        $vaccineStatus = $request->vaccine_status;
+
+        if ($vaccineStatus === 'overdue') {
+            $overdueChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
+                ->pluck('cv.child_id');
+            $query->whereIn('id', $overdueChildIds);
+        } elseif ($vaccineStatus === 'upcoming') {
+            $overdueChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
+                ->pluck('cv.child_id');
+            $upcomingChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString())
+                ->whereNotIn('cv.child_id', $overdueChildIds)
+                ->pluck('cv.child_id');
+            $query->whereIn('id', $upcomingChildIds);
+        }
+
+        $children = $query->get()->map(fn ($child) => [
+            'id' => $child->id,
+            'fullname' => $child->fullname,
+            'first_name' => $child->first_name,
+            'last_name' => $child->last_name,
+            'sex' => $child->sex,
+            'age' => $child->age,
+            'birthdate' => $child->birthdate?->format('Y-m-d'),
+            'weight' => $child->weight,
+            'height' => $child->height,
+            'bmi' => $child->bmi,
+            'barangay' => $child->barangay,
+            'address' => $child->address,
+            'contact_number' => $child->contact_number,
+        ]);
+
+        return Inertia::render('Children/Print', [
+            'children' => $children,
+            'filters' => $request->only(['search', 'sex', 'vaccine_status', 'barangay']),
+            'generated_at' => now()->format('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
+     * Print view for single child profile.
+     */
+    public function showPrint(Child $child)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $child->load(['healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')]);
+
+        return Inertia::render('Children/ShowPrint', [
+            'child' => [
+                'id' => $child->id,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'age' => $child->age,
+                'birthdate' => $child->birthdate?->format('Y-m-d'),
+                'weight' => $child->weight,
+                'height' => $child->height,
+                'bmi' => $child->bmi,
+                'barangay' => $child->barangay,
+                'address' => $child->address,
+                'contact_number' => $child->contact_number,
+                'created_at' => $child->created_at?->format('Y-m-d H:i:s'),
+                'healthlogs' => $child->healthlogs->map(fn ($log) => [
+                    'weight' => $log->weight,
+                    'height' => $log->height,
+                    'bmi' => $log->bmi,
+                    'nutrition_status' => $log->nutrition_status,
+                    'vaccine_name' => $log->vaccine_name,
+                    'dose_number' => $log->dose_number,
+                    'date_given' => $log->date_given?->format('Y-m-d'),
+                    'next_due_date' => $log->next_due_date?->format('Y-m-d'),
+                    'vaccine_status' => $log->vaccine_status,
+                    'created_at' => $log->created_at?->format('Y-m-d'),
+                ]),
+            ],
+            'generated_at' => now()->format('Y-m-d H:i:s'),
+        ]);
     }
 }

@@ -12,11 +12,13 @@ import {
     Calendar,
     ChevronLeft,
     ChevronRight,
+    Download,
     Edit2,
     FileSpreadsheet,
     MapPin,
     Phone,
     Plus,
+    Printer,
     Ruler,
     Scale,
     Search,
@@ -100,7 +102,9 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
     const roles = auth?.roles ?? [];
     const isHealthworker = roles.includes('Healthworker');
-    const canManageChildren = isHealthworker;
+    const isAdmin = roles.includes('Admin');
+    const canManageChildren = isHealthworker || isAdmin;
+    const canExportChildren = isHealthworker || isAdmin;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -108,6 +112,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
     const [importData, setImportData] = useState<any[]>([]);
     const [isImporting, setIsImporting] = useState(false);
     const [forceImport, setForceImport] = useState(false);
+    const [showExportDialog, setShowExportDialog] = useState(false);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -115,6 +120,22 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         setPreviewData([]);
         setImportData([]);
         setForceImport(false);
+    };
+
+    const handleExportPrint = () => {
+        const params = new URLSearchParams();
+        if (searchQuery) params.set('search', searchQuery);
+        if (activeSex) params.set('sex', activeSex);
+        if (activeVaccine) params.set('vaccine_status', activeVaccine);
+        window.location.href = `/children/print?${params.toString()}`;
+    };
+
+    const handleExportCSV = () => {
+        const params = new URLSearchParams();
+        if (searchQuery) params.set('search', searchQuery);
+        if (activeSex) params.set('sex', activeSex);
+        if (activeVaccine) params.set('vaccine_status', activeVaccine);
+        window.location.href = `/children/export?${params.toString()}`;
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -446,6 +467,16 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         </div>
 
                         <div className="flex gap-2">
+                            {canExportChildren && (
+                                <button
+                                    onClick={() => setShowExportDialog(true)}
+                                    className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                >
+                                    <Download className="mr-1.5 inline h-4 w-4" />
+                                    Export / Print
+                                </button>
+                            )}
+
                             {canManageChildren && (
                                 <button
                                     onClick={openImportModal}
@@ -711,6 +742,51 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         Next
                         <ChevronRight className="h-4 w-4" />
                     </button>
+                </div>
+            )}
+
+            {showExportDialog && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+                        <div className="flex items-center justify-between border-b p-4">
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-900">Export / Print</h2>
+                                <p className="text-sm text-cyan-700">
+                                    {searchQuery || activeSex || activeVaccine
+                                        ? `Filters: ${[searchQuery, activeSex, activeVaccine].filter(Boolean).join(', ')}`
+                                        : 'All children'}
+                                </p>
+                            </div>
+                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100">
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="p-4">
+                            <p className="mb-4 text-sm text-gray-600">Choose an option:</p>
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={() => {
+                                        setShowExportDialog(false);
+                                        handleExportPrint();
+                                    }}
+                                    className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white hover:from-cyan-700 hover:to-cyan-500"
+                                >
+                                    <Printer className="mr-2 h-4 w-4" />
+                                    Print View
+                                </Button>
+                                <Button
+                                    onClick={() => {
+                                        setShowExportDialog(false);
+                                        handleExportCSV();
+                                    }}
+                                    className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600"
+                                >
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Export CSV
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
