@@ -157,14 +157,25 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
         window.location.href = `/admin/database/download/${backup.filename}`;
     };
 
-    const handleDelete = async (backup: Backup) => {
-        if (!confirm(`Are you sure you want to delete this backup?\n\n${backup.filename}\nCreated: ${backup.date}`)) {
-            return;
-        }
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedDeleteBackup, setSelectedDeleteBackup] = useState<Backup | null>(null);
+
+    const confirmDelete = (backup: Backup) => {
+        setSelectedDeleteBackup(backup);
+        setShowDeleteModal(true);
+    };
+
+    const closeDeleteModal = () => {
+        setShowDeleteModal(false);
+        setSelectedDeleteBackup(null);
+    };
+
+    const handleDelete = async () => {
+        if (!selectedDeleteBackup) return;
 
         try {
             const response = await axios.delete('/admin/database/delete', {
-                data: { backup_file: backup.path },
+                data: { backup_file: selectedDeleteBackup.path },
             });
 
             if (response.data.success) {
@@ -182,6 +193,8 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                 type: 'error',
                 text: message,
             });
+        } finally {
+            closeDeleteModal();
         }
     };
 

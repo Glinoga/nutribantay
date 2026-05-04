@@ -600,22 +600,8 @@ class DatabaseMaintenanceController extends Controller
         $host = config('database.connections.mysql.host');
         $port = config('database.connections.mysql.port');
 
-        // Find mysql executable
-        $mysqlPath = 'mysql'; // Default to PATH
-
-        // Common Windows MySQL paths
-        $possiblePaths = [
-            'C:/xampp/mysql/bin/mysql.exe',
-            'C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe',
-            'C:/Program Files/MySQL/MySQL Server 5.7/bin/mysql.exe',
-        ];
-
-        foreach ($possiblePaths as $path) {
-            if (file_exists($path)) {
-                $mysqlPath = $path;
-                break;
-            }
-        }
+        // Auto-detect mysql executable
+        $mysqlPath = $this->detectMysqlPath();
 
         // Build mysql command
         $passwordArg = $password ? '--password='.escapeshellarg($password) : '';
@@ -631,7 +617,7 @@ class DatabaseMaintenanceController extends Controller
             $sqlFile
         );
 
-        \Log::info('Executing mysql restore command...');
+        \Log::info('Executing mysql restore command with path: '.$mysqlPath);
 
         // Execute command
         $output = [];
@@ -642,11 +628,51 @@ class DatabaseMaintenanceController extends Controller
             throw new \Exception(
                 'MySQL restore via command line failed. '.
                 'Return code: '.$returnVar.'. '.
-                'Output: '.implode("\n", $output)
+                'Output: '.implode("\n", $output).
+                ' (Using MySQL path: '.$mysqlPath.')'
             );
         }
 
-        \Log::info('Database restored successfully using mysql command line');
+        \Log::info('Database restored successfully using mysql command line ('.$mysqlPath.')');
+    }
+
+    /**
+     * Auto-detect MySQL executable path
+     */
+    private function detectMysqlPath()
+    {
+        // First try: use 'mysql' and rely on system PATH
+        $output = [];
+        $returnVar = 0;
+        exec('which mysql 2>/dev/null', $output, $returnVar);
+        if ($returnVar === 0 && !empty($output[0]) && file_exists($output[0])) {
+            \Log::info('Detected mysql via which: '.$output[0]);
+            return $output[0];
+        }
+
+        // Second try: common paths for different OS
+        $possiblePaths = [
+            // Linux/macOS
+            '/usr/bin/mysql',
+            '/usr/local/bin/mysql',
+            '/usr/local/mysql/bin/mysql',
+            // Windows
+            'C:\xampp\mysql\bin\mysql.exe',
+            'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe',
+            'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql.exe',
+            'C:\wamp\bin\mysql\mysql8.0.21\bin\mysql.exe',
+        ];
+
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                \Log::info('Found mysql at common path: '.$path);
+                return $path;
+            }
+        }
+
+        // Fallback: just use 'mysql' and hope it's in PATH
+        \Log::warning('Could not detect mysql path, falling back to "mysql" in PATH');
+        return 'mysql';
     }
 
     /**
