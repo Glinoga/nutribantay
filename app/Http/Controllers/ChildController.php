@@ -6,6 +6,7 @@ use App\Models\Child;
 use App\Models\ChildVaccineDose;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChildController extends Controller
@@ -50,9 +51,27 @@ class ChildController extends Controller
                 ->whereNotNull('child_vaccine_doses.next_due_date')
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
             $query->whereIn('id', $overdueChildIdsQuery);
+        } elseif ($vaccineStatus === 'mixed') {
+            // Show children with BOTH overdue AND upcoming doses
+            $mixedChildIdsQuery = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
+            
+            $query->whereIn('id', $mixedChildIdsQuery)
+                  ->whereExists(function ($q) use ($now) {
+                      $q->select(DB::raw(1))
+                        ->from('child_vaccine_doses as cvd2')
+                        ->join('child_vaccines as cv2', 'cvd2.child_vaccine_id', '=', 'cv2.id')
+                        ->whereColumn('cv2.child_id', 'children.id')
+                        ->whereNull('cvd2.date_given')
+                        ->whereNotNull('cvd2.next_due_date')
+                        ->where('cvd2.next_due_date', '>=', $now->toDateString());
+                  });
         } elseif ($vaccineStatus === 'upcoming') {
             // Only show children with upcoming doses who have NO overdue doses
-            $upcomingChildIdsQuery = ChildVaccineDose::select('cv.child_id')
+            $upcomingOnlyChildIdsQuery = ChildVaccineDose::select('cv.child_id')
                 ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
                 ->whereNull('child_vaccine_doses.date_given')
                 ->whereNotNull('child_vaccine_doses.next_due_date')
@@ -65,7 +84,7 @@ class ChildController extends Controller
                         ->whereNotNull('cvd2.next_due_date')
                         ->where('cvd2.next_due_date', '<', $now->toDateString());
                 });
-            $query->whereIn('id', $upcomingChildIdsQuery);
+            $query->whereIn('id', $upcomingOnlyChildIdsQuery);
         }
 
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
@@ -79,19 +98,26 @@ class ChildController extends Controller
             ->groupBy('childVaccine.child_id');
 
         $overdueChildIds = collect([]);
-        $upcomingChildIds = collect([]);
+        $upcomingOnlyChildIds = collect([]); // Children with ONLY upcoming (no overdue)
+        $mixedChildIds = collect([]); // Children with BOTH overdue AND upcoming
 
         foreach ($pendingDoses as $childId => $doses) {
             $hasOverdue = $doses->some(fn ($dose) => $dose->next_due_date && $dose->next_due_date->lt($now));
-            if ($hasOverdue) {
+            $hasUpcoming = $doses->some(fn ($dose) => $dose->next_due_date && !$dose->next_due_date->lt($now));
+
+            if ($hasOverdue && $hasUpcoming) {
+                $mixedChildIds->push($childId);
+                $overdueChildIds->push($childId); // Add to overdue for filter
+            } elseif ($hasOverdue) {
                 $overdueChildIds->push($childId);
             } else {
-                $upcomingChildIds->push($childId);
+                $upcomingOnlyChildIds->push($childId);
             }
         }
 
         $overdueCount = $overdueChildIds->count();
-        $upcomingCount = $upcomingChildIds->count();
+        $upcomingCount = $upcomingOnlyChildIds->count();
+        $mixedCount = $mixedChildIds->count();
 
         $avgBmi = Child::where('barangay', $user->barangay)
             ->whereNotNull('weight')
@@ -108,6 +134,7 @@ class ChildController extends Controller
             'avgBMI' => number_format($avgBmi ?? 0, 1),
             'vaccine_overdue' => $overdueCount,
             'vaccine_upcoming' => $upcomingCount,
+            'vaccine_mixed' => $mixedCount,
         ];
 
         return Inertia::render('Children/Index', [
@@ -131,9 +158,11 @@ class ChildController extends Controller
                 'creator' => [
                     'name' => $child->creator?->name,
                 ],
-                'vaccine_alert' => $overdueChildIds->contains($child->id)
-                    ? 'overdue'
-                    : ($upcomingChildIds->contains($child->id) ? 'upcoming' : null),
+                'vaccine_alert' => $mixedChildIds->contains($child->id)
+                    ? 'mixed'
+                    : ($overdueChildIds->contains($child->id)
+                        ? 'overdue'
+                        : ($upcomingOnlyChildIds->contains($child->id) ? 'upcoming' : null)),
             ]),
             'pagination' => [
                 'current_page' => $children->currentPage(),
@@ -226,6 +255,24 @@ class ChildController extends Controller
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
                 ->pluck('cv.child_id');
             $query->whereIn('id', $overdueChildIds);
+        } elseif ($vaccineStatus === 'mixed') {
+            // Show children with BOTH overdue AND upcoming doses
+            $mixedChildIds = ChildVaccineDose::select('cv.child_id')
+                ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
+                ->whereNull('child_vaccine_doses.date_given')
+                ->whereNotNull('child_vaccine_doses.next_due_date')
+                ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
+            
+            $query->whereIn('id', $mixedChildIds)
+                  ->whereExists(function ($q) use ($now) {
+                      $q->select(DB::raw(1))
+                        ->from('child_vaccine_doses as cvd2')
+                        ->join('child_vaccines as cv2', 'cvd2.child_vaccine_id', '=', 'cv2.id')
+                        ->whereColumn('cv2.child_id', 'children.id')
+                        ->whereNull('cvd2.date_given')
+                        ->whereNotNull('cvd2.next_due_date')
+                        ->where('cvd2.next_due_date', '>=', $now->toDateString());
+                  });
         } elseif ($vaccineStatus === 'upcoming') {
             $overdueChildIds = ChildVaccineDose::select('cv.child_id')
                 ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
@@ -233,14 +280,14 @@ class ChildController extends Controller
                 ->whereNotNull('child_vaccine_doses.next_due_date')
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString())
                 ->pluck('cv.child_id');
-            $upcomingChildIds = ChildVaccineDose::select('cv.child_id')
+            $upcomingOnlyChildIds = ChildVaccineDose::select('cv.child_id')
                 ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
                 ->whereNull('child_vaccine_doses.date_given')
                 ->whereNotNull('child_vaccine_doses.next_due_date')
                 ->where('child_vaccine_doses.next_due_date', '>=', $now->toDateString())
                 ->whereNotIn('cv.child_id', $overdueChildIds)
                 ->pluck('cv.child_id');
-            $query->whereIn('id', $upcomingChildIds);
+            $query->whereIn('id', $upcomingOnlyChildIds);
         }
 
         //  Age filters

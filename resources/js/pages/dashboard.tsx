@@ -71,12 +71,13 @@ type VaccineFollowup = {
     vaccine_name: string;
     dose_number: number;
     next_due_date: string;
-    status: 'Overdue' | 'Upcoming';
+    status: 'Overdue' | 'Upcoming' | 'Mixed';
 };
 
 type VaccineFollowups = {
     overdue_count: number;
     due_this_month_count: number;
+    mixed_count?: number;
     follow_ups: VaccineFollowup[];
 };
 
@@ -355,15 +356,28 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                                                                 <td className="px-4 py-2 text-cyan-700">{fu.dose_number}</td>
                                                                 <td className="px-4 py-2 text-cyan-700">{fu.next_due_date}</td>
                                                                 <td className="px-4 py-2">
-                                                                    <Badge
-                                                                        className={
-                                                                            fu.status === 'Overdue'
-                                                                                ? 'cursor-pointer bg-red-100 text-red-800'
-                                                                                : 'cursor-pointer bg-yellow-100 text-yellow-800'
-                                                                        }
-                                                                    >
-                                                                        {fu.status}
-                                                                    </Badge>
+                                                                    {fu.status === 'Mixed' ? (
+                                                                        <div className="flex items-center gap-1">
+                                                                            <Badge className="cursor-pointer bg-red-100 text-red-800">
+                                                                                <AlertTriangle className="mr-1 h-3 w-3" />
+                                                                                Overdue
+                                                                            </Badge>
+                                                                            <Badge className="cursor-pointer bg-yellow-100 text-yellow-800">
+                                                                                <Calendar className="mr-1 h-3 w-3" />
+                                                                                Upcoming
+                                                                            </Badge>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <Badge
+                                                                            className={
+                                                                                fu.status === 'Overdue'
+                                                                                    ? 'cursor-pointer bg-red-100 text-red-800'
+                                                                                    : 'cursor-pointer bg-yellow-100 text-yellow-800'
+                                                                            }
+                                                                        >
+                                                                            {fu.status}
+                                                                        </Badge>
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                         ))}

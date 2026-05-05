@@ -183,8 +183,20 @@ class DashboardController extends Controller
         $dueThisMonth = $pendingDoses->filter(fn ($dose) => $dose->next_due_date
             && $dose->next_due_date->between($startOfMonth, $endOfMonth));
 
+        // Calculate mixed doses (children with BOTH overdue AND upcoming)
+        $mixedDoses = $pendingDoses->filter(function ($dose) use ($pendingDoses, $now) {
+            $childId = $dose->childVaccine->child_id;
+            $childDoses = $pendingDoses->where('childVaccine.child_id', $childId);
+            
+            $hasOverdue = $childDoses->some(fn ($d) => $d->next_due_date && $d->next_due_date->isPast());
+            $hasUpcoming = $childDoses->some(fn ($d) => $d->next_due_date && !$d->next_due_date->isPast());
+            
+            return $hasOverdue && $hasUpcoming && $dose->next_due_date && $dose->next_due_date->isPast();
+        });
+
         $followUps = [];
 
+        // Add all overdue doses (including those from mixed children)
         foreach ($overdueDoses as $dose) {
             $cv = $dose->childVaccine;
             $followUps[] = [
@@ -197,10 +209,8 @@ class DashboardController extends Controller
             ];
         }
 
+        // Add all upcoming doses (including those from mixed children)
         foreach ($dueThisMonth as $dose) {
-            if ($overdueDoses->contains('id', $dose->id)) {
-                continue;
-            }
             $cv = $dose->childVaccine;
             $followUps[] = [
                 'child_id' => $cv->child->id,
@@ -254,6 +264,7 @@ class DashboardController extends Controller
             'vaccine_followups' => [
                 'overdue_count' => $overdueDoses->count(),
                 'due_this_month_count' => $dueThisMonth->count(),
+                'mixed_count' => $mixedDoses->count(),
                 'follow_ups' => $followUps,
             ],
             'user_barangay' => $barangay,

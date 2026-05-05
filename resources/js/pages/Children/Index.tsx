@@ -49,7 +49,7 @@ type Child = {
     address?: string | null;
     barangay?: string | null;
     creator?: { name: string | null };
-    vaccine_alert?: 'overdue' | 'upcoming' | null;
+    vaccine_alert?: 'overdue' | 'upcoming' | 'mixed' | null;
 };
 
 type Pagination = {
@@ -68,6 +68,7 @@ type Stats = {
     avgBMI: string;
     vaccine_overdue: number;
     vaccine_upcoming: number;
+    vaccine_mixed: number;
 };
 
 type IndexProps = {
@@ -77,7 +78,7 @@ type IndexProps = {
     sex?: string;
     flash?: { success?: string };
     stats: Stats;
-    vaccine_status?: 'overdue' | 'upcoming' | null;
+    vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
@@ -564,6 +565,21 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 Due Soon ({stats.vaccine_upcoming})
                             </button>
                         )}
+
+                        {stats.vaccine_mixed > 0 && (
+                            <button
+                                onClick={() => handleVaccineFilter('mixed')}
+                                className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    activeVaccine === 'mixed'
+                                        ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
+                                        : 'border border-orange-200 bg-white text-orange-700 hover:bg-orange-50'
+                                }`}
+                                aria-pressed={activeVaccine === 'mixed'}
+                            >
+                                <AlertTriangle className="h-3.5 w-3.5" />
+                                Mixed ({stats.vaccine_mixed})
+                            </button>
+                        )}
                     </div>
 
                     {flash?.success && (
@@ -603,25 +619,20 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                                 <p className="truncate text-sm font-bold text-gray-900">{child.fullname}</p>
                                                                 <p className="text-xs text-gray-500">ID: {child.id}</p>
                                                                 {child.vaccine_alert && (
-                                                                    <span
-                                                                        className={`mt-0.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium ${
-                                                                            child.vaccine_alert === 'overdue'
-                                                                                ? 'bg-red-100 text-red-700'
-                                                                                : 'bg-yellow-100 text-yellow-700'
-                                                                        }`}
-                                                                    >
-                                                                        {child.vaccine_alert === 'overdue' ? (
-                                                                            <>
+                                                                    <div className="mt-0.5 flex items-center gap-1">
+                                                                        {(child.vaccine_alert === 'overdue' || child.vaccine_alert === 'mixed') && (
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
                                                                                 <AlertTriangle className="h-3 w-3" />
                                                                                 Vaccine Overdue
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
+                                                                            </span>
+                                                                        )}
+                                                                        {(child.vaccine_alert === 'upcoming' || child.vaccine_alert === 'mixed') && (
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-yellow-100 px-1.5 py-0.5 text-[10px] font-medium text-yellow-700">
                                                                                 <Calendar className="h-3 w-3" />
                                                                                 Vaccine Due Soon
-                                                                            </>
+                                                                            </span>
                                                                         )}
-                                                                    </span>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
