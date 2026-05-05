@@ -193,19 +193,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
 });
 
-/*
-|--------------------------------------------------------------------------
-| STOCK ROUTES (Admin + Healthworker)
-|--------------------------------------------------------------------------
-*/
-Route::prefix('stocks')->middleware(['role:Admin|Healthworker'])->group(function () {
-    Route::get('/', [StockController::class, 'index'])->name('stocks.index');
-    Route::get('/create', [StockController::class, 'create'])->name('stocks.create');
-    Route::post('/', [StockController::class, 'store'])->name('stocks.store');
-    Route::get('/{stock}/edit', [StockController::class, 'edit'])->name('stocks.edit');
-    Route::put('/{stock}', [StockController::class, 'update'])->name('stocks.update');
-    Route::delete('/{stock}', [StockController::class, 'destroy'])->name('stocks.destroy');
-});
-
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

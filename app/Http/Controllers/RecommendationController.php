@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AIRecommender;
 use App\Models\Child;
-use App\Models\Stock;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -48,17 +47,7 @@ class RecommendationController extends Controller
         // Compute deworming recommendation flag - only for 12+ months AND no deworming yet
         $needsDeworming = ($totalMonths >= 12 && $dewormingStatus === 'No') ? 'Yes' : 'No';
 
-        // Step 5: Fetch stocks by authenticated user's barangay
-        $user = auth()->user();
-        $userBarangay = $user ? $user->barangay : $child->barangay;
-        $stocks = Stock::where('barangay', $userBarangay)->get();
-        $foodItems = $stocks->where('category', 'food')->pluck('item_name')->toArray();
-        $vitaminItems = $stocks->where('category', 'vitamin')->pluck('item_name')->toArray();
-
-        $foodList = ! empty($foodItems) ? implode(', ', $foodItems) : 'Walang available na pagkain sa barangay.';
-        $vitaminList = ! empty($vitaminItems) ? implode(', ', $vitaminItems) : 'Walang available na vitamin sa barangay.';
-
-        // Step 6: Build the prompt
+        // Step 5: Build the prompt
         $prompt = $this->buildPrompt(
             ageFormatted: $ageFormatted,
             months: $totalMonths,
@@ -68,9 +57,7 @@ class RecommendationController extends Controller
             nutritionStatus: $nutritionStatus,
             vitaminAStatus: $vitaminAStatus,
             dewormingStatus: $dewormingStatus,
-            needsDeworming: $needsDeworming,
-            foodList: $foodList,
-            vitaminList: $vitaminList
+            needsDeworming: $needsDeworming
         );
 
         // Step 7: Try API with retry logic
@@ -92,8 +79,6 @@ class RecommendationController extends Controller
         string $vitaminAStatus,
         string $dewormingStatus,
         string $needsDeworming,
-        string $foodList,
-        string $vitaminList
     ): string {
         return "
 Ikaw ay isang AI nutrition assistant para sa mga barangay health workers sa Pilipinas.
@@ -109,10 +94,6 @@ IMPORMASYON NG BATA:
 - Deworming: {$dewormingStatus}
 - NEEDS DEWORMING: {$needsDeworming}
 
-AVAILABLE SA BARANGAY:
-- Pagkain: {$foodList}
-- Vitamins: {$vitaminList}
-
 FEEDING RULES (STRICT):
 - 0-5 months: Gatas lamang (breastmilk/formula) - WALANG SOLID FOOD
 - 6-11 months: Breastmilk + soft foods (lugaw, mashed fruits/vegetables)
@@ -124,6 +105,7 @@ HALIMBAWA NG VALID MEAL PLAN (para sa 3+ taong gulang):
 - Umaga: Lugaw na may itlog at gulay
 - Tanghali: Kanin na may tinadtad na karne at gulay
 - Gabi: Kamote na may sabaw at prutas
+
 HALIMBAWA NG INVALID (HINDI PUWEDE):
 - Tanghali: Saging lang (WALANG BASE FOOD!)
 - Gabi: Gulay lang (WALANG BASE FOOD!)
@@ -138,13 +120,13 @@ AGE-SPECIFIC MEAL EXAMPLES:
 **STRICT PARA SA 6-11 BUWAN:**
 - Lahat ng pagkain ay dapat MASHED o PUREED
 - Halimbawa: Lugaw na may MASHED na saging, Lugaw na may PUREED na gulay
-- Bawal ang: sinigang, nilagang buo, steak, anumang hindi mashed
+- Bawal ang: sinigang, nilaga, buo, steak, anumang hindi mashed
 
 VALIDATION RULES (BAGO ILABAS ANG SAGOT, DAPAT PASSING LAHAT):
 1. **Tatlong magkaibang base foods lamang** sa meal plan (Umaga, Tanghali, Gabi)
    - Bawal ang: lugaw, kanin, kamote, tinapay, pasta, noodles na paulit-ulit
    - Halimbawa ng valid: Umaga: Lugaw, Tanghali: Kanin, Gabi: Kamote
-   - Halimbawa ng invalid: Umaga: Lugaw, Tanghali: Lugaw, Gabi: Lugaw (DOBULIN!)
+   - Halimbawa ng invalid: Umaga: Lugaw, Tanghali: Lugaw, Gabi: Lugaw (DOBLE!)
 2. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
 3. **Bawat meal dapat may heavy food (lugaw/kanin/kamote/tinapay)** - bawal ang prutas o gulay lang
 4. **Light food (prutas/gulay) dapat KASAMA ng heavy food**, hindi pamalit sa heavy food
@@ -153,11 +135,9 @@ VALIDATION RULES (BAGO ILABAS ANG SAGOT, DAPAT PASSING LAHAT):
 
 AGE-SPECIFIC RULES:
 - 0-5 months: GATAS LAMANG (breastmilk/formula) - WALANG SOLID FOOD
-- 6-11 months: SOFT FOODS - dapat MASHED o PUREED (hal. Lugaw na may MASHED na saging)
-- 12-35 months: REGULAR SOLIDS - hindi na kailangan ng MASHED (hal. Lugaw na may gulay, Kanin na may itlog)
+- 6-11 months: SOFT FOODS LAMANG - dapat MASHED o PUREED (hal. Lugaw na may MASHED na saging)
+- 12-35 months: REGULAR SOLIDS - hindi na kailangan MASHED (hal. Lugaw na may gulay, Kanin na may itlog)
 - 36+ months: Regular solid foods - buong pagkain pwede na
-
-⚠️ CRITICAL: Kung ang bata ay 12-35 buwan, GAMITIN ANG REGULAR NA PORMAT - HUWAG GAMITIN ANG MASHED O PUREED!
 
 DEWORMING RULE (MANDATORY - SUMUNOD SA NEEDS DEWORMING FIELD):
 - Kung NEEDS DEWORMING = Yes: MAGBIGAY NG DEWORMING TABLETS SA OUTPUT
@@ -167,7 +147,6 @@ FOOD RESTRICTIONS FORMAT:
 - Kung 0-5 months: Bawal ang anumang solid food - gatas lamang
 - Kung 6-11 months: Lahat ng pagkain ay dapat mashed o pureed
 - Kung 12+ months: Iwasan ang processed foods
-- Huwag magbigay ng generic na text na bawal ang solid food kung ang bata ay 6 buwan na
 
 OUTPUT FORMAT (Clean Version):
  1. Mga Nutrition Tips (3-4 items)
@@ -176,10 +155,10 @@ OUTPUT FORMAT (Clean Version):
     - Tanghali: [pagkain]
     - Gabi: [pagkain]
  3. Mga Vitamin/Supplements:
-    - {$vitaminList}
- 4. Food Restrictions (kung may)
- 5. Disclaimer
- 6. Pinagkuhanan ng Datos: National Nutrition Council
+     - Vitamin A supplements ayon sa status ng bata
+  4. Food Restrictions (kung may)
+  5. Disclaimer
+  6. National Nutrition Council
 
 IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot.
 ";
@@ -390,20 +369,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
     private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
     {
         if ($ageInMonths >= 12 && strtolower($dewormingStatus) === 'no') {
-            // Fetch medicine stocks for the user's barangay
-            $user = auth()->user();
-            $userBarangay = $user ? $user->barangay : null;
             $medicineList = 'Deworming tablets';
-
-            if ($userBarangay) {
-                $medicines = Stock::where('barangay', $userBarangay)
-                    ->where('category', 'medicine')
-                    ->pluck('item_name')
-                    ->toArray();
-                if (! empty($medicines)) {
-                    $medicineList = implode(', ', $medicines);
-                }
-            }
 
             if (stripos($recommendation, 'deworming') === false) {
                 // Handle multi-line format: line ending with newline

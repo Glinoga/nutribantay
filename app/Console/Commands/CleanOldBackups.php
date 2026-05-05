@@ -20,7 +20,7 @@ class CleanOldBackups extends Command
 
         $this->info("Starting backup cleanup (retention: {$retentionDays} days)...");
 
-        $backupPath = 'Laravel';
+        $backupPath = 'NutriBantay';
 
         if (! Storage::disk('local')->exists($backupPath)) {
             $this->info('No backup directory found. Exiting.');

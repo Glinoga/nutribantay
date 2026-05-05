@@ -16,7 +16,7 @@ import { route } from '@/lib/routes';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Boxes, Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, ShieldCheck, UserCog, UserPen } from 'lucide-react';
+import { Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, ShieldCheck, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -69,7 +69,7 @@ export function AppSidebar() {
         : [];
 
     // Healthworker menu items
-    const healthworkerNavItems: NavItem[] = isHealthworker ? [{ title: 'Stocks Management', href: '/stocks', icon: Boxes }] : [];
+    const healthworkerNavItems: NavItem[] = isHealthworker ? [] : [];
 
     // Footer items (static)
     const footerNavItems: NavItem[] = [];
