@@ -2,12 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus, Syringe } from 'lucide-react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type HealthLogForm = {
@@ -21,10 +20,6 @@ type HealthLogForm = {
     complementary_food: string;
     vitamin_a: boolean;
     deworming: boolean;
-    vaccine_name: string;
-    dose_number: string;
-    date_given: string;
-    next_due_date: string;
 };
 
 type HealthLog = {
@@ -48,23 +43,15 @@ type HealthLog = {
     child?: { fullname: string; id: number };
 };
 
-type Vaccine = {
-    id: number;
-    name: string;
-    description: string;
-};
-
 type EditProps = {
     healthlog: HealthLog;
     child_id?: number;
-    vaccines?: Vaccine[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
 
-export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }: EditProps) {
+export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
     const [showSuccess, setShowSuccess] = useState(false);
-    const [isOtherVaccine, setIsOtherVaccine] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm<HealthLogForm>({
         // child_id is intentionally excluded — child-centric design, not editable
@@ -79,21 +66,7 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
         complementary_food: healthlog.complementary_food ?? '',
         vitamin_a: !!healthlog.vitamin_a,
         deworming: !!healthlog.deworming,
-
-        vaccine_name: healthlog.vaccine_name ?? '',
-        dose_number: healthlog.dose_number ?? '',
-        date_given: healthlog.date_given ?? '',
-        next_due_date: healthlog.next_due_date ?? '',
     });
-
-    // Check on mount if existing vaccine_name matches any vaccine in catalog
-    useEffect(() => {
-        if (healthlog.vaccine_name && vaccines && vaccines.length > 0) {
-            const match = vaccines.find((v) => v.name === healthlog.vaccine_name);
-            setIsOtherVaccine(!match);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [vaccines]);
 
     // Auto-calc BMI
     useEffect(() => {
@@ -376,128 +349,6 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines = [] }
                                         <span className="text-sm font-medium text-gray-700">Deworming</span>
                                     </label>
                                 </div>
-                            </div>
-                        </div>
-
-                        {/* Vaccination Section */}
-                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <div className="flex items-center gap-2">
-                                    <Syringe className="h-5 w-5 text-teal-600" />
-                                    <h2 className="text-lg font-bold text-gray-900">Vaccination Record</h2>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
-                                <div>
-                                    <Label htmlFor="vaccine_name" className="text-gray-700">
-                                        Vaccine Name
-                                    </Label>
-                                    <Select
-                                        value={isOtherVaccine ? 'other' : data.vaccine_name || ''}
-                                        onValueChange={(value) => {
-                                            if (value === 'other') {
-                                                setIsOtherVaccine(true);
-                                            } else {
-                                                setIsOtherVaccine(false);
-                                                setData('vaccine_name', value);
-                                            }
-                                        }}
-                                    >
-                                        <SelectTrigger className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
-                                            <SelectValue placeholder="Select a vaccine" />
-                                        </SelectTrigger>
-                                        <SelectContent className="max-h-60">
-                                            <SelectGroup>
-                                                <SelectLabel>Vaccine Catalog</SelectLabel>
-                                                {vaccines &&
-                                                    vaccines.map((vaccine) => (
-                                                        <SelectItem key={vaccine.id} value={vaccine.name}>
-                                                            <div className="flex flex-col">
-                                                                <span className="font-medium">{vaccine.name}</span>
-                                                                <span className="text-xs text-muted-foreground">{vaccine.description}</span>
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                            </SelectGroup>
-                                            <SelectSeparator />
-                                            <SelectItem value="other">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium">Other (Type manually)</span>
-                                                </div>
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-
-                                    {/* Free-text input for "Other" option */}
-                                    {isOtherVaccine && (
-                                        <div className="fade-in-up mt-2">
-                                            <Input
-                                                id="vaccine_name_other"
-                                                type="text"
-                                                value={data.vaccine_name || ''}
-                                                onChange={(e) => setData('vaccine_name', e.target.value)}
-                                                className="bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                                placeholder="Enter vaccine name"
-                                                autoFocus
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="dose_number" className="text-gray-700">
-                                        Dose Number
-                                    </Label>
-                                    <Input
-                                        id="dose_number"
-                                        type="number"
-                                        value={data.dose_number}
-                                        onChange={(e) => setData('dose_number', e.target.value)}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                        placeholder="Enter dose number"
-                                    />
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="date_given" className="text-gray-700">
-                                        Date Given
-                                    </Label>
-                                    <Input
-                                        id="date_given"
-                                        type="date"
-                                        value={data.date_given}
-                                        onChange={(e) => setData('date_given', e.target.value)}
-                                        className="mt-1 cursor-pointer bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    />
-                                </div>
-
-                                <div>
-                                    <Label htmlFor="next_due_date" className="text-gray-700">
-                                        Next Due Date
-                                    </Label>
-                                    <Input
-                                        id="next_due_date"
-                                        type="date"
-                                        value={data.next_due_date}
-                                        onChange={(e) => setData('next_due_date', e.target.value)}
-                                        className="mt-1 cursor-pointer bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Vaccine Status */}
-                            <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
-                                <Label htmlFor="vaccine_status" className="text-gray-700">
-                                    Vaccine Status (Auto)
-                                </Label>
-                                <Input
-                                    id="vaccine_status"
-                                    type="text"
-                                    value={healthlog.vaccine_status || 'Pending'}
-                                    readOnly
-                                    className="mt-1 w-full cursor-not-allowed rounded-lg border bg-gray-100 font-semibold text-gray-900"
-                                />
-                                <p className="mt-1 text-xs text-gray-500">Status is automatically set based on Date Given and Next Due Date</p>
                             </div>
                         </div>
 

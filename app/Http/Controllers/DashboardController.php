@@ -184,13 +184,13 @@ class DashboardController extends Controller
             && $dose->next_due_date->between($startOfMonth, $endOfMonth));
 
         // Calculate mixed doses (children with BOTH overdue AND upcoming)
-        $mixedDoses = $pendingDoses->filter(function ($dose) use ($pendingDoses, $now) {
+        $mixedDoses = $pendingDoses->filter(function ($dose) use ($pendingDoses) {
             $childId = $dose->childVaccine->child_id;
             $childDoses = $pendingDoses->where('childVaccine.child_id', $childId);
-            
+
             $hasOverdue = $childDoses->some(fn ($d) => $d->next_due_date && $d->next_due_date->isPast());
-            $hasUpcoming = $childDoses->some(fn ($d) => $d->next_due_date && !$d->next_due_date->isPast());
-            
+            $hasUpcoming = $childDoses->some(fn ($d) => $d->next_due_date && ! $d->next_due_date->isPast());
+
             return $hasOverdue && $hasUpcoming && $dose->next_due_date && $dose->next_due_date->isPast();
         });
 

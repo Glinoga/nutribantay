@@ -133,8 +133,8 @@ class ChildVaccineController extends Controller
         ChildVaccineDose::create([
             'child_vaccine_id' => $childVaccine->id,
             'dose_number' => $doseNumber,
-            'date_given' => $request->date_given ?: null,
-            'next_due_date' => $request->next_due_date ?: null,
+            'date_given' => $request->date_given ? $request->date_given : null,
+            'next_due_date' => $request->next_due_date ? $request->next_due_date : null,
             'remarks' => $request->remarks,
             'administered_by' => $user->id,
         ]);
@@ -165,8 +165,8 @@ class ChildVaccineController extends Controller
         ]);
 
         $dose->update([
-            'date_given' => $request->date_given ?: null,
-            'next_due_date' => $request->next_due_date ?: null,
+            'date_given' => $request->date_given ? $request->date_given : null,
+            'next_due_date' => $request->next_due_date ? $request->next_due_date : null,
             'remarks' => $request->remarks,
         ]);
 

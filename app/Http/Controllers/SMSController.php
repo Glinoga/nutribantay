@@ -154,6 +154,7 @@ class SMSController extends Controller
             } elseif ($sentCount > 0 && $failedCount > 0) {
                 $failedPhonesStr = implode(', ', array_slice($failedPhones, 0, 5));
                 $extra = count($failedPhones) > 5 ? ' and '.(count($failedPhones) - 5).' more' : '';
+
                 return back()->with('warning', "SMS sent to {$sentCount} recipient(s), but failed for {$failedCount}: {$failedPhonesStr}{$extra}");
             } else {
                 return back()->with('error', 'Failed to send SMS to all recipients. Errors: '.implode(', ', $errors));

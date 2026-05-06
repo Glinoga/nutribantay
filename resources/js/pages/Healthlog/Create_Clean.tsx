@@ -30,11 +30,6 @@ type HealthLogRecord = {
     complementary_food?: string;
     vitamin_a?: boolean;
     deworming?: boolean;
-    vaccine_name?: string;
-    dose_number?: number;
-    date_given?: string;
-    next_due_date?: string;
-    vaccine_status?: string;
     created_at?: string;
 };
 
@@ -383,51 +378,6 @@ export default function Create({
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Vaccination */}
-                                    {selectedRecord.vaccine_name && (
-                                        <div>
-                                            <h3 className="mb-2 text-sm font-semibold text-gray-700">Vaccination</h3>
-                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                <div className="rounded-lg bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Vaccine Name</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.vaccine_name}</p>
-                                                </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Dose Number</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.dose_number ?? 'N/A'}</p>
-                                                </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Date Given</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">
-                                                        {selectedRecord.date_given ? new Date(selectedRecord.date_given).toLocaleDateString() : 'N/A'}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Next Due Date</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">
-                                                        {selectedRecord.next_due_date
-                                                            ? new Date(selectedRecord.next_due_date).toLocaleDateString()
-                                                            : 'N/A'}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Status</p>
-                                                    <span
-                                                        className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                                            selectedRecord.vaccine_status === 'Completed'
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : selectedRecord.vaccine_status === 'Overdue'
-                                                                  ? 'bg-red-100 text-red-800'
-                                                                  : 'bg-yellow-100 text-yellow-800'
-                                                        }`}
-                                                    >
-                                                        {selectedRecord.vaccine_status || 'Pending'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         )}
@@ -482,7 +432,7 @@ export default function Create({
                                         type="text"
                                         value={data.bmi}
                                         readOnly
-                                        className="mt-1 cursor-not-allowed bg-gray-100 font-semibold text-gray-900"
+                                        className="mt-1 w-full cursor-not-allowed bg-gray-100 font-semibold text-gray-900"
                                     />
                                     <p className="mt-1 text-xs text-gray-500">Calculated automatically from weight and height</p>
                                 </div>
@@ -512,7 +462,10 @@ export default function Create({
                         {/* Supplementary Programs */}
                         <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h2 className="text-lg font-bold text-gray-900">Supplementary Programs</h2>
+                                <div className="flex items-center gap-2">
+                                    <Heart className="h-5 w-5 text-teal-600" />
+                                    <h2 className="text-lg font-bold text-gray-900">Supplementary Programs</h2>
+                                </div>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>

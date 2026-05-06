@@ -32,7 +32,7 @@ class VaccineController extends Controller
                 'description' => $v->description,
                 'children_count' => $v->child_vaccines_count,
                 'created_by' => $v->creator?->name,
-                'created_at' => $v->created_at->format('Y-m-d H:i:s'),
+                'created_at' => $v->created_at ? $v->created_at->format('Y-m-d H:i:s') : null,
             ]),
             'stats' => $stats,
         ]);

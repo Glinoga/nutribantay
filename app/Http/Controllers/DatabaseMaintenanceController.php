@@ -38,7 +38,7 @@ class DatabaseMaintenanceController extends Controller
             ]);
 
             $output = \Artisan::output();
-            \Log::info('Backup command output: ' . $output);
+            \Log::info('Backup command output: '.$output);
 
             // Get the latest backup file (spatie stores in storage/app/private/{APP_NAME}/)
             $backupPath = storage_path('app/private/NutriBantay');
@@ -46,7 +46,7 @@ class DatabaseMaintenanceController extends Controller
             $latestTime = 0;
 
             if (is_dir($backupPath)) {
-                foreach (glob($backupPath . '/*.zip') as $file) {
+                foreach (glob($backupPath.'/*.zip') as $file) {
                     $mtime = filemtime($file);
                     if ($mtime > $latestTime) {
                         $latestTime = $mtime;
@@ -82,8 +82,8 @@ class DatabaseMaintenanceController extends Controller
             return back()->with('warning', 'Backup command executed but status unclear. Please check storage/app/private/NutriBantay/ folder.');
 
         } catch (\Exception $e) {
-            \Log::error('Database backup failed: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Database backup failed: '.$e->getMessage());
+            \Log::error('Stack trace: '.$e->getTraceAsString());
 
             // Log the failed backup attempt
             AuditLog::logAction([
@@ -92,7 +92,7 @@ class DatabaseMaintenanceController extends Controller
                 'description' => "Database backup failed: {$e->getMessage()}",
             ]);
 
-            return back()->with('error', '❌ Backup failed: ' . $e->getMessage());
+            return back()->with('error', '❌ Backup failed: '.$e->getMessage());
         }
     }
 
@@ -504,8 +504,9 @@ class DatabaseMaintenanceController extends Controller
         $output = [];
         $returnVar = 0;
         exec('which mysql 2>/dev/null', $output, $returnVar);
-        if ($returnVar === 0 && !empty($output[0]) && file_exists($output[0])) {
+        if ($returnVar === 0 && ! empty($output[0]) && file_exists($output[0])) {
             \Log::info('Detected mysql via which: '.$output[0]);
+
             return $output[0];
         }
 
@@ -525,12 +526,14 @@ class DatabaseMaintenanceController extends Controller
         foreach ($possiblePaths as $path) {
             if (file_exists($path)) {
                 \Log::info('Found mysql at common path: '.$path);
+
                 return $path;
             }
         }
 
         // Fallback: just use 'mysql' and hope it's in PATH
         \Log::warning('Could not detect mysql path, falling back to "mysql" in PATH');
+
         return 'mysql';
     }
 

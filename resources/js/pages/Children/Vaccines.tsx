@@ -472,8 +472,8 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                 </div>
                             )}
 
-                            {/* Yes/No radio buttons - only when creating new dose */}
-                            {!editingDose && (
+                            {/* Yes/No radio buttons - when creating new dose OR editing pending dose */}
+                            {(!editingDose || (editingDose && !editingDose.dose.date_given)) && (
                                 <div className="rounded-lg bg-blue-50 p-4">
                                     <Label className="font-medium text-blue-900">Has this dose been given?</Label>
                                     <div className="mt-3 flex gap-4">

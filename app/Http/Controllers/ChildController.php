@@ -58,17 +58,17 @@ class ChildController extends Controller
                 ->whereNull('child_vaccine_doses.date_given')
                 ->whereNotNull('child_vaccine_doses.next_due_date')
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
-            
+
             $query->whereIn('id', $mixedChildIdsQuery)
-                  ->whereExists(function ($q) use ($now) {
-                      $q->select(DB::raw(1))
+                ->whereExists(function ($q) use ($now) {
+                    $q->select(DB::raw(1))
                         ->from('child_vaccine_doses as cvd2')
                         ->join('child_vaccines as cv2', 'cvd2.child_vaccine_id', '=', 'cv2.id')
                         ->whereColumn('cv2.child_id', 'children.id')
                         ->whereNull('cvd2.date_given')
                         ->whereNotNull('cvd2.next_due_date')
                         ->where('cvd2.next_due_date', '>=', $now->toDateString());
-                  });
+                });
         } elseif ($vaccineStatus === 'upcoming') {
             // Only show children with upcoming doses who have NO overdue doses
             $upcomingOnlyChildIdsQuery = ChildVaccineDose::select('cv.child_id')
@@ -103,7 +103,7 @@ class ChildController extends Controller
 
         foreach ($pendingDoses as $childId => $doses) {
             $hasOverdue = $doses->some(fn ($dose) => $dose->next_due_date && $dose->next_due_date->lt($now));
-            $hasUpcoming = $doses->some(fn ($dose) => $dose->next_due_date && !$dose->next_due_date->lt($now));
+            $hasUpcoming = $doses->some(fn ($dose) => $dose->next_due_date && ! $dose->next_due_date->lt($now));
 
             if ($hasOverdue && $hasUpcoming) {
                 $mixedChildIds->push($childId);
@@ -262,17 +262,17 @@ class ChildController extends Controller
                 ->whereNull('child_vaccine_doses.date_given')
                 ->whereNotNull('child_vaccine_doses.next_due_date')
                 ->where('child_vaccine_doses.next_due_date', '<', $now->toDateString());
-            
+
             $query->whereIn('id', $mixedChildIds)
-                  ->whereExists(function ($q) use ($now) {
-                      $q->select(DB::raw(1))
+                ->whereExists(function ($q) use ($now) {
+                    $q->select(DB::raw(1))
                         ->from('child_vaccine_doses as cvd2')
                         ->join('child_vaccines as cv2', 'cvd2.child_vaccine_id', '=', 'cv2.id')
                         ->whereColumn('cv2.child_id', 'children.id')
                         ->whereNull('cvd2.date_given')
                         ->whereNotNull('cvd2.next_due_date')
                         ->where('cvd2.next_due_date', '>=', $now->toDateString());
-                  });
+                });
         } elseif ($vaccineStatus === 'upcoming') {
             $overdueChildIds = ChildVaccineDose::select('cv.child_id')
                 ->join('child_vaccines as cv', 'child_vaccine_doses.child_vaccine_id', '=', 'cv.id')
@@ -533,7 +533,6 @@ class ChildController extends Controller
                         'status_wfa', 'status_lfa', 'status_wfl_wfh',
                         'vitamin_a', 'deworming',
                         'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
-                        'vaccine_name', 'dose_number', 'date_given', 'next_due_date', 'vaccine_status',
                         'created_at', 'user_id',
                     ])
                     ->map(fn ($log) => [
@@ -551,11 +550,6 @@ class ChildController extends Controller
                         'rutf' => $log->ruf,
                         'rusf' => $log->rusf,
                         'complementary_food' => $log->complementary_food,
-                        'vaccine_name' => $log->vaccine_name,
-                        'dose_number' => $log->dose_number,
-                        'date_given' => $log->date_given,
-                        'next_due_date' => $log->next_due_date,
-                        'vaccine_status' => $log->vaccine_status,
                         'created_at' => $log->created_at,
                         'user' => ['name' => $log->user?->name],
                     ]),

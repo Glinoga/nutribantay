@@ -43,13 +43,6 @@ return new class extends Migration
             $table->boolean('vitamin_a')->default(false);
             $table->boolean('deworming')->default(false);
 
-            // Vaccination info
-            $table->string('vaccine_name')->nullable();
-            $table->integer('dose_number')->nullable();
-            $table->date('date_given')->nullable();
-            $table->date('next_due_date')->nullable();
-            $table->string('vaccine_status')->nullable();
-
             $table->timestamps();
             $table->text('recommendation')->nullable();
         });

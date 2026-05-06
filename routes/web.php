@@ -12,7 +12,6 @@ use App\Http\Controllers\HealthlogController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\RegistrationCodeController;
 use App\Http\Controllers\SMSController;
-use App\Http\Controllers\StockController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VaccineController;

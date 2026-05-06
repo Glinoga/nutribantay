@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,11 +31,6 @@ class HealthLog extends Model
         'vitamin_a',
         'deworming',
 
-        'vaccine_name',
-        'dose_number',
-        'date_given',
-        'next_due_date',
-
         'recommendation',
     ];
 
@@ -48,10 +42,6 @@ class HealthLog extends Model
         'vitamin_a' => 'boolean',
         'deworming' => 'boolean',
 
-        'dose_number' => 'integer',
-
-        'date_given' => 'datetime',
-        'next_due_date' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -64,25 +54,5 @@ class HealthLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Auto-calculate vaccine status
-     */
-    public function getVaccineStatusAttribute($value)
-    {
-        if (! $this->vaccine_name) {
-            return null;
-        }
-
-        if ($this->date_given) {
-            return 'Completed';
-        }
-
-        if ($this->next_due_date && Carbon::parse($this->next_due_date)->isPast()) {
-            return 'Overdue';
-        }
-
-        return 'Pending';
     }
 }

@@ -4,8 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Child;
 use Faker\Factory as FakerFactory;
+use Illuminate\Database\Seeder;
 
-class AddPhoneNumbersSeeder extends \Illuminate\Database\Seeder
+class AddPhoneNumbersSeeder extends Seeder
 {
     public function run(): void
     {
@@ -18,7 +19,7 @@ class AddPhoneNumbersSeeder extends \Illuminate\Database\Seeder
         $count = 0;
         foreach ($children as $child) {
             $prefix = $faker->randomElement(['917', '918', '919', '920', '921']);
-            $number = '09' . $prefix . $faker->numerify('######');
+            $number = '09'.$prefix.$faker->numerify('######');
 
             $child->update(['contact_number' => $number]);
             $count++;
