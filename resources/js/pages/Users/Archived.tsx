@@ -1,17 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,8 +8,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { Head, Link, router } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 type User = {
     id: number;
@@ -108,17 +100,10 @@ export default function Archived({ users }: Props) {
                                     <TableCell>{user.id}</TableCell>
                                     <TableCell>{user.name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
-                                    <TableCell>
-                                        {new Date(user.deleted_at).toLocaleDateString()}
-                                    </TableCell>
+                                    <TableCell>{new Date(user.deleted_at).toLocaleDateString()}</TableCell>
                                     <TableCell>
                                         <div className="flex gap-1">
-                                            <Button
-                                                size="sm"
-                                                variant="default"
-                                                onClick={() => setRestoreId(user.id)}
-                                                disabled={loading === user.id}
-                                            >
+                                            <Button size="sm" variant="default" onClick={() => setRestoreId(user.id)} disabled={loading === user.id}>
                                                 {loading === user.id ? (
                                                     <>
                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -163,10 +148,7 @@ export default function Archived({ users }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => restoreId && handleRestore(restoreId)}
-                            className="bg-green-600 hover:bg-green-700"
-                        >
+                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} className="bg-green-600 hover:bg-green-700">
                             Restore
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -184,10 +166,7 @@ export default function Archived({ users }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => deleteId && handleForceDelete(deleteId)}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>

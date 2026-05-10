@@ -1,17 +1,11 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -75,9 +69,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                         placeholder="Enter full name"
                         required
                     />
-                    {errors.name && (
-                        <p className="mt-1 text-sm text-destructive">{errors.name}</p>
-                    )}
+                    {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name}</p>}
                 </div>
 
                 {/* Email */}
@@ -90,18 +82,13 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="Enter email address"
                     />
-                    {errors.email && (
-                        <p className="mt-1 text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                 </div>
 
                 {/* Role Dropdown */}
                 <div>
                     <Label htmlFor="role">Role</Label>
-                    <Select
-                        value={data.role}
-                        onValueChange={(value) => setData('role', value)}
-                    >
+                    <Select value={data.role} onValueChange={(value) => setData('role', value)}>
                         <SelectTrigger id="role" className="w-full">
                             <SelectValue placeholder="Select Role" />
                         </SelectTrigger>
@@ -110,9 +97,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                             <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.role && (
-                        <p className="mt-1 text-sm text-destructive">{errors.role}</p>
-                    )}
+                    {errors.role && <p className="mt-1 text-sm text-destructive">{errors.role}</p>}
                 </div>
 
                 {/* Barangay */}
@@ -127,14 +112,8 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                         readOnly={!canEditBarangay}
                         className={!canEditBarangay ? 'cursor-not-allowed bg-muted' : ''}
                     />
-                    {errors.barangay && (
-                        <p className="mt-1 text-sm text-destructive">{errors.barangay}</p>
-                    )}
-                    {!canEditBarangay && (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Only the main admin can edit this field.
-                        </p>
-                    )}
+                    {errors.barangay && <p className="mt-1 text-sm text-destructive">{errors.barangay}</p>}
+                    {!canEditBarangay && <p className="mt-1 text-xs text-muted-foreground">Only the main admin can edit this field.</p>}
                 </div>
 
                 {/* Save Button */}

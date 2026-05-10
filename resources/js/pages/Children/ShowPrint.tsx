@@ -1,7 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Baby, Printer } from 'lucide-react';
+import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
+import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
+import { Doughnut, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
 type HealthLog = {
     weight: number | null;
@@ -48,6 +52,60 @@ const getStatusColor = (status: string | null) => {
 };
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+    const healthlogs = child.healthlogs || [];
+
+    const lineChartData = {
+        labels: healthlogs.map((log) =>
+            log.created_at ? new Date(log.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '',
+        ),
+        datasets: [
+            {
+                label: 'Weight (kg)',
+                data: healthlogs.map((log) => log.weight),
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                tension: 0.3,
+            },
+            {
+                label: 'Height (cm)',
+                data: healthlogs.map((log) => log.height),
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                tension: 0.3,
+            },
+            {
+                label: 'BMI',
+                data: healthlogs.map((log) => log.bmi),
+                borderColor: 'rgb(168, 85, 247)',
+                backgroundColor: 'rgba(168, 85, 247, 0.5)',
+                tension: 0.3,
+            },
+        ],
+    };
+
+    const nutritionCounts = { normal: 0, underweight: 0, overweight: 0, stunted: 0 };
+    healthlogs.forEach((log) => {
+        const status = log.nutrition_status || '';
+        if (status === 'Normal') nutritionCounts.normal++;
+        else if (['Overweight/Obese', 'Overweight', 'Obese'].includes(status)) nutritionCounts.overweight++;
+        else if (['Stunted', 'Severely Stunted'].includes(status)) nutritionCounts.stunted++;
+        else if (['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'].includes(status)) nutritionCounts.underweight++;
+    });
+
+    const hasNutritionData = nutritionCounts.normal + nutritionCounts.underweight + nutritionCounts.overweight + nutritionCounts.stunted > 0;
+
+    const doughnutData = {
+        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted'],
+        datasets: [
+            {
+                data: [nutritionCounts.normal, nutritionCounts.underweight, nutritionCounts.overweight, nutritionCounts.stunted],
+                backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
+                borderColor: ['rgb(34, 197, 94)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
+                borderWidth: 1,
+            },
+        ],
+    };
+
     return (
         <div className="min-h-screen bg-cyan-50 p-8 font-sans print:bg-white">
             <Head title={`${child.fullname} - Print`} />
@@ -58,6 +116,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
                     table { break-inside: auto; }
                     tr { break-inside: avoid; page-break-inside: avoid; }
+                    .chart-container { break-inside: avoid; }
                 }
             `}</style>
 
@@ -142,7 +201,72 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 </div>
             </div>
 
-            {child.healthlogs.length > 0 && (
+            {/* Charts Section */}
+            {healthlogs.length > 0 && (
+                <div className="chart-container mb-8">
+                    <div className="mb-4 flex items-center gap-2">
+                        <TrendingUp className="h-6 w-6 text-cyan-900" />
+                        <h3 className="text-xl font-bold text-cyan-900">Growth Charts</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        <div className="rounded-lg border border-cyan-200 bg-white p-4 print:bg-white">
+                            <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Weight, Height & BMI Over Time</h4>
+                            <div className="relative" style={{ height: '280px' }}>
+                                <Line
+                                    data={lineChartData}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                position: 'bottom',
+                                                labels: { boxWidth: 12, padding: 12 },
+                                            },
+                                        },
+                                        scales: {
+                                            y: {
+                                                beginAtZero: false,
+                                                ticks: { font: { size: 11 } },
+                                            },
+                                            x: {
+                                                ticks: { font: { size: 10 } },
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg border border-cyan-200 bg-white p-4 print:bg-white">
+                            <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Nutrition Status Distribution</h4>
+                            <div className="relative" style={{ height: '280px' }}>
+                                {hasNutritionData ? (
+                                    <Doughnut
+                                        data={doughnutData}
+                                        options={{
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'bottom',
+                                                    labels: { boxWidth: 12, padding: 12 },
+                                                },
+                                            },
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                                        No nutrition status data available.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {healthlogs.length > 0 && (
                 <div className="mb-8">
                     <h3 className="mb-4 text-xl font-bold text-cyan-900">Health Logs</h3>
                     <div className="overflow-x-auto">
@@ -162,7 +286,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {child.healthlogs.map((log, index) => (
+                                {healthlogs.map((log, index) => (
                                     <TableRow key={index} className="hover:bg-cyan-50/50 print:text-xs">
                                         <TableCell className="px-4 py-2">{log.created_at ?? '-'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.weight ?? '-'}</TableCell>

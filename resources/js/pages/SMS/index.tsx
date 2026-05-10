@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,6 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,7 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber } from '@/lib/phoneUtils';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
-import { CheckCircle2, AlertTriangle, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 interface User {
@@ -198,7 +198,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">SMS Messenger</h1>
+                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                        SMS Messenger
+                                    </h1>
                                     <p className="mt-1 flex items-center gap-2 text-gray-600 dark:text-gray-300">
                                         <Sparkles className="h-4 w-4" />
                                         Send messages to guardians instantly
@@ -311,7 +313,13 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                         {/* Quick Actions */}
                                         {recipientType === 'multiple' && filteredUsers.length > 0 && (
                                             <div className="flex gap-2">
-                                                <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs">
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={selectAllFiltered}
+                                                    className="flex-1 text-xs"
+                                                >
                                                     Select All
                                                 </Button>
                                                 <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
@@ -346,13 +354,17 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                                         : 'border-gray-300 group-hover:border-blue-500 dark:border-gray-600'
                                                                 }`}
                                                             >
-                                                                {selectedUsers.includes(user.id) && <CheckCircle2 className="h-4 w-4 text-blue-600" />}
+                                                                {selectedUsers.includes(user.id) && (
+                                                                    <CheckCircle2 className="h-4 w-4 text-blue-600" />
+                                                                )}
                                                             </div>
 
                                                             {/* Avatar */}
                                                             <div
                                                                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
-                                                                    selectedUsers.includes(user.id) ? 'bg-white text-blue-600' : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
+                                                                    selectedUsers.includes(user.id)
+                                                                        ? 'bg-white text-blue-600'
+                                                                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
                                                                 }`}
                                                             >
                                                                 {user.name.charAt(0).toUpperCase()}
@@ -360,10 +372,14 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                                                             {/* User Info */}
                                                             <div className="min-w-0 flex-1">
-                                                                <p className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                                                                <p
+                                                                    className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                                                                >
                                                                     {user.name}
                                                                 </p>
-                                                                <p className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                                <p
+                                                                    className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}
+                                                                >
                                                                     {displayPhoneNumber(user.phone)}
                                                                 </p>
                                                             </div>
@@ -373,7 +389,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             ) : (
                                                 <div className="py-12 text-center">
                                                     <Users className="mx-auto mb-3 h-16 w-16 text-gray-300 dark:text-gray-600" />
-                                                    <p className="text-gray-500 dark:text-gray-400">{searchQuery ? 'No guardians found' : 'No guardians available'}</p>
+                                                    <p className="text-gray-500 dark:text-gray-400">
+                                                        {searchQuery ? 'No guardians found' : 'No guardians available'}
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>
@@ -487,7 +505,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             <AlertTriangle className="h-5 w-5 text-red-600" />
                                             <div>
                                                 <p className="font-semibold text-red-900 dark:text-red-100">Last send failed</p>
-                                                <p className="text-sm text-red-700 dark:text-red-300">Your message and recipients are still available</p>
+                                                <p className="text-sm text-red-700 dark:text-red-300">
+                                                    Your message and recipients are still available
+                                                </p>
                                             </div>
                                         </div>
                                         <Button onClick={handleRetry} variant="destructive" size="sm">
@@ -550,9 +570,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             <Send className="h-5 w-5 text-blue-600" />
                             Confirm SMS Send
                         </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Please review the details before sending:
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Please review the details before sending:</AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <div className="space-y-3 py-4">
@@ -579,9 +597,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             </div>
                             <div className="rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
-                                <p className="text-xl font-bold text-purple-600">
-                                    {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
-                                </p>
+                                <p className="text-xl font-bold text-purple-600">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
                             </div>
                         </div>
 
@@ -589,7 +605,8 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
                                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                                 <p className="text-sm text-amber-800 dark:text-amber-200">
-                                    Warning: You may not have enough credits. Required: {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}, Available: {credits}
+                                    Warning: You may not have enough credits. Required: {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
+                                    , Available: {credits}
                                 </p>
                             </div>
                         )}
@@ -597,7 +614,10 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={cancelSend}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmSend} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                        <AlertDialogAction
+                            onClick={confirmSend}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                        >
                             <Send className="mr-2 h-4 w-4" />
                             Confirm Send
                         </AlertDialogAction>

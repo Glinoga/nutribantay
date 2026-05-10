@@ -1,17 +1,11 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -54,9 +48,7 @@ export default function Create() {
                         placeholder="Enter full name"
                         required
                     />
-                    {errors.name && (
-                        <p className="mt-1 text-sm text-destructive">{errors.name}</p>
-                    )}
+                    {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name}</p>}
                 </div>
 
                 {/* Email */}
@@ -70,9 +62,7 @@ export default function Create() {
                         placeholder="Enter email address"
                         required
                     />
-                    {errors.email && (
-                        <p className="mt-1 text-sm text-destructive">{errors.email}</p>
-                    )}
+                    {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                 </div>
 
                 {/* Password */}
@@ -86,19 +76,13 @@ export default function Create() {
                         placeholder="Min 10 characters with letters and numbers"
                         required
                     />
-                    {errors.password && (
-                        <p className="mt-1 text-sm text-destructive">{errors.password}</p>
-                    )}
+                    {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password}</p>}
                 </div>
 
                 {/* Role Dropdown */}
                 <div>
                     <Label htmlFor="role">Role</Label>
-                    <Select
-                        value={data.role}
-                        onValueChange={(value) => setData('role', value)}
-                        required
-                    >
+                    <Select value={data.role} onValueChange={(value) => setData('role', value)} required>
                         <SelectTrigger id="role" className="w-full">
                             <SelectValue placeholder="Select Role" />
                         </SelectTrigger>
@@ -107,9 +91,7 @@ export default function Create() {
                             <SelectItem value="healthworker">Health Worker</SelectItem>
                         </SelectContent>
                     </Select>
-                    {errors.role && (
-                        <p className="mt-1 text-sm text-destructive">{errors.role}</p>
-                    )}
+                    {errors.role && <p className="mt-1 text-sm text-destructive">{errors.role}</p>}
                 </div>
 
                 <div className="flex justify-end gap-2">

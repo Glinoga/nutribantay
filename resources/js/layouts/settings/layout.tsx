@@ -7,8 +7,8 @@ import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
 import { Cog, Key, Monitor } from 'lucide-react';
+import { type PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -39,7 +39,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         <Heading title="Settings" description="Manage your profile and account settings" />
                     </div>
                     <SidebarGroup>
-                        <SidebarGroupLabel className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider px-2">
+                        <SidebarGroupLabel className="px-2 text-xs font-semibold tracking-wider text-sidebar-foreground/60 uppercase">
                             Account Settings
                         </SidebarGroupLabel>
                         <SidebarMenu>
@@ -51,7 +51,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                         tooltip={{ children: item.title }}
                                         className="cursor-pointer transition-all duration-200"
                                     >
-                                        <Link href={item.href} prefetch className="flex items-center gap-2 w-full">
+                                        <Link href={item.href} prefetch className="flex w-full items-center gap-2">
                                             {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
                                             <span>{item.title}</span>
                                         </Link>
@@ -65,12 +65,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
             <main className="flex-1 overflow-y-auto">
                 <div className="px-4 py-6 lg:px-8">
-                    <div className="lg:hidden mb-6">
+                    <div className="mb-6 lg:hidden">
                         <Heading title="Settings" description="Manage your profile and account settings" />
                     </div>
 
                     <div className="flex flex-col lg:flex-row lg:space-x-12">
-                        <div className="lg:hidden w-full mb-6">
+                        <div className="mb-6 w-full lg:hidden">
                             <nav className="flex flex-col space-y-1">
                                 {sidebarNavItems.map((item, index) => (
                                     <Link
@@ -78,10 +78,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                         href={item.href}
                                         prefetch
                                         className={cn(
-                                            'flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-all duration-200',
+                                            'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-all duration-200',
                                             page.url.startsWith(typeof item.href === 'string' ? item.href : item.href.url)
-                                                ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                                                : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                                                ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                                                : 'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
                                         )}
                                     >
                                         {item.icon && <item.icon className="h-4 w-4" />}

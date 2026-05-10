@@ -19,7 +19,7 @@ export function NavUser() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="group data-[state=open]:bg-sidebar-accent cursor-pointer transition-all duration-200 hover:bg-sidebar-accent"
+                            className="group cursor-pointer transition-all duration-200 hover:bg-sidebar-accent data-[state=open]:bg-sidebar-accent"
                         >
                             <UserInfo user={auth.user} />
                             <ChevronsUpDown className="ml-auto size-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />

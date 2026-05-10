@@ -1,6 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -11,12 +8,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router } from '@inertiajs/react';
-import { Database, Download, Loader2, RefreshCw, Trash2, UploadCloud, AlertTriangle, CheckCircle2, HardDrive, FileText } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Database, Download, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 type Backup = {
@@ -28,9 +28,7 @@ type Backup = {
     timestamp: number;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Database Maintenance', href: '/admin/database' },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Database Maintenance', href: '/admin/database' }];
 
 interface Props {
     backups: Backup[];
@@ -251,7 +249,9 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                             <UploadCloud className="h-5 w-5 text-blue-600" />
                             Create Database Backup
                         </CardTitle>
-                        <CardDescription>Create a complete backup of your database. This backup can be used to restore your data if needed.</CardDescription>
+                        <CardDescription>
+                            Create a complete backup of your database. This backup can be used to restore your data if needed.
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Button onClick={handleBackup} disabled={loading} className="gap-2">
@@ -358,7 +358,9 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                                     <ul className="ml-4 list-disc space-y-1">
                                         <li>Completely replace your current database</li>
                                         <li>Erase ALL existing data</li>
-                                        <li>Restore data from: <strong>{selectedRestoreBackup?.filename}</strong></li>
+                                        <li>
+                                            Restore data from: <strong>{selectedRestoreBackup?.filename}</strong>
+                                        </li>
                                         <li>Create an automatic pre-restore backup</li>
                                     </ul>
                                 </div>
@@ -410,12 +412,13 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                             Delete Backup
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete the backup <strong>{selectedDeleteBackup?.filename}</strong>? This action cannot be undone.
+                            Are you sure you want to delete the backup <strong>{selectedDeleteBackup?.filename}</strong>? This action cannot be
+                            undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700 gap-2">
+                        <AlertDialogAction onClick={handleDelete} className="gap-2 bg-red-600 hover:bg-red-700">
                             <Trash2 className="h-4 w-4" />
                             Delete Backup
                         </AlertDialogAction>

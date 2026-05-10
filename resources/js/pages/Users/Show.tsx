@@ -1,17 +1,10 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { smartToast } from '@/utils/smartToast';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,9 +30,17 @@ export default function Show({ user }: UserShowProps) {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'approved':
-                return <Badge variant="default" className="bg-green-100 text-green-800">Approved</Badge>;
+                return (
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                        Approved
+                    </Badge>
+                );
             case 'pending':
-                return <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">Pending</Badge>;
+                return (
+                    <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
+                        Pending
+                    </Badge>
+                );
             case 'rejected':
                 return <Badge variant="destructive">Rejected</Badge>;
             default:
@@ -85,9 +86,7 @@ export default function Show({ user }: UserShowProps) {
                             </div>
                             <div>
                                 <Label className="text-muted-foreground">Created</Label>
-                                <dd className="mt-1 text-sm">
-                                    {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                                </dd>
+                                <dd className="mt-1 text-sm">{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</dd>
                             </div>
                         </dl>
                     </CardContent>

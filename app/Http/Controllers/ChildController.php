@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -811,5 +812,139 @@ class ChildController extends Controller
             ],
             'generated_at' => now()->format('Y-m-d H:i:s'),
         ]);
+    }
+
+    /**
+     * Export single child profile as CSV including health logs and vaccine history.
+     */
+    public function exportSingle(Child $child)
+    {
+        $user = auth()->user();
+
+        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $child->load(['healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')]);
+
+        $childVaccines = ChildVaccine::where('child_id', $child->id)
+            ->with(['vaccine', 'doses.administeredBy:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'child_'.$child->id.'_export_'.now()->format('Y-m-d').'.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ];
+
+        $callback = function () use ($child, $childVaccines) {
+            $file = fopen('php://output', 'w');
+
+            // UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // ── Section 1: Child Information ──
+            fputcsv($file, ['Child Information']);
+            fputcsv($file, [
+                'Full Name', 'Age (months)', 'Sex', 'Birthdate',
+                'Barangay', 'Address', 'Contact Number',
+                'Weight (kg)', 'Height (cm)', 'BMI',
+            ]);
+            fputcsv($file, [
+                $child->fullname,
+                $child->age,
+                $child->sex,
+                $child->birthdate?->format('Y-m-d'),
+                $child->barangay,
+                $child->address,
+                $child->contact_number,
+                $child->weight,
+                $child->height,
+                $child->bmi,
+            ]);
+
+            // Blank separator row
+            fputcsv($file, []);
+
+            // ── Section 2: Health Logs ──
+            fputcsv($file, ['Health Logs']);
+            fputcsv($file, [
+                'Date', 'Weight (kg)', 'Height (cm)', 'BMI',
+                'Nutrition Status', 'WFA', 'LFA', 'WFL/WFH',
+                'Vitamin A', 'Deworming', 'MNP',
+                'RUTF', 'RUSF', 'Complementary Food',
+                'Created By',
+            ]);
+
+            if ($child->healthlogs->isEmpty()) {
+                fputcsv($file, ['No health logs recorded.']);
+            } else {
+                foreach ($child->healthlogs as $log) {
+                    fputcsv($file, [
+                        $log->created_at?->format('Y-m-d'),
+                        $log->weight,
+                        $log->height,
+                        $log->bmi,
+                        $log->nutrition_status,
+                        $log->status_wfa,
+                        $log->status_lfa,
+                        $log->status_wfl_wfh,
+                        $log->vitamin_a ? 'Yes' : 'No',
+                        $log->deworming ? 'Yes' : 'No',
+                        $log->micronutrient_powder ? 'Yes' : 'No',
+                        $log->ruf ?? '-',
+                        $log->rusf ?? '-',
+                        $log->complementary_food ?? '-',
+                        $log->user?->name ?? '-',
+                    ]);
+                }
+            }
+
+            // Blank separator row
+            fputcsv($file, []);
+
+            // ── Section 3: Vaccine History ──
+            fputcsv($file, ['Vaccine History']);
+            fputcsv($file, [
+                'Vaccine Name', 'Dose #', 'Date Given',
+                'Next Due Date', 'Status', 'Administered By', 'Remarks',
+            ]);
+
+            if ($childVaccines->isEmpty()) {
+                fputcsv($file, ['No vaccines recorded.']);
+            } else {
+                foreach ($childVaccines as $cv) {
+                    if ($cv->doses->isEmpty()) {
+                        fputcsv($file, [
+                            $cv->vaccine?->name ?? '-',
+                            '—',
+                            '—',
+                            '—',
+                            'Not Started',
+                            '—',
+                            '—',
+                        ]);
+                    } else {
+                        foreach ($cv->doses as $dose) {
+                            fputcsv($file, [
+                                $cv->vaccine?->name ?? '-',
+                                $dose->dose_number,
+                                $dose->date_given?->format('Y-m-d') ?: '—',
+                                $dose->next_due_date?->format('Y-m-d') ?: '—',
+                                $dose->dose_status,
+                                $dose->administeredBy?->name ?? '—',
+                                $dose->remarks ?: '—',
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

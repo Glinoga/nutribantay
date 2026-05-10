@@ -49,9 +49,7 @@ export default function Edit({ announcement, categories }: EditProps) {
         image: null as File | null,
     });
 
-    const [preview, setPreview] = useState<string | null>(
-        announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null)
-    );
+    const [preview, setPreview] = useState<string | null>(announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null));
     const [isDirty, setIsDirty] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
@@ -231,12 +229,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                             <Label className="mb-2 block font-medium text-gray-700">
                                 Date <span className="text-red-500">*</span>
                             </Label>
-                            <Input
-                                type="date"
-                                className="mt-2 w-full"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
-                            />
+                            <Input type="date" className="mt-2 w-full" value={data.date} onChange={(e) => setData('date', e.target.value)} />
                         </div>
                         <div className="rounded-lg border p-4">
                             <Label className="mb-2 block font-medium text-gray-700">End Date</Label>
@@ -311,13 +304,7 @@ export default function Edit({ announcement, categories }: EditProps) {
                             )}
                         </Button>
 
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleCancel}
-                            disabled={processing}
-                            className="gap-2"
-                        >
+                        <Button type="button" variant="outline" onClick={handleCancel} disabled={processing} className="gap-2">
                             <X size={16} />
                             Cancel
                         </Button>

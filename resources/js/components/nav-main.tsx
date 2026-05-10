@@ -14,7 +14,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                         tooltip={{ children: item.title }}
                         className="cursor-pointer transition-all duration-200 hover:translate-x-0.5"
                     >
-                        <Link href={item.href} prefetch className="flex items-center gap-2 w-full">
+                        <Link href={item.href} prefetch className="flex w-full items-center gap-2">
                             {item.icon && <item.icon className="h-4 w-4 shrink-0" />}
                             <span className="truncate">{item.title}</span>
                         </Link>

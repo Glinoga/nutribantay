@@ -1,29 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import axios from 'axios';
-import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -33,10 +7,20 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { Head, Link, router } from '@inertiajs/react';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 type User = {
     id: number;
@@ -185,9 +169,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             setMaintenanceConfirm(false);
 
             if (res.data.status) {
-                smartToast.success(
-                    'Maintenance mode ENABLED - All Healthworker users will be logged out on their next request',
-                );
+                smartToast.success('Maintenance mode ENABLED - All Healthworker users will be logged out on their next request');
             } else {
                 smartToast.success('Maintenance mode DISABLED - All users can now access the system normally');
             }
@@ -274,7 +256,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'active':
-                return <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">Active</Badge>;
+                return (
+                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                        Active
+                    </Badge>
+                );
             case 'used':
                 return <Badge variant="secondary">Used</Badge>;
             case 'expired':
@@ -330,14 +316,16 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">User List</h1>
                 <div className="flex gap-2">
-                    <Button onClick={() => {
-                        setCreateSuccess('');
-                        setCreateError('');
-                        setGeneratedCode('');
-                        setGeneratedPassword('');
-                        setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
-                        setShowCreateModal(true);
-                    }}>
+                    <Button
+                        onClick={() => {
+                            setCreateSuccess('');
+                            setCreateError('');
+                            setGeneratedCode('');
+                            setGeneratedPassword('');
+                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                            setShowCreateModal(true);
+                        }}
+                    >
                         Create User
                     </Button>
                     <Button variant="secondary" asChild>
@@ -376,19 +364,8 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     <Label htmlFor="count" className="text-gray-700">
                         Number of Codes:
                     </Label>
-                    <Input
-                        id="count"
-                        type="number"
-                        min="1"
-                        value={count}
-                        onChange={(e) => setCount(Number(e.target.value))}
-                        className="w-20"
-                    />
-                    <Button
-                        onClick={generateAdminCodes}
-                        disabled={loading}
-                        variant="default"
-                    >
+                    <Input id="count" type="number" min="1" value={count} onChange={(e) => setCount(Number(e.target.value))} className="w-20" />
+                    <Button onClick={generateAdminCodes} disabled={loading} variant="default">
                         {loading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -425,9 +402,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 <TableCell>{user.name}</TableCell>
                                 <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
                                 <TableCell>{user.email || '-'}</TableCell>
-                                <TableCell>
-                                    {user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}
-                                </TableCell>
+                                <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
                                 <TableCell>
                                     {user.status === 'pending' && (
                                         <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
@@ -439,11 +414,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             Approved
                                         </Badge>
                                     )}
-                                    {user.status === 'rejected' && (
-                                        <Badge variant="destructive">
-                                            Rejected
-                                        </Badge>
-                                    )}
+                                    {user.status === 'rejected' && <Badge variant="destructive">Rejected</Badge>}
                                     {!user.status && <span className="text-muted-foreground">-</span>}
                                 </TableCell>
                                 <TableCell>
@@ -458,11 +429,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                 >
                                                     Approve
                                                 </Button>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    onClick={() => setRejectUserId(user.id)}
-                                                >
+                                                <Button size="sm" variant="destructive" onClick={() => setRejectUserId(user.id)}>
                                                     Reject
                                                 </Button>
                                             </>
@@ -473,11 +440,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
                                             <Link href={`/users/${user.id}/edit`}>Edit</Link>
                                         </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() => setArchiveUserId(user.id)}
-                                        >
+                                        <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
                                             Archive
                                         </Button>
                                     </div>
@@ -499,10 +462,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => approveUserId && handleApprove(approveUserId)}
-                            className="bg-green-600 hover:bg-green-700"
-                        >
+                        <AlertDialogAction onClick={() => approveUserId && handleApprove(approveUserId)} className="bg-green-600 hover:bg-green-700">
                             Approve
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -514,9 +474,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Reject User</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to reject this user? This action cannot be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Are you sure you want to reject this user? This action cannot be undone.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -555,9 +513,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             <AlertDialog open={maintenanceConfirm} onOpenChange={setMaintenanceConfirm}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>{maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}</AlertDialogTitle>
                         <AlertDialogDescription>
                             {maintenance ? (
                                 <>
@@ -565,16 +521,15 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </>
                             ) : (
                                 <>
-                                    This will <strong>enable</strong> maintenance mode. All Healthworker users will be logged out on their next request and redirected to the home page. Only Admin users can access the system.
+                                    This will <strong>enable</strong> maintenance mode. All Healthworker users will be logged out on their next
+                                    request and redirected to the home page. Only Admin users can access the system.
                                 </>
                             )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmMaintenanceToggle}>
-                            Confirm
-                        </AlertDialogAction>
+                        <AlertDialogAction onClick={confirmMaintenanceToggle}>Confirm</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -584,9 +539,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Registration Codes</DialogTitle>
-                        <DialogDescription>
-                            View and manage registration codes for admin users.
-                        </DialogDescription>
+                        <DialogDescription>View and manage registration codes for admin users.</DialogDescription>
                     </DialogHeader>
                     <div className="mb-4 flex items-center justify-between">
                         <Input
@@ -627,25 +580,15 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         <TableRow key={code.id} className="hover:bg-muted/50">
                                             <TableCell className="font-mono">{code.code}</TableCell>
                                             <TableCell>{code.barangay}</TableCell>
-                                            <TableCell>
-                                                {code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}
-                                            </TableCell>
+                                            <TableCell>{code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}</TableCell>
                                             <TableCell>{getStatusBadge(code.status)}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-1">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="default"
-                                                        onClick={() => copyToClipboard(code.code)}
-                                                    >
+                                                    <Button size="sm" variant="default" onClick={() => copyToClipboard(code.code)}>
                                                         {copiedCode === code.code ? 'Copied!' : 'Copy'}
                                                     </Button>
                                                     {(code.status === 'used' || code.status === 'expired') && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="destructive"
-                                                            onClick={() => setDeleteCodeId(code.id)}
-                                                        >
+                                                        <Button size="sm" variant="destructive" onClick={() => setDeleteCodeId(code.id)}>
                                                             Delete
                                                         </Button>
                                                     )}
@@ -657,9 +600,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             </TableBody>
                         </Table>
                     )}
-                    <div className="mt-4 text-sm text-muted-foreground">
-                        Total: {filteredCodes.length} code(s)
-                    </div>
+                    <div className="mt-4 text-sm text-muted-foreground">Total: {filteredCodes.length} code(s)</div>
                 </DialogContent>
             </Dialog>
 
@@ -668,16 +609,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Code</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to delete this code? This action cannot be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Are you sure you want to delete this code? This action cannot be undone.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={confirmDeleteCode}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={confirmDeleteCode} className="bg-destructive hover:bg-destructive/90">
                             Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -685,21 +621,22 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             </AlertDialog>
 
             {/* Create User Modal */}
-            <Dialog open={showCreateModal} onOpenChange={(open) => {
-                if (!open) {
-                    setShowCreateModal(false);
-                    setCreateSuccess('');
-                    setCreateError('');
-                    setGeneratedCode('');
-                    setGeneratedPassword('');
-                }
-            }}>
+            <Dialog
+                open={showCreateModal}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setShowCreateModal(false);
+                        setCreateSuccess('');
+                        setCreateError('');
+                        setGeneratedCode('');
+                        setGeneratedPassword('');
+                    }
+                }}
+            >
                 <DialogContent className="max-w-md">
                     <DialogHeader>
                         <DialogTitle>Create User</DialogTitle>
-                        <DialogDescription>
-                            Create a new user with registration code.
-                        </DialogDescription>
+                        <DialogDescription>Create a new user with registration code.</DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div>
@@ -736,11 +673,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     placeholder="Password"
                                     required
                                 />
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    onClick={generatePassword}
-                                >
+                                <Button type="button" variant="secondary" onClick={generatePassword}>
                                     Generate
                                 </Button>
                             </div>
@@ -752,7 +685,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 id="role"
                                 value={newUser.role}
                                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                                 required
                             >
                                 <option value="Healthworker">Healthworker</option>
@@ -773,9 +706,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             </div>
                         )}
 
-                        {createError && (
-                            <div className="text-sm text-destructive">{createError}</div>
-                        )}
+                        {createError && <div className="text-sm text-destructive">{createError}</div>}
 
                         {createSuccess && generatedCode && (
                             <div className="rounded-lg bg-green-50 p-3 text-sm">
@@ -787,11 +718,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             {generatedCode} - {generatedPassword}
                                         </p>
                                     </div>
-                                    <Button
-                                        size="sm"
-                                        className="bg-green-600 hover:bg-green-700"
-                                        onClick={copyCredentials}
-                                    >
+                                    <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={copyCredentials}>
                                         {copiedLogin ? 'Copied!' : 'Copy'}
                                     </Button>
                                 </div>
@@ -815,11 +742,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         >
                             Cancel
                         </Button>
-                        <Button
-                            variant="secondary"
-                            onClick={() => handleCreateUser(false)}
-                            disabled={createLoading}
-                        >
+                        <Button variant="secondary" onClick={() => handleCreateUser(false)} disabled={createLoading}>
                             {createLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -829,10 +752,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 'Create & Add Another'
                             )}
                         </Button>
-                        <Button
-                            onClick={() => handleCreateUser(true)}
-                            disabled={createLoading}
-                        >
+                        <Button onClick={() => handleCreateUser(true)} disabled={createLoading}>
                             {createLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

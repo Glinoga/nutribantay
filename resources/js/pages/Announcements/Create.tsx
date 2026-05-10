@@ -246,13 +246,7 @@ export default function Create({ categories }: CreateProps) {
                     {/* Image Upload */}
                     <div className="mb-4 rounded-lg border p-4">
                         <Label className="mb-2 block font-medium text-gray-700">Upload Image</Label>
-                        <Input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="mt-2"
-                        />
+                        <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2" />
                         {preview && (
                             <div className="relative mt-4 inline-block">
                                 <img src={preview} alt="Preview" className="max-h-64 rounded-lg border" />
@@ -279,13 +273,7 @@ export default function Create({ categories }: CreateProps) {
                             )}
                         </Button>
 
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={handleCancel}
-                            disabled={processing}
-                            className="gap-2"
-                        >
+                        <Button type="button" variant="outline" onClick={handleCancel} disabled={processing} className="gap-2">
                             <X size={16} />
                             Cancel
                         </Button>

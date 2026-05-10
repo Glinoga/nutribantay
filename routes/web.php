@@ -71,6 +71,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/children/{child}/print', [ChildController::class, 'showPrint'])
         ->name('children.show.print')
         ->middleware(['role:Admin|Healthworker']);
+    Route::get('/children/{child}/export', [ChildController::class, 'exportSingle'])
+        ->name('children.export.single')
+        ->middleware(['role:Admin|Healthworker']);
     Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
     Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
 

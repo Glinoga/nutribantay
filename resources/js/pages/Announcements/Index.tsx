@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -286,9 +286,7 @@ export default function Index({ announcements, categories }: { announcements: An
 
                         {/* Create Button */}
                         <Link href={route('announcements.create')}>
-                            <Button
-                                className="group relative overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                            >
+                            <Button className="group relative overflow-hidden rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl">
                                 <span className="relative z-10 flex items-center gap-2 font-semibold">
                                     <Plus className="h-5 w-5 transition-transform group-hover:rotate-90" />
                                     New Announcement
@@ -404,10 +402,7 @@ export default function Index({ announcements, categories }: { announcements: An
 
                                     {/* Actions */}
                                     <div className="flex gap-3">
-                                        <Link
-                                            href={route('announcements.edit', { announcement: announcement.id })}
-                                            className="flex-1"
-                                        >
+                                        <Link href={route('announcements.edit', { announcement: announcement.id })} className="flex-1">
                                             <Button
                                                 className="group/btn w-full bg-blue-600 text-white transition-all hover:bg-blue-700 hover:shadow-lg"
                                                 size="sm"
@@ -455,9 +450,7 @@ export default function Index({ announcements, categories }: { announcements: An
                         </p>
                         {!searchQuery && selectedCategory === 'all' && (
                             <Link href={route('announcements.create')}>
-                                <Button
-                                    className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                                >
+                                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl">
                                     <Plus className="mr-2 h-5 w-5" />
                                     Create Your First Announcement
                                 </Button>
