@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Edit2, Plus, Syringe, Trash2, X } from 'lucide-react';
+import { Plus, Syringe, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -120,7 +120,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
     const openEditDose = (cv: ChildVaccine, dose: Dose) => {
         setEditingDose({ cv, dose });
         setRecordingDoseFor(null);
-        setAdministeredChoice(dose.date_given ? 'yes' : 'no');
+        setAdministeredChoice('yes');
         doseForm.setData({
             dose_number: String(dose.dose_number),
             date_given: dose.date_given ?? '',
@@ -399,21 +399,15 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                             </td>
                                                             <td className="px-4 py-3 text-gray-900">{dose.administered_by ?? '-'}</td>
                                                             <td className="px-4 py-3">
-                                                                <div className="flex items-center justify-center gap-2">
-                                                                    <button
-                                                                        onClick={() => openEditDose(cv, dose)}
-                                                                        className="cursor-pointer rounded-lg p-1.5 text-teal-600 transition-colors hover:bg-teal-50"
-                                                                    >
-                                                                        <Edit2 className="h-4 w-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleDeleteDose(cv, dose)}
-                                                                        className="cursor-pointer rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4" />
-                                                                    </button>
-                                                                </div>
-                                                            </td>
+                                                                 <div className="flex items-center justify-center">
+                                                                     <button
+                                                                         onClick={() => handleDeleteDose(cv, dose)}
+                                                                         className="cursor-pointer rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                                     >
+                                                                         <Trash2 className="h-4 w-4" />
+                                                                     </button>
+                                                                 </div>
+                                                             </td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -487,16 +481,18 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                             />
                                             <span>Yes, already given</span>
                                         </label>
-                                        <label className="flex cursor-pointer items-center gap-2">
-                                            <input
-                                                type="radio"
-                                                name="administered"
-                                                checked={administeredChoice === 'no'}
-                                                onChange={() => handleAdministeredChange('no')}
-                                                className="h-4 w-4 cursor-pointer text-teal-600"
-                                            />
-                                            <span>No, scheduling for later</span>
-                                        </label>
+                                        {!editingDose && (
+                                             <label className="flex cursor-pointer items-center gap-2">
+                                                 <input
+                                                     type="radio"
+                                                     name="administered"
+                                                     checked={administeredChoice === 'no'}
+                                                     onChange={() => handleAdministeredChange('no')}
+                                                     className="h-4 w-4 cursor-pointer text-teal-600"
+                                                 />
+                                                 <span>No, scheduling for later</span>
+                                             </label>
+                                         )}
                                     </div>
                                 </div>
                             )}
@@ -506,43 +502,40 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                 <div>
                                     <Label className="text-gray-700">Date Given</Label>
                                     <Input
-                                        type="date"
-                                        value={doseForm.data.date_given}
-                                        onChange={(e) => doseForm.setData('date_given', e.target.value)}
-                                        className="cursor-pointer"
-                                    />
+                                         type="date"
+                                         value={doseForm.data.date_given}
+                                         onChange={(e) => doseForm.setData('date_given', e.target.value)}
+                                         max={getTodayDate()}
+                                         className="cursor-pointer"
+                                     />
                                 </div>
                             )}
 
-                            {/* Next Due Date / Scheduled Date */}
-                            {(editingDose || administeredChoice === 'yes' || administeredChoice === 'no') && (
-                                <div>
-                                    <Label className="text-gray-700">
-                                        {editingDose
-                                            ? editingDose.dose.date_given
-                                                ? 'Next Due Date (optional)'
-                                                : 'Scheduled Date (optional)'
-                                            : administeredChoice === 'yes'
-                                              ? 'Next Due Date (optional)'
-                                              : 'Scheduled Date'}
-                                    </Label>
-                                    <p className="mb-2 text-sm text-gray-500">
-                                        {editingDose
-                                            ? editingDose.dose.date_given
-                                                ? 'When should the next dose be scheduled?'
-                                                : 'When should this dose be given?'
-                                            : administeredChoice === 'yes'
-                                              ? 'When should the next dose be scheduled?'
-                                              : 'When should this dose be given?'}
-                                    </p>
-                                    <Input
-                                        type="date"
-                                        value={doseForm.data.next_due_date}
-                                        onChange={(e) => doseForm.setData('next_due_date', e.target.value)}
-                                        className="cursor-pointer"
-                                    />
-                                </div>
-                            )}
+                            {/* Scheduled Date - when scheduling for later */}
+                             {administeredChoice === 'no' && (
+                                 <div>
+                                     <Label className="text-gray-700">
+                                         {editingDose
+                                             ? editingDose.dose.date_given
+                                                 ? 'Next Due Date (optional)'
+                                                 : 'Scheduled Date (optional)'
+                                             : 'Scheduled Date'}
+                                     </Label>
+                                     <p className="mb-2 text-sm text-gray-500">
+                                         {editingDose
+                                             ? editingDose.dose.date_given
+                                                 ? 'When should the next dose be scheduled?'
+                                                 : 'When should this dose be given?'
+                                             : 'When should this dose be given?'}
+                                     </p>
+                                     <Input
+                                         type="date"
+                                         value={doseForm.data.next_due_date}
+                                         onChange={(e) => doseForm.setData('next_due_date', e.target.value)}
+                                         className="cursor-pointer"
+                                     />
+                                 </div>
+                             )}
 
                             {/* Remarks */}
                             <div>
