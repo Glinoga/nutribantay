@@ -96,6 +96,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/healthlogs/{healthlog}/edit', [HealthlogController::class, 'edit'])->name('healthlogs.edit');
         Route::put('/healthlogs/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
         Route::delete('/healthlogs/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');
+
+        // Archived health logs
+        Route::get('/healthlogs-archived', [HealthlogController::class, 'archived'])->name('healthlogs.archived');
+        Route::post('/healthlogs/{id}/restore', [HealthlogController::class, 'restore'])->name('healthlogs.restore');
+        Route::delete('/healthlogs/{id}/force-delete', [HealthlogController::class, 'forceDelete'])->name('healthlogs.forceDelete');
     });
 
     /*
@@ -142,22 +147,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/maintenance/status', [SystemController::class, 'status']);
         Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
-            ->name('admin.database.index');
+            ->name('admin.database.index')
+            ->middleware('role:Admin');
 
         Route::post('/admin/database/backup', [DatabaseMaintenanceController::class, 'backup'])
-            ->name('admin.database.backup');
+            ->name('admin.database.backup')
+            ->middleware('role:Admin');
 
         Route::get('/admin/database/list', [DatabaseMaintenanceController::class, 'list'])
-            ->name('admin.database.list');
+            ->name('admin.database.list')
+            ->middleware('role:Admin');
 
         Route::post('/admin/database/restore', [DatabaseMaintenanceController::class, 'restore'])
-            ->name('admin.database.restore');
+            ->name('admin.database.restore')
+            ->middleware('role:Admin');
 
-        Route::get('/admin/database/download/{filename}', [DatabaseMaintenanceController::class, 'download'])
-            ->name('admin.database.download');
+        Route::get('/admin/database/download/{source}/{filename}', [DatabaseMaintenanceController::class, 'download'])
+            ->name('admin.database.download')
+            ->middleware('role:Admin');
 
         Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
-            ->name('admin.database.delete');
+            ->name('admin.database.delete')
+            ->middleware('role:Admin');
 
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('/audit-logs/export', [AuditLogController::class, 'export'])->name('audit-logs.export');
@@ -190,6 +201,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        // Archived announcements
+        Route::get('/admin/announcements-archived', [AnnouncementController::class, 'archived'])->name('announcements.archived');
+        Route::post('/admin/announcements/{id}/restore', [AnnouncementController::class, 'restore'])->name('announcements.restore');
+        Route::delete('/admin/announcements/{id}/force-delete', [AnnouncementController::class, 'forceDelete'])->name('announcements.forceDelete');
     });
 
     Route::post('/recommendations', [RecommendationController::class, 'generate'])->middleware('throttle:10,1')->name('recommendations.generate');

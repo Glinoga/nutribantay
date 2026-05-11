@@ -39,6 +39,7 @@ interface Announcement {
     summary: string;
     content: string;
     image?: string;
+    is_expired?: boolean;
 }
 
 interface AnnouncementsProps {
@@ -208,11 +209,18 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                 )}
 
                                 <div className="p-6 pt-8">
-                                    <span
-                                        className={`mb-3 inline-block rounded-full ${getCategoryColorClass(announcement.category.color || 'primary')} px-3 py-1 text-xs font-medium text-white`}
-                                    >
-                                        {announcement.category.name}
-                                    </span>
+                                    <div className="mb-3 flex flex-wrap gap-2">
+                                        <span
+                                            className={`rounded-full ${getCategoryColorClass(announcement.category.color || 'primary')} px-3 py-1 text-xs font-medium text-white`}
+                                        >
+                                            {announcement.category.name}
+                                        </span>
+                                        {announcement.is_expired && (
+                                            <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-medium text-white">
+                                                Expired
+                                            </span>
+                                        )}
+                                    </div>
                                     <h3 className="mb-2 text-xl font-semibold text-[var(--text)] group-hover:text-[var(--primary)]">
                                         {announcement.title}
                                     </h3>

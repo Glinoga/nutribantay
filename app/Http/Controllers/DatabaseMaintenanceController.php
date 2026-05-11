@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\MysqlDumper;
 use App\Models\AuditLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -25,71 +25,77 @@ class DatabaseMaintenanceController extends Controller
     }
 
     /**
-     * Create a manual database backup
+     * Create a manual database backup.
+     *
+     * Uses a pure-PHP PDO-based dumper instead of spawning mysqldump as a subprocess.
+     * This avoids Windows Winsock error 10106 (WSAEPROVIDERFAILEDINIT) that occurs
+     * when the web server process tries to launch mysqldump via Symfony Process.
      */
     public function backup()
     {
         try {
-            \Log::info('=== Starting manual backup from web interface ===');
+            \Log::info('=== Starting synchronous web-triggered backup (PHP-native dumper) ===');
 
-            // Use spatie backup package
-            \Artisan::call('backup:run', [
-                '--only-db' => true,
+            // ── 1. Determine destination paths ───────────────────────────────
+            $appName = 'NutriBantay';
+            $timestamp = now()->format('Y-m-d-H-i-s');
+            $sqlFile = storage_path("app/backup-temp/{$timestamp}-db.sql");
+            $zipName = "{$timestamp}.zip";
+            // We want to store in storage/app/NutriBantay to keep it accessible
+            $zipDestDir = storage_path("app/{$appName}");
+            $zipDest = $zipDestDir . '/' . $zipName;
+
+            // Ensure destination directories exist
+            if (!file_exists(dirname($sqlFile))) {
+                @mkdir(dirname($sqlFile), 0755, true);
+            }
+            if (!file_exists($zipDestDir)) {
+                @mkdir($zipDestDir, 0755, true);
+            }
+
+            // ── 2. Dump via pure PHP/PDO (no subprocess, no Winsock) ─────────
+            $connection = config('database.default', 'mysql');
+            MysqlDumper::dump($sqlFile, $connection);
+
+            // ── 3. Zip the SQL file ───────────────────────────────────────────
+            $zip = new \ZipArchive;
+            if ($zip->open($zipDest, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                throw new \RuntimeException("Cannot create zip archive at: {$zipDest}");
+            }
+            $zip->addFile($sqlFile, "{$timestamp}-db.sql");
+            $zip->close();
+
+            // ── 4. Clean up the raw SQL temp file ───────────────────────────
+            @unlink($sqlFile);
+
+            // ── 5. Verify the zip was written ────────────────────────────────
+            if (! file_exists($zipDest) || filesize($zipDest) < 100) {
+                throw new \RuntimeException('Backup zip was not created or is suspiciously small.');
+            }
+
+            $sizeFormatted = $this->formatBytes(filesize($zipDest));
+            \Log::info("Backup created: {$zipName} ({$sizeFormatted})");
+
+            // ── 6. Audit log ─────────────────────────────────────────────────
+            AuditLog::logAction([
+                'action' => 'backup_created',
+                'model_type' => 'System',
+                'description' => "Database backup created successfully: {$zipName}",
+                'new_values' => [
+                    'filename' => $zipName,
+                    'size' => $sizeFormatted,
+                ],
             ]);
 
-            $output = \Artisan::output();
-            \Log::info('Backup command output: '.$output);
-
-            // Get the latest backup file (spatie stores in storage/app/private/{APP_NAME}/)
-            $backupPath = storage_path('app/private/NutriBantay');
-            $latestBackup = null;
-            $latestTime = 0;
-
-            if (is_dir($backupPath)) {
-                foreach (glob($backupPath.'/*.zip') as $file) {
-                    $mtime = filemtime($file);
-                    if ($mtime > $latestTime) {
-                        $latestTime = $mtime;
-                        $latestBackup = $file;
-                    }
-                }
-            }
-
-            if ($latestBackup && $latestTime > time() - 300) { // Created within last 5 minutes
-                $filename = basename($latestBackup);
-                $size = filesize($latestBackup);
-
-                // Log the backup creation in audit log
-                AuditLog::logAction([
-                    'action' => 'backup_created',
-                    'model_type' => 'System',
-                    'description' => "Database backup created: {$filename}",
-                    'new_values' => [
-                        'filename' => $filename,
-                        'size' => $this->formatBytes($size),
-                        'timestamp' => date('Y-m-d H:i:s', $latestTime),
-                    ],
-                ]);
-
-                return back()->with('success', "✅ Database backup created successfully! Backup: {$filename}");
-            }
-
-            // If we got here, check if the command output indicates success
-            if (strpos($output, 'Backup completed') !== false || strpos($output, 'successfully') !== false) {
-                return back()->with('success', '✅ Database backup created successfully!');
-            }
-
-            return back()->with('warning', 'Backup command executed but status unclear. Please check storage/app/private/NutriBantay/ folder.');
+            return back()->with('success', "✅ Backup created successfully: {$zipName} ({$sizeFormatted})");
 
         } catch (\Exception $e) {
-            \Log::error('Database backup failed: '.$e->getMessage());
-            \Log::error('Stack trace: '.$e->getTraceAsString());
+            \Log::error('Backup failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
-            // Log the failed backup attempt
             AuditLog::logAction([
                 'action' => 'backup_failed',
                 'model_type' => 'System',
-                'description' => "Database backup failed: {$e->getMessage()}",
+                'description' => 'Database backup failed: '.$e->getMessage(),
             ]);
 
             return back()->with('error', '❌ Backup failed: '.$e->getMessage());
@@ -109,7 +115,9 @@ class DatabaseMaintenanceController extends Controller
     }
 
     /**
-     * Restore database from backup file
+     * Restore database from a MySQL backup zip (produced by the PHP-native dumper).
+     *
+     * The zip must contain a single .sql file with a valid MySQL dump.
      */
     public function restore(Request $request)
     {
@@ -118,120 +126,136 @@ class DatabaseMaintenanceController extends Controller
             'confirmation' => 'required|string|in:RESTORE DATABASE',
         ]);
 
-        try {
-            $backupFile = $request->input('backup_file');
+        $extractPath = storage_path('app/restore-temp');
 
-            // Build the full path - backups are stored in {APP_NAME} folder (NutriBantay)
-            $fullPath = 'NutriBantay/'.basename($backupFile);
+        try {
+            $backupFileRel = $request->input('backup_file');
+            $fullPath = storage_path('app/' . $backupFileRel);
 
             // Verify backup file exists
-            if (! Storage::disk('local')->exists($fullPath)) {
+            if (!file_exists($fullPath)) {
                 \Log::error("Backup file not found at: {$fullPath}");
-
                 return back()->with('error', '❌ Backup file not found.');
             }
 
-            // Step 1: Create pre-restore backup
-            \Log::info('Creating pre-restore backup...');
-            Artisan::call('backup:run', [
-                '--only-db' => true,
-                '--disable-notifications' => true,
-            ]);
-
-            // Step 2: Extract and restore the backup
-            $backupPath = Storage::disk('local')->path($fullPath);
-            $extractPath = storage_path('app/restore-temp');
-
-            \Log::info("Extracting from: {$backupPath}");
-            \Log::info("Extracting to: {$extractPath}");
-
-            // Create temp directory
-            if (! file_exists($extractPath)) {
-                mkdir($extractPath, 0755, true);
+            // ── 1. Extract zip ────────────────────────────────────────────────
+            if (file_exists($extractPath)) {
+                $this->recursiveDelete($extractPath);
             }
-
-            // Clear any existing files in temp directory
-            $this->recursiveDelete($extractPath);
             mkdir($extractPath, 0755, true);
 
-            // Extract zip file
             $zip = new \ZipArchive;
-            if ($zip->open($backupPath) === true) {
-                $zip->extractTo($extractPath);
-
-                // Log extracted files for debugging
-                $extractedFiles = [];
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    $extractedFiles[] = $zip->getNameIndex($i);
-                }
-                \Log::info('Extracted files: '.json_encode($extractedFiles));
-
-                $zip->close();
-            } else {
-                throw new \Exception('Failed to extract backup archive.');
+            if ($zip->open($fullPath) !== true) {
+                throw new \RuntimeException('Failed to extract backup archive.');
             }
+            $zip->extractTo($extractPath);
+            $zip->close();
 
-            // Step 3: Find the SQL file (recursively search all subdirectories)
+            // ── 2. Find the .sql file ─────────────────────────────────────────
             $sqlFile = $this->findSqlFile($extractPath);
 
             if (! $sqlFile) {
-                // List all files for debugging
                 $allFiles = $this->listAllFiles($extractPath);
-                \Log::error('SQL file not found. All extracted files: '.json_encode($allFiles));
-
-                throw new \Exception('SQL file not found in backup archive. Please check if the backup is valid.');
+                \Log::error('SQL file not found in backup. Files: '.json_encode($allFiles));
+                throw new \RuntimeException('MySQL SQL dump file (.sql) not found in backup archive.');
             }
 
-            \Log::info("Found SQL file at: {$sqlFile}");
+            \Log::info("Found SQL dump at: {$sqlFile}");
 
-            // Step 4: Restore database
-            $this->restoreDatabase($sqlFile);
+            // ── 3. Execute the SQL dump ───────────────────────────────────────
+            $sql = file_get_contents($sqlFile);
 
-            // Step 5: Cleanup temp files
+            if (empty($sql)) {
+                throw new \RuntimeException('SQL dump file is empty or unreadable.');
+            }
+
+            // Safety: reject old SQLite dumps
+            if (
+                stripos($sql, 'PRAGMA foreign_keys') !== false ||
+                stripos($sql, 'AUTOINCREMENT') !== false
+            ) {
+                throw new \RuntimeException(
+                    'This backup contains SQLite data which is incompatible with MySQL. '.
+                    'Please delete old backups and create a new one.'
+                );
+            }
+
+            \Log::info('Executing MySQL restore via DB::unprepared …');
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::unprepared($sql);
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+            \Log::info('MySQL restore completed successfully.');
+
+            // ── 4. Clean up ───────────────────────────────────────────────────
             $this->recursiveDelete($extractPath);
 
-            \Log::info('Database restored successfully from: '.$backupFile);
-
-            // Log the successful restore
+            // ── 5. Audit log ──────────────────────────────────────────────────
             AuditLog::logAction([
-                'action' => 'backup_restored',
+                'action' => 'database_restored',
                 'model_type' => 'System',
-                'description' => 'Database restored from backup: '.basename($backupFile),
+                'description' => 'Database restored from MySQL backup',
                 'new_values' => [
-                    'backup_file' => basename($backupFile),
-                    'restored_at' => now()->toDateTimeString(),
+                    'backup_file' => basename($backupFileRel),
                 ],
             ]);
 
-            return back()->with('success', '✅ Database restored successfully! A pre-restore backup was created automatically.');
+
+
+            return back()->with('success', '✅ Database restored successfully from MySQL backup.');
 
         } catch (\Exception $e) {
-            \Log::error('Database restore failed: '.$e->getMessage());
-            \Log::error('Stack trace: '.$e->getTraceAsString());
+            \Log::error('Database restore failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
-            // Log the failed restore
-            AuditLog::logAction([
-                'action' => 'backup_restore_failed',
-                'model_type' => 'System',
-                'description' => "Database restore failed: {$e->getMessage()}",
-                'old_values' => [
-                    'backup_file' => $request->input('backup_file'),
-                ],
-            ]);
-
-            // Cleanup temp directory on error
-            if (isset($extractPath) && file_exists($extractPath)) {
+            // Clean up temp files even on failure
+            if (file_exists($extractPath)) {
                 $this->recursiveDelete($extractPath);
             }
 
-            return back()->with('error', '❌ Restore failed: '.$e->getMessage());
+            return back()->with('error', '❌ Database restore failed: '.$e->getMessage());
         }
     }
 
     /**
-     * Recursively find SQL file in directory
+     * Recursively find SQLite database file in directory
      */
-    private function findSqlFile($directory)
+    private function findSqliteFile($directory)
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $ext = strtolower($file->getExtension());
+                // Look for .sqlite, .db, or no extension files
+                if ($ext === 'sqlite' || $ext === 'db' || $ext === '') {
+                    // Check if it looks like a SQLite database
+                    if ($this->isSqliteFile($file->getPathname())) {
+                        return $file->getPathname();
+                    }
+                }
+            }
+        }
+
+        // Fallback: look for any file that might be SQLite
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getSize() > 1000) {
+                if ($this->isSqliteFile($file->getPathname())) {
+                    return $file->getPathname();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find a MySQL .sql dump file in the given directory (recursive).
+     */
+    private function findSqlFile(string $directory): ?string
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
@@ -245,6 +269,28 @@ class DatabaseMaintenanceController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Check if file is a valid SQLite database
+     */
+    private function isSqliteFile($path)
+    {
+        if (! file_exists($path)) {
+            return false;
+        }
+
+        // Check for SQLite magic header
+        $handle = fopen($path, 'rb');
+        if (! $handle) {
+            return false;
+        }
+
+        $header = fread($handle, 16);
+        fclose($handle);
+
+        // SQLite files start with "SQLite format 3\0" or "SQLite database"
+        return strpos($header, 'SQLite') !== false || strpos($header, "\x53\x51\x4c\x69") !== false;
     }
 
     /**
@@ -293,15 +339,16 @@ class DatabaseMaintenanceController extends Controller
     /**
      * Download a backup file
      */
-    public function download($filename)
+    public function download($source, $filename)
     {
-        $path = 'NutriBantay/'.$filename;
+        $relPath = ($source === 'private' ? 'private/NutriBantay/' : 'NutriBantay/') . basename($filename);
+        $fullPath = storage_path('app/' . $relPath);
 
-        if (! Storage::disk('local')->exists($path)) {
+        if (!file_exists($fullPath)) {
             abort(404, 'Backup file not found.');
         }
 
-        return Storage::disk('local')->download($path);
+        return response()->download($fullPath);
     }
 
     /**
@@ -314,15 +361,16 @@ class DatabaseMaintenanceController extends Controller
         ]);
 
         try {
-            $backupFile = $request->input('backup_file');
+            $backupFileRel = $request->input('backup_file');
+            $fullPath = storage_path('app/' . $backupFileRel);
 
-            if (! Storage::disk('local')->exists($backupFile)) {
+            if (!file_exists($fullPath)) {
                 return back()->with('error', '❌ Backup file not found.');
             }
 
-            $filename = basename($backupFile);
+            $filename = basename($fullPath);
 
-            Storage::disk('local')->delete($backupFile);
+            @unlink($fullPath);
 
             // Log the deletion
             AuditLog::logAction([
@@ -350,30 +398,35 @@ class DatabaseMaintenanceController extends Controller
     {
         $backups = [];
 
-        // Backups are stored in the {APP_NAME} folder (NutriBantay)
-        $backupPath = 'NutriBantay';
+        // We check two locations:
+        // 1. storage/app/NutriBantay (Primary for new backups)
+        // 2. storage/app/private/NutriBantay (Legacy location)
+        
+        $locations = [
+            'storage' => storage_path('app/NutriBantay'),
+            'private' => storage_path('app/private/NutriBantay')
+        ];
 
-        if (Storage::disk('local')->exists($backupPath)) {
-            $files = Storage::disk('local')->files($backupPath);
+        foreach ($locations as $source => $path) {
+            if (is_dir($path)) {
+                $files = glob($path . '/*.zip');
 
-            foreach ($files as $file) {
-                // Only process .zip files
-                if (pathinfo($file, PATHINFO_EXTENSION) !== 'zip') {
-                    continue;
+                foreach ($files as $file) {
+                    $filename = basename($file);
+                    $size = filesize($file);
+                    $timestamp = filemtime($file);
+
+                    $backups[] = [
+                        'filename' => $filename,
+                        'path' => ($source === 'private' ? 'private/NutriBantay/' : 'NutriBantay/') . $filename,
+                        'full_path' => $file,
+                        'size' => $this->formatBytes($size),
+                        'size_bytes' => $size,
+                        'date' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),
+                        'timestamp' => $timestamp,
+                        'source' => $source
+                    ];
                 }
-
-                $filename = basename($file);
-                $size = Storage::disk('local')->size($file);
-                $timestamp = Storage::disk('local')->lastModified($file);
-
-                $backups[] = [
-                    'filename' => $filename,
-                    'path' => $backupPath.'/'.$filename,  // This will be 'NutriBantay/filename.zip'
-                    'size' => $this->formatBytes($size),
-                    'size_bytes' => $size,
-                    'date' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),
-                    'timestamp' => $timestamp,
-                ];
             }
         }
 
@@ -383,158 +436,6 @@ class DatabaseMaintenanceController extends Controller
         });
 
         return $backups;
-    }
-
-    /**
-     * Helper: Restore database from SQL file
-     */
-    private function restoreDatabase($sqlFile)
-    {
-        // Read SQL file
-        $sql = file_get_contents($sqlFile);
-
-        if (empty($sql)) {
-            throw new \Exception('SQL file is empty or unreadable.');
-        }
-
-        // CRITICAL CHECK: Reject SQLite dumps
-        if (stripos($sql, 'PRAGMA foreign_keys') !== false ||
-            stripos($sql, 'BEGIN TRANSACTION') !== false ||
-            stripos($sql, 'AUTOINCREMENT') !== false) {
-
-            throw new \Exception(
-                'This backup contains SQLite data, but your database is MySQL. '.
-                'This backup is incompatible. Please delete old backups and create new ones.'
-            );
-        }
-
-        // Verify it looks like a MySQL dump
-        if (stripos($sql, 'MySQL dump') === false &&
-            stripos($sql, 'SET @OLD_CHARACTER_SET_CLIENT') === false &&
-            stripos($sql, 'ENGINE=InnoDB') === false) {
-
-            throw new \Exception(
-                'This does not appear to be a valid MySQL backup file. '.
-                'Please ensure DB_CONNECTION=mysql in your .env file and create new backups.'
-            );
-        }
-
-        \Log::info('SQL file validated as MySQL dump. Proceeding with restore...');
-
-        try {
-            // Disable foreign key checks during restore
-            DB::statement('SET FOREIGN_KEY_CHECKS=0');
-
-            // Execute the SQL dump
-            DB::unprepared($sql);
-
-            // Re-enable foreign key checks
-            DB::statement('SET FOREIGN_KEY_CHECKS=1');
-
-            \Log::info('Database restored successfully using MySQL');
-
-        } catch (\Exception $e) {
-            // Re-enable foreign key checks on error
-            try {
-                DB::statement('SET FOREIGN_KEY_CHECKS=1');
-            } catch (\Exception $cleanupError) {
-                // Ignore cleanup errors
-            }
-
-            \Log::error('MySQL restore via DB::unprepared failed: '.$e->getMessage());
-
-            // Try alternative method using mysql command line
-            $this->restoreDatabaseViaCommandLine($sqlFile);
-        }
-    }
-
-    /**
-     * Alternative restore method using mysql command line
-     */
-    private function restoreDatabaseViaCommandLine($sqlFile)
-    {
-        $database = config('database.connections.mysql.database');
-        $username = config('database.connections.mysql.username');
-        $password = config('database.connections.mysql.password');
-        $host = config('database.connections.mysql.host');
-        $port = config('database.connections.mysql.port');
-
-        // Auto-detect mysql executable
-        $mysqlPath = $this->detectMysqlPath();
-
-        // Build mysql command
-        $passwordArg = $password ? '--password='.escapeshellarg($password) : '';
-
-        $command = sprintf(
-            '"%s" --host=%s --port=%s --user=%s %s %s < "%s" 2>&1',
-            $mysqlPath,
-            escapeshellarg($host),
-            escapeshellarg($port),
-            escapeshellarg($username),
-            $passwordArg,
-            escapeshellarg($database),
-            $sqlFile
-        );
-
-        \Log::info('Executing mysql restore command with path: '.$mysqlPath);
-
-        // Execute command
-        $output = [];
-        $returnVar = 0;
-        exec($command, $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new \Exception(
-                'MySQL restore via command line failed. '.
-                'Return code: '.$returnVar.'. '.
-                'Output: '.implode("\n", $output).
-                ' (Using MySQL path: '.$mysqlPath.')'
-            );
-        }
-
-        \Log::info('Database restored successfully using mysql command line ('.$mysqlPath.')');
-    }
-
-    /**
-     * Auto-detect MySQL executable path
-     */
-    private function detectMysqlPath()
-    {
-        // First try: use 'mysql' and rely on system PATH
-        $output = [];
-        $returnVar = 0;
-        exec('which mysql 2>/dev/null', $output, $returnVar);
-        if ($returnVar === 0 && ! empty($output[0]) && file_exists($output[0])) {
-            \Log::info('Detected mysql via which: '.$output[0]);
-
-            return $output[0];
-        }
-
-        // Second try: common paths for different OS
-        $possiblePaths = [
-            // Linux/macOS
-            '/usr/bin/mysql',
-            '/usr/local/bin/mysql',
-            '/usr/local/mysql/bin/mysql',
-            // Windows
-            'C:\xampp\mysql\bin\mysql.exe',
-            'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe',
-            'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql.exe',
-            'C:\wamp\bin\mysql\mysql8.0.21\bin\mysql.exe',
-        ];
-
-        foreach ($possiblePaths as $path) {
-            if (file_exists($path)) {
-                \Log::info('Found mysql at common path: '.$path);
-
-                return $path;
-            }
-        }
-
-        // Fallback: just use 'mysql' and hope it's in PATH
-        \Log::warning('Could not detect mysql path, falling back to "mysql" in PATH');
-
-        return 'mysql';
     }
 
     /**

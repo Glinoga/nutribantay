@@ -62,6 +62,7 @@ return [
             ]) : [],
             'dump' => [
                 'dump_binary_path' => 'C:/xampp/mysql/bin',
+                'add_extra_option' => '--protocol=tcp --host=127.0.0.1',
             ],
         ],
 

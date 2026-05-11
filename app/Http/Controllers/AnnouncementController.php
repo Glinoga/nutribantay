@@ -146,4 +146,47 @@ class AnnouncementController extends Controller
 
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
+
+    public function archived()
+    {
+        $archivedAnnouncements = Announcement::onlyTrashed()
+            ->with('category')
+            ->get()
+            ->map(fn ($announcement) => [
+                'id' => $announcement->id,
+                'title' => $announcement->title,
+                'category_id' => $announcement->category_id,
+                'category' => $announcement->category,
+                'date' => $announcement->date,
+                'end_date' => $announcement->end_date,
+                'author' => $announcement->author,
+                'summary' => $announcement->summary,
+                'deleted_at' => $announcement->deleted_at,
+            ]);
+
+        return Inertia::render('Announcements/Archived', [
+            'announcements' => $archivedAnnouncements,
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $announcement = Announcement::onlyTrashed()->findOrFail($id);
+        $announcement->restore();
+
+        return redirect()->route('announcements.archived')->with('success', 'Announcement restored successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $announcement = Announcement::onlyTrashed()->findOrFail($id);
+
+        if ($announcement->image) {
+            Storage::disk('public')->delete($announcement->image);
+        }
+
+        $announcement->forceDelete();
+
+        return redirect()->route('announcements.archived')->with('success', 'Announcement permanently deleted.');
+    }
 }

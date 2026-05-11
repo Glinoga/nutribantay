@@ -237,4 +237,57 @@ class HealthlogController extends Controller
         return redirect()->route('children.show', $childId)
             ->with('success', 'Health log deleted.');
     }
+
+    public function archived()
+    {
+        $user = auth()->user();
+
+        $archivedLogs = HealthLog::onlyTrashed()
+            ->whereHas('child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->with('child')
+            ->get()
+            ->map(fn ($log) => [
+                'id' => $log->id,
+                'child_id' => $log->child_id,
+                'weight' => $log->weight,
+                'height' => $log->height,
+                'bmi' => $log->bmi,
+                'nutrition_status' => $log->nutrition_status,
+                'deleted_at' => $log->deleted_at,
+            ]);
+
+        return Inertia::render('Healthlog/Archived', [
+            'healthlogs' => archivedLogs,
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $user = auth()->user();
+
+        $healthlog = HealthLog::onlyTrashed()->findOrFail($id);
+
+        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $healthlog->restore();
+
+        return redirect()->route('healthlogs.archived')->with('success', 'Health log restored successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = auth()->user();
+
+        $healthlog = HealthLog::onlyTrashed()->findOrFail($id);
+
+        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $healthlog->forceDelete();
+
+        return redirect()->route('healthlogs.archived')->with('success', 'Health log permanently deleted.');
+    }
 }

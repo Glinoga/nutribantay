@@ -381,6 +381,7 @@ class ChildController extends Controller
             $file = fopen('php://output', 'w');
 
             fputcsv($file, [
+                'ID',
                 'Full Name',
                 'Age (months)',
                 'Sex',
@@ -395,6 +396,7 @@ class ChildController extends Controller
 
             foreach ($children as $child) {
                 fputcsv($file, [
+                    $child->id,
                     $child->fullname,
                     $child->age,
                     $child->sex,
@@ -848,11 +850,12 @@ class ChildController extends Controller
             // ── Section 1: Child Information ──
             fputcsv($file, ['Child Information']);
             fputcsv($file, [
-                'Full Name', 'Age (months)', 'Sex', 'Birthdate',
+                'ID', 'Full Name', 'Age (months)', 'Sex', 'Birthdate',
                 'Barangay', 'Address', 'Contact Number',
                 'Weight (kg)', 'Height (cm)', 'BMI',
             ]);
             fputcsv($file, [
+                $child->id,
                 $child->fullname,
                 $child->age,
                 $child->sex,
@@ -871,7 +874,7 @@ class ChildController extends Controller
             // ── Section 2: Health Logs ──
             fputcsv($file, ['Health Logs']);
             fputcsv($file, [
-                'Date', 'Weight (kg)', 'Height (cm)', 'BMI',
+                'ID', 'Date', 'Weight (kg)', 'Height (cm)', 'BMI',
                 'Nutrition Status', 'WFA', 'LFA', 'WFL/WFH',
                 'Vitamin A', 'Deworming', 'MNP',
                 'RUTF', 'RUSF', 'Complementary Food',
@@ -883,6 +886,7 @@ class ChildController extends Controller
             } else {
                 foreach ($child->healthlogs as $log) {
                     fputcsv($file, [
+                        $log->id,
                         $log->created_at?->format('Y-m-d'),
                         $log->weight,
                         $log->height,

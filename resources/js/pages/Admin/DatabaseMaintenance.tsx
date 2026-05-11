@@ -15,9 +15,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Database, Download, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type Backup = {
     filename: string;
@@ -26,6 +26,7 @@ type Backup = {
     size_bytes: number;
     date: string;
     timestamp: number;
+    source: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Database Maintenance', href: '/admin/database' }];
@@ -34,8 +35,8 @@ interface Props {
     backups: Backup[];
 }
 
-export default function DatabaseMaintenance({ backups: initialBackups }: Props) {
-    const [backups, setBackups] = useState<Backup[]>(initialBackups);
+export default function DatabaseMaintenance({ backups }: Props) {
+    const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [loading, setLoading] = useState(false);
     const [restoring, setRestoring] = useState(false);
 
@@ -47,6 +48,15 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
     // Delete confirmation state
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedDeleteBackup, setSelectedDeleteBackup] = useState<Backup | null>(null);
+
+    // Listen for flash messages from the server
+    useEffect(() => {
+        if (flash?.success) {
+            smartToast.success(flash.success);
+        } else if (flash?.error) {
+            smartToast.error(flash.error);
+        }
+    }, [flash]);
 
     const totalBackupsSize = useMemo(() => {
         return backups.reduce((sum, b) => sum + b.size_bytes, 0);
@@ -67,7 +77,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
         if (loading) return;
 
         setLoading(true);
-        const loadingToast = smartToast.loading('Creating database backup...');
+        const loadingToast = smartToast.loading('Creating backup — this may take a few seconds...');
 
         router.post(
             '/admin/database/backup',
@@ -76,12 +86,11 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                 preserveScroll: true,
                 onSuccess: () => {
                     smartToast.dismiss(loadingToast);
-                    smartToast.success('Database backup created successfully!');
-                    refreshBackupList();
+                    // Success message will be handled by the flash useEffect
                 },
-                onError: () => {
+                onError: (errors) => {
                     smartToast.dismiss(loadingToast);
-                    smartToast.error('Failed to create backup. Please try again.');
+                    smartToast.error(errors?.message || 'Failed to trigger backup.');
                 },
                 onFinish: () => {
                     setLoading(false);
@@ -91,18 +100,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
     };
 
     const refreshBackupList = () => {
-        router.get(
-            '/admin/database/list',
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: (page) => {
-                    if (page.props.backups) {
-                        setBackups(page.props.backups as Backup[]);
-                    }
-                },
-            },
-        );
+        router.reload({ only: ['backups'] });
     };
 
     const openRestoreDialog = (backup: Backup) => {
@@ -135,7 +133,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                 preserveScroll: true,
                 onSuccess: () => {
                     smartToast.dismiss(loadingToast);
-                    smartToast.success('Database restored successfully!');
+                    // Success message handled by flash useEffect
                     closeRestoreDialog();
                     setTimeout(() => {
                         window.location.reload();
@@ -144,11 +142,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                 onError: (errors) => {
                     smartToast.dismiss(loadingToast);
                     const errorMsg = errors?.message || 'Failed to restore database';
-                    if (typeof errorMsg === 'string' && errorMsg.includes('SQLite')) {
-                        smartToast.error('This backup is incompatible (SQLite format). Please delete old backups and create new ones.');
-                    } else {
-                        smartToast.error(errorMsg);
-                    }
+                    smartToast.error(errorMsg);
                 },
                 onFinish: () => {
                     setRestoring(false);
@@ -174,8 +168,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
             data: { backup_file: selectedDeleteBackup.path },
             preserveScroll: true,
             onSuccess: () => {
-                smartToast.success('Backup deleted successfully!');
-                refreshBackupList();
+                // Success message handled by flash useEffect
                 closeDeleteDialog();
             },
             onError: () => {
@@ -185,7 +178,7 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
     };
 
     const handleDownload = (backup: Backup) => {
-        window.location.href = `/admin/database/download/${backup.filename}`;
+        window.location.href = `/admin/database/download/${backup.source}/${backup.filename}`;
     };
 
     return (
@@ -341,7 +334,8 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                         )}
                     </CardContent>
                 </Card>
-            </div>
+
+                </div>
 
             {/* Restore Confirmation Dialog */}
             <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
@@ -361,7 +355,6 @@ export default function DatabaseMaintenance({ backups: initialBackups }: Props) 
                                         <li>
                                             Restore data from: <strong>{selectedRestoreBackup?.filename}</strong>
                                         </li>
-                                        <li>Create an automatic pre-restore backup</li>
                                     </ul>
                                 </div>
                                 <p className="text-sm text-gray-700">

@@ -485,6 +485,7 @@ class DashboardController extends Controller
 
             // Data header row
             fputcsv($handle, [
+                'ID',
                 'Child Name',
                 'Birthday',
                 'Age (Months)',
@@ -502,6 +503,7 @@ class DashboardController extends Controller
             // Data rows
             foreach ($healthlogs as $log) {
                 fputcsv($handle, [
+                    $log->id,
                     $log->child->fullname ?? '',
                     $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
                     $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),

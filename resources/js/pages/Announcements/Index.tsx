@@ -29,6 +29,7 @@ interface Announcement {
     summary: string;
     content: string;
     image?: string;
+    is_expired?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -365,15 +366,22 @@ export default function Index({ announcements, categories }: { announcements: An
                                 {/* Content */}
                                 <div className="p-6">
                                     {/* Category Badge */}
-                                    <Badge
-                                        className="mb-3 font-semibold shadow-sm"
-                                        style={{
-                                            backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                            color: 'white',
-                                        }}
-                                    >
-                                        {announcement.category.name}
-                                    </Badge>
+                                    <div className="mb-3 flex flex-wrap gap-2">
+                                        <Badge
+                                            className="font-semibold shadow-sm"
+                                            style={{
+                                                backgroundColor: `var(--${announcement.category.color || 'primary'})`,
+                                                color: 'white',
+                                            }}
+                                        >
+                                            {announcement.category.name}
+                                        </Badge>
+                                        {announcement.is_expired && (
+                                            <Badge className="bg-red-500 font-semibold text-white shadow-sm">
+                                                Expired
+                                            </Badge>
+                                        )}
+                                    </div>
 
                                     {/* Title */}
                                     <h3 className="mb-3 text-xl font-bold text-gray-900 transition-colors group-hover:text-blue-600">
