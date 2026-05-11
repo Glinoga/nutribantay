@@ -123,11 +123,12 @@ class HealthlogController extends Controller
 
         HealthLog::create($validated);
 
-        // Auto-update child's current weight/height with latest health log (only if values exist)
+        // Auto-update child's current weight/height/nutrition_status with latest health log
         if (! empty($validated['weight']) && ! empty($validated['height'])) {
             $child->update([
                 'weight' => $validated['weight'],
                 'height' => $validated['height'],
+                'nutrition_status' => $validated['nutrition_status'] ?? null,
                 'updated_by' => auth()->id(),
             ]);
         }
@@ -206,6 +207,16 @@ class HealthlogController extends Controller
         }
 
         $healthlog->update($validated);
+
+        // Sync nutrition_status to child if weight/height were updated
+        if ($weight !== null && $height !== null) {
+            $child->update([
+                'weight' => $validated['weight'],
+                'height' => $validated['height'],
+                'nutrition_status' => $validated['nutrition_status'] ?? null,
+                'updated_by' => auth()->id(),
+            ]);
+        }
 
         return redirect()->route('children.show', $child->id)
             ->with('success', 'Health log updated successfully.');

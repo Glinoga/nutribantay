@@ -19,6 +19,7 @@ class Child extends Model
         'sex',
         'weight',
         'height',
+        'nutrition_status',
         'birthdate',
         'barangay',
         'address',

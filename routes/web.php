@@ -192,7 +192,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
     });
 
-    Route::post('/recommendations', [RecommendationController::class, 'generate'])->name('recommendations.generate');
+    Route::post('/recommendations', [RecommendationController::class, 'generate'])->middleware('throttle:10,1')->name('recommendations.generate');
 });
 
 require __DIR__.'/settings.php';

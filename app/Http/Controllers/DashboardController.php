@@ -155,15 +155,14 @@ class DashboardController extends Controller
             ];
         }
 
-        $last6MonthsLogs = HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
-            ->where('created_at', '>=', Carbon::now()->subMonths(6))
-            ->get();
+        // Get children's nutrition_status directly from child table
+        $children = Child::where('barangay', $barangay)->whereNotNull('nutrition_status')->get();
 
         $statusDistribution = [
-            'normal' => $last6MonthsLogs->where('nutrition_status', 'Normal')->count(),
-            'underweight' => $last6MonthsLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-            'overweight' => $last6MonthsLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-            'stunted' => $last6MonthsLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+            'normal' => $children->filter(fn ($c) => $c->nutrition_status === 'Normal')->count(),
+            'underweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition']))->count(),
+            'overweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Overweight', 'Obese']))->count(),
+            'stunted' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Stunted', 'Severely Stunted']))->count(),
         ];
 
         // Vaccine follow-ups
@@ -350,11 +349,16 @@ class DashboardController extends Controller
             default => $query()->where('created_at', '>=', Carbon::now()->subYears(3))->get(),
         };
 
+        // Use child's nutrition_status directly (not aggregated from health logs)
+        $user = auth()->user();
+        $barangay = $user->barangay;
+        $children = Child::where('barangay', $barangay)->whereNotNull('nutrition_status')->get();
+
         $statusDistribution = [
-            'normal' => $trendLogs->where('nutrition_status', 'Normal')->count(),
-            'underweight' => $trendLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-            'overweight' => $trendLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-            'stunted' => $trendLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+            'normal' => $children->filter(fn ($c) => $c->nutrition_status === 'Normal')->count(),
+            'underweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition']))->count(),
+            'overweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Overweight', 'Obese']))->count(),
+            'stunted' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Stunted', 'Severely Stunted']))->count(),
         ];
 
         $total = $trendLogs->count();

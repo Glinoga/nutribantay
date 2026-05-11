@@ -18,10 +18,8 @@ class RecommendationController extends Controller
     {
         $apiKey = config('openai.api_key');
 
-        // Step 1: Validate and fetch child
-        $child = Child::with(['healthLogs' => function ($query) {
-            $query->latest()->first();
-        }])->find($request->child_id);
+        // Step 1: Validate and fetch child (no eager load - load healthLogs only when needed)
+        $child = Child::find($request->child_id);
 
         if (! $child || ! $child->birthdate) {
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
@@ -35,12 +33,13 @@ class RecommendationController extends Controller
         $months = $totalMonths % 12;
         $ageFormatted = "{$years} taon, {$months} buwan";
 
-        // Step 3: Get child data
-        $bmi = $request->bmi ?? $child->healthLogs?->first()?->bmi ?? 0;
-        $nutritionStatus = $request->nutrition_status ?? $child->healthLogs?->first()?->nutrition_status ?? 'Normal';
+        // Step 3: Get child data (load healthLogs for all ages - now using AI for all)
+        $child->load('healthLogs');
+        $latestHealthLog = $child->healthLogs()->latest()->first();
+        $bmi = $request->bmi ?? $latestHealthLog?->bmi ?? 0;
+        $nutritionStatus = $request->nutrition_status ?? $latestHealthLog?->nutrition_status ?? 'Normal';
 
         // Step 4: Get Vitamin A and Deworming status from health log (latest one)
-        $latestHealthLog = $child->healthLogs()->latest()->first();
         $vitaminAStatus = $latestHealthLog?->vitamin_a ? 'Yes' : 'No';
         $dewormingStatus = $latestHealthLog?->deworming ? 'Yes' : 'No';
 
@@ -61,10 +60,13 @@ class RecommendationController extends Controller
         );
 
         // Step 7: Try API with retry logic
-        $recommendation = $this->generateWithRetry($apiKey, $prompt, $nutritionStatus, $child->sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
+        $recommendation = $this->generateWithRetry($apiKey, $prompt, $totalMonths, $nutritionStatus, $child->sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
 
         // Step 8: Post-process to fix any meals with only light foods
         $recommendation = $this->fixMealPlan($recommendation, $months);
+
+        // Step 9: Post-process to fix deworming if AI missed it
+        $recommendation = $this->fixDewormingRecommendation($recommendation, $months, $dewormingStatus);
 
         return response()->json(['recommendation' => trim($recommendation)]);
     }
@@ -94,87 +96,94 @@ IMPORMASYON NG BATA:
 - Deworming: {$dewormingStatus}
 - NEEDS DEWORMING: {$needsDeworming}
 
-FEEDING RULES (STRICT):
-- 0-5 months: Gatas lamang (breastmilk/formula) - WALANG SOLID FOOD
-- 6-11 months: Breastmilk + soft foods (lugaw, mashed fruits/vegetables)
-- 12-35 months: Lugaw/Kanin na may gulay at itlog, may prutas
-- 36+ months: Regular solid foods - dapat may base food + side dish
+NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - SUNUGIN LAMANG):
+====================================================================================
 
-MEAL FORMAT (STRICT - Bawat meal dapat may heavy food + side dish):
-HALIMBAWA NG VALID MEAL PLAN (para sa 3+ taong gulang):
-- Umaga: Lugaw na may itlog at gulay
-- Tanghali: Kanin na may tinadtad na karne at gulay
-- Gabi: Kamote na may sabaw at prutas
+0-5 BUWAN (Gatas lamang):
+- Dalas: 8-12 beses isang araw (on-demand)
+- Pagkain: Gatas lamang (breastmilk o formula) - WALANG SOLID FOOD
 
-HALIMBAWA NG INVALID (HINDI PUWEDE):
-- Tanghali: Saging lang (WALANG BASE FOOD!)
-- Gabi: Gulay lang (WALANG BASE FOOD!)
-- Umaga: Lugaw lang (KAILANGAN MAY SIDE DISH!)
+6 NA BUWAN:
+- Dalas: 2 beses isang araw
+- Pagkain: Malapot na Lugaw (2-3 kutsara)
 
-AGE-SPECIFIC MEAL EXAMPLES:
-- 0-5 months: GATAS LAMANG - Walang solid food!
-- 6-11 months: Lugaw na may MASHED fruits/vegetables, o soft na pagkain (PUREED)
-- 12-35 months: Lugaw/Kanin na may gulay at itlog, may prutas
-- 36+ months: Lugaw/Kanin/Kamote na may karne/gulay/prutas
+6-8 BUWAN:
+- Dalas: 2-3 beses isang araw
+- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
+  - Lugaw na may kalabasa (1/2 tasa)
+  - Lugaw na may malunggay (1/2 tasa)
+  - Lugaw na may pritong isda (1/2 tasa)
 
-**STRICT PARA SA 6-11 BUWAN:**
-- Lahat ng pagkain ay dapat MASHED o PUREED
-- Halimbawa: Lugaw na may MASHED na saging, Lugaw na may PUREED na gulay
-- Bawal ang: sinigang, nilaga, buo, steak, anumang hindi mashed
+9-11 BUWAN:
+- Dalas: 3-4 beses isang araw + 2 meryenda
+- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
+  - Lugaw na monggo, sayote, at saluyot (1/2 tasa)
+  - Papaya na minasa (1/2 tasa)
+  - Lugaw na may kalabasa at pritong isda (1/2 tasa)
+  - Kalabasa at repolyong sopas (1/2 tasa)
 
-VALIDATION RULES (BAGO ILABAS ANG SAGOT, DAPAT PASSING LAHAT):
-1. **Tatlong magkaibang base foods lamang** sa meal plan (Umaga, Tanghali, Gabi)
-   - Bawal ang: lugaw, kanin, kamote, tinapay, pasta, noodles na paulit-ulit
-   - Halimbawa ng valid: Umaga: Lugaw, Tanghali: Kanin, Gabi: Kamote
-   - Halimbawa ng invalid: Umaga: Lugaw, Tanghali: Lugaw, Gabi: Lugaw (DOBLE!)
-2. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
-3. **Bawat meal dapat may heavy food (lugaw/kanin/kamote/tinapay)** - bawal ang prutas o gulay lang
-4. **Light food (prutas/gulay) dapat KASAMA ng heavy food**, hindi pamalit sa heavy food
-5. **0-5 months - GATAS LAMANG** - huwag magbigay ng anumang solid food
-6. **6-11 months - SOFT FOODS LAMANG** - dapat mashed o pureed, huwag magbigay ng regular solid food
+12-23 BUWAN:
+- Dalas: 4-5 beses isang araw + 2 meryenda
+- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
+  - Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)
+  - Hiniwang saging (1 tasa)
+  - Ginataang kadyos na may kalabasa (1 tasa kanin + 1/2 tasa ulam)
+  - Hiniwang itlog (1 tasa)
+  - Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)
 
-AGE-SPECIFIC RULES:
-- 0-5 months: GATAS LAMANG (breastmilk/formula) - WALANG SOLID FOOD
-- 6-11 months: SOFT FOODS LAMANG - dapat MASHED o PUREED (hal. Lugaw na may MASHED na saging)
-- 12-35 months: REGULAR SOLIDS - hindi na kailangan MASHED (hal. Lugaw na may gulay, Kanin na may itlog)
-- 36+ months: Regular solid foods - buong pagkain pwede na
+24+ BUWAN:
+- Dalas: 4-5 beses isang araw + 2 meryenda
+- Pagkain: Regular solid foods - sundin ang 12-23 months guidelines
 
-DEWORMING RULE (MANDATORY - SUMUNOD SA NEEDS DEWORMING FIELD):
-- Kung NEEDS DEWORMING = Yes: MAGBIGAY NG DEWORMING TABLETS SA OUTPUT
-- Kung NEEDS DEWORMING = No: HUWAG MAGBIGAY NG DEWORMING SA OUTPUT
+STRICT RULES:
+1. **Bawat meal AY ISANG PAGKAIN LAMANG** sa listahan - HUWAG COMBINE
+2. **HUWAG UMIULIT NG PAGKAIN SA SAME DAY** - iba dapat bawat meal (Umaga/Tanghali/Gabi)
+3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD**
+4. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
+5. **Bawal ang pagkain na wala sa listahan**
+6. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
 
-FOOD RESTRICTIONS FORMAT:
-- Kung 0-5 months: Bawal ang anumang solid food - gatas lamang
-- Kung 6-11 months: Lahat ng pagkain ay dapat mashed o pureed
-- Kung 12+ months: Iwasan ang processed foods
+OUTPUT FORMAT:
+1. Mga Nutrition Tips (3-4 items)
+2. Meal Plan (Bawat meal ay ISA lamang - HUWAG COMBINE):
+   - Umaga: [isang pagkain sa listahan]
+   - Tanghali: [isang pagkain sa listahan - DI IULIT]
+   - Gabi: [isang pagkain sa listahan - DI IULIT]
+3. Mga Vitamin/Supplements (ayon sa status)
+4. Food Restrictions
+5. Disclaimer
+6. Pinagkuhanan ng Datos: National Nutrition Council
 
-OUTPUT FORMAT (Clean Version):
- 1. Mga Nutrition Tips (3-4 items)
- 2. Meal Plan:
-    - Umaga: [pagkain]
-    - Tanghali: [pagkain]
-    - Gabi: [pagkain]
- 3. Mga Vitamin/Supplements:
-     - Vitamin A supplements ayon sa status ng bata
-  4. Food Restrictions (kung may)
-  5. Disclaimer
-  6. National Nutrition Council
-
-IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot.
+IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot. HUWAG GUMAMIT NG # (HASHTAG) SA OUTPUT.
 ";
     }
 
-    private function generateWithRetry(string $apiKey, string $prompt, string $nutritionStatus, string $sex, int $months, float $bmi, string $vitaminAStatus, string $dewormingStatus): string
+    private function generateWithRetry(string $apiKey, string $prompt, int $totalMonths, string $nutritionStatus, string $sex, int $months, float $bmi, string $vitaminAStatus, string $dewormingStatus): string
     {
+        // Skip API calls if no API key configured
+        if (empty($apiKey)) {
+            \Log::info('No OpenAI API key configured, using local fallback');
+
+            return $this->getLocalFallback(
+                $nutritionStatus,
+                $sex,
+                $months,
+                $bmi,
+                $vitaminAStatus,
+                $dewormingStatus
+            );
+        }
+
         $attempts = 0;
         $lastError = null;
+        $lastValidationError = null;
 
         while ($attempts <= self::MAX_RETRIES) {
             $attempts++;
 
-            // If not first attempt, add stricter instruction
-            if ($attempts > 1) {
-                $prompt .= "\n\n⚠️ WARNING: Ang nakaraang sagot ay INVALID dahil may duplicate base food. Gumamit ng TATLONG MAGKAIBANG base foods sa meal plan!";
+            // If not first attempt, add generic warning to retry
+            if ($attempts > 1 && $lastValidationError) {
+                $prompt .= "\n\n⚠️ WARNING: Ang nakaraang sagot ay INVALID. Paki-correct ang output ayon sa validation rules!";
             }
 
             try {
@@ -199,14 +208,14 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
                 $recommendation = $response->json('choices.0.message.content');
 
-                // Validate the output
-                $validationResult = $this->validateRecommendation($recommendation);
+                // Validate the output with age context
+                $validationResult = $this->validateRecommendation($recommendation, $totalMonths);
 
                 if ($validationResult === true) {
                     return $recommendation;
                 } else {
-                    $lastError = $validationResult; // Validation failed reason
-                    // Continue to retry
+                    $lastValidationError = $validationResult;
+                    $lastError = $validationResult;
                 }
 
             } catch (\Throwable $e) {
@@ -242,63 +251,73 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         );
     }
 
-    private function validateRecommendation(string $recommendation): true|string
+    private function validateRecommendation(string $recommendation, int $ageInMonths = 0): true|string
     {
-        // Check for duplicate base foods in meal plan
-        $mealPlanPatterns = [
-            '/Umaga:.*?Lugaw/i',
-            '/Umaga:.*?Kanin/i',
-            '/Umaga:.*?Kamote/i',
-            '/Umaga:.*?Tinapay/i',
-            '/Umaga:.*?Pasta/i',
-            '/Umaga:.*?Noodles/i',
-            '/Tanghali:.*?Lugaw/i',
-            '/Tanghali:.*?Kanin/i',
-            '/Tanghali:.*?Kamote/i',
-            '/Tanghali:.*?Tinapay/i',
-            '/Tanghali:.*?Pasta/i',
-            '/Tanghali:.*?Noodles/i',
-            '/Gabi:.*?Lugaw/i',
-            '/Gabi:.*?Kanin/i',
-            '/Gabi:.*?Kamote/i',
-            '/Gabi:.*?Tinapay/i',
-            '/Gabi:.*?Pasta/i',
-            '/Gabi:.*?Noodles/i',
-        ];
-
-        $matches = [];
-        foreach ($mealPlanPatterns as $pattern) {
-            if (preg_match($pattern, $recommendation, $match)) {
-                $matches[] = $match[0];
+        // For 0-5 months, check that no solid foods are suggested
+        if ($ageInMonths < 6) {
+            $solidFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'itlog', 'karne', 'isda', 'manok', 'gulay', 'prutas'];
+            $recLower = strtolower($recommendation);
+            foreach ($solidFoods as $food) {
+                if (strpos($recLower, $food) !== false) {
+                    return self::VALIDATION_FAILED.': May solid food sa 0-5 months - dapat GATAS LAMANG!';
+                }
             }
         }
 
-        // Remove duplicates and check if we have 3 different meals
-        $uniqueBaseFoods = array_unique($matches);
+        // Check for duplicate base foods in meal plan (for 6+ months)
+        if ($ageInMonths >= 6) {
+            $mealPlanPatterns = [
+                '/Umaga:.*?Lugaw/i',
+                '/Umaga:.*?Kanin/i',
+                '/Umaga:.*?Kamote/i',
+                '/Umaga:.*?Tinapay/i',
+                '/Umaga:.*?Pasta/i',
+                '/Umaga:.*?Noodles/i',
+                '/Tanghali:.*?Lugaw/i',
+                '/Tanghali:.*?Kanin/i',
+                '/Tanghali:.*?Kamote/i',
+                '/Tanghali:.*?Tinapay/i',
+                '/Tanghali:.*?Pasta/i',
+                '/Tanghali:.*?Noodles/i',
+                '/Gabi:.*?Lugaw/i',
+                '/Gabi:.*?Kanin/i',
+                '/Gabi:.*?Kamote/i',
+                '/Gabi:.*?Tinapay/i',
+                '/Gabi:.*?Pasta/i',
+                '/Gabi:.*?Noodles/i',
+            ];
 
-        // Count how many unique base foods we found
-        $lugawCount = preg_grep('/Lugaw/i', $matches);
-        $kaninCount = preg_grep('/Kanin/i', $matches);
-        $kamoteCount = preg_grep('/Kamote/i', $matches);
-        $tinapayCount = preg_grep('/Tinapay/i', $matches);
+            $matches = [];
+            foreach ($mealPlanPatterns as $pattern) {
+                if (preg_match($pattern, $recommendation, $match)) {
+                    $matches[] = $match[0];
+                }
+            }
 
-        $differentBases = 0;
-        if (! empty($lugawCount)) {
-            $differentBases++;
-        }
-        if (! empty($kaninCount)) {
-            $differentBases++;
-        }
-        if (! empty($kamoteCount)) {
-            $differentBases++;
-        }
-        if (! empty($tinapayCount)) {
-            $differentBases++;
-        }
+            // Count how many unique base foods we found
+            $lugawCount = preg_grep('/Lugaw/i', $matches);
+            $kaninCount = preg_grep('/Kanin/i', $matches);
+            $kamoteCount = preg_grep('/Kamote/i', $matches);
+            $tinapayCount = preg_grep('/Tinapay/i', $matches);
 
-        // If we have duplicates, validation fails
-        if (count($matches) > $differentBases) {
-            return self::VALIDATION_FAILED.': May duplicate base food sa meal plan';
+            $differentBases = 0;
+            if (! empty($lugawCount)) {
+                $differentBases++;
+            }
+            if (! empty($kaninCount)) {
+                $differentBases++;
+            }
+            if (! empty($kamoteCount)) {
+                $differentBases++;
+            }
+            if (! empty($tinapayCount)) {
+                $differentBases++;
+            }
+
+            // If we have duplicates, validation fails
+            if (count($matches) > $differentBases) {
+                return self::VALIDATION_FAILED.': May duplicate base food sa meal plan';
+            }
         }
 
         // Check for processed foods (banned)
@@ -339,13 +358,12 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                     }
                 }
 
-                // If no heavy food, add one based on age
-                if (! $hasHeavyFood) {
+                // For 0-5 months, override ALL meal lines to gatas-only
+                if ($ageInMonths < 6) {
+                    $mealContent = 'Gatas lamang (breastmilk/formula)';
+                } elseif (! $hasHeavyFood) {
                     // Determine appropriate heavy food based on age
-                    if ($ageInMonths < 6) {
-                        // For 0-5 months, no solid food should be suggested
-                        $mealContent = 'Gatas lamang (breastmilk/formula)';
-                    } elseif ($ageInMonths < 12) {
+                    if ($ageInMonths < 12) {
                         // 6-11 months: add lugaw
                         $mealContent = 'Lugaw na may '.$mealContent;
                     } elseif ($ageInMonths < 36) {
