@@ -478,24 +478,33 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 </button>
                             )}
 
-                            {canManageChildren && (
-                                <button
-                                    onClick={openImportModal}
-                                    className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                                >
-                                    <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
-                                    Upload Excel
-                                </button>
-                            )}
+{canManageChildren && (
+                                 <button
+                                     onClick={openImportModal}
+                                     className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                 >
+                                     <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
+                                     Upload Excel
+                                 </button>
+                             )}
 
-                            {canManageChildren && (
-                                <Link href="/children/create">
-                                    <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
-                                        <Plus className="mr-1.5 h-4 w-4" />
-                                        Add Child
-                                    </Button>
-                                </Link>
-                            )}
+                             {canManageChildren && (
+                                 <Link href="/children-archived">
+                                     <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
+                                         <Trash2 className="mr-1.5 h-4 w-4" />
+                                         View Archived
+                                     </Button>
+                                 </Link>
+                             )}
+
+                             {canManageChildren && (
+                                 <Link href="/children/create">
+                                     <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
+                                         <Plus className="mr-1.5 h-4 w-4" />
+                                         Add Child
+                                     </Button>
+                                 </Link>
+                             )}
                         </div>
                     </div>
 

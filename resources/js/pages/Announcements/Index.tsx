@@ -295,6 +295,17 @@ export default function Index({ announcements, categories }: { announcements: An
                                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity group-hover:opacity-100" />
                             </Button>
                         </Link>
+                        
+                        {/* View Archived Button */}
+                        <Link href="/admin/announcements-archived">
+                            <Button className="group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 px-8 py-6 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl">
+                                <span className="relative z-10 flex items-center gap-2 font-semibold">
+                                    <Trash2 className="h-5 w-5 transition-transform group-hover:rotate-90" />
+                                    View Archived
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-amber-500 opacity-0 transition-opacity group-hover:opacity-100" />
+                            </Button>
+                        </Link>
                     </div>
 
                     {/* Category Filters */}

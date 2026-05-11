@@ -26,7 +26,6 @@ type Child = {
     sex: string;
     age: number | null;
     deleted_at: string;
-    barangay: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -81,17 +80,16 @@ export default function Archived({ children }: Props) {
 
             <div className="m-4 rounded-lg border">
                 <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Sex</TableHead>
-                            <TableHead>Age (months)</TableHead>
-                            <TableHead>Barangay</TableHead>
-                            <TableHead>Deleted Date</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
+<TableHeader>
+                            <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Sex</TableHead>
+                                <TableHead>Age (months)</TableHead>
+                                <TableHead>Deleted Date</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
                     <TableBody>
                         {children.length === 0 ? (
                             <TableRow>
@@ -101,48 +99,47 @@ export default function Archived({ children }: Props) {
                             </TableRow>
                         ) : (
                             children.map((child) => (
-                                <TableRow key={child.id} className="hover:bg-muted/50">
-                                    <TableCell>{child.id}</TableCell>
-                                    <TableCell>{child.fullname}</TableCell>
-                                    <TableCell>{child.sex}</TableCell>
-                                    <TableCell>{child.age ?? '-'}</TableCell>
-                                    <TableCell>{child.barangay}</TableCell>
-                                    <TableCell>{new Date(child.deleted_at).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <div className="flex gap-1">
-                                            <Button
-                                                size="sm"
-                                                variant="default"
-                                                onClick={() => setRestoreId(child.id)}
-                                                disabled={loading === child.id}
-                                            >
-                                                {loading === child.id ? (
-                                                    <>
-                                                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                                                        Restoring...
-                                                    </>
-                                                ) : (
-                                                    'Restore'
-                                                )}
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                onClick={() => setDeleteId(child.id)}
-                                                disabled={loading === child.id}
-                                            >
-                                                {loading === child.id ? (
-                                                    <>
-                                                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                                                        Deleting...
-                                                    </>
-                                                ) : (
-                                                    'Delete Permanently'
-                                                )}
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
+<TableRow key={child.id} className="hover:bg-muted/50">
+                                     <TableCell>{child.id}</TableCell>
+                                     <TableCell>{child.fullname}</TableCell>
+                                     <TableCell>{child.sex}</TableCell>
+                                     <TableCell>{child.age ?? '-'}</TableCell>
+                                     <TableCell>{new Date(child.deleted_at).toLocaleDateString()}</TableCell>
+                                     <TableCell>
+                                         <div className="flex gap-1">
+                                             <Button
+                                                 size="sm"
+                                                 variant="default"
+                                                 onClick={() => setRestoreId(child.id)}
+                                                 disabled={loading === child.id}
+                                             >
+                                                 {loading === child.id ? (
+                                                     <>
+                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                         Restoring...
+                                                     </>
+                                                 ) : (
+                                                     'Restore'
+                                                 )}
+                                             </Button>
+                                             <Button
+                                                 size="sm"
+                                                 variant="destructive"
+                                                 onClick={() => setDeleteId(child.id)}
+                                                 disabled={loading === child.id}
+                                             >
+                                                 {loading === child.id ? (
+                                                     <>
+                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                         Deleting...
+                                                     </>
+                                                 ) : (
+                                                     'Delete Permanently'
+                                                 )}
+                                             </Button>
+                                         </div>
+                                     </TableCell>
+                                 </TableRow>
                             ))
                         )}
                     </TableBody>
