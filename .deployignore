@@ -8,6 +8,7 @@ storage/framework/cache/
 storage/framework/sessions/
 storage/framework/views/
 storage/logs/
+storage/app/
 storage/app/backup-temp/
 storage/app/private/Laravel/
 tests/
