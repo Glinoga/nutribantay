@@ -35,8 +35,8 @@ jobs:
           npm run build
 
       - name: Deploy to VPS via rsync
-        uses: easingthemes/ssh-deploy@v5.0.0
-        env:
+        uses: easingthemes/ssh-deploy@v6.0.1
+        with:
           SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
           ARGS: '-rlgoDzvc --delete --exclude-from=.deployignore'
           SOURCE: '.'
