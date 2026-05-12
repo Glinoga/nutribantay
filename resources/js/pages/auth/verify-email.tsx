@@ -1,5 +1,4 @@
 // Components
-import { logout } from '@/routes';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -13,6 +12,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/email/verification-notification');
+    };
+
+    const handleLogout = () => {
+        post('/logout');
     };
 
     return (
@@ -31,9 +34,9 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     Resend verification email
                 </Button>
 
-                <TextLink href={logout()} className="mx-auto block text-sm">
+                <button type="button" className="mx-auto block text-sm text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500" onClick={handleLogout}>
                     Log out
-                </TextLink>
+                </button>
             </form>
         </AuthLayout>
     );
