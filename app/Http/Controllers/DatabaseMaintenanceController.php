@@ -43,13 +43,13 @@ class DatabaseMaintenanceController extends Controller
             $zipName = "{$timestamp}.zip";
             // We want to store in storage/app/NutriBantay to keep it accessible
             $zipDestDir = storage_path("app/{$appName}");
-            $zipDest = $zipDestDir . '/' . $zipName;
+            $zipDest = $zipDestDir.'/'.$zipName;
 
             // Ensure destination directories exist
-            if (!file_exists(dirname($sqlFile))) {
+            if (! file_exists(dirname($sqlFile))) {
                 @mkdir(dirname($sqlFile), 0755, true);
             }
-            if (!file_exists($zipDestDir)) {
+            if (! file_exists($zipDestDir)) {
                 @mkdir($zipDestDir, 0755, true);
             }
 
@@ -63,6 +63,14 @@ class DatabaseMaintenanceController extends Controller
                 throw new \RuntimeException("Cannot create zip archive at: {$zipDest}");
             }
             $zip->addFile($sqlFile, "{$timestamp}-db.sql");
+
+            // AES-256 encrypt the zip contents at rest
+            $encPassword = config('app.backup_encryption_password');
+            if ($encPassword) {
+                $zip->setPassword($encPassword);
+                $zip->setEncryptionName("{$timestamp}-db.sql", \ZipArchive::EM_AES_256);
+            }
+
             $zip->close();
 
             // ── 4. Clean up the raw SQL temp file ───────────────────────────
@@ -130,11 +138,12 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
-            $fullPath = storage_path('app/' . $backupFileRel);
+            $fullPath = storage_path('app/'.$backupFileRel);
 
             // Verify backup file exists
-            if (!file_exists($fullPath)) {
+            if (! file_exists($fullPath)) {
                 \Log::error("Backup file not found at: {$fullPath}");
+
                 return back()->with('error', '❌ Backup file not found.');
             }
 
@@ -148,6 +157,13 @@ class DatabaseMaintenanceController extends Controller
             if ($zip->open($fullPath) !== true) {
                 throw new \RuntimeException('Failed to extract backup archive.');
             }
+
+            // Decrypt the zip using the encryption password
+            $encPassword = config('app.backup_encryption_password');
+            if ($encPassword) {
+                $zip->setPassword($encPassword);
+            }
+
             $zip->extractTo($extractPath);
             $zip->close();
 
@@ -200,8 +216,6 @@ class DatabaseMaintenanceController extends Controller
                     'backup_file' => basename($backupFileRel),
                 ],
             ]);
-
-
 
             return back()->with('success', '✅ Database restored successfully from MySQL backup.');
 
@@ -337,21 +351,6 @@ class DatabaseMaintenanceController extends Controller
     }
 
     /**
-     * Download a backup file
-     */
-    public function download($source, $filename)
-    {
-        $relPath = ($source === 'private' ? 'private/NutriBantay/' : 'NutriBantay/') . basename($filename);
-        $fullPath = storage_path('app/' . $relPath);
-
-        if (!file_exists($fullPath)) {
-            abort(404, 'Backup file not found.');
-        }
-
-        return response()->download($fullPath);
-    }
-
-    /**
      * Delete a backup file
      */
     public function delete(Request $request)
@@ -362,9 +361,9 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
-            $fullPath = storage_path('app/' . $backupFileRel);
+            $fullPath = storage_path('app/'.$backupFileRel);
 
-            if (!file_exists($fullPath)) {
+            if (! file_exists($fullPath)) {
                 return back()->with('error', '❌ Backup file not found.');
             }
 
@@ -401,15 +400,15 @@ class DatabaseMaintenanceController extends Controller
         // We check two locations:
         // 1. storage/app/NutriBantay (Primary for new backups)
         // 2. storage/app/private/NutriBantay (Legacy location)
-        
+
         $locations = [
             'storage' => storage_path('app/NutriBantay'),
-            'private' => storage_path('app/private/NutriBantay')
+            'private' => storage_path('app/private/NutriBantay'),
         ];
 
         foreach ($locations as $source => $path) {
             if (is_dir($path)) {
-                $files = glob($path . '/*.zip');
+                $files = glob($path.'/*.zip');
 
                 foreach ($files as $file) {
                     $filename = basename($file);
@@ -418,13 +417,13 @@ class DatabaseMaintenanceController extends Controller
 
                     $backups[] = [
                         'filename' => $filename,
-                        'path' => ($source === 'private' ? 'private/NutriBantay/' : 'NutriBantay/') . $filename,
+                        'path' => ($source === 'private' ? 'private/NutriBantay/' : 'NutriBantay/').$filename,
                         'full_path' => $file,
                         'size' => $this->formatBytes($size),
                         'size_bytes' => $size,
                         'date' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),
                         'timestamp' => $timestamp,
-                        'source' => $source
+                        'source' => $source,
                     ];
                 }
             }

@@ -7,6 +7,8 @@ use Carbon\Carbon;
 
 class GrowthHelper
 {
+    private static array $standardCache = [];
+
     /**
      * BMI calculation
      */
@@ -55,20 +57,14 @@ class GrowthHelper
         // -------------------------------------------------------
         // 1. WEIGHT-FOR-AGE (WFA)
         // -------------------------------------------------------
-        $wfa = GrowthStandard::where('gender', $gender)
-            ->where('type', 'weight_for_age')
-            ->where('measure_value', $ageMonths)
-            ->first();
+        $wfa = self::getCachedStandard($gender, 'weight_for_age', $ageMonths);
 
         $statusWfa = $wfa ? self::classify($weight, $wfa, 'wfa') : null;
 
         // -------------------------------------------------------
         // 2. LENGTH/HEIGHT-FOR-AGE (LFA)
         // -------------------------------------------------------
-        $lfa = GrowthStandard::where('gender', $gender)
-            ->where('type', 'height_length_for_age')
-            ->where('measure_value', $ageMonths)
-            ->first();
+        $lfa = self::getCachedStandard($gender, 'height_length_for_age', $ageMonths);
 
         $statusLfa = $lfa ? self::classify($height, $lfa, 'lfa') : null;
 
@@ -79,10 +75,7 @@ class GrowthHelper
 
         $lookupHeight = number_format(round($height * 2) / 2, 1, '.', '');
 
-        $wfl = GrowthStandard::where('gender', $gender)
-            ->where('type', $type)
-            ->where('measure_value', $lookupHeight)
-            ->first();
+        $wfl = self::getCachedStandard($gender, $type, $lookupHeight);
 
         $statusWflWfh = $wfl ? self::classify($weight, $wfl, 'wfl') : null;
 
@@ -99,6 +92,24 @@ class GrowthHelper
             'status_wfl_wfh' => $statusWflWfh,
             'overall' => $overall,
         ];
+    }
+
+    private static function getCachedStandard(string $gender, string $type, float|int|string $measureValue): ?GrowthStandard
+    {
+        $cacheKey = "{$gender}|{$type}|{$measureValue}";
+
+        if (isset(self::$standardCache[$cacheKey])) {
+            return self::$standardCache[$cacheKey];
+        }
+
+        $standard = GrowthStandard::where('gender', $gender)
+            ->where('type', $type)
+            ->where('measure_value', $measureValue)
+            ->first();
+
+        self::$standardCache[$cacheKey] = $standard;
+
+        return $standard;
     }
 
     /**

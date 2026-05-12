@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AIRecommender;
 use App\Helpers\GrowthHelper;
+use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\HealthLog;
 use Carbon\Carbon;
@@ -133,6 +134,9 @@ class HealthlogController extends Controller
             ]);
         }
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return redirect()->route('children.show', $child->id)
             ->with('success', '✅ Health log added successfully.');
     }
@@ -218,6 +222,9 @@ class HealthlogController extends Controller
             ]);
         }
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return redirect()->route('children.show', $child->id)
             ->with('success', 'Health log updated successfully.');
     }
@@ -232,7 +239,11 @@ class HealthlogController extends Controller
         }
 
         $childId = $healthlog->child_id;
+        $barangay = $healthlog->child->barangay;
         $healthlog->delete();
+
+        RefreshDashboardForBarangay::dispatch($barangay)
+            ->delay(now()->addSeconds(10));
 
         return redirect()->route('children.show', $childId)
             ->with('success', 'Health log deleted.');

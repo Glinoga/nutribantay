@@ -130,30 +130,36 @@ class AuditLogController extends Controller
             $query->byBarangay($user->barangay);
         }
 
-        $logs = $query->get();
-
-        // Build CSV content
-        $csv = "Timestamp,User,Action,Type,Model Name,Description,IP Address,Barangay\n";
-
-        foreach ($logs as $log) {
-            $csv .= sprintf(
-                '"%s","%s","%s","%s","%s","%s","%s","%s"'."\n",
-                $log->created_at->toIso8601String(),
-                $log->user_name ?? $log->user?->name ?? 'System',
-                $log->action,
-                $log->model_type ?? '-',
-                $log->model_name ?? '-',
-                str_replace('"', '""', $log->description ?? '-'),
-                $log->ip_address ?? '-',
-                $log->barangay ?? '-'
-            );
-        }
-
         $filename = 'audit_logs_'.now()->format('Y_m_d_His').'.csv';
 
-        return response($csv, 200, [
+        $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ]);
+        ];
+
+        $callback = function () use ($query) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['Timestamp', 'User', 'Action', 'Type', 'Model Name', 'Description', 'IP Address', 'Barangay']);
+
+            $query->chunk(500, function ($logs) use ($handle) {
+                foreach ($logs as $log) {
+                    fputcsv($handle, [
+                        $log->created_at->toIso8601String(),
+                        $log->user_name ?? $log->user?->name ?? 'System',
+                        $log->action,
+                        $log->model_type ?? '-',
+                        $log->model_name ?? '-',
+                        str_replace('"', '""', $log->description ?? '-'),
+                        $log->ip_address ?? '-',
+                        $log->barangay ?? '-',
+                    ]);
+                }
+            });
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

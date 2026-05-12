@@ -162,10 +162,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.database.restore')
             ->middleware('role:Admin');
 
-        Route::get('/admin/database/download/{source}/{filename}', [DatabaseMaintenanceController::class, 'download'])
-            ->name('admin.database.download')
-            ->middleware('role:Admin');
-
         Route::delete('/admin/database/delete', [DatabaseMaintenanceController::class, 'delete'])
             ->name('admin.database.delete')
             ->middleware('role:Admin');

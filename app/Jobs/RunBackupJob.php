@@ -37,17 +37,17 @@ class RunBackupJob implements ShouldQueue
             ]);
 
             $output = Artisan::output();
-            Log::info('Background backup command output: ' . $output);
+            Log::info('Background backup command output: '.$output);
 
             // Get the backup name from config
             $backupName = config('backup.backup.name') ?: env('APP_NAME', 'laravel-backup');
-            $backupPath = storage_path('app/' . $backupName);
+            $backupPath = storage_path('app/'.$backupName);
 
             $latestBackup = null;
             $latestTime = 0;
 
             if (is_dir($backupPath)) {
-                $files = glob($backupPath . '/*.zip');
+                $files = glob($backupPath.'/*.zip');
                 foreach ($files as $file) {
                     $mtime = filemtime($file);
                     if ($mtime > $latestTime) {
@@ -70,15 +70,15 @@ class RunBackupJob implements ShouldQueue
                         'size' => $this->formatBytes($size),
                     ],
                 ]);
-                
+
                 Log::info("Background backup successful: {$filename}");
             } else {
                 Log::warning('Backup job finished but no recent backup file was found.');
             }
 
         } catch (\Exception $e) {
-            Log::error('Background backup job failed: ' . $e->getMessage());
-            
+            Log::error('Background backup job failed: '.$e->getMessage());
+
             AuditLog::logAction([
                 'action' => 'backup_failed',
                 'model_type' => 'System',
@@ -98,6 +98,6 @@ class RunBackupJob implements ShouldQueue
             $bytes /= 1024;
         }
 
-        return round($bytes, $precision) . ' ' . $units[$i];
+        return round($bytes, $precision).' '.$units[$i];
     }
 }

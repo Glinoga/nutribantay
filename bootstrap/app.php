@@ -32,6 +32,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->onOneServer()
             ->appendOutputTo(storage_path('logs/backup-cleanup.log'));
+
+        // Refresh dashboard cache every 5 minutes
+        $schedule->command('dashboard:refresh')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->appendOutputTo(storage_path('logs/dashboard-cache.log'));
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);

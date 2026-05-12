@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Child;
-use App\Models\ChildVaccineDose;
+use App\Jobs\RefreshDashboardForBarangay;
+use App\Models\DashboardCache;
 use App\Models\HealthLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,50 +15,24 @@ class DashboardController extends Controller
     {
         $now = Carbon::now();
 
-        switch ($period) {
-            case 'daily':
-                return [
-                    'start' => $now->copy()->startOfDay(),
-                    'end' => $now->copy()->endOfDay(),
-                ];
-            case 'weekly':
-                return [
-                    'start' => $now->copy()->startOfWeek(),
-                    'end' => $now->copy()->endOfWeek(),
-                ];
-            case 'monthly':
-                return [
-                    'start' => $now->copy()->startOfMonth(),
-                    'end' => $now->copy()->endOfMonth(),
-                ];
-            case 'yearly':
-            default:
-                return [
-                    'start' => $now->copy()->startOfYear(),
-                    'end' => $now->copy()->endOfYear(),
-                ];
-        }
-    }
-
-    private function getBaseQuery(Request $request)
-    {
-        $user = auth()->user();
-
-        // All users (including Admin) restricted to own barangay - matching commit bfcd512
-        return Child::query()->where('barangay', $user->barangay);
-    }
-
-    private function getHealthlogBaseQuery(Request $request)
-    {
-        $user = auth()->user();
-
-        $query = HealthLog::query();
-
-        if (! $user->hasRole('Admin')) {
-            $query->whereHas('child', fn ($q) => $q->where('barangay', $user->barangay));
-        }
-
-        return $query;
+        return match ($period) {
+            'daily' => [
+                'start' => $now->copy()->startOfDay(),
+                'end' => $now->copy()->endOfDay(),
+            ],
+            'weekly' => [
+                'start' => $now->copy()->startOfWeek(),
+                'end' => $now->copy()->endOfWeek(),
+            ],
+            'monthly' => [
+                'start' => $now->copy()->startOfMonth(),
+                'end' => $now->copy()->endOfMonth(),
+            ],
+            default => [
+                'start' => $now->copy()->startOfYear(),
+                'end' => $now->copy()->endOfYear(),
+            ],
+        };
     }
 
     public function index(Request $request)
@@ -67,204 +41,97 @@ class DashboardController extends Controller
         $isAdmin = $user->hasRole('Admin');
         $barangay = $user->barangay;
 
-        // Total children
-        $totalChildren = $this->getBaseQuery($request)->count();
+        $cache = DashboardCache::where('barangay', $barangay)->first();
 
-        // Get age ranges (for monitoring) - using PHP Carbon for DB compatibility
-        $children = $this->getBaseQuery($request)->get();
+        if (! $cache) {
+            RefreshDashboardForBarangay::dispatch($barangay);
 
-        $now = Carbon::now();
-        $age0to5 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 0 && $c->birthdate->floatDiffInMonths($now) <= 5)->count();
-        $age6to11 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 6 && $c->birthdate->floatDiffInMonths($now) <= 11)->count();
-        $age12to35 = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 12 && $c->birthdate->floatDiffInMonths($now) <= 35)->count();
-        $age36plus = $children->filter(fn ($c) => $c->birthdate && $c->birthdate->floatDiffInMonths($now) >= 36)->count();
-
-        // Current year healthlogs
-        $currentYear = Carbon::now()->startOfYear();
-
-        // Get latest healthlogs per child for nutrition status
-        $latestHealthlogs = HealthLog::select('health_logs.*')
-            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
-            ->where('created_at', '>=', $currentYear)
-            ->latest('created_at')
-            ->get()
-            ->groupBy('child_id')
-            ->map(fn ($logs) => $logs->first());
-
-        // Nutrition status breakdown
-        $nutritionStatus = [
-            'normal' => $latestHealthlogs->where('nutrition_status', 'Normal')->count(),
-            'underweight' => $latestHealthlogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-            'overweight' => $latestHealthlogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-            'stunted' => $latestHealthlogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
-        ];
-
-        // Vitamin A and Deworming coverage
-        $vitaminA = $latestHealthlogs->where('vitamin_a', true)->count();
-        $deworming = $latestHealthlogs->where('deworming', true)->count();
-        $totalWithLogs = $latestHealthlogs->count();
-
-        // Today stats
-        $today = Carbon::now()->startOfDay();
-        $childrenRegisteredToday = $this->getBaseQuery($request)
-            ->whereDate('created_at', $today)
-            ->count();
-        $healthlogsToday = $this->getHealthlogBaseQuery($request)
-            ->whereDate('created_at', $today)
-            ->count();
-
-        // This week
-        $thisWeek = Carbon::now()->startOfWeek();
-        $healthlogsThisWeek = $this->getHealthlogBaseQuery($request)
-            ->where('created_at', '>=', $thisWeek)
-            ->count();
-
-        // This month
-        $thisMonth = Carbon::now()->startOfMonth();
-        $healthlogsThisMonth = $this->getHealthlogBaseQuery($request)
-            ->where('created_at', '>=', $thisMonth)
-            ->count();
-
-        // This year
-        $healthlogsThisYear = $this->getHealthlogBaseQuery($request)
-            ->where('created_at', '>=', $currentYear)
-            ->count();
-
-        $monthlyTrend6 = [];
-        $monthlyTrend12 = [];
-
-        for ($i = 5; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $monthlyTrend6[] = [
-                'month' => $month->format('M Y'),
-                'count' => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
-                    ->whereYear('created_at', $month->year)
-                    ->whereMonth('created_at', $month->month)
-                    ->count(),
-            ];
+            return Inertia::render('dashboard', [
+                'stats' => [
+                    'total_children' => 0,
+                    'age_breakdown' => ['0to5' => 0, '6to11' => 0, '12to35' => 0, '36plus' => 0],
+                    'nutrition_status' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0],
+                    'vitamin_a' => ['given' => 0, 'total' => 0, 'percentage' => 0],
+                    'deworming' => ['given' => 0, 'total' => 0, 'percentage' => 0],
+                    'daily' => ['children_registered' => 0, 'healthlogs' => 0],
+                    'weekly' => ['healthlogs' => 0],
+                    'monthly' => ['healthlogs' => 0],
+                    'yearly' => ['healthlogs' => 0],
+                ],
+                'trends' => [
+                    'monthly_6months' => [],
+                    'monthly_1year' => [],
+                    'status_distribution' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0],
+                ],
+                'vaccine_followups' => [
+                    'overdue_count' => 0,
+                    'due_this_month_count' => 0,
+                    'mixed_count' => 0,
+                    'follow_ups' => [],
+                ],
+                'user_barangay' => $barangay,
+                'is_admin' => $isAdmin,
+            ]);
         }
 
-        for ($i = 11; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $monthlyTrend12[] = [
-                'month' => $month->format('M Y'),
-                'count' => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
-                    ->whereYear('created_at', $month->year)
-                    ->whereMonth('created_at', $month->month)
-                    ->count(),
-            ];
-        }
+        $nb = $cache->nutrition_breakdown ?? [];
+        $ab = $cache->age_breakdown ?? [];
+        $ml = $cache->monthly_logs ?? [];
 
-        // Get children's nutrition_status directly from child table
-        $children = Child::where('barangay', $barangay)->whereNotNull('nutrition_status')->get();
+        $months6 = collect($ml)->take(-6)->map(fn ($count, $month) => ['month' => $month, 'count' => $count])->values();
+        $months12 = collect($ml)->map(fn ($count, $month) => ['month' => $month, 'count' => $count])->values();
 
-        $statusDistribution = [
-            'normal' => $children->filter(fn ($c) => $c->nutrition_status === 'Normal')->count(),
-            'underweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition']))->count(),
-            'overweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Overweight', 'Obese']))->count(),
-            'stunted' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Stunted', 'Severely Stunted']))->count(),
-        ];
-
-        // Vaccine follow-ups
-        $pendingDoses = ChildVaccineDose::whereNull('date_given')
-            ->whereNotNull('next_due_date')
-            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $barangay))
-            ->with([
-                'childVaccine.child:id,first_name,middle_initial,last_name,barangay',
-                'childVaccine.vaccine:id,name',
-            ])
-            ->get();
-
-        $overdueDoses = $pendingDoses->filter(fn ($dose) => $dose->next_due_date && $dose->next_due_date->isPast());
-
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-        $dueThisMonth = $pendingDoses->filter(fn ($dose) => $dose->next_due_date
-            && $dose->next_due_date->between($startOfMonth, $endOfMonth));
-
-        // Calculate mixed doses (children with BOTH overdue AND upcoming)
-        $mixedDoses = $pendingDoses->filter(function ($dose) use ($pendingDoses) {
-            $childId = $dose->childVaccine->child_id;
-            $childDoses = $pendingDoses->where('childVaccine.child_id', $childId);
-
-            $hasOverdue = $childDoses->some(fn ($d) => $d->next_due_date && $d->next_due_date->isPast());
-            $hasUpcoming = $childDoses->some(fn ($d) => $d->next_due_date && ! $d->next_due_date->isPast());
-
-            return $hasOverdue && $hasUpcoming && $dose->next_due_date && $dose->next_due_date->isPast();
-        });
-
-        $followUps = [];
-
-        // Add all overdue doses (including those from mixed children)
-        foreach ($overdueDoses as $dose) {
-            $cv = $dose->childVaccine;
-            $followUps[] = [
-                'child_id' => $cv->child->id,
-                'child_name' => $cv->child->fullname,
-                'vaccine_name' => $cv->vaccine->name,
-                'dose_number' => $dose->dose_number,
-                'next_due_date' => $dose->next_due_date->format('Y-m-d'),
-                'status' => 'Overdue',
-            ];
-        }
-
-        // Add all upcoming doses (including those from mixed children)
-        foreach ($dueThisMonth as $dose) {
-            $cv = $dose->childVaccine;
-            $followUps[] = [
-                'child_id' => $cv->child->id,
-                'child_name' => $cv->child->fullname,
-                'vaccine_name' => $cv->vaccine->name,
-                'dose_number' => $dose->dose_number,
-                'next_due_date' => $dose->next_due_date->format('Y-m-d'),
-                'status' => 'Upcoming',
-            ];
-        }
+        $totalWithLogs = $cache->total_with_logs;
 
         return Inertia::render('dashboard', [
             'stats' => [
-                'total_children' => $totalChildren,
+                'total_children' => $cache->total_children,
                 'age_breakdown' => [
-                    '0to5' => $age0to5,
-                    '6to11' => $age6to11,
-                    '12to35' => $age12to35,
-                    '36plus' => $age36plus,
+                    '0to5' => $ab['0to5'] ?? 0,
+                    '6to11' => $ab['6to11'] ?? 0,
+                    '12to35' => $ab['12to35'] ?? 0,
+                    '36plus' => $ab['36plus'] ?? 0,
                 ],
-                'nutrition_status' => $nutritionStatus,
+                'nutrition_status' => [
+                    'normal' => $nb['normal'] ?? 0,
+                    'underweight' => $nb['underweight'] ?? 0,
+                    'overweight' => $nb['overweight'] ?? 0,
+                    'stunted' => $nb['stunted'] ?? 0,
+                ],
                 'vitamin_a' => [
-                    'given' => $vitaminA,
+                    'given' => $cache->vitamin_a_given,
                     'total' => $totalWithLogs,
-                    'percentage' => $totalWithLogs > 0 ? round(($vitaminA / $totalWithLogs) * 100, 1) : 0,
+                    'percentage' => $totalWithLogs > 0 ? round(($cache->vitamin_a_given / $totalWithLogs) * 100, 1) : 0,
                 ],
                 'deworming' => [
-                    'given' => $deworming,
+                    'given' => $cache->deworming_given,
                     'total' => $totalWithLogs,
-                    'percentage' => $totalWithLogs > 0 ? round(($deworming / $totalWithLogs) * 100, 1) : 0,
+                    'percentage' => $totalWithLogs > 0 ? round(($cache->deworming_given / $totalWithLogs) * 100, 1) : 0,
                 ],
                 'daily' => [
-                    'children_registered' => $childrenRegisteredToday,
-                    'healthlogs' => $healthlogsToday,
+                    'children_registered' => $cache->today_children,
+                    'healthlogs' => $cache->today_health_logs,
                 ],
                 'weekly' => [
-                    'healthlogs' => $healthlogsThisWeek,
+                    'healthlogs' => $cache->week_health_logs,
                 ],
                 'monthly' => [
-                    'healthlogs' => $healthlogsThisMonth,
+                    'healthlogs' => $cache->month_health_logs,
                 ],
                 'yearly' => [
-                    'healthlogs' => $healthlogsThisYear,
+                    'healthlogs' => $cache->year_health_logs,
                 ],
             ],
             'trends' => [
-                'monthly_6months' => $monthlyTrend6,
-                'monthly_1year' => $monthlyTrend12,
-                'status_distribution' => $statusDistribution,
+                'monthly_6months' => $months6,
+                'monthly_1year' => $months12,
+                'status_distribution' => $nb,
             ],
             'vaccine_followups' => [
-                'overdue_count' => $overdueDoses->count(),
-                'due_this_month_count' => $dueThisMonth->count(),
-                'mixed_count' => $mixedDoses->count(),
-                'follow_ups' => $followUps,
+                'overdue_count' => $cache->vaccine_overdue,
+                'due_this_month_count' => $cache->vaccine_upcoming,
+                'mixed_count' => 0,
+                'follow_ups' => [],
             ],
             'user_barangay' => $barangay,
             'is_admin' => $isAdmin,
@@ -279,96 +146,59 @@ class DashboardController extends Controller
         $user = auth()->user();
         $barangay = $user->barangay;
 
-        // Get healthlogs for the period with latest child data
-        $healthlogs = HealthLog::query()
-            ->with(['child', 'user'])
-            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
-            ->where('created_at', '>=', $range['start'])
-            ->where('created_at', '<=', $range['end'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="dashboard_'.$period.'_'.date('Y-m-d').'.csv"',
+        ];
 
-        return $this->exportCSV($healthlogs, $period);
-    }
+        $callback = function () use ($barangay, $period, $range) {
+            $handle = fopen('php://output', 'w');
 
-    private function getPeriodAwareTrends(string $period, string $barangay): array
-    {
-        $query = fn () => HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay));
+            fputcsv($handle, ['Report Period', ucfirst($period)]);
+            fputcsv($handle, ['Barangay', $barangay]);
+            fputcsv($handle, ['Date Range', $range['start']->format('Y-m-d').' to '.$range['end']->format('Y-m-d')]);
+            fputcsv($handle, ['Generated', Carbon::now()->format('Y-m-d H:i:s')]);
+            fputcsv($handle, []);
 
-        switch ($period) {
-            case 'daily':
-                $labels = [];
-                $counts = [];
-                for ($i = 6; $i >= 0; $i--) {
-                    $date = Carbon::now()->subDays($i);
-                    $labels[] = $date->format('M d');
-                    $counts[] = $query()->whereDate('created_at', $date)->count();
-                }
-                break;
+            HealthLog::with(['child', 'user'])
+                ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+                ->whereBetween('created_at', [$range['start'], $range['end']])
+                ->orderBy('created_at', 'desc')
+                ->chunk(200, function ($healthlogs) use ($handle) {
+                    static $headerWritten = false;
 
-            case 'weekly':
-                $labels = [];
-                $counts = [];
-                for ($i = 3; $i >= 0; $i--) {
-                    $start = Carbon::now()->subWeeks($i)->startOfWeek();
-                    $end = $start->copy()->endOfWeek();
-                    $labels[] = $start->format('M d').' - '.$end->format('M d');
-                    $counts[] = $query()->whereBetween('created_at', [$start, $end])->count();
-                }
-                break;
+                    if (! $headerWritten) {
+                        fputcsv($handle, [
+                            'ID', 'Child Name', 'Birthday', 'Age (Months)', 'Sex',
+                            'Weight (kg)', 'Height (cm)', 'BMI', 'Nutrition Status',
+                            'Vitamin A', 'Deworming', 'MNP', 'Last Visit',
+                        ]);
+                        $headerWritten = true;
+                    }
 
-            case 'monthly':
-                $labels = [];
-                $counts = [];
-                for ($i = 5; $i >= 0; $i--) {
-                    $month = Carbon::now()->subMonths($i);
-                    $labels[] = $month->format('M Y');
-                    $counts[] = $query()
-                        ->whereYear('created_at', $month->year)
-                        ->whereMonth('created_at', $month->month)
-                        ->count();
-                }
-                break;
+                    foreach ($healthlogs as $log) {
+                        fputcsv($handle, [
+                            $log->id,
+                            $log->child->fullname ?? '',
+                            $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
+                            $log->age_in_months ?? ($log->child->birthdate ? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())) : ''),
+                            $log->child->sex ?? '',
+                            $log->weight ?? '',
+                            $log->height ?? '',
+                            $log->bmi ?? '',
+                            $log->nutrition_status ?? 'N/A',
+                            $log->vitamin_a ? 'Yes' : 'No',
+                            $log->deworming ? 'Yes' : 'No',
+                            $log->micronutrient_powder ? 'Yes' : 'No',
+                            $log->created_at ? Carbon::parse($log->created_at)->format('Y-m-d') : '',
+                        ]);
+                    }
+                });
 
-            case 'yearly':
-            default:
-                $labels = [];
-                $counts = [];
-                for ($i = 2; $i >= 0; $i--) {
-                    $year = Carbon::now()->subYears($i);
-                    $labels[] = $year->format('Y');
-                    $counts[] = $query()->whereYear('created_at', $year->year)->count();
-                }
-                break;
-        }
-
-        $trendLogs = match ($period) {
-            'daily' => $query()->where('created_at', '>=', Carbon::now()->subDays(7))->get(),
-            'weekly' => $query()->where('created_at', '>=', Carbon::now()->subWeeks(4))->get(),
-            'monthly' => $query()->where('created_at', '>=', Carbon::now()->subMonths(6))->get(),
-            default => $query()->where('created_at', '>=', Carbon::now()->subYears(3))->get(),
+            fclose($handle);
         };
 
-        // Use child's nutrition_status directly (not aggregated from health logs)
-        $user = auth()->user();
-        $barangay = $user->barangay;
-        $children = Child::where('barangay', $barangay)->whereNotNull('nutrition_status')->get();
-
-        $statusDistribution = [
-            'normal' => $children->filter(fn ($c) => $c->nutrition_status === 'Normal')->count(),
-            'underweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition']))->count(),
-            'overweight' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Overweight', 'Obese']))->count(),
-            'stunted' => $children->filter(fn ($c) => in_array($c->nutrition_status, ['Stunted', 'Severely Stunted']))->count(),
-        ];
-
-        $total = $trendLogs->count();
-
-        return [
-            'trend' => collect(array_map(fn ($l, $c) => ['label' => $l, 'count' => $c], $labels, $counts)),
-            'status_distribution' => $statusDistribution,
-            'vitamin_a_percentage' => $total > 0 ? round(($trendLogs->where('vitamin_a', true)->count() / $total) * 100, 1) : 0,
-            'deworming_percentage' => $total > 0 ? round(($trendLogs->where('deworming', true)->count() / $total) * 100, 1) : 0,
-        ];
+        return response()->stream($callback, 200, $headers);
     }
 
     public function printView(Request $request)
@@ -379,9 +209,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         $barangay = $user->barangay;
 
-        // Get latest healthlogs per child for the period
-        $healthlogs = HealthLog::query()
-            ->with(['child', 'user'])
+        $healthLogs = HealthLog::with(['child', 'user'])
             ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
             ->where('created_at', '>=', $range['start'])
             ->where('created_at', '<=', $range['end'])
@@ -390,28 +218,15 @@ class DashboardController extends Controller
             ->groupBy('child_id')
             ->map(fn ($logs) => $logs->first());
 
-        // Calculate stats for print view
-        $totalChildren = $healthlogs->count();
-        $nutritionStatus = [
-            'normal' => $healthlogs->where('nutrition_status', 'Normal')->count(),
-            'underweight' => $healthlogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-            'overweight' => $healthlogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-            'stunted' => $healthlogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
-        ];
-
-        $vitaminA = $healthlogs->where('vitamin_a', true)->count();
-        $deworming = $healthlogs->where('deworming', true)->count();
-
-        // Get period-aware trend data for charts
-        $trends = $this->getPeriodAwareTrends($period, $barangay);
+        $totalChildren = $healthLogs->count();
 
         return Inertia::render('DashboardPrint', [
             'period' => $period,
             'data' => [
-                'healthlogs' => $healthlogs->values()->map(fn ($log) => [
+                'healthlogs' => $healthLogs->values()->map(fn ($log) => [
                     'child_name' => $log->child->fullname ?? '',
                     'birthdate' => $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
-                    'age' => $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),
+                    'age' => $log->age_in_months ?? ($log->child->birthdate ? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())) : ''),
                     'sex' => $log->child->sex ?? '',
                     'weight' => $log->weight,
                     'height' => $log->height,
@@ -426,102 +241,18 @@ class DashboardController extends Controller
                     'total_children' => $totalChildren,
                     'period_start' => $range['start']->format('Y-m-d'),
                     'period_end' => $range['end']->format('Y-m-d'),
-                    'nutrition_status' => $nutritionStatus,
-                    'vitamin_a_given' => $vitaminA,
-                    'deworming_given' => $deworming,
+                    'nutrition_status' => [
+                        'normal' => $healthLogs->where('nutrition_status', 'Normal')->count(),
+                        'underweight' => $healthLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
+                        'overweight' => $healthLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
+                        'stunted' => $healthLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+                    ],
+                    'vitamin_a_given' => $healthLogs->where('vitamin_a', true)->count(),
+                    'deworming_given' => $healthLogs->where('deworming', true)->count(),
                 ],
                 'barangay' => $barangay,
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'trends' => [
-                    'trend' => $trends['trend']->values()->all(),
-                    'status_distribution' => $trends['status_distribution'],
-                    'vitamin_a_percentage' => $trends['vitamin_a_percentage'],
-                    'deworming_percentage' => $trends['deworming_percentage'],
-                ],
             ],
         ]);
-    }
-
-    private function exportCSV($healthlogs, string $period)
-    {
-        $range = $this->getDateRange($period);
-        $user = auth()->user();
-        $barangay = $user->barangay;
-
-        // Compute summary stats
-        $latestLogs = $healthlogs->groupBy('child_id')->map(fn ($logs) => $logs->first());
-        $totalChildren = $latestLogs->count();
-        $normal = $latestLogs->where('nutrition_status', 'Normal')->count();
-        $underweight = $latestLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count();
-        $overweight = $latestLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count();
-        $stunted = $latestLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count();
-        $vitaminA = $latestLogs->where('vitamin_a', true)->count();
-        $deworming = $latestLogs->where('deworming', true)->count();
-
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="dashboard_'.$period.'_'.date('Y-m-d').'.csv"',
-        ];
-
-        $callback = function () use ($healthlogs, $period, $range, $totalChildren, $normal, $underweight, $overweight, $stunted, $vitaminA, $deworming, $barangay) {
-            $handle = fopen('php://output', 'w');
-
-            // Summary header rows
-            fputcsv($handle, ['Report Period', ucfirst($period)]);
-            fputcsv($handle, ['Barangay', $barangay]);
-            fputcsv($handle, ['Date Range', $range['start']->format('Y-m-d').' to '.$range['end']->format('Y-m-d')]);
-            fputcsv($handle, ['Generated', Carbon::now()->format('Y-m-d H:i:s')]);
-            fputcsv($handle, []);
-
-            fputcsv($handle, ['Summary', '']);
-            fputcsv($handle, ['Total Children', $totalChildren]);
-            fputcsv($handle, ['Normal', $normal]);
-            fputcsv($handle, ['Underweight', $underweight]);
-            fputcsv($handle, ['Overweight', $overweight]);
-            fputcsv($handle, ['Stunted', $stunted]);
-            fputcsv($handle, ['Vitamin A Given', $vitaminA]);
-            fputcsv($handle, ['Deworming Given', $deworming]);
-            fputcsv($handle, []);
-
-            // Data header row
-            fputcsv($handle, [
-                'ID',
-                'Child Name',
-                'Birthday',
-                'Age (Months)',
-                'Sex',
-                'Weight (kg)',
-                'Height (cm)',
-                'BMI',
-                'Nutrition Status',
-                'Vitamin A',
-                'Deworming',
-                'MNP',
-                'Last Visit',
-            ]);
-
-            // Data rows
-            foreach ($healthlogs as $log) {
-                fputcsv($handle, [
-                    $log->id,
-                    $log->child->fullname ?? '',
-                    $log->child->birthdate ? Carbon::parse($log->child->birthdate)->format('Y-m-d') : '',
-                    $log->age_in_months ?? floor(Carbon::parse($log->child->birthdate)->diffInMonths(Carbon::now())),
-                    $log->child->sex ?? '',
-                    $log->weight ?? '',
-                    $log->height ?? '',
-                    $log->bmi ?? '',
-                    $log->nutrition_status ?? 'N/A',
-                    $log->vitamin_a ? 'Yes' : 'No',
-                    $log->deworming ? 'Yes' : 'No',
-                    $log->micronutrient_powder ? 'Yes' : 'No',
-                    $log->created_at ? Carbon::parse($log->created_at)->format('Y-m-d') : '',
-                ]);
-            }
-
-            fclose($handle);
-        };
-
-        return response()->stream($callback, 200, $headers);
     }
 }

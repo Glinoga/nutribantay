@@ -16,7 +16,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, Database, Download, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Database, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type Backup = {
@@ -177,10 +177,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
         });
     };
 
-    const handleDownload = (backup: Backup) => {
-        window.location.href = `/admin/database/download/${backup.source}/${backup.filename}`;
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Database Maintenance" />
@@ -297,15 +293,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                                 <TableCell>{backup.date}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            onClick={() => handleDownload(backup)}
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="gap-1 border-green-200 text-green-700 hover:bg-green-50"
-                                                        >
-                                                            <Download className="h-3 w-3" />
-                                                            Download
-                                                        </Button>
                                                         <Button
                                                             onClick={() => openRestoreDialog(backup)}
                                                             size="sm"

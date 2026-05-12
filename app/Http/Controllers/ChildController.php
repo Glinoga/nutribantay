@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
@@ -95,7 +96,7 @@ class ChildController extends Controller
             ->whereNotNull('next_due_date')
             ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $user->barangay))
             ->with(['childVaccine.child:id,barangay'])
-            ->get()
+            ->cursor()
             ->groupBy('childVaccine.child_id');
 
         $overdueChildIds = collect([]);
@@ -125,8 +126,8 @@ class ChildController extends Controller
             ->whereNotNull('height')
             ->where('weight', '>', 0)
             ->where('height', '>', 0)
-            ->get()
-            ->avg(fn ($c) => $c->bmi ?? 0);
+            ->selectRaw('AVG(CASE WHEN height > 0 THEN weight * 10000.0 / (height * height) ELSE NULL END) as avg_bmi')
+            ->value('avg_bmi');
 
         $stats = [
             'total' => Child::where('barangay', $user->barangay)->count(),
@@ -302,9 +303,7 @@ class ChildController extends Controller
             $query->where('birthdate', '<', $maxBirthdate);
         }
 
-        $children = $query->get();
-
-        return $this->exportCSV($children);
+        return $this->exportCSV($query->cursor());
     }
 
     public function create()
@@ -349,6 +348,9 @@ class ChildController extends Controller
             'created_by' => $user->id,
             'barangay' => $user->barangay,
         ]);
+
+        RefreshDashboardForBarangay::dispatch($user->barangay)
+            ->delay(now()->addSeconds(10));
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');
     }
@@ -471,6 +473,9 @@ class ChildController extends Controller
             ['updated_by' => auth()->id()]
         ));
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return redirect()->route('children.show', $child->id)->with('success', 'Child updated successfully!');
     }
 
@@ -478,12 +483,15 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only delete children in their barangay, Admin has full access
         if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
             abort(403);
         }
 
+        $barangay = $child->barangay;
         $child->delete();
+
+        RefreshDashboardForBarangay::dispatch($barangay)
+            ->delay(now()->addSeconds(10));
 
         return redirect()->route('children.index')->with('success', 'Child deleted successfully!');
     }
@@ -636,20 +644,17 @@ class ChildController extends Controller
         $created = 0;
         $skipped = 0;
 
+        $existingMap = Child::where('barangay', $user->barangay)
+            ->get()
+            ->keyBy(fn ($c) => strtolower($c->first_name).'|'.strtolower($c->last_name).'|'.($c->birthdate ? $c->birthdate->format('Y-m-d') : ''));
+
         foreach ($rows as $row) {
-            // Skip invalid rows
             if (empty($row['first_name']) || empty($row['last_name']) || empty($row['sex'])) {
                 continue;
             }
 
-            // Check for duplicates within same barangay
-            $existingChild = Child::where('barangay', $user->barangay)
-                ->where('first_name', $row['first_name'])
-                ->where('last_name', $row['last_name'])
-                ->where('birthdate', $row['birthdate'])
-                ->first();
-
-            if ($existingChild) {
+            $dupeKey = strtolower($row['first_name']).'|'.strtolower($row['last_name']).'|'.($row['birthdate'] ?? '');
+            if ($existingMap->has($dupeKey)) {
                 $skipped++;
 
                 continue;
@@ -673,6 +678,9 @@ class ChildController extends Controller
 
             $created++;
         }
+
+        RefreshDashboardForBarangay::dispatch($user->barangay)
+            ->delay(now()->addSeconds(10));
 
         $message = "Import complete! {$created} children imported.";
         if ($skipped > 0) {
@@ -746,7 +754,7 @@ class ChildController extends Controller
             $query->whereIn('id', $upcomingChildIds);
         }
 
-        $children = $query->get()->map(fn ($child) => [
+        $children = $query->cursor()->map(fn ($child) => [
             'id' => $child->id,
             'fullname' => $child->fullname,
             'first_name' => $child->first_name,

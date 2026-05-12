@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Backup Encryption Password
+    |--------------------------------------------------------------------------
+    |
+    | Used to AES-256 encrypt database backup zip files at rest. The backup
+    | system encrypts on create and decrypts on restore transparently.
+    |
+    */
+
+    'backup_encryption_password' => env('BACKUP_ENCRYPTION_PASSWORD'),
+
 ];

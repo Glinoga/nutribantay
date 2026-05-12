@@ -67,7 +67,7 @@ return [
         /*
          * The database dump can be compressed to decrease diskspace usage.
          */
-        'database_dump_compressor' => null,
+        'database_dump_compressor' => 'gzip',
 
         /*
          * If specified, the backup zip file will be encrypted with the given password.
@@ -175,55 +175,27 @@ return [
             'disks' => ['local'],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
-                MaximumStorageInMegabytes::class => 5000,
+                MaximumStorageInMegabytes::class => 20000,
             ],
         ],
     ],
 
     'cleanup' => [
-        /*
-         * The strategy that will be used to cleanup old backups. The default strategy
-         * will keep all backups for a certain amount of days. After that period only
-         * a daily backup will be kept. After that period only weekly backups will
-         * be kept and so on.
-         */
         'strategy' => DefaultStrategy::class,
 
-        /*
-         * The number of days for which backups must be kept.
-         */
         'default_strategy' => [
 
-            /*
-             * The number of days for which daily backups must be kept.
-             */
             'keep_all_backups_for_days' => 7,
 
-            /*
-             * The number of days for which daily backups must be kept.
-             */
-            'keep_daily_backups_for_days' => 16,
+            'keep_daily_backups_for_days' => 7,
 
-            /*
-             * The number of weeks for which one weekly backup must be kept.
-             */
-            'keep_weekly_backups_for_weeks' => 8,
+            'keep_weekly_backups_for_weeks' => 4,
 
-            /*
-             * The number of months for which one monthly backup must be kept.
-             */
-            'keep_monthly_backups_for_months' => 4,
+            'keep_monthly_backups_for_months' => 3,
 
-            /*
-             * The number of years for which one yearly backup must be kept.
-             */
-            'keep_yearly_backups_for_years' => 2,
+            'keep_yearly_backups_for_years' => 1,
 
-            /*
-             * After cleaning up the backups remove the oldest backup until
-             * this amount of megabytes has been reached.
-             */
-            'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
+            'delete_oldest_backups_when_using_more_megabytes_than' => 20000,
         ],
     ],
 
