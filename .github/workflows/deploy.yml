@@ -2,7 +2,7 @@ name: Deploy to KVM 2 VPS
 
 on:
   push:
-    branches: [main]
+    branches: [merged]
 
 jobs:
   deploy:
@@ -52,9 +52,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ${{ secrets.VPS_DEPLOY_PATH }}
-            php artisan migrate --force --seed
+            php artisan migrate --force
+            php artisan dashboard:refresh
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan queue:restart
-            sudo supervisorctl restart nutribantay-queue:*
+            sudo supervisorctl restart nutribantay-queue-default:*
+            sudo supervisorctl restart nutribantay-queue-dashboard:*
