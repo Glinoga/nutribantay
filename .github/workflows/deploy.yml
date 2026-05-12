@@ -55,7 +55,6 @@ jobs:
             php artisan migrate --force
             php artisan dashboard:refresh
             php artisan config:cache
-            php artisan route:cache
             php artisan view:cache
             php artisan queue:restart
             sudo supervisorctl restart nutribantay-queue-default:*
