@@ -12,10 +12,10 @@ class DashboardTestSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'nutribantay@gmail.com')->first();
 
         if (! $admin) {
-            $this->command->warn('No admin user found. Run seeder first: php artisan db:seed');
+            $this->command->warn('No admin user found.');
 
             return;
         }

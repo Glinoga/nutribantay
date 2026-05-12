@@ -10,18 +10,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Run PermissionSeeder first
         $this->call(PermissionSeeder::class);
 
-        $this->call(GrowthStandardSeeder::class);
-
-        $this->call(DashboardTestSeeder::class);
-
-        $this->call(CategorySeeder::class);
-
-        $this->call(AddPhoneNumbersSeeder::class);
-
-        // Create admin account
+        // Create default accounts first so other seeders can reference them
         $admin = User::firstOrCreate(
             ['email' => 'nutribantay@gmail.com'],
             [
@@ -33,7 +24,6 @@ class DatabaseSeeder extends Seeder
         );
         $admin->syncRoles(['Admin']);
 
-        // Create healthworker account
         $healthworker = User::firstOrCreate(
             ['email' => 'health@example.com'],
             [
@@ -44,5 +34,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $healthworker->syncRoles(['Healthworker']);
+
+        $this->call(GrowthStandardSeeder::class);
+        $this->call(DashboardTestSeeder::class);
+        $this->call(CategorySeeder::class);
+        $this->call(AddPhoneNumbersSeeder::class);
     }
 }
