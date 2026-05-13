@@ -39,8 +39,7 @@ class RecommendationController extends Controller
         $months = $totalMonths % 12;
         $ageFormatted = "{$years} taon, {$months} buwan";
 
-        // Step 3: Get child data (load healthLogs for all ages - now using AI for all)
-        $child->load('healthLogs');
+        // Step 3: Get child data
         $latestHealthLog = $child->healthLogs()->latest()->first();
         $bmi = $request->bmi ?? $latestHealthLog?->bmi ?? 0;
         $nutritionStatus = $request->nutrition_status ?? $latestHealthLog?->nutrition_status ?? 'Normal';
@@ -367,19 +366,9 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 // For 0-5 months, override ALL meal lines to gatas-only
                 if ($ageInMonths < 6) {
                     $mealContent = 'Gatas lamang (breastmilk/formula)';
-                } elseif (! $hasHeavyFood) {
-                    // Determine appropriate heavy food based on age
-                    if ($ageInMonths < 12) {
-                        // 6-11 months: add lugaw
-                        $mealContent = 'Lugaw na may '.$mealContent;
-                    } elseif ($ageInMonths < 36) {
-                        // 12-35 months: add lugaw or kanin
-                        $mealContent = 'Lugaw na may '.$mealContent;
-                    } else {
-                        // 36+ months: add appropriate base
-                        $mealContent = 'Lugaw na may '.$mealContent;
-                    }
-
+                } elseif (! $hasHeavyFood && $ageInMonths < 12) {
+                    // 6-11 months: NCS requires a carb base. Add lugaw if missing.
+                    $mealContent = 'Lugaw na may '.$mealContent;
                     $line = $mealTime.': '.$mealContent;
                 }
             }

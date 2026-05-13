@@ -204,7 +204,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/admin/announcements/{id}/force-delete', [AnnouncementController::class, 'forceDelete'])->name('announcements.forceDelete');
     });
 
-    Route::post('/recommendations', [RecommendationController::class, 'generate'])->middleware('throttle:10,1')->name('recommendations.generate');
+    Route::post('/recommendations', [RecommendationController::class, 'generate'])->middleware('throttle:recommendations')->name('recommendations.generate');
 });
 
 require __DIR__.'/settings.php';

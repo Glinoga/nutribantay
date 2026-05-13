@@ -10,31 +10,15 @@ class AIRecommender
             return 'Hindi sapat ang datos para gumawa ng recommendation.';
         }
 
-        $ageMonths = floor($ageInMonths);
+        $ageMonths = (int) floor($ageInMonths);
 
-        // For 0-5 months, return gatas-only recommendation
         if ($ageMonths < 6) {
             return self::getGatasOnlyRecommendation();
         }
 
-        $ageYears = floor($ageMonths / 12);
-        $remainingMonths = $ageMonths % 12;
-
-        // Determine feeding stage
-        if ($ageMonths < 12) {
-            $feedingStage = '6-11 months - Breastmilk + soft foods (mashed/pureed)';
-        } else {
-            $feedingStage = '12+ months - Regular solid foods';
-        }
-
-        // Base foods for different ages
-        $baseFoods = self::getBaseFoodsForAge($ageMonths);
-
-        // Generate tips based on status and age
         $tips = self::generateTips($status, $ageMonths, $sex);
 
-        // Generate meal plan
-        $mealPlan = self::generateMealPlan($ageMonths, $status, $baseFoods);
+        $mealPlan = self::generateMealPlan($ageMonths);
 
         // Personalized recommendations (age-aware)
         $supplements = self::getSupplementRecommendations($vitaminA, $deworming, $ageMonths);
@@ -52,6 +36,19 @@ class AIRecommender
         if (! empty($supplements)) {
             $output .= "\nMGA SUPPLEMENTS:\n".$supplements."\n";
         }
+
+        $output .= "\nMGA RESTRICTIONS SA PAGKAIN:\n";
+        $output .= "- Iwasan ang mga processed foods tulad ng instant noodles, de-lata, soft drinks, at packaged snacks.\n";
+        $output .= "- Iwasan ang matatamis na pagkain at candies.\n";
+        if ($status === 'Underweight') {
+            $output .= "- Siguraduhing may sapat na protina at calories sa bawat meal.\n";
+        } elseif ($status === 'Overweight' || $status === 'Obese') {
+            $output .= "- Limitahan ang matatamis at matatabang pagkain. Encourage ang physical activity.\n";
+        }
+
+        $output .= "\nDISCLAIMER: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines at hindi kapalit ng medikal na payo mula sa doktor o nutritionist.\n";
+
+        $output .= "\nPinagkuhanan ng Datos: National Nutrition Council\n";
 
         $output .= "\nPAALALA: Kumunsulta sa pinakamalapit na health center para sa karagdagang gabay at pagsusuri sa nutrisyon ng iyong anak.";
 
@@ -75,6 +72,14 @@ class AIRecommender
         $output .= "Umaga: Gatas lamang (breastmilk o formula)\n";
         $output .= "Tanghali: Gatas lamang (breastmilk o formula)\n";
         $output .= "Gabi: Gatas lamang (breastmilk o formula)\n";
+
+        $output .= "\nMGA RESTRICTIONS SA PAGKAIN:\n";
+        $output .= "- WALANG solid food para sa 0-5 buwan - gatas lamang ang kailangan.\n";
+        $output .= "- Iwasan ang anumang pagkain maliban sa breastmilk o formula.\n";
+
+        $output .= "\nDISCLAIMER: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines at hindi kapalit ng medikal na payo mula sa doktor o nutritionist.\n";
+
+        $output .= "\nPinagkuhanan ng Datos: National Nutrition Council\n";
 
         $output .= "\nPAALALA: Kumunsulta sa pinakamalapit na health center para sa karagdagang gabay at pagsusuri sa nutrisyon ng iyong anak.";
 
@@ -109,11 +114,6 @@ class AIRecommender
                 'Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)',
             ];
         }
-    }
-
-    private static function getBaseFoodsForAge(int $ageMonths): array
-    {
-        return self::getNCSMealOptions($ageMonths);
     }
 
     private static function generateTips(string $status, int $ageMonths, string $sex): array
@@ -179,7 +179,7 @@ class AIRecommender
         return $tips;
     }
 
-    private static function generateMealPlan(int $ageMonths, string $status, array $baseFoods): array
+    private static function generateMealPlan(int $ageMonths): array
     {
         // For 0-5 months - gatas only
         if ($ageMonths < 6) {
