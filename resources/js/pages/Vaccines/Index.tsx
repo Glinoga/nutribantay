@@ -188,7 +188,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                         </p>
                     </div>
 
-                    <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                    <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
                         <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md">
                             <div className="flex items-center justify-between">
                                 <div>

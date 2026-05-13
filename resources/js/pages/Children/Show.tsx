@@ -810,7 +810,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Measurements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Measurements</h3>
-                                        <div className="grid grid-cols-3 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4 sm:grid-cols-3">
                                             <div>
                                                 <p className="text-sm text-gray-500">Weight</p>
                                                 <p className="font-medium text-gray-900">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
@@ -829,7 +829,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Nutrition Status */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Nutrition Status</h3>
-                                        <div className="grid grid-cols-4 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4 sm:grid-cols-4">
                                             {[
                                                 {
                                                     label: 'Overall',
@@ -891,7 +891,7 @@ export default function Show({ child }: { child: Child }) {
                                         <h3 className="mb-2 font-semibold text-gray-700">Vaccination</h3>
                                         <div className="rounded-lg bg-gray-50 p-4">
                                             {selectedLog.vaccine_name ? (
-                                                <div className="grid grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                                                     {[
                                                         { label: 'Vaccine Name', value: selectedLog.vaccine_name },
                                                         { label: 'Dose Number', value: selectedLog.dose_number },
@@ -982,7 +982,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 h-full w-96 bg-white p-6 shadow-lg transition-transform duration-300 ${
+                        className={`fixed top-0 right-0 z-40 h-full w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >

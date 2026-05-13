@@ -255,7 +255,7 @@ export default function Edit({ child }: Props) {
                                         />
                                     </div>
 
-                                    <div className="mt-6 flex justify-center gap-6 border-t border-gray-100 pt-6">
+                                    <div className="mt-6 flex flex-col justify-center gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:gap-6">
                                         <Button
                                             type="submit"
                                             disabled={processing}

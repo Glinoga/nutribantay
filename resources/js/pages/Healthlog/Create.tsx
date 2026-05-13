@@ -194,7 +194,7 @@ export default function Create({
                             <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                                 <h2 className="text-lg font-bold text-gray-900">Child Information</h2>
                             </div>
-                            <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-5">
+                            <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3 lg:grid-cols-5">
                                 <div className="rounded-lg bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Full Name</p>
                                     <p className="mt-1 font-semibold text-gray-900">{child.fullname}</p>

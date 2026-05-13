@@ -1,7 +1,7 @@
 import { login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 
 type GuestLayoutProps = {
     title: string;
@@ -10,6 +10,7 @@ type GuestLayoutProps = {
 
 export default function GuestLayout({ children, title, showHeader = true }: PropsWithChildren<GuestLayoutProps>) {
     const { auth } = usePage<SharedData>().props;
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <>
@@ -118,6 +119,29 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     </Link>
                                 </nav>
                             </div>
+
+                            {/* Mobile hamburger */}
+                            <button
+                                className="flex items-center justify-center rounded-lg p-2 text-[var(--primary)] md:hidden"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                aria-label="Toggle navigation menu"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    {mobileMenuOpen ? (
+                                        <>
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <line x1="3" y1="6" x2="21" y2="6" />
+                                            <line x1="3" y1="12" x2="21" y2="12" />
+                                            <line x1="3" y1="18" x2="21" y2="18" />
+                                        </>
+                                    )}
+                                </svg>
+                            </button>
+
                             <div className="flex items-center gap-4">
                                 {auth.user ? (
                                     <Link
@@ -144,6 +168,62 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 )}
                             </div>
                         </div>
+
+                        {/* Mobile navigation dropdown */}
+                        {mobileMenuOpen && (
+                            <div className="border-t border-[var(--border-muted)] bg-[var(--bg-light)] px-6 py-4 md:hidden">
+                                <nav className="flex flex-col space-y-3">
+                                    <Link
+                                        href="/"
+                                        className="font-medium text-[var(--text)] transition-colors hover:text-[var(--primary)]"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Home
+                                    </Link>
+                                    <Link
+                                        href="/guest/announcements"
+                                        className="font-medium text-[var(--text)] transition-colors hover:text-[var(--primary)]"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Announcements
+                                    </Link>
+                                    <Link
+                                        href="/guest/contact"
+                                        className="font-medium text-[var(--text)] transition-colors hover:text-[var(--primary)]"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Contact
+                                    </Link>
+                                    <hr className="border-[var(--border-muted)]" />
+                                    {auth.user ? (
+                                        <Link
+                                            href="/dashboard"
+                                            className="inline-block rounded-full bg-[var(--primary)] px-6 py-2 text-center font-medium text-white"
+                                            onClick={() => setMobileMenuOpen(false)}
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <div className="flex flex-col space-y-2">
+                                            <Link
+                                                href={login()}
+                                                className="inline-block rounded-full border-2 border-[var(--primary)] px-6 py-2 text-center font-medium text-[var(--primary)]"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                            >
+                                                Log in
+                                            </Link>
+                                            <Link
+                                                href={register()}
+                                                className="inline-block rounded-full bg-[var(--primary)] px-6 py-2 text-center font-medium text-white"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                            >
+                                                Register
+                                            </Link>
+                                        </div>
+                                    )}
+                                </nav>
+                            </div>
+                        )}
                     </header>
                 )}
 

@@ -37,14 +37,14 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
             />
 
             {/* Content Layer */}
-            <div className="relative z-10 flex w-11/12 max-w-5xl overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative z-10 flex w-11/12 max-w-5xl flex-col overflow-hidden rounded-2xl shadow-lg md:flex-row">
                 {/* Left Panel */}
-                <div className="flex w-1/2 items-center justify-center bg-black p-10 text-white">
-                    <h1 className="text-3xl leading-snug font-extrabold">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY</h1>
+                <div className="flex w-full items-center justify-center bg-black p-6 text-white md:w-1/2 md:p-10">
+                    <h1 className="text-center text-2xl leading-snug font-extrabold md:text-left md:text-3xl">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY</h1>
                 </div>
 
                 {/* Right Panel */}
-                <div className="flex w-1/2 flex-col justify-center bg-[#E8F8F8] p-12">
+                <div className="flex w-full flex-col justify-center bg-[#E8F8F8] p-6 md:w-1/2 md:p-12">
                     <h2 className="mb-6 text-2xl font-bold">Log In</h2>
 
                     {/* Maintenance Mode Warning from Logout */}

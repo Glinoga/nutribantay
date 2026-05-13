@@ -78,18 +78,18 @@ export default function Archived({ children }: Props) {
                 </Button>
             </div>
 
-            <div className="m-4 rounded-lg border">
+            <div className="m-4 overflow-x-auto rounded-lg border">
                 <Table>
-<TableHeader>
-                            <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Sex</TableHead>
-                                <TableHead>Age (months)</TableHead>
-                                <TableHead>Deleted Date</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Sex</TableHead>
+                            <TableHead>Age (months)</TableHead>
+                            <TableHead>Deleted Date</TableHead>
+                            <TableHead>Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
                     <TableBody>
                         {children.length === 0 ? (
                             <TableRow>
