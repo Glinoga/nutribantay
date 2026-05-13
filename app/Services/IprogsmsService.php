@@ -52,11 +52,13 @@ class IprogsmsService
 
         $body = $response->json();
 
+        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+
         return [
-            'success' => $response->successful(),
+            'success' => $isSuccess,
             'phone' => $normalizedPhone,
             'response' => $body,
-            'error' => $response->successful() ? null : ($body['message'] ?? 'Unknown error'),
+            'error' => $isSuccess ? null : ($body['message'] ?? $body['error'] ?? 'Unknown error'),
         ];
     }
 
@@ -77,8 +79,10 @@ class IprogsmsService
 
         $body = $response->json();
 
+        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+
         // If bulk fails, try individual sends with retry
-        if (! $response->successful()) {
+        if (! $isSuccess) {
             return $this->sendIndividualWithRetry($normalizedPhones, $message, $maxRetries);
         }
 
@@ -144,9 +148,11 @@ class IprogsmsService
         // IPROG returns: {"status": "success", "data": {"load_balance": 5.0}}
         $credits = $body['data']['load_balance'] ?? $body['credits'] ?? $body['balance'] ?? 0;
 
+        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+
         return [
-            'success' => $response->successful(),
-            'credits' => (int) $credits,
+            'success' => $isSuccess,
+            'credits' => $isSuccess ? (int) $credits : 0,
             'response' => $body,
         ];
     }
@@ -161,9 +167,11 @@ class IprogsmsService
             'message_id' => $messageId,
         ]);
 
+        $body = $response->json();
+
         return [
-            'success' => $response->successful(),
-            'response' => $response->json(),
+            'success' => $response->successful() && ($body['status'] ?? 'success') !== 'error',
+            'response' => $body,
         ];
     }
 }

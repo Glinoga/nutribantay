@@ -25,6 +25,12 @@ class RecommendationController extends Controller
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
         }
 
+        // Authorization: healthworkers restricted to their barangay
+        $user = auth()->user();
+        if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin') && $child->barangay !== $user->barangay) {
+            return response()->json(['recommendation' => '❌ You can only generate recommendations for children in your barangay.'], 403);
+        }
+
         // Step 2: Calculate age accurately
         $birthdate = Carbon::parse($child->birthdate);
         $now = Carbon::now();
@@ -60,13 +66,13 @@ class RecommendationController extends Controller
         );
 
         // Step 7: Try API with retry logic
-        $recommendation = $this->generateWithRetry($apiKey, $prompt, $totalMonths, $nutritionStatus, $child->sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
+        $recommendation = $this->generateWithRetry($apiKey, $prompt, $totalMonths, $nutritionStatus, $child->sex, $totalMonths, $bmi, $vitaminAStatus, $dewormingStatus);
 
         // Step 8: Post-process to fix any meals with only light foods
-        $recommendation = $this->fixMealPlan($recommendation, $months);
+        $recommendation = $this->fixMealPlan($recommendation, $totalMonths);
 
         // Step 9: Post-process to fix deworming if AI missed it
-        $recommendation = $this->fixDewormingRecommendation($recommendation, $months, $dewormingStatus);
+        $recommendation = $this->fixDewormingRecommendation($recommendation, $totalMonths, $dewormingStatus);
 
         return response()->json(['recommendation' => trim($recommendation)]);
     }
@@ -167,7 +173,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             return $this->getLocalFallback(
                 $nutritionStatus,
                 $sex,
-                $months,
+                $totalMonths,
                 $bmi,
                 $vitaminAStatus,
                 $dewormingStatus
@@ -231,7 +237,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         return $this->getLocalFallback(
             $nutritionStatus,
             $sex,
-            $months,
+            $totalMonths,
             $bmi,
             $vitaminAStatus,
             $dewormingStatus

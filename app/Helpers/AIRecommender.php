@@ -4,9 +4,9 @@ namespace App\Helpers;
 
 class AIRecommender
 {
-    public static function getRecommendation($status, $sex, $ageInMonths, $bmi, $vitaminA = null, $deworming = null)
+    public static function getRecommendation(string $status, string $sex, int|float $ageInMonths, int|float $bmi, ?string $vitaminA = null, ?string $deworming = null): string
     {
-        if (empty($status) || empty($sex) || empty($ageInMonths)) {
+        if ($status === null || $status === '' || $sex === null || $sex === '' || $ageInMonths === null) {
             return 'Hindi sapat ang datos para gumawa ng recommendation.';
         }
 
@@ -14,7 +14,7 @@ class AIRecommender
 
         // For 0-5 months, return gatas-only recommendation
         if ($ageMonths < 6) {
-            return self::getGatasOnlyRecommendation($status);
+            return self::getGatasOnlyRecommendation();
         }
 
         $ageYears = floor($ageMonths / 12);
@@ -50,7 +50,7 @@ class AIRecommender
         $output .= 'Gabi: '.$mealPlan['evening']."\n";
 
         if (! empty($supplements)) {
-            $output .= "\nMGA SUPPLMENTS:\n".$supplements."\n";
+            $output .= "\nMGA SUPPLEMENTS:\n".$supplements."\n";
         }
 
         $output .= "\nPAALALA: Kumunsulta sa pinakamalapit na health center para sa karagdagang gabay at pagsusuri sa nutrisyon ng iyong anak.";
@@ -58,7 +58,7 @@ class AIRecommender
         return $output;
     }
 
-    private static function getGatasOnlyRecommendation(string $status): string
+    private static function getGatasOnlyRecommendation(): string
     {
         $tips = [];
         $tips[] = 'Siguraduhing makakuha ng sapat na gatas (breastmilk o formula) araw-araw.';
@@ -83,18 +83,17 @@ class AIRecommender
 
     private static function getNCSMealOptions(int $ageMonths): array
     {
-        // National Nutrition Council Guidelines
         if ($ageMonths < 6) {
-            return []; // 0-5 months: gatas only
-        } elseif ($ageMonths === 6) {
+            return [];
+        } elseif ($ageMonths <= 6) {
             return ['Malapot na Lugaw (2-3 kutsara)'];
-        } elseif ($ageMonths >= 7 && $ageMonths <= 8) {
+        } elseif ($ageMonths <= 8) {
             return [
                 'Lugaw na may kalabasa (1/2 tasa)',
                 'Lugaw na may malunggay (1/2 tasa)',
                 'Lugaw na may pritong isda (1/2 tasa)',
             ];
-        } elseif ($ageMonths >= 9 && $ageMonths <= 11) {
+        } elseif ($ageMonths <= 11) {
             return [
                 'Lugaw na monggo, sayote, at saluyot (1/2 tasa)',
                 'Papaya na minasa (1/2 tasa)',
@@ -102,7 +101,6 @@ class AIRecommender
                 'Kalabasa at repolyong sopas (1/2 tasa)',
             ];
         } else {
-            // 12-23+ months
             return [
                 'Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)',
                 'Hiniwang saging (1 tasa)',
@@ -122,7 +120,6 @@ class AIRecommender
     {
         $tips = [];
 
-        // For 0-5 months (gatas-only age)
         if ($ageMonths < 6) {
             $tips[] = 'Siguraduhing makakuha ng sapat na gatas (breastmilk o formula) araw-araw.';
             $tips[] = 'I breastfeeding ang baby tuwing 2-3 oras, o ayon sa kagustuhan ng baby.';
@@ -132,7 +129,6 @@ class AIRecommender
             return $tips;
         }
 
-        // For 6-11 months (soft foods age)
         if ($ageMonths >= 6 && $ageMonths < 12) {
             switch ($status) {
                 case 'Underweight':
@@ -152,9 +148,7 @@ class AIRecommender
                     $tips[] = 'Dapat 3-4 na maliit na meals sa isang araw kasama ang breastfeeding.';
             }
             $tips[] = 'Para sa edad na '.$ageMonths.' buwan, lahat ng pagkain ay dapat MASHED o PUREED.';
-        }
-        // For 12+ months (regular solids age)
-        elseif ($ageMonths >= 12) {
+        } elseif ($ageMonths >= 12) {
             switch ($status) {
                 case 'Underweight':
                     $tips[] = 'Ang bata ay may mababang timbang para sa edad. Magbigay ng masustansiyang pagkain na may mataas na protina at calories.';
@@ -174,7 +168,6 @@ class AIRecommender
             }
         }
 
-        // Sex-based tip (only for 12+ months)
         if ($ageMonths >= 12) {
             if (strtolower($sex) === 'male') {
                 $tips[] = 'Mahalaga ang sapat na protina para sa tamang paglaki ng mga bata.';
@@ -224,7 +217,7 @@ class AIRecommender
         ];
     }
 
-    private static function getSupplementRecommendations($vitaminA, $deworming, int $ageMonths): string
+    private static function getSupplementRecommendations(?string $vitaminA, ?string $deworming, int $ageMonths): string
     {
         $recommendations = [];
 
