@@ -93,9 +93,9 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
             >
                 {showHeader && (
                     <header className="fixed top-0 z-50 z-[1001] w-full bg-[var(--bg-light)] shadow-md dark:bg-[var(--bg-light)]">
-                        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-                            <div className="flex items-center gap-12">
-                                <Link href="/" className="relative text-2xl font-bold text-[var(--primary)]">
+                        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
+                            <div className="flex items-center gap-8 md:gap-12">
+                                <Link href="/" className="relative text-xl font-bold text-[var(--primary)] md:text-2xl">
                                     <span className="gradient-text">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
@@ -120,33 +120,11 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 </nav>
                             </div>
 
-                            {/* Mobile hamburger */}
-                            <button
-                                className="flex items-center justify-center rounded-lg p-2 text-[var(--primary)] md:hidden"
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                aria-label="Toggle navigation menu"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    {mobileMenuOpen ? (
-                                        <>
-                                            <line x1="18" y1="6" x2="6" y2="18" />
-                                            <line x1="6" y1="6" x2="18" y2="18" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <line x1="3" y1="6" x2="21" y2="6" />
-                                            <line x1="3" y1="12" x2="21" y2="12" />
-                                            <line x1="3" y1="18" x2="21" y2="18" />
-                                        </>
-                                    )}
-                                </svg>
-                            </button>
-
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 md:gap-4">
                                 {auth.user ? (
                                     <Link
                                         href="/dashboard"
-                                        className="hover:bg-opacity-90 rounded-full bg-[var(--primary)] px-6 py-2 font-medium text-white transition-all hover:shadow-md"
+                                        className="hidden md:inline-flex rounded-full bg-[var(--primary)] px-4 py-1.5 text-sm font-medium text-white transition-all hover:shadow-md md:px-6 md:py-2 md:text-base"
                                     >
                                         Dashboard
                                     </Link>
@@ -154,18 +132,40 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     <>
                                         <Link
                                             href={login()}
-                                            className="rounded-full border-2 border-[var(--primary)] bg-transparent px-6 py-2 font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-md"
+                                            className="hidden md:inline-flex rounded-full border-2 border-[var(--primary)] bg-transparent px-4 py-1.5 text-sm font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-md md:px-6 md:py-2 md:text-base"
                                         >
                                             Log in
                                         </Link>
                                         <Link
                                             href={register()}
-                                            className="hover:bg-opacity-90 rounded-full bg-[var(--primary)] px-6 py-2 font-medium text-white transition-all hover:shadow-md"
+                                            className="hidden md:inline-flex rounded-full bg-[var(--primary)] px-4 py-1.5 text-sm font-medium text-white transition-all hover:shadow-md md:px-6 md:py-2 md:text-base"
                                         >
                                             Register
                                         </Link>
                                     </>
                                 )}
+
+                                {/* Mobile hamburger */}
+                                <button
+                                    className="flex items-center justify-center rounded-lg p-2 text-[var(--primary)] md:hidden"
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    aria-label="Toggle navigation menu"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        {mobileMenuOpen ? (
+                                            <>
+                                                <line x1="18" y1="6" x2="6" y2="18" />
+                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <line x1="3" y1="6" x2="21" y2="6" />
+                                                <line x1="3" y1="12" x2="21" y2="12" />
+                                                <line x1="3" y1="18" x2="21" y2="18" />
+                                            </>
+                                        )}
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
