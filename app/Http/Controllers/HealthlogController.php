@@ -7,7 +7,6 @@ use App\Helpers\GrowthHelper;
 use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\HealthLog;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -112,12 +111,10 @@ class HealthlogController extends Controller
             $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
-            $age = Carbon::parse($child->birthdate)->age;
-
             $validated['recommendation'] = AIRecommender::getRecommendation(
                 $evaluation['overall'],
                 $child->sex,
-                $age,
+                $evaluation['age_months'],
                 $evaluation['bmi']
             );
         }
@@ -200,12 +197,10 @@ class HealthlogController extends Controller
             $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
-            $age = Carbon::parse($child->birthdate)->age;
-
             $validated['recommendation'] = AIRecommender::getRecommendation(
                 $evaluation['overall'],
                 $child->sex,
-                $age,
+                $evaluation['age_months'],
                 $evaluation['bmi']
             );
         }
