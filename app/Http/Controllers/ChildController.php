@@ -672,7 +672,7 @@ class ChildController extends Controller
                 'birthdate' => $row['birthdate'] ?? null,
                 'barangay' => $user->barangay,
                 'created_by' => $user->id,
-                'address' => null,
+                'address' => $row['address'] ?? null,
                 'contact_number' => null,
             ]);
 

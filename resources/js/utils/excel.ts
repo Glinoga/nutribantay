@@ -39,6 +39,7 @@ export const readExcel = async (file: File) => {
 
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number | null)[][];
 
+    const addressIdx = 1;
     const fullNameIdx = 3;
     const sexIdx = 5;
     const birthdateIdx = 6;
@@ -56,9 +57,22 @@ export const readExcel = async (file: File) => {
         })
         .map((row) => {
             const fullName = row[fullNameIdx]?.toString().trim() || '';
-            const nameParts = fullName.split(' ');
-            const lastName = nameParts[0] || '';
-            const firstName = nameParts.slice(1).join(' ') || '';
+
+            const commaIndex = fullName.indexOf(', ');
+            let lastName: string, firstName: string, middleInitial: string | null;
+            if (commaIndex !== -1) {
+                lastName = fullName.substring(0, commaIndex).trim();
+                const givenPart = fullName.substring(commaIndex + 2).trim();
+                const givenParts = givenPart.split(' ');
+                firstName = givenParts[0] || '';
+                middleInitial = givenParts.slice(1).join(' ') || null;
+            } else {
+                const nameParts = fullName.split(' ');
+                lastName = nameParts[0] || '';
+                firstName = nameParts.slice(1).join(' ') || '';
+                middleInitial = null;
+            }
+
             const sex = row[sexIdx]?.toString().trim() || '';
             const sexNormalized = sex.toUpperCase().startsWith('M') ? 'M' : 'F';
             const birthdateRaw = row[birthdateIdx];
@@ -67,11 +81,13 @@ export const readExcel = async (file: File) => {
             return {
                 fullName: fullName,
                 first_name: firstName,
+                middle_initial: middleInitial,
                 last_name: lastName,
                 sex: sexNormalized,
                 birthdate: birthdate,
                 weight: row[weightIdx] || null,
                 height: row[heightIdx] || null,
+                address: row[addressIdx]?.toString().trim() || null,
             };
         });
 
