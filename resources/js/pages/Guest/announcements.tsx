@@ -2,10 +2,9 @@ import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
-import { X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-// get color class based on category
 function getCategoryColorClass(categoryColor: string) {
     const colorMap: Record<string, string> = {
         primary: 'bg-[var(--primary)]',
@@ -19,7 +18,6 @@ function getCategoryColorClass(categoryColor: string) {
     return colorMap[categoryColor] || 'bg-[var(--primary)]';
 }
 
-// Define interface for the announcements
 interface Category {
     id: number;
     name: string;
@@ -63,7 +61,6 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
 
     const filteredAnnouncements = useMemo(() => {
         return announcements.filter((announcement) => {
-            // Apply search filter
             const matchesSearch =
                 searchQuery === '' ||
                 announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -71,17 +68,11 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                 announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.category.name.toLowerCase().includes(searchQuery.toLowerCase());
 
-            // Apply category filter
             const matchesCategory = activeFilter === null || (announcement.category && announcement.category.name === activeFilter);
 
             return matchesSearch && matchesCategory;
         });
     }, [announcements, searchQuery, activeFilter]);
-
-    const handleResetClick = () => {
-        setSearchQuery('');
-        setActiveFilter(null);
-    };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
@@ -98,12 +89,21 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
     return (
         <GuestLayout title="Announcements">
             <Head title="Announcements" />
-            {/* Hero Section */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
+
+            <style>{`
+                .guest-gradient-text {
+                    background: linear-gradient(90deg, var(--primary), hsl(180, 80%, 30%));
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
+                }
+            `}</style>
+
+            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
                 <div className="absolute top-0 left-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            fill="var(--secondary)"
+                            fill="var(--primary)"
                             d="M42.8,-73.2C55.9,-67.3,67.2,-56.9,74.3,-44C81.5,-31,84.5,-15.5,83.8,-0.4C83.2,14.8,78.8,29.5,71.6,42.9C64.3,56.3,54.2,68.2,41.5,75.8C28.8,83.3,14.4,86.3,-0.3,86.9C-15.1,87.5,-30.2,85.6,-41.7,78C-53.3,70.4,-61.3,57.1,-66.6,43.7C-72,30.3,-74.7,15.1,-76.3,-0.9C-78,-16.9,-78.6,-33.8,-72,-47.2C-65.4,-60.6,-51.6,-70.4,-37.4,-75.5C-23.3,-80.6,-8.8,-80.9,3.1,-76.5C15,-72,29.8,-79.1,42.8,-73.2Z"
                             transform="translate(100 100)"
                         />
@@ -111,27 +111,18 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                 </div>
 
                 <div className="container mx-auto px-6 text-center lg:px-8">
-                    <span className="mb-2 inline-block rounded-full bg-[var(--bg)] px-4 py-1 text-sm font-medium text-[var(--secondary)]">
+                    <span className="mb-2 inline-block rounded-full bg-white/80 px-4 py-1 text-sm font-medium text-[var(--primary)] shadow-sm backdrop-blur-sm">
                         COMMUNITY UPDATES
                     </span>
                     <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
-                        <span className="gradient-text">Latest Announcements</span>
+                        <span className="guest-gradient-text">Latest Announcements</span>
                     </h1>
                     <p className="mx-auto mb-10 max-w-2xl text-lg text-[var(--text-muted)] md:text-xl">
                         Stay informed about upcoming events, programs, and initiatives in our community
                     </p>
 
-                    {/* Search Bar */}
                     <div className="relative z-10 mx-auto mt-8 flex max-w-md items-center rounded-full border border-[var(--border)] bg-white/80 p-1 shadow-lg backdrop-blur-sm dark:bg-[var(--bg)]/80">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="ml-3 h-5 w-5 text-[var(--text-muted)]"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                        <Search className="ml-3 h-5 w-5 text-[var(--text-muted)]" />
                         <input
                             id="announcement-search"
                             type="text"
@@ -143,7 +134,7 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                         {searchQuery && (
                             <button
                                 onClick={handleSearchReset}
-                                className="mr-3 rounded-full border border-2 border-[var(--border)] p-1 text-[var(--text-muted)] hover:bg-[var(--text-muted)] hover:text-white"
+                                className="mr-3 rounded-full border-2 border-[var(--border)] p-1 text-[var(--text-muted)] hover:bg-[var(--text-muted)] hover:text-white"
                                 title="Clear search"
                             >
                                 <X size={16} />
@@ -153,7 +144,6 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                 </div>
             </section>
 
-            {/* Announcements List */}
             <section className="bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -164,7 +154,6 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                             <h2 className="text-3xl font-bold text-[var(--text)]">Upcoming Activities</h2>
                         </div>
 
-                        {/* Filter Button */}
                         <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
                             <button
                                 className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === null ? 'bg-[var(--primary)] text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
@@ -191,12 +180,12 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                 key={announcement.id}
                                 className="group relative overflow-hidden rounded-2xl bg-white shadow-md transition-all hover:shadow-xl dark:bg-[var(--bg-light)]"
                             >
-                                <div
-                                    className="absolute inset-x-0 top-0 h-2"
+                                    <div
+                                        className="absolute inset-x-0 top-0 h-2"
                                     style={{
                                         backgroundColor: `var(--${announcement.category.color || 'primary'})`,
                                     }}
-                                ></div>
+                                />
 
                                 {announcement.image && (
                                     <div className="h-48 overflow-hidden">
@@ -246,32 +235,12 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                     <div className="flex items-center justify-between">
                                         <Link href={route('guest.announcements.show', { announcement: announcement.id })}>
                                             <Button
-                                                className="rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:border-[var(--bg-light)] hover:bg-[var(--primary)] hover:text-white"
+                                                className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
                                                 size="sm"
                                             >
                                                 Read More
                                             </Button>
                                         </Link>
-
-                                        <button
-                                            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-muted)] transition-colors hover:border-[var(--primary)] hover:text-[var(--primary)]"
-                                            title="Share"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                                                />
-                                            </svg>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -291,41 +260,19 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                                         setSearchQuery('');
                                         setActiveFilter(null);
                                     }}
-                                    className="mt-4 rounded-full border border-[var(--primary)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)]"
+                                    className="mt-4 rounded-full border border-[var(--primary)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:bg-[var(--primary)] hover:text-white"
                                 >
                                     Clear Filters
                                 </button>
                             )}
                         </div>
                     )}
-
-                    {/* Pagination - unchanged */}
-                    {filteredAnnouncements.length > 0 && (
-                        <div className="mt-16 flex justify-center">
-                            <div className="inline-flex rounded-md shadow">
-                                <button className="inline-flex items-center justify-center rounded-l-md border border-r-0 border-[var(--border)] bg-white px-4 py-2 text-[var(--text-muted)]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
-                                <button className="border border-[var(--primary)] bg-[var(--primary)] px-4 py-2 text-white">1</button>
-                                <button className="border border-[var(--border)] bg-white px-4 py-2 text-[var(--text)]">2</button>
-                                <button className="border border-[var(--border)] bg-white px-4 py-2 text-[var(--text)]">3</button>
-                                <button className="inline-flex items-center justify-center rounded-r-md border border-[var(--border)] bg-white px-4 py-2 text-[var(--text-muted)]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </section>
 
-            {/* Newsletter Section */}
-            <section className="relative overflow-hidden bg-[var(--primary)] py-16">
-                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[var(--secondary)] opacity-20"></div>
-                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[var(--secondary)] opacity-20"></div>
+            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-800 py-16">
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20"></div>
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20"></div>
 
                 <div className="relative container mx-auto px-6 text-center lg:px-8">
                     <h2 className="mb-auto text-3xl font-bold text-white md:text-4xl">Stay Informed, Stay Healthy</h2>

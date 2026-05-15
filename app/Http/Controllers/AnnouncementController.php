@@ -26,10 +26,10 @@ class AnnouncementController extends Controller
         // Only show announcements where the publication date has arrived (today or in the past)
         // and if they have an end_date, make sure it hasn't passed yet
         $announcements = Announcement::with('category')
-            ->whereDate('date', '<=', now()) // Publication date has arrived
+            ->whereDate('date', '<=', now())
             ->where(function ($query) {
-                $query->whereNull('end_date') // No end date (permanent announcements)
-                    ->orWhereDate('end_date', '>=', now()); // Or end date hasn't passed
+                $query->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', now());
             })
             ->latest()
             ->get();

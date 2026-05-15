@@ -8,7 +8,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, useForm } from '@inertiajs/react';
-import { Loader2, Megaphone, OctagonAlert, X } from 'lucide-react';
+import { CheckCircle2, Megaphone, OctagonAlert, Sparkles, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -115,170 +115,237 @@ export default function Create({ categories }: CreateProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Announcement" />
 
-            <div className="m-4">
-                {/* Display errors */}
-                {Object.keys(errors).length > 0 && (
-                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
-                        <div className="mb-2 flex items-center gap-2 font-semibold">
-                            <OctagonAlert className="inline-block h-5 w-5" />
-                            Please fix the following errors:
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .fade-in-up {
+                    animation: fadeInUp 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+
+                @keyframes pulse {
+                    0%, 100% {
+                        opacity: 1;
+                    }
+                    50% {
+                        opacity: 0.8;
+                    }
+                }
+            `}</style>
+
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+
+                <div className="relative mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="fade-in-up mb-6 text-center">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
+                            <Megaphone className="h-5 w-5 text-teal-600" />
+                            <span className="text-sm font-semibold text-teal-700">New Announcement</span>
                         </div>
-                        <ul className="list-disc pl-5">
-                            {Object.entries(errors).map(([field, message]) => (
-                                <li key={field} className="text-sm">
-                                    {message}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
 
-                <form onSubmit={handleSubmit} encType="multipart/form-data">
-                    <h1 className="mb-6 flex items-center gap-2 text-2xl font-bold">
-                        <Megaphone size={24} className="text-blue-600" />
-                        Create Announcement
-                    </h1>
-
-                    {/* Title */}
-                    <div className="mb-4 rounded-lg border p-4">
-                        <Label className="mb-2 block font-medium text-gray-700">
-                            Announcement Title <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            type="text"
-                            className="w-full"
-                            placeholder="Enter announcement title"
-                            value={data.title}
-                            onChange={(e) => setData('title', e.target.value)}
-                        />
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                                Create Announcement
+                            </span>
+                        </h1>
+                        <p className="mx-auto max-w-xl text-gray-600">
+                            Create a new announcement to keep your community informed
+                        </p>
                     </div>
 
-                    {/* Category + Author */}
-                    <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="rounded-lg border p-4">
-                            <Label className="mb-2 block font-medium text-gray-700">
-                                Category <span className="text-red-500">*</span>
+                    {Object.keys(errors).length > 0 && (
+                        <div className="fade-in-up mb-6 rounded-xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-red-100 p-6 shadow-lg">
+                            <div className="flex items-start gap-3">
+                                <div className="rounded-full bg-red-200 p-2">
+                                    <OctagonAlert className="h-6 w-6 text-red-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="mb-2 font-bold text-red-800">Please fix the following errors:</h4>
+                                    <ul className="list-inside list-disc space-y-1">
+                                        {Object.entries(errors).map(([field, message]) => (
+                                            <li key={field} className="text-sm text-red-700">
+                                                {message}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-5">
+                        <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm">
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">
+                                Announcement Title <span className="text-red-500">*</span>
                             </Label>
-                            <p className="mb-2 text-xs text-gray-500">Select the category for this announcement</p>
-                            <Select value={data.category_id} onValueChange={(value) => setData('category_id', value)}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {categories.map((category) => (
-                                        <SelectItem key={category.id} value={category.id.toString()}>
-                                            {category.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="rounded-lg border p-4">
-                            <Label className="mb-2 block font-medium text-gray-700">Author</Label>
-                            <p className="mb-2 text-xs text-gray-500">Who is publishing this announcement</p>
                             <Input
                                 type="text"
-                                className="mt-2 w-full"
-                                placeholder="Enter author name"
-                                value={data.author}
-                                onChange={(e) => setData('author', e.target.value)}
+                                placeholder="Enter announcement title"
+                                value={data.title}
+                                onChange={(e) => setData('title', e.target.value)}
+                                className="rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                         </div>
-                    </div>
 
-                    {/* Dates */}
-                    <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="rounded-lg border p-4">
-                            <Label className="mb-2 block font-medium text-gray-700">
-                                Publication Date <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                type="date"
-                                className="mt-2 w-full"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
-                                min={new Date().toISOString().split('T')[0]}
-                            />
-                            <p className="mt-1 text-xs text-gray-500">Select today to publish immediately, or choose a future date to schedule</p>
-                        </div>
-                        <div className="rounded-lg border p-4">
-                            <Label className="mb-2 block font-medium text-gray-700">End Date</Label>
-                            <Input
-                                type="date"
-                                className="mt-2 w-full"
-                                value={data.end_date}
-                                onChange={(e) => setData('end_date', e.target.value)}
-                                min={data.date || new Date().toISOString().split('T')[0]}
-                            />
-                            <p className="mt-1 text-xs text-gray-500">Optional: When the announcement should no longer be shown</p>
-                        </div>
-                    </div>
-
-                    {/* Summary */}
-                    <div className="mb-4 rounded-lg border p-4">
-                        <Label className="mb-2 block font-medium text-gray-700">
-                            Summary <span className="text-red-500">*</span>
-                        </Label>
-                        <Textarea
-                            className="w-full"
-                            placeholder="Enter a brief summary of the announcement"
-                            value={data.summary}
-                            onChange={(e) => setData('summary', e.target.value)}
-                            rows={3}
-                        />
-                    </div>
-
-                    {/* Content */}
-                    <div className="mb-4 rounded-lg border p-4">
-                        <Label className="mb-2 block font-medium text-gray-700">
-                            Content <span className="text-red-500">*</span>
-                        </Label>
-                        <Textarea
-                            className="w-full"
-                            placeholder="Enter the full content of the announcement"
-                            value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
-                            rows={6}
-                        />
-                    </div>
-
-                    {/* Image Upload */}
-                    <div className="mb-4 rounded-lg border p-4">
-                        <Label className="mb-2 block font-medium text-gray-700">Upload Image</Label>
-                        <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2" />
-                        {preview && (
-                            <div className="relative mt-4 inline-block">
-                                <img src={preview} alt="Preview" className="max-h-64 rounded-lg border" />
-                                <button
-                                    type="button"
-                                    onClick={removeImage}
-                                    className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                                >
-                                    <X size={16} />
-                                </button>
+                        <div className="fade-in-up grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: '0.1s' }}>
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm">
+                                <Label className="mb-2 block text-sm font-bold text-gray-800">
+                                    Category <span className="text-red-500">*</span>
+                                </Label>
+                                <p className="mb-2 text-xs text-gray-500">Select the category for this announcement</p>
+                                <Select value={data.category_id} onValueChange={(value) => setData('category_id', value)}>
+                                    <SelectTrigger className="w-full rounded-lg border-teal-200 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                                        <SelectValue placeholder="Select category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category.id} value={category.id.toString()}>
+                                                {category.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
-                        )}
-                    </div>
 
-                    <div className="flex gap-3">
-                        <Button type="submit" disabled={processing} className="gap-2">
-                            {processing ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Creating...
-                                </>
-                            ) : (
-                                'Create Announcement'
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm">
+                                <Label className="mb-2 block text-sm font-bold text-gray-800">Author</Label>
+                                <p className="mb-2 text-xs text-gray-500">Who is publishing this announcement</p>
+                                <Input
+                                    type="text"
+                                    placeholder="Enter author name"
+                                    value={data.author}
+                                    onChange={(e) => setData('author', e.target.value)}
+                                    className="rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="fade-in-up grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: '0.15s' }}>
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm">
+                                <Label className="mb-2 block text-sm font-bold text-gray-800">
+                                    Publication Date <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                    type="date"
+                                    value={data.date}
+                                    onChange={(e) => setData('date', e.target.value)}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    className="mt-2 rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                />
+                                <p className="mt-1 text-xs text-gray-500">Select today to publish immediately, or choose a future date to schedule</p>
+                            </div>
+
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm">
+                                <Label className="mb-2 block text-sm font-bold text-gray-800">End Date</Label>
+                                <Input
+                                    type="date"
+                                    value={data.end_date}
+                                    onChange={(e) => setData('end_date', e.target.value)}
+                                    min={data.date || new Date().toISOString().split('T')[0]}
+                                    className="mt-2 rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                />
+                                <p className="mt-1 text-xs text-gray-500">Optional: When the announcement should no longer be shown</p>
+                            </div>
+                        </div>
+
+                        <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm" style={{ animationDelay: '0.2s' }}>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">
+                                Summary <span className="text-red-500">*</span>
+                            </Label>
+                            <Textarea
+                                placeholder="Enter a brief summary of the announcement"
+                                value={data.summary}
+                                onChange={(e) => setData('summary', e.target.value)}
+                                rows={3}
+                                className="rounded-lg border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm" style={{ animationDelay: '0.25s' }}>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">
+                                Content <span className="text-red-500">*</span>
+                            </Label>
+                            <Textarea
+                                placeholder="Enter the full content of the announcement"
+                                value={data.content}
+                                onChange={(e) => setData('content', e.target.value)}
+                                rows={6}
+                                className="rounded-lg border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm" style={{ animationDelay: '0.3s' }}>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800">Upload Image</Label>
+                            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2 rounded-lg border-teal-200 text-sm transition-colors file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100" />
+                            {preview && (
+                                <div className="relative mt-4 inline-block">
+                                    <img src={preview} alt="Preview" className="max-h-64 rounded-lg border" />
+                                    <button
+                                        type="button"
+                                        onClick={removeImage}
+                                        className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
                             )}
-                        </Button>
+                        </div>
 
-                        <Button type="button" variant="outline" onClick={handleCancel} disabled={processing} className="gap-2">
-                            <X size={16} />
-                            Cancel
-                        </Button>
-                    </div>
-                </form>
+                        <div className="fade-in-up flex flex-col gap-4 border-t border-gray-200 pt-8 sm:flex-row sm:justify-center" style={{ animationDelay: '0.35s' }}>
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="group relative overflow-hidden rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 px-12 py-6 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100"
+                            >
+                                <span className="relative z-10 flex items-center gap-2">
+                                    {processing ? (
+                                        <>
+                                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <CheckCircle2 className="h-5 w-5 transition-transform group-hover:rotate-12" />
+                                            Create Announcement
+                                        </>
+                                    )}
+                                </span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-teal-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                            </Button>
+
+                            <Button
+                                type="button"
+                                onClick={handleCancel}
+                                disabled={processing}
+                                className="rounded-full border-2 border-gray-300 bg-white px-12 py-6 text-lg font-bold text-gray-700 shadow-md transition-all hover:scale-105 hover:border-gray-400 hover:bg-gray-50 hover:shadow-lg"
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+
+                        <div className="fade-in-up rounded-xl border-2 border-teal-100 bg-gradient-to-br from-teal-50 to-cyan-50 p-5" style={{ animationDelay: '0.4s' }}>
+                            <div className="flex items-start gap-3">
+                                <Sparkles className="h-5 w-5 flex-shrink-0 text-teal-600" />
+                                <div>
+                                    <p className="font-semibold text-teal-800">Quick Tips:</p>
+                                    <ul className="mt-2 space-y-1 text-sm text-teal-700">
+                                        <li>• All fields marked with <span className="text-red-500">*</span> are required</li>
+                                        <li>• Set an end date to automatically expire announcements</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </AppLayout>
     );
