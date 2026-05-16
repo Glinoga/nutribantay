@@ -198,6 +198,7 @@ export default function Index({ announcements, categories }: { announcements: An
                 .announcements-container::-webkit-scrollbar-thumb:hover {
                     background: linear-gradient(to bottom, rgb(13, 148, 136), rgb(8, 145, 178));
                 }
+
             `}</style>
 
             <div className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 pt-8 pb-16">
@@ -335,11 +336,11 @@ export default function Index({ announcements, categories }: { announcements: An
 
             <div className="announcements-container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {filteredAnnouncements.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))' }}>
                         {filteredAnnouncements.map((announcement, index) => (
                             <div
                                 key={announcement.id}
-                                className="announcement-card group relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl"
+                                className="announcement-card group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl"
                                 style={{
                                     animationDelay: `${index * 50}ms`,
                                 }}
@@ -365,7 +366,7 @@ export default function Index({ announcements, categories }: { announcements: An
                                     )}
                                 </div>
 
-                                <div className="p-5">
+                                <div className="flex flex-1 flex-col p-5">
                                     <div className="mb-3 flex flex-wrap gap-2">
                                         <Badge
                                             className="font-semibold shadow-sm"
@@ -404,7 +405,7 @@ export default function Index({ announcements, categories }: { announcements: An
 
                                     <p className="mb-5 line-clamp-3 text-sm text-gray-700">{announcement.summary}</p>
 
-                                    <div className="flex gap-2">
+                                    <div className="mt-auto flex gap-2">
                                         <Link href={route('announcements.edit', { announcement: announcement.id })} className="flex-1">
                                             <Button
                                                 className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm shadow-sm hover:from-teal-600 hover:to-cyan-600"
@@ -449,7 +450,7 @@ export default function Index({ announcements, categories }: { announcements: An
                         <p className="mb-6 max-w-md text-center text-gray-600">
                             {searchQuery || selectedCategory !== 'all'
                                 ? "Try adjusting your search or filter to find what you're looking for."
-                                : 'Get started by creating your first announcement to keep your community informed.'}
+                                 : 'Get started by creating your first announcement to keep your community informed.'}
                         </p>
                         {!searchQuery && selectedCategory === 'all' && (
                             <Link href={route('announcements.create')}>
