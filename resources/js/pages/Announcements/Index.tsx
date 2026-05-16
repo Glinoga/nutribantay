@@ -336,7 +336,7 @@ export default function Index({ announcements, categories }: { announcements: An
 
             <div className="announcements-container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {filteredAnnouncements.length > 0 ? (
-                    <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))' }}>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {filteredAnnouncements.map((announcement, index) => (
                             <div
                                 key={announcement.id}
