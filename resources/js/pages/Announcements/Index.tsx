@@ -1,11 +1,28 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Bell, Calendar, Edit2, Filter, Loader2, Megaphone, Plus, Search, Sparkles, Trash2, TrendingUp, User, X } from 'lucide-react';
+import {
+    Activity,
+    Bell,
+    Calendar,
+    Edit2,
+    Filter,
+    List,
+    Loader2,
+    Megaphone,
+    Plus,
+    Search,
+    Sparkles,
+    Trash2,
+    TrendingUp,
+    User,
+    X,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: '/admin/announcements' }];
@@ -34,9 +51,20 @@ interface Announcement {
     updated_at: string;
 }
 
-export default function Index({ announcements, categories }: { announcements: Announcement[]; categories: Category[] }) {
+type IndexProps = {
+    announcements: Announcement[];
+    pagination: PaginationData;
+    categories: Category[];
+    filter: string;
+    search?: string;
+};
+
+export default function Index(props: IndexProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string; warning?: string } }>().props;
     const [deletingId, setDeletingId] = useState<number | null>(null);
+
+    const [searchInput, setSearchInput] = useState(props.search || '');
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         if (flash?.success) {
@@ -48,44 +76,62 @@ export default function Index({ announcements, categories }: { announcements: An
         }
     }, [flash]);
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-    const filteredAnnouncements = useMemo(() => {
-        return announcements.filter((announcement) => {
-            const matchesSearch =
-                announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                announcement.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (announcement.author?.toLowerCase() || '').includes(searchQuery.toLowerCase());
-
-            const matchesCategory = selectedCategory === 'all' || announcement.category_id.toString() === selectedCategory;
-
-            return matchesSearch && matchesCategory;
-        });
-    }, [announcements, searchQuery, selectedCategory]);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchInput !== (props.search || '')) {
+                router.get(route('announcements.index'), {
+                    search: searchInput || undefined,
+                    filter: props.filter,
+                    page: 1,
+                }, { replace: true, preserveState: true });
+            }
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchInput]);
 
     const stats = useMemo(() => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const active = announcements.filter((a) => {
+        const active = props.announcements.filter((a) => {
             const announcementDate = new Date(a.date);
             const endDate = a.end_date ? new Date(a.end_date) : null;
             return announcementDate <= today && (!endDate || endDate >= today);
         }).length;
 
-        const upcoming = announcements.filter((a) => {
+        const upcoming = props.announcements.filter((a) => {
             const announcementDate = new Date(a.date);
             return announcementDate > today;
         }).length;
 
         return {
-            total: announcements.length,
+            total: props.pagination.total,
             active,
             upcoming,
-            categories: categories.length,
+            categories: props.categories.length,
         };
-    }, [announcements, categories]);
+    }, [props.announcements, props.pagination.total, props.categories.length]);
+
+    const filteredAnnouncements = useMemo(() => {
+        if (selectedCategory === 'all') return props.announcements;
+        return props.announcements.filter((a) => a.category_id.toString() === selectedCategory);
+    }, [props.announcements, selectedCategory]);
+
+    const handleFilterChange = (newFilter: string) => {
+        router.get(route('announcements.index'), {
+            filter: newFilter,
+            search: props.search || undefined,
+            page: 1,
+        }, { replace: true, preserveState: true });
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(route('announcements.index'), {
+            page,
+            filter: props.filter,
+            search: props.search || undefined,
+        }, { replace: true, preserveScroll: true });
+    };
 
     const handleDelete = (announcement: Announcement) => {
         if (!confirm(`Are you sure you want to delete "${announcement.title}"? This action cannot be undone.`)) {
@@ -131,15 +177,6 @@ export default function Index({ announcements, categories }: { announcements: An
                     to {
                         opacity: 1;
                         transform: translateY(0);
-                    }
-                }
-
-                @keyframes shimmer {
-                    0% {
-                        background-position: -1000px 0;
-                    }
-                    100% {
-                        background-position: 1000px 0;
                     }
                 }
 
@@ -275,13 +312,19 @@ export default function Index({ announcements, categories }: { announcements: An
                             <input
                                 type="text"
                                 placeholder="Search announcements..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
                                 className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
-                            {searchQuery && (
+                            {searchInput && (
                                 <button
-                                    onClick={() => setSearchQuery('')}
+                                    onClick={() => {
+                                        setSearchInput('');
+                                        router.get(route('announcements.index'), {
+                                            filter: props.filter,
+                                            page: 1,
+                                        }, { replace: true, preserveState: true });
+                                    }}
                                     className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                                 >
                                     <X className="h-4 w-4" />
@@ -306,6 +349,28 @@ export default function Index({ announcements, categories }: { announcements: An
                         </div>
                     </div>
 
+                    <div className="mb-4 flex flex-wrap items-center gap-3">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Show:</span>
+                        {[
+                            { key: 'active', label: 'Active', icon: Activity },
+                            { key: 'expired', label: 'Expired', icon: Megaphone },
+                            { key: 'all', label: 'All', icon: List },
+                        ].map(({ key, label, icon: Icon }) => (
+                            <button
+                                key={key}
+                                onClick={() => handleFilterChange(key)}
+                                className={`filter-pill inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    props.filter === key
+                                        ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
+                                        : 'border border-gray-200 bg-white/90 text-gray-700 hover:bg-white'
+                                }`}
+                            >
+                                <Icon className="h-3.5 w-3.5" />
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setSelectedCategory('all')}
@@ -315,9 +380,9 @@ export default function Index({ announcements, categories }: { announcements: An
                                     : 'border border-gray-200 bg-white/90 text-gray-700 hover:bg-white'
                             }`}
                         >
-                            All Announcements
+                            All Categories
                         </button>
-                        {categories.map((category) => (
+                        {props.categories.map((category) => (
                             <button
                                 key={category.id}
                                 onClick={() => setSelectedCategory(category.id.toString())}
@@ -445,14 +510,14 @@ export default function Index({ announcements, categories }: { announcements: An
                             <Sparkles className="h-16 w-16 text-teal-600" />
                         </div>
                         <h3 className="mb-2 text-2xl font-bold text-gray-900">
-                            {searchQuery || selectedCategory !== 'all' ? 'No matching announcements' : 'No announcements yet'}
+                            {props.search || selectedCategory !== 'all' ? 'No matching announcements' : 'No announcements yet'}
                         </h3>
                         <p className="mb-6 max-w-md text-center text-gray-600">
-                            {searchQuery || selectedCategory !== 'all'
+                            {props.search || selectedCategory !== 'all'
                                 ? "Try adjusting your search or filter to find what you're looking for."
                                  : 'Get started by creating your first announcement to keep your community informed.'}
                         </p>
-                        {!searchQuery && selectedCategory === 'all' && (
+                        {!props.search && selectedCategory === 'all' && (
                             <Link href={route('announcements.create')}>
                                 <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
                                     <Plus className="mr-1.5 h-4 w-4" />
@@ -462,6 +527,8 @@ export default function Index({ announcements, categories }: { announcements: An
                         )}
                     </div>
                 )}
+
+                <Pagination pagination={props.pagination} onPageChange={handlePageChange} />
             </div>
         </AppLayout>
     );

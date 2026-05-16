@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
+import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -42,9 +43,10 @@ interface Announcement {
 
 interface AnnouncementsProps {
     announcements: Announcement[];
+    pagination: PaginationData;
 }
 
-export default function Announcements({ announcements }: AnnouncementsProps) {
+export default function Announcements({ announcements, pagination }: AnnouncementsProps) {
     const [searchQuery, setSearchQuery] = useState('');
 
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -84,6 +86,10 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
 
     const handleSearchReset = () => {
         setSearchQuery('');
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(route('guest.announcements'), { page }, { replace: true, preserveScroll: true });
     };
 
     return (
@@ -246,6 +252,8 @@ export default function Announcements({ announcements }: AnnouncementsProps) {
                             </div>
                         ))}
                     </div>
+
+                    <Pagination pagination={pagination} onPageChange={handlePageChange} />
 
                     {filteredAnnouncements.length === 0 && (
                         <div className="py-12 text-center">

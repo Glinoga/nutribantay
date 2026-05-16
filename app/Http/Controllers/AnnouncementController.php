@@ -11,13 +11,50 @@ use Inertia\Inertia;
 
 class AnnouncementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $announcements = Announcement::with('category')->latest()->get();
+        $filter = $request->query('filter', 'active');
+        $search = $request->query('search');
+
+        $query = Announcement::with('category');
+
+        if ($filter === 'active') {
+            $query->where(function ($q) {
+                $q->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', now()->toDateString());
+            });
+        } elseif ($filter === 'expired') {
+            $query->whereDate('end_date', '<', now()->toDateString());
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%")
+                    ->orWhere('author', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderByRaw(
+            'CASE WHEN end_date IS NULL OR end_date >= ? THEN 0 ELSE 1 END',
+            [now()->toDateString()]
+        )->orderBy('date', 'desc');
+
+        $announcements = $query->paginate(9);
 
         return Inertia::render('Announcements/Index', [
-            'announcements' => $announcements,
+            'announcements' => $announcements->items(),
+            'pagination' => [
+                'current_page' => $announcements->currentPage(),
+                'last_page' => $announcements->lastPage(),
+                'per_page' => $announcements->perPage(),
+                'total' => $announcements->total(),
+                'from' => $announcements->firstItem(),
+                'to' => $announcements->lastItem(),
+            ],
             'categories' => Category::all(),
+            'filter' => $filter,
+            'search' => $search,
         ]);
     }
 
@@ -31,11 +68,19 @@ class AnnouncementController extends Controller
                 $query->whereNull('end_date')
                     ->orWhereDate('end_date', '>=', now());
             })
-            ->latest()
-            ->get();
+            ->latest('date')
+            ->paginate(9);
 
         return Inertia::render('guest/announcements', [
-            'announcements' => $announcements,
+            'announcements' => $announcements->items(),
+            'pagination' => [
+                'current_page' => $announcements->currentPage(),
+                'last_page' => $announcements->lastPage(),
+                'per_page' => $announcements->perPage(),
+                'total' => $announcements->total(),
+                'from' => $announcements->firstItem(),
+                'to' => $announcements->lastItem(),
+            ],
         ]);
     }
 

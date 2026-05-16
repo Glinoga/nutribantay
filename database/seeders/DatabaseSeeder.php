@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GrowthStandardSeeder::class);
         $this->call(DashboardTestSeeder::class);
         $this->call(CategorySeeder::class);
+        $this->call(AnnouncementSeeder::class);
         $this->call(AddPhoneNumbersSeeder::class);
     }
 }
