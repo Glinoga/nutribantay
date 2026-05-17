@@ -1,8 +1,9 @@
+import AnnouncementCard from '@/components/announcement-card';
 import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Share2, Sparkles, User } from 'lucide-react';
+import { ArrowLeft, Calendar, HeartHandshake, Share2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface Category {
@@ -29,6 +30,7 @@ interface Announcement {
 
 interface ShowAnnouncementProps {
     announcement: Announcement;
+    relatedAnnouncements?: Announcement[];
 }
 
 function getCategoryColor(categoryColor: string) {
@@ -44,7 +46,7 @@ function getCategoryColor(categoryColor: string) {
     return colorMap[categoryColor] || 'var(--primary)';
 }
 
-export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps) {
+export default function ShowAnnouncement({ announcement, relatedAnnouncements = [] }: ShowAnnouncementProps) {
     const [copied, setCopied] = useState(false);
 
     const formatDate = (dateString: string) => {
@@ -69,29 +71,30 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
         }
     };
 
+    const handleRelatedShare = (related: Announcement) => {
+        const url = `${window.location.origin}/guest/announcements/${related.slug}`;
+        if (navigator.share) {
+            navigator.share({
+                title: related.title,
+                text: related.summary,
+                url,
+            });
+        } else {
+            navigator.clipboard.writeText(url);
+        }
+    };
+
     return (
         <GuestLayout title={announcement.title}>
             <Head title={announcement.title} />
 
             <style>{`
-                .guest-gradient-text {
-                    background: linear-gradient(90deg, var(--primary), hsl(180, 80%, 30%));
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                }
                 @keyframes fadeInUp {
                     from { opacity: 0; transform: translateY(30px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
                 .animate-fade-in-up {
                     animation: fadeInUp 0.6s ease-out forwards;
-                }
-                .glass-card {
-                    background: rgba(255, 255, 255, 0.7);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
                 }
             `}</style>
 
@@ -131,7 +134,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                         )}
                         <button
                             onClick={handleShare}
-                            className="flex items-center gap-2 text-[var(--primary)] transition-all hover:text-[var(--primary)]/80"
+                            className="flex cursor-pointer items-center gap-2 text-[var(--primary)] transition-all hover:text-[var(--primary)]/80"
                         >
                             <Share2 size={18} />
                             <span>{copied ? 'Link copied!' : 'Share'}</span>
@@ -140,7 +143,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                 </div>
             </section>
 
-            <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]" style={{ animationDelay: '0.1s' }}>
+            <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
                         {announcement.image && (
@@ -149,48 +152,94 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                             </div>
                         )}
 
-                        <div className="animate-fade-in-up mb-8 rounded-2xl glass-card p-8" style={{ animationDelay: '0.2s' }}>
-                            <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-[var(--text)]">
-                                <Sparkles className="h-5 w-5 text-[var(--primary)]" />
-                                Summary
-                            </h2>
-                            <p className="text-lg leading-relaxed text-[var(--text-muted)]">{announcement.summary}</p>
-                        </div>
-
-                        <div className="prose prose-lg max-w-none">
-                            <div
-                                className="leading-relaxed whitespace-pre-line text-[var(--text)]"
-                                style={{ fontSize: '1.125rem', lineHeight: '1.75' }}
-                            >
-                                {announcement.content}
-                            </div>
+                        <div
+                            className="prose prose-lg max-w-none leading-relaxed whitespace-pre-line text-[var(--text)]"
+                            style={{ fontSize: '1.125rem', lineHeight: '1.85' }}
+                        >
+                            {announcement.content}
                         </div>
 
                         {announcement.end_date && (
-                            <div className="animate-fade-in-up mt-12 rounded-2xl border border-amber-200 bg-amber-50/80 p-6 backdrop-blur-sm" style={{ animationDelay: '0.3s' }}>
+                            <div className="mt-12 rounded-2xl border border-amber-200 bg-amber-50/80 p-6 backdrop-blur-sm">
                                 <h3 className="mb-2 font-semibold text-amber-800">Event Duration</h3>
                                 <p className="text-amber-700">This announcement is valid until {formatDate(announcement.end_date)}</p>
                             </div>
                         )}
 
-                        <div className="animate-fade-in-up mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 p-8 text-center md:flex-row" style={{ animationDelay: '0.4s' }}>
+                        <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 p-8 text-center md:flex-row">
                             <div className="mr-0 md:mr-6">
                                 <h3 className="mb-2 text-xl font-semibold text-[var(--text)]">Stay Connected</h3>
                                 <p className="text-[var(--text-muted)]">Don&apos;t miss our latest updates and announcements</p>
                             </div>
                             <div className="flex gap-4">
                                 <Link href={route('guest.announcements')}>
-                                    <Button variant="outline" className="rounded-full border-teal-600 text-teal-700 hover:bg-teal-700 hover:text-white">
+                                    <Button variant="outline" className="cursor-pointer rounded-full border-teal-600 text-teal-700 hover:bg-teal-700 hover:text-white">
                                         View All Announcements
                                     </Button>
                                 </Link>
                                 <Link href={route('guest.contact')}>
-                                    <Button className="rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 text-white hover:from-teal-800 hover:to-cyan-700">
+                                    <Button className="cursor-pointer rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 text-white hover:from-teal-800 hover:to-cyan-700">
                                         Contact Us
                                     </Button>
                                 </Link>
                             </div>
                         </div>
+
+                        {relatedAnnouncements.length > 0 && (
+                            <div className="mt-16">
+                                <div className="mb-8 text-center">
+                                    <h2 className="text-2xl font-bold text-[var(--text)]">Related Announcements</h2>
+                                    <p className="mt-2 text-[var(--text-muted)]">You might also be interested in</p>
+                                </div>
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                    {relatedAnnouncements.slice(0, 3).map((related) => (
+                                        <AnnouncementCard
+                                            key={related.id}
+                                            announcement={related}
+                                            variant="default"
+                                            lineClamp={3}
+                                            onShare={() => handleRelatedShare(related)}
+                                            renderActions={() => (
+                                                <Link href={route('guest.announcements.show', { announcement: related.slug })}>
+                                                    <Button
+                                                        className="cursor-pointer rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
+                                                        size="sm"
+                                                    >
+                                                        Read More
+                                                    </Button>
+                                                </Link>
+                                            )}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white">
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
+                <div className="relative container mx-auto px-6 text-center lg:px-8">
+                    <h2 className="mb-4 text-3xl font-bold md:text-4xl">Join Our Mission for a Healthier Community</h2>
+                    <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+                        Help us make a difference in the lives of children and families in our barangay.
+                    </p>
+                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+                        <Link
+                            href={route('register')}
+                            className="inline-flex cursor-pointer items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
+                        >
+                            <HeartHandshake className="mr-2 h-5 w-5" />
+                            Get Started Today
+                        </Link>
+                        <Link
+                            href={route('guest.contact')}
+                            className="inline-flex cursor-pointer items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
+                        >
+                            Contact Us
+                        </Link>
                     </div>
                 </div>
             </section>

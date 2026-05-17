@@ -1,23 +1,11 @@
+import AnnouncementCard from '@/components/announcement-card';
 import { Button } from '@/components/ui/button';
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, X } from 'lucide-react';
+import { HeartHandshake, Megaphone, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
-
-function getCategoryColorClass(categoryColor: string) {
-    const colorMap: Record<string, string> = {
-        primary: 'bg-[var(--primary)]',
-        secondary: 'bg-[var(--secondary)]',
-        success: 'bg-[var(--success)]',
-        danger: 'bg-[var(--danger)]',
-        warning: 'bg-[var(--warning)]',
-        info: 'bg-[var(--info)]',
-    };
-
-    return colorMap[categoryColor] || 'bg-[var(--primary)]';
-}
 
 interface Category {
     id: number;
@@ -45,22 +33,38 @@ interface Announcement {
 interface AnnouncementsProps {
     announcements: Announcement[];
     pagination: PaginationData;
+    categories: Category[];
 }
 
-export default function Announcements({ announcements, pagination }: AnnouncementsProps) {
+function getCategoryColor(color: string) {
+    const colorMap: Record<string, string> = {
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        success: 'var(--success)',
+        danger: 'var(--danger)',
+        warning: 'var(--warning)',
+        info: 'var(--info)',
+    };
+    return colorMap[color] || 'var(--primary)';
+}
+
+export default function Announcements({ announcements, pagination, categories }: AnnouncementsProps) {
     const [searchQuery, setSearchQuery] = useState('');
 
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
-    const categories = useMemo(() => {
-        const uniqueCategories = new Set<string>();
-        announcements.forEach((announcement) => {
-            if (announcement.category && announcement.category.name) {
-                uniqueCategories.add(announcement.category.name);
-            }
-        });
-        return Array.from(uniqueCategories.values());
-    }, [announcements]);
+    const shareAnnouncement = (announcement: Announcement) => {
+        const url = `${window.location.origin}/guest/announcements/${announcement.slug}`;
+        if (navigator.share) {
+            navigator.share({
+                title: announcement.title,
+                text: announcement.summary,
+                url,
+            });
+        } else {
+            navigator.clipboard.writeText(url);
+        }
+    };
 
     const filteredAnnouncements = useMemo(() => {
         return announcements.filter((announcement) => {
@@ -174,96 +178,57 @@ export default function Announcements({ announcements, pagination }: Announcemen
                             <h2 className="text-3xl font-bold text-[var(--text)]">Upcoming Activities</h2>
                         </div>
 
-                        <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
+                        <div className="mt-4 flex flex-wrap items-center gap-2 md:mt-0">
                             <button
-                                className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === null ? 'bg-gradient-to-r from-teal-700 to-cyan-600 text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
+                                className={`cursor-pointer rounded-full border ${activeFilter === null ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md' : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-all`}
                                 onClick={() => handleFilterClick(null)}
                             >
                                 All
                             </button>
 
-                            {categories.map((category) => (
-                                <button
-                                    key={category}
-                                    className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === category ? 'bg-gradient-to-r from-teal-700 to-cyan-600 text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
-                                    onClick={() => handleFilterClick(category)}
-                                >
-                                    {category}
-                                </button>
-                            ))}
+                            {categories.map((category) => {
+                                const catColor = getCategoryColor(category.color);
+                                const isActive = activeFilter === category.name;
+                                return (
+                                    <button
+                                        key={category.id}
+                                        className={`cursor-pointer inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                                            isActive
+                                                ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md'
+                                                : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
+                                        }`}
+                                        onClick={() => handleFilterClick(category.name)}
+                                    >
+                                        <span
+                                            className="h-2.5 w-2.5 rounded-full"
+                                            style={{ backgroundColor: catColor }}
+                                        />
+                                        {category.name}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                         {filteredAnnouncements.map((announcement) => (
-                            <div
+                            <AnnouncementCard
                                 key={announcement.id}
-                                className="group relative overflow-hidden rounded-2xl bg-white/80 shadow-md backdrop-blur-sm transition-all hover:shadow-xl"
-                            >
-                                    <div
-                                        className="absolute inset-x-0 top-0 h-2"
-                                    style={{
-                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                    }}
-                                />
-
-                                {announcement.image && (
-                                    <div className="h-48 overflow-hidden">
-                                        <img
-                                            src={`/storage/${announcement.image}`}
-                                            alt={announcement.title}
-                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    </div>
+                                announcement={announcement}
+                                variant="default"
+                                lineClamp={4}
+                                onShare={shareAnnouncement}
+                                renderActions={() => (
+                                    <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
+                                        <Button
+                                            className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
+                                            size="sm"
+                                        >
+                                            Read More
+                                        </Button>
+                                    </Link>
                                 )}
-
-                                <div className="p-6 pt-8">
-                                    <div className="mb-3 flex flex-wrap gap-2">
-                                        <span
-                                            className={`rounded-full ${getCategoryColorClass(announcement.category.color || 'primary')} px-3 py-1 text-xs font-medium text-white`}
-                                        >
-                                            {announcement.category.name}
-                                        </span>
-                                        {announcement.is_expired && (
-                                            <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-medium text-white">
-                                                Expired
-                                            </span>
-                                        )}
-                                    </div>
-                                    <h3 className="mb-2 text-xl font-semibold text-[var(--text)] group-hover:text-[var(--primary)]">
-                                        {announcement.title}
-                                    </h3>
-                                    <p className="mb-3 text-sm text-[var(--text-muted)]">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="mr-1 inline-block h-4 w-4"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                        {announcement.date}
-                                    </p>
-                                    <div className="mb-4 h-0.5 w-16 rounded-full bg-[var(--border-muted)]"></div>
-                                    <p className="mb-6 line-clamp-4 text-[var(--text)]">{announcement.summary}</p>
-                                    <div className="flex items-center justify-between">
-                                        <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
-                                            <Button
-                                                className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
-                                                size="sm"
-                                            >
-                                                Read More
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
+                            />
                         ))}
                     </div>
 
@@ -281,11 +246,15 @@ export default function Announcements({ announcements, pagination }: Announcemen
                     <Pagination pagination={pagination} onPageChange={handlePageChange} />
 
                     {filteredAnnouncements.length === 0 && (
-                        <div className="py-12 text-center">
-                            <p className="text-lg text-[var(--text-muted)]">
+                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--bg-light)]">
+                                <Megaphone size={40} className="text-[var(--text-muted)]" />
+                            </div>
+                            <h3 className="mb-2 text-xl font-semibold text-[var(--text)]">No announcements found</h3>
+                            <p className="mb-6 max-w-md text-[var(--text-muted)]">
                                 {searchQuery || activeFilter
                                     ? 'No announcements match your search criteria. Try adjusting your filters.'
-                                    : 'No announcements available at the moment.'}
+                                    : 'There are no announcements available at the moment. Check back later for updates.'}
                             </p>
                             {(searchQuery || activeFilter) && (
                                 <button
@@ -293,7 +262,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                                         setSearchQuery('');
                                         setActiveFilter(null);
                                     }}
-                                    className="mt-4 rounded-full border border-[var(--primary)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:bg-[var(--primary)] hover:text-white"
+                                    className="cursor-pointer rounded-full bg-[var(--primary)] px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:bg-[var(--primary)]/90"
                                 >
                                     Clear Filters
                                 </button>
@@ -303,12 +272,29 @@ export default function Announcements({ announcements, pagination }: Announcemen
                 </div>
             </section>
 
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-800 py-16">
-                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20"></div>
-                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20"></div>
-
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white">
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
                 <div className="relative container mx-auto px-6 text-center lg:px-8">
-                    <h2 className="mb-auto text-3xl font-bold text-white md:text-4xl">Stay Informed, Stay Healthy</h2>
+                    <h2 className="mb-4 text-3xl font-bold md:text-4xl">Stay Informed, Stay Healthy</h2>
+                    <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+                        Follow our latest announcements to stay up-to-date with community programs and events.
+                    </p>
+                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+                        <Link
+                            href={route('register')}
+                            className="inline-flex cursor-pointer items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
+                        >
+                            <HeartHandshake className="mr-2 h-5 w-5" />
+                            Get Started Today
+                        </Link>
+                        <Link
+                            href={route('guest.contact')}
+                            className="inline-flex cursor-pointer items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
+                        >
+                            Contact Us
+                        </Link>
+                    </div>
                 </div>
             </section>
         </GuestLayout>

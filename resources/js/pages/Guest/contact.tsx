@@ -1,6 +1,20 @@
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import {
+    CheckCircle,
+    ChevronDown,
+    Clock,
+    HeartHandshake,
+    Mail,
+    MapPin,
+    MessageSquare,
+    Phone,
+    Send,
+    User,
+} from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
@@ -88,8 +102,8 @@ export default function Contact() {
                     <div className="grid items-center gap-12 md:grid-cols-2">
                         {/* Hero Content */}
                         <div className="text-center md:text-left">
-                            <div className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--primary)] px-4 py-1 text-sm font-medium text-white">
-                                <span className="mr-2 flex h-2 w-2 rounded-full bg-white"></span>
+                            <div className="inline-flex items-center rounded-full bg-[var(--primary)]/10 px-4 py-1 text-sm font-medium text-[var(--primary)]">
+                                <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--primary)]"></span>
                                 GET IN TOUCH WITH US
                             </div>
                             <h1 className="mt-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
@@ -104,25 +118,16 @@ export default function Contact() {
                             <div className="mt-8 flex flex-wrap gap-4 md:justify-start">
                                 <a
                                     href="#contact-form"
-                                    className="group flex items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:shadow-lg"
+                                    className="group flex cursor-pointer items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:shadow-lg"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                    </svg>
+                                    <Send className="mr-2 h-5 w-5" />
                                     <span>Send a Message</span>
                                 </a>
                                 <a
                                     href="#faq"
-                                    className="group flex items-center justify-center rounded-full border-2 border-[var(--secondary)] px-6 py-3 text-[var(--secondary)] transition-all hover:bg-[var(--secondary)] hover:text-white hover:shadow-lg"
+                                    className="group flex cursor-pointer items-center justify-center rounded-full border-2 border-[var(--secondary)] px-6 py-3 text-[var(--secondary)] transition-all hover:bg-[var(--secondary)] hover:text-white hover:shadow-lg"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
+                                    <MessageSquare className="mr-2 h-5 w-5" />
                                     <span>View FAQs</span>
                                 </a>
                             </div>
@@ -133,22 +138,9 @@ export default function Contact() {
                             <div className="relative z-10 overflow-hidden rounded-2xl bg-white/70 p-1 shadow-xl backdrop-blur-sm">
                                 <div className="grid gap-px rounded-xl bg-[var(--border)] sm:grid-cols-2">
                                     {/* Call Us Card */}
-                                    <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
+                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                                />
-                                            </svg>
+                                            <Phone className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Call Us</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">Mon-Fri, 8am-5pm</p>
@@ -158,22 +150,9 @@ export default function Contact() {
                                     </div>
 
                                     {/* Email Us Card */}
-                                    <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
-                                        <div className="border-[var(--primary)]text-[var(--secondary)] mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                                />
-                                            </svg>
+                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
+                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--secondary)] text-[var(--secondary)]">
+                                            <Mail className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Email Us</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">We'll respond within 24h</p>
@@ -183,28 +162,9 @@ export default function Contact() {
                                     </div>
 
                                     {/* Visit Us Card */}
-                                    <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
+                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--success)]">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                                />
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                                />
-                                            </svg>
+                                            <MapPin className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Visit Us</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">Bagong Silang Phase 3 Health Center</p>
@@ -212,22 +172,9 @@ export default function Contact() {
                                     </div>
 
                                     {/* Office Hours Card */}
-                                    <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
+                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
                                         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--info)]">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-6 w-6"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                />
-                                            </svg>
+                                            <Clock className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Office Hours</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">We are only available on:</p>
@@ -252,7 +199,7 @@ export default function Contact() {
                             {/* Form Info */}
                             <div className="md:col-span-2">
                                 <div className="sticky top-8">
-                                    <span className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--primary)] px-3 py-1 text-xs font-medium text-white">
+                                    <span className="inline-flex items-center rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-medium text-[var(--primary)]">
                                         CONTACT FORM
                                     </span>
                                     <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Send us a Message!</h2>
@@ -264,9 +211,7 @@ export default function Contact() {
                                     <div className="mt-8 space-y-6">
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                                                </svg>
+                                                <Phone className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">Phone Support</h3>
@@ -278,10 +223,7 @@ export default function Contact() {
 
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                                </svg>
+                                                <Mail className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">Email Response</h3>
@@ -293,13 +235,7 @@ export default function Contact() {
 
                                         <div className="flex">
                                             <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
+                                                <User className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">In-Person Support</h3>
@@ -316,100 +252,96 @@ export default function Contact() {
                             <div className="md:col-span-3">
                                 <div className="overflow-hidden rounded-2xl glass-card p-8 shadow-sm">
                                     {submitted && (
-                                        <div className="mb-6 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                            <p>Thank you for your message! We will get back to you soon.</p>
+                                        <div className="mb-6 animate-in slide-in-from-top-2 rounded-xl bg-green-50 p-6 text-center dark:bg-green-900/30">
+                                            <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
+                                            <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">Message Sent!</h3>
+                                            <p className="mt-1 text-green-700 dark:text-green-300">Thank you for reaching out. We will get back to you soon.</p>
                                         </div>
                                     )}
-                                    <form className="space-y-6" onSubmit={handleSubmit}>
-                                        <div className="grid gap-6 md:grid-cols-2">
+                                    <form className="space-y-5" onSubmit={handleSubmit}>
+                                        <div className="grid gap-5 md:grid-cols-2">
                                             <div>
-                                                <label htmlFor="first_name" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                                <label htmlFor="first_name" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                     First Name <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input
+                                                <Input
                                                     type="text"
                                                     id="first_name"
                                                     maxLength={50}
                                                     value={data.first_name}
                                                     onChange={(e) => setData('first_name', e.target.value)}
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label htmlFor="last_name" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                                <label htmlFor="last_name" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                     Last Name <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input
+                                                <Input
                                                     type="text"
                                                     id="last_name"
                                                     maxLength={50}
                                                     value={data.last_name}
                                                     onChange={(e) => setData('last_name', e.target.value)}
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                     required
                                                 />
                                             </div>
                                         </div>
 
-                                        <div className="grid gap-6 md:grid-cols-2">
+                                        <div className="grid gap-5 md:grid-cols-2">
                                             <div>
-                                                <label htmlFor="email" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                     Email Address <span className="text-[var(--danger)]">*</span>
                                                 </label>
-                                                <input
+                                                <Input
                                                     type="email"
                                                     id="email"
                                                     maxLength={50}
                                                     value={data.email}
                                                     onChange={(e) => setData('email', e.target.value)}
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                     required
                                                 />
                                             </div>
                                             <div>
-                                                <label htmlFor="phone" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                                <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                     Phone Number
                                                 </label>
-                                                <input
+                                                <Input
                                                     type="tel"
                                                     id="phone"
                                                     maxLength={15}
                                                     value={data.phone}
                                                     onChange={(e) => setData('phone', e.target.value)}
-                                                    className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label htmlFor="subject" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                            <label htmlFor="subject" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                 Subject <span className="text-[var(--danger)]">*</span>
                                             </label>
-                                            <input
+                                            <Input
                                                 type="text"
                                                 id="subject"
                                                 maxLength={100}
                                                 value={data.subject}
                                                 onChange={(e) => setData('subject', e.target.value)}
-                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                 required
                                             />
                                         </div>
 
                                         <div>
-                                            <label htmlFor="message" className="mb-2 block text-sm font-medium text-[var(--text)]">
+                                            <label htmlFor="message" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
                                                 Message <span className="text-[var(--danger)]">*</span>
                                             </label>
-                                            <textarea
+                                            <Textarea
                                                 id="message"
                                                 rows={5}
                                                 minLength={20}
                                                 value={data.message}
                                                 onChange={(e) => setData('message', e.target.value)}
-                                                className="w-full rounded-xs border-0 bg-white px-4 py-3 text-[var(--text)] shadow-sm ring-1 ring-[var(--border)] transition-all ring-inset focus:ring-2 focus:ring-[var(--primary)] focus:ring-inset"
                                                 required
-                                            ></textarea>
+                                            />
                                         </div>
 
                                         <div className="flex items-start">
@@ -440,21 +372,10 @@ export default function Contact() {
                                             <button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="group hover:bg-opacity-90 inline-flex w-full items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:outline-none sm:w-auto"
+                                                className="group inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:opacity-90 focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:outline-none sm:w-auto"
                                             >
                                                 <span className="mr-2">{processing ? 'Sending...' : 'Send Message'}</span>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
+                                                <Send className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                                             </button>
                                         </div>
                                     </form>
@@ -469,7 +390,7 @@ export default function Contact() {
             <section className="animate-fade-in-up bg-[var(--bg-light)] py-16 dark:bg-[var(--bg)]" style={{ animationDelay: '0.3s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
-                        <span className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--success)] px-3 py-1 text-xs font-medium text-white">
+                        <span className="inline-flex items-center rounded-full bg-[var(--success)]/10 px-3 py-1 text-xs font-medium text-[var(--success)]">
                             OUR LOCATION
                         </span>
                         <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Visit Us Today</h2>
@@ -510,25 +431,22 @@ export default function Contact() {
                             </MapContainer>
 
                             {/* Location information overlay */}
-                            <div className="pointer-events-auto absolute right-8 bottom-4 left-8 z-[1000] rounded-xl bg-white p-6 shadow-lg dark:bg-[var(--bg-light)]">
+                            <div className="pointer-events-auto absolute right-6 bottom-6 left-6 z-[1000] rounded-xl bg-white/90 p-5 shadow-lg backdrop-blur-sm dark:bg-[var(--bg-light)]/90">
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
-                                        <p className="mt-1 text-[var(--text-muted)]">Bagong Silang Phase 3, Caloocan, Metro Manila</p>
+                                    <div className="flex items-start gap-3">
+                                        <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[var(--primary)]" />
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
+                                            <p className="mt-0.5 text-sm text-[var(--text-muted)]">Bagong Silang Phase 3, Caloocan, Metro Manila</p>
+                                        </div>
                                     </div>
                                     <a
                                         href="https://maps.google.com/maps?q=14.7695106,121.0489927"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 px-4 py-2 text-white transition-all hover:shadow-lg"
+                                        className="inline-flex shrink-0 cursor-pointer items-center rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 px-4 py-2 text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707L15 4m0 13V4m0 0L9 7"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        <MapPin className="mr-2 h-4 w-4" />
                                         <span>Get Directions</span>
                                     </a>
                                 </div>
@@ -542,7 +460,7 @@ export default function Contact() {
             <section id="faq" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]" style={{ animationDelay: '0.4s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
-                        <span className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--secondary)] px-3 py-1 text-xs font-medium text-white">
+                        <span className="inline-flex items-center rounded-full bg-[var(--secondary)]/10 px-3 py-1 text-xs font-medium text-[var(--secondary)]">
                             HELPFUL INFORMATION
                         </span>
                         <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Frequently Asked Questions</h2>
@@ -550,7 +468,6 @@ export default function Contact() {
                     </div>
 
                     <div className="mx-auto grid max-w-4xl gap-6">
-                        {/* FAQ Item 1 */}
                         {FAQs.map((faq) => (
                             <div
                                 key={faq.id}
@@ -559,16 +476,8 @@ export default function Contact() {
                                 <details className="group">
                                     <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
                                         <span>{faq.question}</span>
-                                        <span className="ml-6 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
+                                        <span className="ml-6 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180">
+                                            <ChevronDown className="h-5 w-5" />
                                         </span>
                                     </summary>
                                     <div className="overflow-hidden transition-all duration-500 ease-in-out">
@@ -594,39 +503,30 @@ export default function Contact() {
             </section>
 
             {/* CTA Section */}
-            <section className="animate-fade-in-up relative overflow-hidden bg-[var(--primary)] py-16 text-white" style={{ animationDelay: '0.5s' }}>
-                <div className="absolute inset-0 z-0">
-                    <svg
-                        className="absolute top-0 left-full h-full w-1/2 -translate-x-1/2 transform"
-                        viewBox="0 0 500 500"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <g transform="translate(0, 0)">
-                            <path
-                                d="M125,-160.4C159.9,-137.3,184.8,-98.2,188.9,-59C193.1,-19.8,176.6,19.6,153.8,52.6C131.1,85.5,102,112,69.1,135.7C36.2,159.4,-0.6,180.3,-41.3,180.5C-82,180.7,-126.7,160.3,-151.2,126.8C-175.7,93.3,-180,46.7,-174.8,4C-169.7,-38.7,-155.1,-77.3,-127.5,-100.5C-100,-123.7,-59.5,-131.3,-17.8,-146.7C23.9,-162,90.1,-183.4,125,-160.4Z"
-                                fill="var(--primary-dark)"
-                                opacity="0.1"
-                            />
-                        </g>
-                    </svg>
-                    <svg
-                        className="absolute top-0 right-full h-full w-1/2 translate-x-1/2 transform"
-                        viewBox="0 0 500 500"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <g transform="translate(0, 0)">
-                            <path
-                                d="M137.1,-191.3C173.1,-154.1,194.2,-105.5,208.5,-55.8C222.7,-6.1,230.1,44.7,214.4,88.7C198.7,132.7,160,170,114.6,191C69.2,212,17.1,216.6,-35.5,209.7C-88.2,202.8,-141.5,184.4,-181.8,148.2C-222.1,112,-249.5,58,-245.1,7.2C-240.7,-43.6,-204.5,-91.2,-164.1,-129.6C-123.7,-168,-61.9,-197.2,-3.7,-192.9C54.5,-188.5,101.1,-228.5,137.1,-191.3Z"
-                                fill="var(--primary-light)"
-                                opacity="0.05"
-                            />
-                        </g>
-                    </svg>
-                </div>
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white" style={{ animationDelay: '0.5s' }}>
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
 
-                <div className="relative z-10 container mx-auto px-6 lg:px-8">
-                    <div className="mx-auto max-w-4xl text-center">
-                        <h2 className="text-3xl font-bold md:text-4xl">Join Our Mission for a Healthier Community</h2>
+                <div className="relative z-10 container mx-auto px-6 text-center lg:px-8">
+                    <h2 className="mb-4 text-3xl font-bold md:text-4xl">Join Our Mission for a Healthier Community</h2>
+                    <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
+                        Help us make a difference in the lives of children and families in our barangay.
+                    </p>
+                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+                        <Link
+                            href={route('register')}
+                            className="inline-flex cursor-pointer items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
+                        >
+                            <HeartHandshake className="mr-2 h-5 w-5" />
+                            Get Started Today
+                        </Link>
+                        <a
+                            href="#contact-form"
+                            className="inline-flex cursor-pointer items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
+                        >
+                            <Send className="mr-2 h-5 w-5" />
+                            Send a Message
+                        </a>
                     </div>
                 </div>
             </section>

@@ -1,3 +1,4 @@
+import AnnouncementCard from '@/components/announcement-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
@@ -22,7 +23,6 @@ import {
     Sparkles,
     Trash2,
     TrendingUp,
-    User,
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -198,10 +198,6 @@ export default function Index(props: IndexProps) {
                 .announcement-card {
                     animation: slideIn 0.4s ease-out forwards;
                     opacity: 0;
-                }
-
-                .announcement-card:hover img {
-                    transform: scale(1.05);
                 }
 
                 .stat-card {
@@ -462,75 +458,20 @@ export default function Index(props: IndexProps) {
                         <div key="card" className="animate-fadeIn">
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                                 {filteredAnnouncements.map((announcement, index) => (
-                                    <div
+                                    <AnnouncementCard
                                         key={announcement.id}
-                                        className="announcement-card group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl"
-                                        style={{
-                                            animationDelay: `${index * 50}ms`,
-                                        }}
-                                    >
-                                        <div
-                                            className="absolute inset-x-0 top-0 h-1.5"
-                                            style={{
-                                                backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                            }}
-                                        />
-
-                                        <div className="relative h-48 overflow-hidden">
-                                            {announcement.image ? (
-                                                <img
-                                                    src={`/storage/${announcement.image}`}
-                                                    alt={announcement.title}
-                                                    className="h-full w-full object-cover transition-transform duration-500"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50">
-                                                    <Megaphone className="h-14 w-14 text-teal-300" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex flex-1 flex-col p-5">
-                                            <div className="mb-3 flex flex-wrap gap-2">
-                                                <Badge
-                                                    className="font-semibold shadow-sm"
-                                                    style={{
-                                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                                        color: 'white',
-                                                    }}
+                                        announcement={announcement}
+                                        variant="admin"
+                                        showAuthor
+                                        lineClamp={3}
+                                        className="announcement-card"
+                                        style={{ animationDelay: `${index * 50}ms` }}
+                                        renderActions={() => (
+                                            <div className="flex gap-2">
+                                                <Link
+                                                    href={route('announcements.edit', { announcement: announcement.slug }) + `?page=${props.pagination.current_page}`}
+                                                    className="flex-1"
                                                 >
-                                                    {announcement.category.name}
-                                                </Badge>
-                                                {announcement.is_expired && (
-                                                    <Badge className="bg-red-500 font-semibold text-white shadow-sm">
-                                                        Expired
-                                                    </Badge>
-                                                )}
-                                            </div>
-
-                                            <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600">
-                                                {announcement.title}
-                                            </h3>
-
-                                            <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
-                                                <div className="flex items-center gap-1.5">
-                                                    <Calendar className="h-4 w-4" />
-                                                    <span>{announcement.date}</span>
-                                                </div>
-                                                {announcement.author && (
-                                                    <div className="flex items-center gap-1.5">
-                                                        <User className="h-4 w-4" />
-                                                        <span>{announcement.author}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="mb-3 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-
-                                            <p className="mb-5 line-clamp-3 text-sm text-gray-700">{announcement.summary}</p>
-
-                                            <div className="mt-auto flex gap-2">
-                                                <Link href={route('announcements.edit', { announcement: announcement.slug }) + `?page=${props.pagination.current_page}`} className="flex-1">
                                                     <Button
                                                         className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm shadow-sm hover:from-teal-600 hover:to-cyan-600"
                                                         size="sm"
@@ -559,8 +500,8 @@ export default function Index(props: IndexProps) {
                                                     )}
                                                 </Button>
                                             </div>
-                                        </div>
-                                    </div>
+                                        )}
+                                    />
                                 ))}
                             </div>
                         </div>

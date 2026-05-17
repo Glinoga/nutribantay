@@ -82,6 +82,7 @@ class AnnouncementController extends Controller
                 'from' => $announcements->firstItem(),
                 'to' => $announcements->lastItem(),
             ],
+            'categories' => Category::all(),
         ]);
     }
 
@@ -95,8 +96,20 @@ class AnnouncementController extends Controller
 
         $announcement->load('category');
 
+        $relatedAnnouncements = Announcement::with('category')
+            ->where('category_id', $announcement->category_id)
+            ->where('id', '!=', $announcement->id)
+            ->where(function ($q) {
+                $q->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', now()->toDateString());
+            })
+            ->orderBy('date', 'desc')
+            ->take(3)
+            ->get();
+
         return Inertia::render('Guest/showannouncement', [
             'announcement' => $announcement,
+            'relatedAnnouncements' => $relatedAnnouncements,
         ]);
     }
 

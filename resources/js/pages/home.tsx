@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Link } from '@inertiajs/react';
+import { Activity, ArrowRight, Baby, Check, HeartHandshake, Share2, Users } from 'lucide-react';
+import { useState } from 'react';
 
 // Define interface for the announcements
 interface Category {
@@ -45,6 +47,23 @@ function getCategoryColorClass(categoryColor: string) {
 }
 
 export default function Home({ announcements = [], maintenance = null }: HomeProps) {
+    const [sharedId, setSharedId] = useState<number | null>(null);
+
+    const shareAnnouncement = (announcement: Announcement) => {
+        const url = `${window.location.origin}/guest/announcements/${announcement.slug}`;
+        if (navigator.share) {
+            navigator.share({
+                title: announcement.title,
+                text: announcement.summary,
+                url,
+            });
+        } else {
+            navigator.clipboard.writeText(url);
+            setSharedId(announcement.id);
+            setTimeout(() => setSharedId(null), 2000);
+        }
+    };
+
     return (
         <GuestLayout title="Home">
             <style>{`
@@ -101,41 +120,38 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                         Empowering our community with nutrition monitoring and health services for a healthier future
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-                                    <a
-                                        href="#announcements"
-                                        className="group flex w-48 items-center justify-center rounded-full border-2 border-[var(--primary)] px-6 py-3 font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-lg"
-                                    >
-                                        <span>Latest Updates</span>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                            <polyline points="12 5 19 12 12 19"></polyline>
-                                        </svg>
-                                    </a>
+                        <a
+                            href="#announcements"
+                            className="group flex w-48 items-center justify-center rounded-full border-2 border-[var(--primary)] px-6 py-3 font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-lg"
+                        >
+                            <span>Latest Updates</span>
+                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </a>
                     </div>
 
                     {/* Floating Health Stats Cards */}
                     <div className="relative mx-auto mt-16 max-w-5xl">
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
+                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
+                                    <Baby className="h-6 w-6 text-[var(--primary)]" />
+                                </div>
                                 <h3 className="text-3xl font-bold text-[var(--primary)]">500+</h3>
-                                <p className="text-sm text-[var(--text-muted)]">Children Monitored</p>
+                                <p className="mt-1 text-sm text-[var(--text-muted)]">Children Monitored</p>
                             </div>
                             <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
+                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
+                                    <Activity className="h-6 w-6 text-[var(--primary)]" />
+                                </div>
                                 <h3 className="text-3xl font-bold text-[var(--primary)]">50+</h3>
-                                <p className="text-sm text-[var(--text-muted)]">Health Programs</p>
+                                <p className="mt-1 text-sm text-[var(--text-muted)]">Health Programs</p>
                             </div>
                             <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
+                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
+                                    <Users className="h-6 w-6 text-[var(--primary)]" />
+                                </div>
                                 <h3 className="text-3xl font-bold text-[var(--primary)]">200+</h3>
-                                <p className="text-sm text-[var(--text-muted)]">Families Assisted</p>
+                                <p className="mt-1 text-sm text-[var(--text-muted)]">Families Assisted</p>
                             </div>
                         </div>
                     </div>
@@ -143,7 +159,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
             </section>
 
             {/* Announcements Preview Section */}
-            <section id="announcements" className="animate-fade-in-up py-20">
+            <section id="announcements" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-12 flex flex-col items-center justify-between gap-4 md:flex-row">
                         <div>
@@ -152,25 +168,13 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             </span>
                             <h2 className="text-3xl font-bold text-[var(--text)] md:text-4xl">Latest Announcements</h2>
                         </div>
-                        <a
+                        <Link
                             href={route('guest.announcements')}
                             className="inline-flex items-center rounded-full border-2 border-[var(--primary)] px-6 py-2 text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white"
                         >
                             <span>View All</span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="ml-2 h-4 w-4"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </a>
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
                     </div>
 
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -190,9 +194,34 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                     </div>
                                     <div className="relative z-20 flex h-full flex-col p-6 pt-16">
                                         <h3 className="mb-3 text-xl font-semibold group-hover:text-[var(--info)]">{announcement.title}</h3>
-                                        <p className="mb-4 flex-grow text-[var(--text-muted)]">{announcement.summary}</p>
-                                        <div className="relative z-30 mt-auto flex items-center justify-between pt-4">
-                                            <span className="text-sm text-[var(--text-muted)]">{announcement.date}</span>
+                                        <p
+                                            className="mb-4 flex-1 text-[var(--text-muted)]"
+                                            style={{
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden',
+                                            }}
+                                        >
+                                            {announcement.summary}
+                                        </p>
+                                        <div className="relative z-30 mt-auto flex items-center justify-between gap-2 pt-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-sm text-[var(--text-muted)]">{announcement.date}</span>
+                                                <button
+                                                    onClick={() => shareAnnouncement(announcement)}
+                                                    className="flex cursor-pointer items-center gap-1 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
+                                                >
+                                                    {sharedId === announcement.id ? (
+                                                        <Check className="h-4 w-4 text-green-500" />
+                                                    ) : (
+                                                        <Share2 className="h-4 w-4" />
+                                                    )}
+                                                    <span className={sharedId === announcement.id ? 'text-green-500' : ''}>
+                                                        {sharedId === announcement.id ? 'Copied!' : 'Share'}
+                                                    </span>
+                                                </button>
+                                            </div>
                                             <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
                                                 <Button
                                                     className="rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:border-[var(--bg-light)] hover:bg-[var(--primary)] hover:text-white"
@@ -215,13 +244,31 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
             </section>
 
             {/* Call to Action Section */}
-            <section className="animate-fade-in-up bg-[var(--primary)] py-12">
-                <div className="container mx-auto px-6 text-center lg:px-8">
-                    <h2 className="mb-8 text-3xl font-bold text-white md:text-4xl">Making a Difference in Our Community</h2>
-                    <p className="text-opacity-80 mx-auto mb-8 max-w-2xl text-lg text-white">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16">
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
+                <div className="relative container mx-auto px-6 text-center lg:px-8">
+                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Making a Difference in Our Community</h2>
+                    <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
                         Be part of our mission to improve nutrition and health outcomes for children in our community. Register today to access our
                         services.
                     </p>
+                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+                        <Link
+                            href={route('register')}
+                            className="inline-flex items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
+                        >
+                            <HeartHandshake className="mr-2 h-5 w-5" />
+                            Get Started Today
+                        </Link>
+                        <Link
+                            href={route('guest.contact')}
+                            className="inline-flex items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
+                        >
+                            Contact Us
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </div>
                 </div>
             </section>
         </GuestLayout>
