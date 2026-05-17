@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Link } from '@inertiajs/react';
-import { Activity, ArrowRight, Baby, Check, HeartHandshake, Share2, Users } from 'lucide-react';
+import { Activity, ArrowRight, Baby, Check, Share2, Users } from 'lucide-react';
 import { useState } from 'react';
 
 // Define interface for the announcements
@@ -254,13 +254,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                         services.
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-                        <Link
-                            href={route('register')}
-                            className="inline-flex items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
-                        >
-                            <HeartHandshake className="mr-2 h-5 w-5" />
-                            Get Started Today
-                        </Link>
                         <Link
                             href={route('guest.contact')}
                             className="inline-flex items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"

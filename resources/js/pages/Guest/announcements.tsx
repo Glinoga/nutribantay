@@ -4,7 +4,7 @@ import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link, router } from '@inertiajs/react';
-import { HeartHandshake, Megaphone, Search, X } from 'lucide-react';
+import { Megaphone, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface Category {
@@ -281,13 +281,6 @@ export default function Announcements({ announcements, pagination, categories }:
                         Follow our latest announcements to stay up-to-date with community programs and events.
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-                        <Link
-                            href={route('register')}
-                            className="inline-flex cursor-pointer items-center rounded-full bg-white px-8 py-3 font-semibold text-[var(--primary)] shadow-lg transition-all hover:bg-[var(--bg-light)] hover:shadow-xl"
-                        >
-                            <HeartHandshake className="mr-2 h-5 w-5" />
-                            Get Started Today
-                        </Link>
                         <Link
                             href={route('guest.contact')}
                             className="inline-flex cursor-pointer items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"

@@ -99,6 +99,7 @@ class AnnouncementController extends Controller
         $relatedAnnouncements = Announcement::with('category')
             ->where('category_id', $announcement->category_id)
             ->where('id', '!=', $announcement->id)
+            ->where('date', '<=', now())
             ->where(function ($q) {
                 $q->whereNull('end_date')
                     ->orWhereDate('end_date', '>=', now()->toDateString());

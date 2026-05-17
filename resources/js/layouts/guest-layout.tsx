@@ -1,6 +1,5 @@
 import { route } from '@/lib/routes';
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
 
 type GuestLayoutProps = {
@@ -9,7 +8,6 @@ type GuestLayoutProps = {
 };
 
 export default function GuestLayout({ children, title, showHeader = true }: PropsWithChildren<GuestLayoutProps>) {
-    const { auth } = usePage<SharedData>().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
@@ -121,32 +119,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 </nav>
                             </div>
 
-                            <div className="flex items-center gap-2 md:gap-4">
-                                {auth.user ? (
-                                    <Link
-                                        href="/dashboard"
-                                        className="hidden md:inline-flex rounded-full bg-[var(--primary)] px-4 py-1.5 text-sm font-medium text-white transition-all hover:shadow-md md:px-6 md:py-2 md:text-base"
-                                    >
-                                        Dashboard
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href={route('login')}
-                                            className="hidden md:inline-flex rounded-full border-2 border-[var(--primary)] bg-transparent px-4 py-1.5 text-sm font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-md md:px-6 md:py-2 md:text-base"
-                                        >
-                                            Log in
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="hidden md:inline-flex rounded-full bg-[var(--primary)] px-4 py-1.5 text-sm font-medium text-white transition-all hover:shadow-md md:px-6 md:py-2 md:text-base"
-                                        >
-                                            Register
-                                        </Link>
-                                    </>
-                                )}
-
-                                {/* Mobile hamburger */}
+                            <div className="flex items-center">
                                 <button
                                     className="flex items-center justify-center rounded-lg p-2 text-[var(--primary)] md:hidden"
                                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -195,33 +168,6 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     >
                                         Contact
                                     </Link>
-                                    <hr className="border-[var(--border-muted)]" />
-                                    {auth.user ? (
-                                        <Link
-                                            href="/dashboard"
-                                            className="inline-block rounded-full bg-[var(--primary)] px-6 py-2 text-center font-medium text-white"
-                                            onClick={() => setMobileMenuOpen(false)}
-                                        >
-                                            Dashboard
-                                        </Link>
-                                    ) : (
-                                        <div className="flex flex-col space-y-2">
-                                            <Link
-                                                href={route('login')}
-                                                className="inline-block rounded-full border-2 border-[var(--primary)] px-6 py-2 text-center font-medium text-[var(--primary)]"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                Log in
-                                            </Link>
-                                            <Link
-                                                href={route('register')}
-                                                className="inline-block rounded-full bg-[var(--primary)] px-6 py-2 text-center font-medium text-white"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                Register
-                                            </Link>
-                                        </div>
-                                    )}
                                 </nav>
                             </div>
                         )}
