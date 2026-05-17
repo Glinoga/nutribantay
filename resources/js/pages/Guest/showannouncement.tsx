@@ -15,6 +15,7 @@ interface Category {
 
 interface Announcement {
     id: number;
+    slug?: string;
     title: string;
     date: string;
     end_date?: string;

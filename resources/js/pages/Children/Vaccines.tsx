@@ -44,6 +44,7 @@ type ChildVaccine = {
 type ChildVaccinesProps = {
     child: {
         id: number;
+        slug?: string;
         fullname: string;
         barangay: string;
     };
@@ -98,7 +99,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         e.preventDefault();
         if (!selectedVaccineId) return;
 
-        router.post(route('children.vaccines.store', { child: child.id }), {
+        router.post(route('children.vaccines.store', { child: child.slug }), {
             vaccine_id: selectedVaccineId,
         });
     };
@@ -213,8 +214,8 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: child.fullname, href: route('children.show', { child: child.id }) },
-                { title: 'Vaccines', href: route('children.vaccines.index', { child: child.id }) },
+                { title: child.fullname, href: route('children.show', { child: child.slug }) },
+                { title: 'Vaccines', href: route('children.vaccines.index', { child: child.slug }) },
             ]}
         >
             <Head title={`Vaccines - ${child.fullname}`} />
@@ -277,7 +278,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                     {/* Action Buttons */}
                     <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
-                        <Link href={route('children.show', { child: child.id })}>
+                        <Link href={route('children.show', { child: child.slug })}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg">
                                 <X className="h-4 w-4" />
                                 Back to Child

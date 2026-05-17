@@ -28,6 +28,7 @@ type Category = {
 
 type Announcement = {
     id: number;
+    slug?: string;
     title: string;
     category_id: number;
     category: Category;

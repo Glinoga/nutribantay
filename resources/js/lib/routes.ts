@@ -1,4 +1,4 @@
-export function route(name: string, params?: Record<string, string | number>): string {
+export function route(name: string, params?: Record<string, string | number | null | undefined>): string {
     const routes: Record<string, string> = {
         // Home
         home: '/',
@@ -147,7 +147,7 @@ export function route(name: string, params?: Record<string, string | number>): s
 
     if (params && path.includes('{')) {
         return Object.entries(params).reduce((p, [key, value]) => {
-            return p.replace(`{${key}}`, value.toString());
+            return p.replace(`{${key}}`, (value ?? '').toString());
         }, path);
     }
 

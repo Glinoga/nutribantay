@@ -41,7 +41,7 @@ type HealthLog = {
     next_due_date?: string | null;
     vaccine_status?: string | null;
     child_id?: number;
-    child?: { fullname: string; id: number };
+    child?: { fullname: string; id: number; slug?: string };
 };
 
 type EditProps = {
@@ -97,13 +97,14 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
 
     // Use child_id from controller prop first, then fall back to healthlog data
     const childId = propChildId ?? healthlog.child_id ?? healthlog.child?.id;
+    const childSlug = healthlog.child?.slug ?? childId;
     const childName = healthlog.child?.fullname || 'Child';
 
     return (
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: childName, href: route('children.show', { child: childId ?? 0 }) },
+                { title: childName, href: route('children.show', { child: childSlug }) },
                 { title: 'Edit Health Log', href: route('healthlogs.edit', { healthlog: healthlog.id }) },
             ]}
         >
@@ -165,7 +166,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                     record for this child, please use the button below instead.
                                 </p>
                                 {childId && (
-                                    <Link href={route('children.healthlogs.create', { child: childId })}>
+                                    <Link href={route('children.healthlogs.create', { child: childSlug })}>
                                         <Button className="mt-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:from-teal-600 hover:to-cyan-600">
                                             <Plus className="mr-2 h-4 w-4" />
                                             Add New Health Log
@@ -368,8 +369,9 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                 variant="outline"
                                 onClick={() => {
                                     const childId = healthlog.child_id ?? healthlog.child?.id;
+                                    const childSlug = healthlog.child?.slug ?? childId;
                                     if (childId) {
-                                        router.visit(route('children.show', { child: childId }));
+                                        router.visit(route('children.show', { child: childSlug }));
                                     } else {
                                         router.visit(route('children.index'));
                                     }
@@ -384,7 +386,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => router.visit(route('children.show', { child: childId }))}
+                                    onClick={() => router.visit(route('children.show', { child: childSlug }))}
                                     className="px-8 py-5 text-lg font-bold"
                                 >
                                     Cancel & Go to Profile

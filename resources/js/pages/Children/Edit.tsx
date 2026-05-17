@@ -13,6 +13,7 @@ import { useState } from 'react';
 
 interface Child {
     id: number;
+    slug?: string;
     first_name: string;
     middle_initial?: string;
     last_name: string;
@@ -57,11 +58,11 @@ export default function Edit({ child }: Props) {
             return;
         }
 
-        put(route('children.update', { child: child.id }), {
+        put(route('children.update', { child: child.slug }), {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.success('Child record updated successfully!');
-                router.visit(route('children.show', { child: child.id }));
+                router.visit(route('children.show', { child: child.slug }));
             },
             onError: () => {
                 smartToast.error('Failed to update record. Please try again.');
@@ -70,15 +71,15 @@ export default function Edit({ child }: Props) {
     };
 
     const handleClose = () => {
-        router.visit(route('children.show', { child: child.id }));
+        router.visit(route('children.show', { child: child.slug }));
     };
 
     return (
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: `${child.first_name} ${child.last_name}`, href: route('children.show', { child: child.id }) },
-                { title: 'Edit', href: route('children.edit', { child: child.id }) },
+                { title: `${child.first_name} ${child.last_name}`, href: route('children.show', { child: child.slug }) },
+                { title: 'Edit', href: route('children.edit', { child: child.slug }) },
             ]}
         >
             <Head title="Edit Child Record" />

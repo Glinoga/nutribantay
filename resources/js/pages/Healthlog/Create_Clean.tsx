@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 
 type Child = {
     id: number;
+    slug?: string;
     fullname: string;
     sex: string;
     birthdate: string;
@@ -96,7 +97,7 @@ export default function Create({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('children.healthlogs.store', { child: child.id }), {
+        post(route('children.healthlogs.store', { child: child.slug }), {
             onSuccess: () => {
                 setShowSuccess(true);
                 smartToast.success('Health log added successfully!');
@@ -111,8 +112,8 @@ export default function Create({
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: child.fullname, href: route('children.show', { child: child.id }) },
-                { title: 'Add Health Log', href: route('children.healthlogs.create', { child: child.id }) },
+                { title: child.fullname, href: route('children.show', { child: child.slug }) },
+                { title: 'Add Health Log', href: route('children.healthlogs.create', { child: child.slug }) },
             ]}
         >
             <Head title={`Add Health Log - ${child.fullname}`} />
@@ -566,7 +567,7 @@ export default function Create({
                                 Cancel & Go Back
                             </Button>
 
-                            <Link href={route('children.show', { child: child.id })}>
+                            <Link href={route('children.show', { child: child.slug })}>
                                 <Button type="button" variant="outline" className="px-8 py-5 text-lg font-bold">
                                     Cancel & Go to Profile
                                 </Button>

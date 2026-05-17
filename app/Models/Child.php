@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Child extends Model
 {
@@ -26,6 +27,7 @@ class Child extends Model
         'contact_number',
         'created_by',
         'updated_by',
+        'slug',
     ];
 
     protected $casts = [
@@ -34,6 +36,23 @@ class Child extends Model
 
     // 🔥 This exposes computed attributes (fullname, formatted_name) to JSON/API
     protected $appends = ['fullname', 'formatted_name', 'bmi', 'age', 'is_over_60_months'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Child $child) {
+            if (! $child->slug) {
+                $base = Str::slug($child->first_name.' '.$child->last_name);
+                $slug = $base;
+                $counter = 1;
+
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $base.'-'.++$counter;
+                }
+
+                $child->slug = $slug;
+            }
+        });
+    }
 
     /*
     |--------------------------------------------------------------------------

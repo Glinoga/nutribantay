@@ -20,6 +20,7 @@ import { useState } from 'react';
 
 type Child = {
     id: number;
+    slug?: string;
     fullname: string;
     first_name: string;
     middle_initial: string | null;

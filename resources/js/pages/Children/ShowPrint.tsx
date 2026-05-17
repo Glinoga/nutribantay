@@ -23,6 +23,7 @@ type HealthLog = {
 
 type Child = {
     id: number;
+    slug?: string;
     fullname: string;
     first_name: string;
     middle_initial: string | null;
@@ -126,7 +127,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
-                <Link href={route('children.show', { child: child.id })}>
+                <Link href={route('children.show', { child: child.slug })}>
                     <Button variant="outline" className="cursor-pointer border-cyan-300">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Profile

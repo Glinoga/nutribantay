@@ -482,7 +482,7 @@ export default function Contact() {
                         {/* Leaflet Map */}
                         <div className="relative h-[36rem] w-full">
                             <MapContainer
-                                center={[14.7783, 121.04487]}
+                                center={[14.7695106, 121.0489927]}
                                 zoom={16}
                                 style={{ height: '100%', width: '100%' }}
                                 scrollWheelZoom={true}
@@ -492,7 +492,7 @@ export default function Contact() {
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <Marker position={[14.7783, 121.04487]}>
+                                <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
                                             <h3 className="text-lg font-bold text-gray-800">Bagong Silang Phase 3 Health Center</h3>
@@ -514,10 +514,10 @@ export default function Contact() {
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                     <div>
                                         <h3 className="text-xl font-semibold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
-                                        <p className="mt-1 text-[var(--text-muted)]">Q29X+VJC, Caloocan, Metro Manila</p>
+                                        <p className="mt-1 text-[var(--text-muted)]">Bagong Silang Phase 3, Caloocan, Metro Manila</p>
                                     </div>
                                     <a
-                                        href="https://maps.google.com/maps?q=14.7783,121.04487"
+                                        href="https://maps.google.com/maps?q=14.7695106,121.0489927"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 px-4 py-2 text-white transition-all hover:shadow-lg"

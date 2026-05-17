@@ -37,6 +37,7 @@ const MySwal = withReactContent(Swal);
 
 type Child = {
     id: number;
+    slug?: string;
     fullname: string;
     first_name: string;
     middle_initial?: string | null;
@@ -232,7 +233,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             background: 'hsl(178 100% 98%)',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('children.destroy', { child: child.id }), {
+                router.delete(route('children.destroy', { child: child.slug }), {
                     preserveScroll: true,
                     onSuccess: () => {
                         smartToast.success(`${child.fullname}'s record deleted successfully!`);
@@ -702,7 +703,7 @@ router.get(route('children.index'), params, { replace: true });
 
                                                 <div className="border-t border-gray-100">
                                                     <Link
-                                                        href={route('children.show', { child: child.id })}
+                                                        href={route('children.show', { child: child.slug })}
                                                         className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
                                                     >
                                                         <Activity className="h-3.5 w-3.5" />
@@ -713,7 +714,7 @@ router.get(route('children.index'), params, { replace: true });
                                                 {canManageChildren && (
                                                     <div className="flex border-t border-gray-100">
                                                         <Link
-                                                            href={route('children.edit', { child: child.id })}
+                                                            href={route('children.edit', { child: child.slug })}
                                                             className="flex flex-1 items-center justify-center gap-1 border-r border-gray-100 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
                                                         >
                                                             <Edit2 className="h-3.5 w-3.5" />

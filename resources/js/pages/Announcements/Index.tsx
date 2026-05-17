@@ -39,6 +39,7 @@ interface Category {
 
 interface Announcement {
     id: number;
+    slug?: string;
     title: string;
     category_id: number;
     category: Category;
@@ -154,7 +155,7 @@ export default function Index(props: IndexProps) {
 
         setDeletingId(announcement.id);
 
-        router.delete(route('announcements.destroy', { announcement: announcement.id }), {
+        router.delete(route('announcements.destroy', { announcement: announcement.slug }), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeletingId(null);
@@ -529,7 +530,7 @@ export default function Index(props: IndexProps) {
                                             <p className="mb-5 line-clamp-3 text-sm text-gray-700">{announcement.summary}</p>
 
                                             <div className="mt-auto flex gap-2">
-                                                <Link href={route('announcements.edit', { announcement: announcement.id }) + `?page=${props.pagination.current_page}`} className="flex-1">
+                                                <Link href={route('announcements.edit', { announcement: announcement.slug }) + `?page=${props.pagination.current_page}`} className="flex-1">
                                                     <Button
                                                         className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm shadow-sm hover:from-teal-600 hover:to-cyan-600"
                                                         size="sm"
@@ -623,7 +624,7 @@ export default function Index(props: IndexProps) {
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Link href={route('announcements.edit', { announcement: announcement.id }) + `?page=${props.pagination.current_page}`}>
+                                                        <Link href={route('announcements.edit', { announcement: announcement.slug }) + `?page=${props.pagination.current_page}`}>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"

@@ -14,6 +14,7 @@ interface Category {
 
 interface Announcement {
     id: number;
+    slug?: string;
     title: string;
     date: string;
     end_date?: string;
@@ -192,7 +193,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                         <p className="mb-4 flex-grow text-[var(--text-muted)]">{announcement.summary}</p>
                                         <div className="relative z-30 mt-auto flex items-center justify-between pt-4">
                                             <span className="text-sm text-[var(--text-muted)]">{announcement.date}</span>
-                                            <Link href={route('guest.announcements.show', { announcement: announcement.id })}>
+                                            <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
                                                 <Button
                                                     className="rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:border-[var(--bg-light)] hover:bg-[var(--primary)] hover:text-white"
                                                     size="sm"

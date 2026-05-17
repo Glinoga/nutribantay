@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Announcement extends Model
 {
@@ -19,9 +20,27 @@ class Announcement extends Model
         'summary',
         'content',
         'image',
+        'slug',
     ];
 
     protected $appends = ['is_expired'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Announcement $announcement) {
+            if (! $announcement->slug) {
+                $base = Str::slug($announcement->title);
+                $slug = $base;
+                $counter = 1;
+
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $base.'-'.++$counter;
+                }
+
+                $announcement->slug = $slug;
+            }
+        });
+    }
 
     public function category()
     {

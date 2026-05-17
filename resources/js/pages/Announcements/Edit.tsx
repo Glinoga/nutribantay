@@ -22,6 +22,7 @@ interface Category {
 
 interface Announcement {
     id: number;
+    slug?: string;
     title: string;
     date: string;
     end_date: string | null;
@@ -103,7 +104,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         formData.append('_method', 'PUT');
         formData.append('page', page || '1');
 
-        router.post(route('announcements.update', { announcement: announcement.id }), formData, {
+        router.post(route('announcements.update', { announcement: announcement.slug }), formData, {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {

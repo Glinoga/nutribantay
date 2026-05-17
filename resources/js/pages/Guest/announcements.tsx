@@ -29,6 +29,7 @@ interface Category {
 
 interface Announcement {
     id: number;
+    slug?: string;
     title: string;
     date: string;
     end_date?: string;
@@ -252,7 +253,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                                     <div className="mb-4 h-0.5 w-16 rounded-full bg-[var(--border-muted)]"></div>
                                     <p className="mb-6 line-clamp-4 text-[var(--text)]">{announcement.summary}</p>
                                     <div className="flex items-center justify-between">
-                                        <Link href={route('guest.announcements.show', { announcement: announcement.id })}>
+                                        <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
                                             <Button
                                                 className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
                                                 size="sm"

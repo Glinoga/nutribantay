@@ -67,6 +67,7 @@ type HealthLog = {
 
 type Child = {
     id: number;
+    slug?: string;
     fullname: string;
     first_name: string;
     middle_initial?: string | null;
@@ -125,7 +126,7 @@ export default function Show({ child }: { child: Child }) {
             return;
         }
 
-        put(route('children.update', { child: child.id }), {
+        put(route('children.update', { child: child.slug }), {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.success('Child record updated successfully!');
@@ -162,7 +163,7 @@ export default function Show({ child }: { child: Child }) {
 
     const submitNote = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(route('children.notes.store', { child: child.id }), { note: newNote });
+        router.post(route('children.notes.store', { child: child.slug }), { note: newNote });
         setNewNote('');
     };
 
@@ -278,7 +279,7 @@ export default function Show({ child }: { child: Child }) {
     };
 
     return (
-        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: route('children.show', { child: child.id }) }]}>
+        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: route('children.show', { child: child.slug }) }]}>
             <Head title={`${child.fullname} - Child Details`} />
 
             <style>{`
@@ -371,7 +372,7 @@ export default function Show({ child }: { child: Child }) {
                         </button>
 
                         {canManageHealthlogs && (
-                            <Link href={route('children.healthlogs.create', { child: child.id })}>
+                            <Link href={route('children.healthlogs.create', { child: child.slug })}>
                                 <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                     <Plus className="h-4 w-4" />
                                     Add Health Log
@@ -379,7 +380,7 @@ export default function Show({ child }: { child: Child }) {
                             </Link>
                         )}
 
-                        <Link href={route('children.vaccines.index', { child: child.id })}>
+                        <Link href={route('children.vaccines.index', { child: child.slug })}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
                                 <Syringe className="h-4 w-4" />
                                 Vaccine Tracker
@@ -700,7 +701,7 @@ export default function Show({ child }: { child: Child }) {
                             <p className="mb-4 text-sm text-gray-600">
                                 These records are from the old health log system.{' '}
                                 <Link
-                                    href={route('children.vaccines.index', { child: child.id })}
+                                    href={route('children.vaccines.index', { child: child.slug })}
                                     className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
                                 >
                                     Use the Vaccine Tracker
@@ -1064,7 +1065,7 @@ export default function Show({ child }: { child: Child }) {
                                 <p className="mt-1 text-sm text-amber-700">
                                     Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
                                     health measurements, please{' '}
-                                    <Link href={route('children.healthlogs.create', { child: child.id })} className="font-semibold text-teal-600 hover:underline">
+                                    <Link href={route('children.healthlogs.create', { child: child.slug })} className="font-semibold text-teal-600 hover:underline">
                                         create a health log
                                     </Link>{' '}
                                     instead.
@@ -1274,7 +1275,7 @@ export default function Show({ child }: { child: Child }) {
                             <Button
                                 onClick={() => {
                                     setShowExportDialog(false);
-                                    window.location.href = route('children.show.print', { child: child.id });
+                                    window.location.href = route('children.show.print', { child: child.slug });
                                 }}
                                 className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white hover:from-cyan-700 hover:to-cyan-500"
                             >
@@ -1284,7 +1285,7 @@ export default function Show({ child }: { child: Child }) {
                             <Button
                                 onClick={() => {
                                     setShowExportDialog(false);
-                                    window.location.href = route('children.export.single', { child: child.id });
+                                    window.location.href = route('children.export.single', { child: child.slug });
                                 }}
                                 className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600"
                             >

@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Announcement;
+use App\Models\Child;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -34,6 +37,22 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->configureRateLimiting();
+        $this->configureSlugBindings();
+    }
+
+    protected function configureSlugBindings(): void
+    {
+        Route::bind('child', function ($value) {
+            return is_numeric($value)
+                ? Child::findOrFail($value)
+                : Child::where('slug', $value)->firstOrFail();
+        });
+
+        Route::bind('announcement', function ($value) {
+            return is_numeric($value)
+                ? Announcement::findOrFail($value)
+                : Announcement::where('slug', $value)->firstOrFail();
+        });
     }
 
     protected function configureRateLimiting(): void
