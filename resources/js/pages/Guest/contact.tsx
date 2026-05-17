@@ -467,8 +467,8 @@ export default function Contact() {
                         {/* Leaflet Map */}
                         <div className="relative h-[36rem] w-full">
                             <MapContainer
-                                center={[14.7783, 121.04487]}
-                                zoom={16}
+                                center={[14.7695106, 121.0489927]}
+                                zoom={17}
                                 style={{ height: '100%', width: '100%' }}
                                 scrollWheelZoom={true}
                                 className="rounded-2xl"
@@ -477,7 +477,7 @@ export default function Contact() {
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <Marker position={[14.7783, 121.04487]}>
+                                <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
                                             <h3 className="text-lg font-bold text-gray-800">Bagong Silang Phase 3 Health Center</h3>
@@ -502,7 +502,7 @@ export default function Contact() {
                                         <p className="mt-1 text-[var(--text-muted)]">Q29X+VJC, Caloocan, Metro Manila</p>
                                     </div>
                                     <a
-                                        href="https://maps.google.com/maps?q=14.7783,121.04487"
+                                        href="https://maps.google.com/maps?q=14.7695106,121.0489927"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:shadow-lg"
