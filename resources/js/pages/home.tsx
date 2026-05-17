@@ -172,22 +172,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             <p className="mb-4 text-[var(--text-muted)]">
                                 Regular assessment of children's growth, nutrition status, and health indicators to ensure optimal development.
                             </p>
-                            <a href="#" className="inline-flex items-center text-[var(--primary)] hover:underline">
-                                <span>Learn more</span>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="ml-2 h-4 w-4"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </a>
                         </div>
 
                         {/* Service 2 */}
@@ -211,22 +195,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                 Educational programs for parents and children about proper nutrition, healthy eating habits, and preventive
                                 healthcare.
                             </p>
-                            <a href="#" className="inline-flex items-center text-[var(--secondary)] hover:underline">
-                                <span>Learn more</span>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="ml-2 h-4 w-4"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </a>
                         </div>
 
                         {/* Service 3 */}
@@ -249,22 +217,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             <p className="mb-4 text-[var(--text-muted)]">
                                 Initiatives to strengthen community health resources and promote wellness among all residents.
                             </p>
-                            <a href="#" className="inline-flex items-center text-[var(--success)] hover:underline">
-                                <span>Learn more</span>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="ml-2 h-4 w-4"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                            </a>
                         </div>
                     </div>
                 </div>

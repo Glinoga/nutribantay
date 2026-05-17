@@ -381,7 +381,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                             <circle cx="12" cy="10" r="3"></circle>
                                         </svg>
-                                        Barangay Hall, Caloocan City, Philippines
+                                        Bagong Silang Phase 3 Health Center, Caloocan City, Philippines
                                     </p>
                                     <p className="mb-3 flex items-center text-[var(--text-muted)]">
                                         <svg
@@ -412,7 +412,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                             <polyline points="22,6 12,13 2,6"></polyline>
                                         </svg>
-                                        info@nutribantay.com
+                                        nutribantay@gmail.com
                                     </p>
                                 </address>
                             </div>
