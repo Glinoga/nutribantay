@@ -138,7 +138,7 @@ export default function Contact() {
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Call Us</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">Mon-Fri, 8am-5pm</p>
                                         <a href="tel:+09123456789" className="inline-block text-lg font-medium text-[var(--text)]">
-                                            0912 345 6789
+                                            0966 822 1878
                                         </a>
                                     </div>
 
@@ -162,8 +162,8 @@ export default function Contact() {
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Email Us</h3>
                                         <p className="mb-3 text-[var(--text-muted)]">We'll respond within 24h</p>
-                                        <a href="mailto:nutribantay@gmail.com" className="inline-block text-lg font-medium text-[var(--text)]">
-                                            nutribantay@gmail.com
+                                        <a href="mailto:barangay176b@gmail.com" className="inline-block text-lg font-medium text-[var(--text)]">
+                                            barangay176b@gmail.com
                                         </a>
                                     </div>
 
@@ -467,8 +467,8 @@ export default function Contact() {
                         {/* Leaflet Map */}
                         <div className="relative h-[36rem] w-full">
                             <MapContainer
-                                center={[14.7695106, 121.0489927]}
-                                zoom={17}
+                                center={[14.7783, 121.04487]}
+                                zoom={16}
                                 style={{ height: '100%', width: '100%' }}
                                 scrollWheelZoom={true}
                                 className="rounded-2xl"
@@ -477,7 +477,7 @@ export default function Contact() {
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <Marker position={[14.7695106, 121.0489927]}>
+                                <Marker position={[14.7783, 121.04487]}>
                                     <Popup>
                                         <div className="p-2 text-center">
                                             <h3 className="text-lg font-bold text-gray-800">Bagong Silang Phase 3 Health Center</h3>
@@ -502,7 +502,7 @@ export default function Contact() {
                                         <p className="mt-1 text-[var(--text-muted)]">Q29X+VJC, Caloocan, Metro Manila</p>
                                     </div>
                                     <a
-                                        href="https://maps.google.com/maps?q=14.7695106,121.0489927"
+                                        href="https://maps.google.com/maps?q=14.7783,121.04487"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:shadow-lg"
