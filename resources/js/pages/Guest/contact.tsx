@@ -62,8 +62,23 @@ export default function Contact() {
 
     return (
         <GuestLayout title="Contact Us">
+            <style>{`
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.6s ease-out forwards;
+                }
+                .glass-card {
+                    background: rgba(255, 255, 255, 0.7);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+            `}</style>
             {/* Hero Section */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28" style={{ animationDelay: '0.1s' }}>
                 <div className="absolute top-20 right-20 -z-10 h-64 w-64 rounded-full bg-[var(--primary)] opacity-10 blur-3xl"></div>
                 <div className="absolute bottom-10 left-10 -z-10 h-48 w-48 rounded-full bg-[var(--secondary)] opacity-10 blur-3xl"></div>
                 <div className="absolute -top-10 -left-10 -z-10 h-40 w-40 rounded-full border border-[var(--primary)] opacity-20"></div>
@@ -115,7 +130,7 @@ export default function Contact() {
 
                         {/* Contact Cards */}
                         <div className="relative">
-                            <div className="relative z-10 overflow-hidden rounded-2xl bg-white p-1 shadow-xl dark:bg-[var(--bg-light)]">
+                            <div className="relative z-10 overflow-hidden rounded-2xl bg-white/70 p-1 shadow-xl backdrop-blur-sm">
                                 <div className="grid gap-px rounded-xl bg-[var(--border)] sm:grid-cols-2">
                                     {/* Call Us Card */}
                                     <div className="bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
@@ -230,7 +245,7 @@ export default function Contact() {
             </section>
 
             {/* Contact Form Section */}
-            <section id="contact-form" className="bg-white py-20 dark:bg-[var(--bg)]">
+            <section id="contact-form" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]" style={{ animationDelay: '0.2s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-6xl">
                         <div className="grid gap-16 md:grid-cols-5">
@@ -299,7 +314,7 @@ export default function Contact() {
 
                             {/* Form */}
                             <div className="md:col-span-3">
-                                <div className="overflow-hidden rounded-2xl bg-[var(--bg-light)] p-8 shadow-sm">
+                                <div className="overflow-hidden rounded-2xl glass-card p-8 shadow-sm">
                                     {submitted && (
                                         <div className="mb-6 rounded-md bg-green-50 p-4 text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                             <p>Thank you for your message! We will get back to you soon.</p>
@@ -451,7 +466,7 @@ export default function Contact() {
             </section>
 
             {/* Map Section */}
-            <section className="bg-[var(--bg-light)] py-16 dark:bg-[var(--bg)]">
+            <section className="animate-fade-in-up bg-[var(--bg-light)] py-16 dark:bg-[var(--bg)]" style={{ animationDelay: '0.3s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
                         <span className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--success)] px-3 py-1 text-xs font-medium text-white">
@@ -505,7 +520,7 @@ export default function Contact() {
                                         href="https://maps.google.com/maps?q=14.7783,121.04487"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-[var(--success)] px-4 py-2 text-white transition-all hover:shadow-lg"
+                                        className="hover:bg-opacity-90 inline-flex items-center rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 px-4 py-2 text-white transition-all hover:shadow-lg"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path
@@ -524,7 +539,7 @@ export default function Contact() {
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="bg-white py-20 dark:bg-[var(--bg)]">
+            <section id="faq" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]" style={{ animationDelay: '0.4s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
                         <span className="bg-opacity-10 inline-flex items-center rounded-full bg-[var(--secondary)] px-3 py-1 text-xs font-medium text-white">
@@ -544,7 +559,7 @@ export default function Contact() {
                                 <details className="group">
                                     <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
                                         <span>{faq.question}</span>
-                                        <span className="ml-6 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-light)] text-[var(--primary)] transition-transform duration-500 ease-in-out group-open:rotate-180 dark:bg-[var(--bg)]">
+                                        <span className="ml-6 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 className="h-5 w-5"
@@ -579,7 +594,7 @@ export default function Contact() {
             </section>
 
             {/* CTA Section */}
-            <section className="relative overflow-hidden bg-[var(--primary)] py-16 text-white">
+            <section className="animate-fade-in-up relative overflow-hidden bg-[var(--primary)] py-16 text-white" style={{ animationDelay: '0.5s' }}>
                 <div className="absolute inset-0 z-0">
                     <svg
                         className="absolute top-0 left-full h-full w-1/2 -translate-x-1/2 transform"

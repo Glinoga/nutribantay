@@ -92,11 +92,12 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                 style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
                 {showHeader && (
-                    <header className="fixed top-0 z-50 z-[1001] w-full bg-[var(--bg-light)] shadow-md dark:bg-[var(--bg-light)]">
+                    <header className="fixed top-0 z-50 z-[1001] w-full bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm">
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
-                                <Link href="/" className="relative text-xl font-bold text-[var(--primary)] md:text-2xl">
-                                    <span className="gradient-text">NutriBantay</span>
+                                <Link href="/" className="flex items-center gap-2">
+                                    <img src="/NutriBantay Logo.png" alt="NutriBantay" className="h-8 w-auto md:h-10" />
+                                    <span className="text-xl font-bold md:text-2xl gradient-text">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
                                     <Link
@@ -233,15 +234,21 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                     <div className="mx-auto max-w-7xl px-6">
                         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-3">
                             <div>
-                                <h3 className="gradient-text mb-3 text-2xl font-bold">NutriBantay</h3>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <img src="/NutriBantay Logo.png" alt="NutriBantay" className="h-10 w-auto" />
+                                    <h3 className="text-2xl font-bold gradient-text">NutriBantay</h3>
+                                </div>
                                 <div className="section-divider"></div>
                                 <p className="mb-4 text-[var(--text-muted)]">
                                     Empowering our community with nutrition monitoring and health services.
                                 </p>
-                                <div className="mt-6 flex space-x-4">
+                                <div className="mt-6">
                                     <a
-                                        href="#"
-                                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-transform hover:scale-110"
+                                        href="https://web.facebook.com/profile.php?id=61572504453595"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Follow NutriBantay on Facebook"
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-all hover:bg-gradient-to-r hover:from-teal-600 hover:to-cyan-500 hover:shadow-md hover:scale-110"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -255,44 +262,6 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                             strokeLinejoin="round"
                                         >
                                             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                                        </svg>
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-transform hover:scale-110"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84 0 0 0 .497-3.753C20.18 7.773 21.692 5.25 22 4.009z"></path>
-                                        </svg>
-                                    </a>
-                                    <a
-                                        href="#"
-                                        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-transform hover:scale-110"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                                         </svg>
                                     </a>
                                 </div>

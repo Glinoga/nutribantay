@@ -103,9 +103,22 @@ export default function Announcements({ announcements, pagination }: Announcemen
                     background-clip: text;
                     color: transparent;
                 }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.6s ease-out forwards;
+                }
+                .glass-card {
+                    background: rgba(255, 255, 255, 0.7);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
             `}</style>
 
-            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
                 <div className="absolute top-0 left-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -133,7 +146,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                             id="announcement-search"
                             type="text"
                             placeholder="Search announcements..."
-                            className="w-full bg-transparent px-4 py-3 text-[var(--text)] focus:outline-none"
+                            className="w-full bg-transparent px-4 py-3 text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-teal-500/50 rounded-full"
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
@@ -150,7 +163,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                 </div>
             </section>
 
-            <section className="bg-white py-16 dark:bg-[var(--bg)]">
+            <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
@@ -162,7 +175,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
 
                         <div className="mt-4 flex flex-wrap gap-2 md:mt-0">
                             <button
-                                className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === null ? 'bg-[var(--primary)] text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
+                                className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === null ? 'bg-gradient-to-r from-teal-700 to-cyan-600 text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
                                 onClick={() => handleFilterClick(null)}
                             >
                                 All
@@ -171,7 +184,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                             {categories.map((category) => (
                                 <button
                                     key={category}
-                                    className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === category ? 'bg-[var(--primary)] text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
+                                    className={`rounded-full border-2 border-[var(--primary)] ${activeFilter === category ? 'bg-gradient-to-r from-teal-700 to-cyan-600 text-white' : 'text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-colors`}
                                     onClick={() => handleFilterClick(category)}
                                 >
                                     {category}
@@ -184,7 +197,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                         {filteredAnnouncements.map((announcement) => (
                             <div
                                 key={announcement.id}
-                                className="group relative overflow-hidden rounded-2xl bg-white shadow-md transition-all hover:shadow-xl dark:bg-[var(--bg-light)]"
+                                className="group relative overflow-hidden rounded-2xl bg-white/80 shadow-md backdrop-blur-sm transition-all hover:shadow-xl"
                             >
                                     <div
                                         className="absolute inset-x-0 top-0 h-2"
@@ -253,6 +266,17 @@ export default function Announcements({ announcements, pagination }: Announcemen
                         ))}
                     </div>
 
+                    {pagination.total > 0 && (
+                        <div className="mb-6 text-center text-sm text-[var(--text-muted)]">
+                            Showing{' '}
+                            <span className="font-medium text-[var(--text)]">{pagination.from}</span>
+                            –<span className="font-medium text-[var(--text)]">{pagination.to}</span>
+                            {' '}of{' '}
+                            <span className="font-medium text-[var(--text)]">{pagination.total}</span>{' '}
+                            announcement{pagination.total !== 1 ? 's' : ''}
+                        </div>
+                    )}
+
                     <Pagination pagination={pagination} onPageChange={handlePageChange} />
 
                     {filteredAnnouncements.length === 0 && (
@@ -278,7 +302,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                 </div>
             </section>
 
-            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-800 py-16">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-800 py-16">
                 <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20"></div>
                 <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20"></div>
 

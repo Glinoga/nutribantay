@@ -79,9 +79,22 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                     background-clip: text;
                     color: transparent;
                 }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(30px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.6s ease-out forwards;
+                }
+                .glass-card {
+                    background: rgba(255, 255, 255, 0.7);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
             `}</style>
 
-            <section className="relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-12">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-12">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-8">
                         <Link
@@ -126,7 +139,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                 </div>
             </section>
 
-            <section className="bg-white py-16 dark:bg-[var(--bg)]">
+            <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]" style={{ animationDelay: '0.1s' }}>
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
                         {announcement.image && (
@@ -135,7 +148,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                             </div>
                         )}
 
-                        <div className="mb-8 rounded-2xl bg-[var(--bg-light)] p-8">
+                        <div className="animate-fade-in-up mb-8 rounded-2xl glass-card p-8" style={{ animationDelay: '0.2s' }}>
                             <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-[var(--text)]">
                                 <Sparkles className="h-5 w-5 text-[var(--primary)]" />
                                 Summary
@@ -153,25 +166,25 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                         </div>
 
                         {announcement.end_date && (
-                            <div className="mt-12 rounded-2xl border border-amber-200 bg-amber-50 p-6">
+                            <div className="animate-fade-in-up mt-12 rounded-2xl border border-amber-200 bg-amber-50/80 p-6 backdrop-blur-sm" style={{ animationDelay: '0.3s' }}>
                                 <h3 className="mb-2 font-semibold text-amber-800">Event Duration</h3>
                                 <p className="text-amber-700">This announcement is valid until {formatDate(announcement.end_date)}</p>
                             </div>
                         )}
 
-                        <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-[var(--bg-light)] p-8 text-center md:flex-row">
+                        <div className="animate-fade-in-up mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 p-8 text-center md:flex-row" style={{ animationDelay: '0.4s' }}>
                             <div className="mr-0 md:mr-6">
                                 <h3 className="mb-2 text-xl font-semibold text-[var(--text)]">Stay Connected</h3>
                                 <p className="text-[var(--text-muted)]">Don&apos;t miss our latest updates and announcements</p>
                             </div>
                             <div className="flex gap-4">
                                 <Link href={route('guest.announcements')}>
-                                    <Button variant="outline" className="rounded-full">
+                                    <Button variant="outline" className="rounded-full border-teal-600 text-teal-700 hover:bg-teal-700 hover:text-white">
                                         View All Announcements
                                     </Button>
                                 </Link>
                                 <Link href={route('guest.contact')}>
-                                    <Button className="rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90">
+                                    <Button className="rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 text-white hover:from-teal-800 hover:to-cyan-700">
                                         Contact Us
                                     </Button>
                                 </Link>
