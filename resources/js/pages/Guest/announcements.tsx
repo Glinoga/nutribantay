@@ -68,7 +68,7 @@ export default function Announcements({ announcements, pagination }: Announcemen
                 announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                announcement.category?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false;
+                (announcement.category?.name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase())
 
             const matchesCategory = activeFilter === null || (announcement.category && announcement.category.name === activeFilter);
 
