@@ -55,6 +55,7 @@ class AnnouncementController extends Controller
             'categories' => Category::all(),
             'filter' => $filter,
             'search' => $search,
+            'view' => $request->query('view', 'card'),
         ]);
     }
 
@@ -135,11 +136,12 @@ class AnnouncementController extends Controller
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 
-    public function edit(Announcement $announcement)
+    public function edit(Request $request, Announcement $announcement)
     {
         return Inertia::render('Announcements/Edit', [
             'announcement' => $announcement,
             'categories' => Category::all(),
+            'page' => $request->query('page', 1),
         ]);
     }
 
@@ -165,7 +167,9 @@ class AnnouncementController extends Controller
 
         $announcement->update($validated);
 
-        return redirect()->route('announcements.index')->with('success', 'Announcement updated successfully.');
+        $page = $request->input('page', 1);
+
+        return redirect()->route('announcements.index', ['page' => $page])->with('success', 'Announcement updated successfully.');
     }
 
     // Archive old announcements (implemented) && If user wants to archive (not implemented yet)

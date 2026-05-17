@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -12,6 +13,7 @@ import {
     Calendar,
     Edit2,
     Filter,
+    LayoutGrid,
     List,
     Loader2,
     Megaphone,
@@ -57,6 +59,7 @@ type IndexProps = {
     categories: Category[];
     filter: string;
     search?: string;
+    view?: string;
 };
 
 export default function Index(props: IndexProps) {
@@ -65,6 +68,7 @@ export default function Index(props: IndexProps) {
 
     const [searchInput, setSearchInput] = useState(props.search || '');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const view = (props.view as 'card' | 'list') || 'card';
 
     useEffect(() => {
         if (flash?.success) {
@@ -125,11 +129,21 @@ export default function Index(props: IndexProps) {
         }, { replace: true, preserveState: true });
     };
 
+    const handleViewChange = (newView: 'card' | 'list') => {
+        if (newView === view) return;
+        router.get(route('announcements.index'), {
+            filter: props.filter,
+            search: props.search || undefined,
+            view: newView,
+        }, { replace: true, preserveScroll: true });
+    };
+
     const handlePageChange = (page: number) => {
         router.get(route('announcements.index'), {
             page,
             filter: props.filter,
             search: props.search || undefined,
+            view,
         }, { replace: true, preserveScroll: true });
     };
 
@@ -236,6 +250,21 @@ export default function Index(props: IndexProps) {
                     background: linear-gradient(to bottom, rgb(13, 148, 136), rgb(8, 145, 178));
                 }
 
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(6px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out;
+                }
+
             `}</style>
 
             <div className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 pt-8 pb-16">
@@ -332,7 +361,34 @@ export default function Index(props: IndexProps) {
                             )}
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
+                            <div className="flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                                <button
+                                    onClick={() => handleViewChange('card')}
+                                    className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
+                                        view === 'card'
+                                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
+                                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                    title="Card view"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Grid</span>
+                                </button>
+                                <button
+                                    onClick={() => handleViewChange('list')}
+                                    className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
+                                        view === 'list'
+                                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
+                                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                                    }`}
+                                    title="List view"
+                                >
+                                    <List className="h-4 w-4" />
+                                    <span className="hidden sm:inline">List</span>
+                                </button>
+                            </div>
+
                             <Link href={route('announcements.create')}>
                                 <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
                                     <Plus className="mr-1.5 h-4 w-4" />
@@ -401,109 +457,205 @@ export default function Index(props: IndexProps) {
 
             <div className="announcements-container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                 {filteredAnnouncements.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                        {filteredAnnouncements.map((announcement, index) => (
-                            <div
-                                key={announcement.id}
-                                className="announcement-card group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl"
-                                style={{
-                                    animationDelay: `${index * 50}ms`,
-                                }}
-                            >
-                                <div
-                                    className="absolute inset-x-0 top-0 h-1.5"
-                                    style={{
-                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                    }}
-                                />
-
-                                <div className="relative h-48 overflow-hidden">
-                                    {announcement.image ? (
-                                        <img
-                                            src={`/storage/${announcement.image}`}
-                                            alt={announcement.title}
-                                            className="h-full w-full object-cover transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50">
-                                            <Megaphone className="h-14 w-14 text-teal-300" />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex flex-1 flex-col p-5">
-                                    <div className="mb-3 flex flex-wrap gap-2">
-                                        <Badge
-                                            className="font-semibold shadow-sm"
+                    view === 'card' ? (
+                        <div key="card" className="animate-fadeIn">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                {filteredAnnouncements.map((announcement, index) => (
+                                    <div
+                                        key={announcement.id}
+                                        className="announcement-card group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl"
+                                        style={{
+                                            animationDelay: `${index * 50}ms`,
+                                        }}
+                                    >
+                                        <div
+                                            className="absolute inset-x-0 top-0 h-1.5"
                                             style={{
                                                 backgroundColor: `var(--${announcement.category.color || 'primary'})`,
-                                                color: 'white',
                                             }}
-                                        >
-                                            {announcement.category.name}
-                                        </Badge>
-                                        {announcement.is_expired && (
-                                            <Badge className="bg-red-500 font-semibold text-white shadow-sm">
-                                                Expired
-                                            </Badge>
-                                        )}
-                                    </div>
+                                        />
 
-                                    <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600">
-                                        {announcement.title}
-                                    </h3>
-
-                                    <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
-                                        <div className="flex items-center gap-1.5">
-                                            <Calendar className="h-4 w-4" />
-                                            <span>{announcement.date}</span>
-                                        </div>
-                                        {announcement.author && (
-                                            <div className="flex items-center gap-1.5">
-                                                <User className="h-4 w-4" />
-                                                <span>{announcement.author}</span>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="mb-3 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-
-                                    <p className="mb-5 line-clamp-3 text-sm text-gray-700">{announcement.summary}</p>
-
-                                    <div className="mt-auto flex gap-2">
-                                        <Link href={route('announcements.edit', { announcement: announcement.id })} className="flex-1">
-                                            <Button
-                                                className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm shadow-sm hover:from-teal-600 hover:to-cyan-600"
-                                                size="sm"
-                                            >
-                                                <Edit2 className="mr-1.5 h-4 w-4" />
-                                                Edit
-                                            </Button>
-                                        </Link>
-
-                                        <Button
-                                            className="bg-red-600 text-white shadow-sm hover:bg-red-700"
-                                            size="sm"
-                                            onClick={() => handleDelete(announcement)}
-                                            disabled={deletingId === announcement.id}
-                                        >
-                                            {deletingId === announcement.id ? (
-                                                <>
-                                                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                                    Deleting...
-                                                </>
+                                        <div className="relative h-48 overflow-hidden">
+                                            {announcement.image ? (
+                                                <img
+                                                    src={`/storage/${announcement.image}`}
+                                                    alt={announcement.title}
+                                                    className="h-full w-full object-cover transition-transform duration-500"
+                                                />
                                             ) : (
-                                                <>
-                                                    <Trash2 className="mr-1.5 h-4 w-4" />
-                                                    Delete
-                                                </>
+                                                <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50">
+                                                    <Megaphone className="h-14 w-14 text-teal-300" />
+                                                </div>
                                             )}
-                                        </Button>
+                                        </div>
+
+                                        <div className="flex flex-1 flex-col p-5">
+                                            <div className="mb-3 flex flex-wrap gap-2">
+                                                <Badge
+                                                    className="font-semibold shadow-sm"
+                                                    style={{
+                                                        backgroundColor: `var(--${announcement.category.color || 'primary'})`,
+                                                        color: 'white',
+                                                    }}
+                                                >
+                                                    {announcement.category.name}
+                                                </Badge>
+                                                {announcement.is_expired && (
+                                                    <Badge className="bg-red-500 font-semibold text-white shadow-sm">
+                                                        Expired
+                                                    </Badge>
+                                                )}
+                                            </div>
+
+                                            <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600">
+                                                {announcement.title}
+                                            </h3>
+
+                                            <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                                                <div className="flex items-center gap-1.5">
+                                                    <Calendar className="h-4 w-4" />
+                                                    <span>{announcement.date}</span>
+                                                </div>
+                                                {announcement.author && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <User className="h-4 w-4" />
+                                                        <span>{announcement.author}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="mb-3 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+
+                                            <p className="mb-5 line-clamp-3 text-sm text-gray-700">{announcement.summary}</p>
+
+                                            <div className="mt-auto flex gap-2">
+                                                <Link href={route('announcements.edit', { announcement: announcement.id }) + `?page=${props.pagination.current_page}`} className="flex-1">
+                                                    <Button
+                                                        className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-sm shadow-sm hover:from-teal-600 hover:to-cyan-600"
+                                                        size="sm"
+                                                    >
+                                                        <Edit2 className="mr-1.5 h-4 w-4" />
+                                                        Edit
+                                                    </Button>
+                                                </Link>
+
+                                                <Button
+                                                    className="bg-red-600 text-white shadow-sm hover:bg-red-700"
+                                                    size="sm"
+                                                    onClick={() => handleDelete(announcement)}
+                                                    disabled={deletingId === announcement.id}
+                                                >
+                                                    {deletingId === announcement.id ? (
+                                                        <>
+                                                            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                                                            Deleting...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Trash2 className="mr-1.5 h-4 w-4" />
+                                                            Delete
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ) : (
+                        <div key="list" className="animate-fadeIn">
+                            <div className="overflow-hidden rounded-xl bg-white shadow-md">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50">
+                                            <TableHead className="font-semibold text-teal-800">Title</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 md:table-cell">Category</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell">Author</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell">Date</TableHead>
+                                            <TableHead className="font-semibold text-teal-800">Status</TableHead>
+                                            <TableHead className="text-right font-semibold text-teal-800">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {filteredAnnouncements.map((announcement) => (
+                                            <TableRow key={announcement.id} className="hover:bg-teal-50/50">
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-medium text-gray-900">{announcement.title}</span>
+                                                        <span className="text-xs text-gray-500 md:hidden">
+                                                            {announcement.category.name}
+                                                            {announcement.author ? ` · ${announcement.author}` : ''}
+                                                            {` · ${announcement.date}`}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="hidden md:table-cell">
+                                                    <Badge
+                                                        className="font-semibold shadow-sm"
+                                                        style={{
+                                                            backgroundColor: `var(--${announcement.category.color || 'primary'})`,
+                                                            color: 'white',
+                                                        }}
+                                                    >
+                                                        {announcement.category.name}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="hidden text-gray-600 lg:table-cell">
+                                                    {announcement.author ?? '-'}
+                                                </TableCell>
+                                                <TableCell className="hidden text-gray-600 sm:table-cell">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                                                        <span>{announcement.date}</span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {announcement.is_expired ? (
+                                                        <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
+                                                            Expired
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                                            Active
+                                                        </span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Link href={route('announcements.edit', { announcement: announcement.id }) + `?page=${props.pagination.current_page}`}>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="h-8 w-8 p-0 text-teal-600 hover:bg-teal-50 hover:text-teal-700"
+                                                            >
+                                                                <Edit2 className="h-4 w-4" />
+                                                                <span className="sr-only">Edit</span>
+                                                            </Button>
+                                                        </Link>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                                            onClick={() => handleDelete(announcement)}
+                                                            disabled={deletingId === announcement.id}
+                                                        >
+                                                            {deletingId === announcement.id ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="h-4 w-4" />
+                                                            )}
+                                                            <span className="sr-only">Delete</span>
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    )
                 ) : (
                     <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl bg-white p-12 shadow-sm">
                         <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">

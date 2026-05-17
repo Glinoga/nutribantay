@@ -36,9 +36,10 @@ interface Announcement {
 interface EditProps {
     announcement: Announcement;
     categories: Category[];
+    page?: string;
 }
 
-export default function Edit({ announcement, categories }: EditProps) {
+export default function Edit({ announcement, categories, page }: EditProps) {
     const { data, setData, processing, errors } = useForm({
         title: announcement.title || '',
         date: announcement.date || '',
@@ -100,6 +101,7 @@ export default function Edit({ announcement, categories }: EditProps) {
         }
 
         formData.append('_method', 'PUT');
+        formData.append('page', page || '1');
 
         router.post(route('announcements.update', { announcement: announcement.id }), formData, {
             forceFormData: true,
