@@ -142,6 +142,7 @@ class ChildController extends Controller
         return Inertia::render('Children/Index', [
             'children' => $children->map(fn ($child) => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,
@@ -192,6 +193,7 @@ class ChildController extends Controller
         return Inertia::render('Children/Archived', [
             'children' => $archivedChildren->map(fn ($child) => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,
@@ -430,6 +432,7 @@ class ChildController extends Controller
         return Inertia::render('Children/Edit', [
             'child' => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,
                 'last_name' => $child->last_name,
@@ -513,6 +516,7 @@ class ChildController extends Controller
         return Inertia::render('Children/Show', [
             'child' => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,
@@ -793,6 +797,7 @@ class ChildController extends Controller
         return Inertia::render('Children/ShowPrint', [
             'child' => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'first_name' => $child->first_name,
                 'middle_initial' => $child->middle_initial,

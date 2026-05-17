@@ -32,6 +32,7 @@ class ChildVaccineController extends Controller
         return Inertia::render('Children/Vaccines', [
             'child' => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'barangay' => $child->barangay,
             ],

@@ -26,6 +26,7 @@ class HealthlogController extends Controller
         return Inertia::render('Healthlog/Create', [
             'child' => [
                 'id' => $child->id,
+                'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'sex' => $child->sex,
                 'birthdate' => $child->birthdate,
