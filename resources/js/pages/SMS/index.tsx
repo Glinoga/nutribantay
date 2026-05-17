@@ -20,6 +20,7 @@ import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { type BreadcrumbItem } from '@/types';
 
 interface User {
     id: number;
@@ -31,6 +32,8 @@ interface SMSPageProps {
     users: User[];
     credits: number;
 }
+
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'SMS', href: route('sms.index') }];
 
 export default function SMSIndex({ users, credits }: SMSPageProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string; warning?: string } }>().props;
@@ -181,384 +184,422 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
     };
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Send SMS" />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 p-4 sm:p-6 lg:p-8 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-                {/* Animated Header with Gradient */}
-                <div className="relative mb-8">
-                    <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 blur-3xl"></div>
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
-                    <div className="relative rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
+                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
+                            <MessageSquare className="h-6 w-6 text-teal-600" />
+                            <span className="text-sm font-semibold text-teal-700">SMS Management</span>
+                        </div>
+                    </div>
+
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
                                 <div className="relative">
-                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-50 blur-lg"></div>
-                                    <div className="relative rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-4 shadow-lg">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
                                         <MessageSquare className="h-8 w-8 text-white" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
                                         SMS Messenger
                                     </h1>
-                                    <p className="mt-1 flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
                                         <Sparkles className="h-4 w-4" />
                                         Send messages to guardians instantly
                                     </p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Quick Stats */}
-                            <div className="flex flex-wrap items-center gap-4">
-                                <div className="rounded-xl bg-blue-50 px-4 py-2 text-center dark:bg-blue-900/20">
-                                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{users.length}</div>
-                                    <div className="text-xs text-gray-600 dark:text-gray-400">Total Users</div>
+                    {/* Stats Row */}
+                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Total Users</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600">{users.length}</p>
                                 </div>
-                                <div className="rounded-xl bg-purple-50 px-4 py-2 text-center dark:bg-purple-900/20">
-                                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{getRecipientCount()}</div>
-                                    <div className="text-xs text-gray-600 dark:text-gray-400">Selected</div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <Users className="h-5 w-5 text-teal-500" />
                                 </div>
-                                <div className="rounded-xl bg-green-50 px-4 py-2 text-center dark:bg-green-900/20">
-                                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{credits}</div>
-                                    <div className="text-xs text-gray-600 dark:text-gray-400">SMS Credits</div>
+                            </div>
+                        </div>
+                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Selected</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{getRecipientCount()}</p>
+                                </div>
+                                <div className="rounded-full bg-cyan-50 p-2.5">
+                                    <CheckCircle2 className="h-5 w-5 text-cyan-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">SMS Credits</p>
+                                    <p className="mt-1 text-2xl font-bold text-green-600">{credits}</p>
+                                </div>
+                                <div className="rounded-full bg-green-50 p-2.5">
+                                    <Zap className="h-5 w-5 text-green-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Send Mode</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 capitalize">{recipientType}</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <MessageSquare className="h-5 w-5 text-teal-500" />
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    {/* Recipients Panel */}
-                    <div className="space-y-4 lg:col-span-1">
-                        <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 py-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <CardTitle className="flex items-center gap-2">
-                                            <Users className="h-5 w-5 text-blue-600" />
-                                            Recipients
-                                        </CardTitle>
-                                        <CardDescription>Select who receives your message</CardDescription>
-                                    </div>
-                                    <div className="rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white">{getRecipientCount()}</div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4 p-4">
-                                {/* Recipient Type Selector */}
-                                <div className="space-y-2">
-                                    <Label className="text-sm font-medium">Send Mode</Label>
-                                    <Select value={recipientType} onValueChange={handleRecipientTypeChange}>
-                                        <SelectTrigger className="border-2 transition-colors hover:border-blue-500">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="single">
-                                                <div className="flex items-center gap-2">
-                                                    <Phone className="h-4 w-4" />
-                                                    Single Recipient
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="multiple">
-                                                <div className="flex items-center gap-2">
-                                                    <Users className="h-4 w-4" />
-                                                    Multiple Recipients
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="all">
-                                                <div className="flex items-center gap-2">
-                                                    <Zap className="h-4 w-4" />
-                                                    Broadcast to All
-                                                </div>
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                {recipientType === 'all' ? (
-                                    <div className="rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 dark:border-blue-800 dark:from-blue-900/20 dark:to-purple-900/20">
-                                        <div className="flex items-start gap-3">
-                                            <div className="rounded-lg bg-blue-600 p-2">
-                                                <Zap className="h-5 w-5 text-white" />
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-blue-900 dark:text-blue-100">Broadcast Mode</p>
-                                                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                                                    Your message will reach all {users.length} guardians with registered numbers
-                                                </p>
-                                            </div>
+                    {/* Main Content Grid */}
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                        {/* Recipients Panel */}
+                        <div className="space-y-4 lg:col-span-1">
+                            <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <Users className="h-5 w-5 text-teal-600" />
+                                                Recipients
+                                            </CardTitle>
+                                            <CardDescription>Select who receives your message</CardDescription>
                                         </div>
+                                        <div className="rounded-full bg-teal-600 px-3 py-1 text-sm font-semibold text-white">{getRecipientCount()}</div>
                                     </div>
-                                ) : (
-                                    <>
-                                        {/* Search Bar */}
-                                        <div className="relative">
-                                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                                            <input
-                                                type="text"
-                                                placeholder="Search children/guardian..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full rounded-lg border-2 py-2 pr-10 pl-10 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                                            />
-                                            {searchQuery && (
-                                                <button
-                                                    onClick={() => setSearchQuery('')}
-                                                    className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {/* Quick Actions */}
-                                        {recipientType === 'multiple' && filteredUsers.length > 0 && (
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={selectAllFiltered}
-                                                    className="flex-1 text-xs"
-                                                >
-                                                    Select All
-                                                </Button>
-                                                <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
-                                                    Clear All
-                                                </Button>
-                                            </div>
-                                        )}
-
-                                        {/* User List */}
-                                        <div className="custom-scrollbar max-h-96 space-y-2 overflow-y-auto pr-2">
-                                            {filteredUsers.length > 0 ? (
-                                                filteredUsers.map((user, index) => (
-                                                    <div
-                                                        key={user.id}
-                                                        className={`group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ${
-                                                            selectedUsers.includes(user.id)
-                                                                ? 'scale-[1.02] bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
-                                                                : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700'
-                                                        }`}
-                                                        onClick={() => handleUserSelect(user.id)}
-                                                        style={{
-                                                            animationDelay: `${index * 50}ms`,
-                                                            animation: 'slideIn 0.3s ease-out forwards',
-                                                        }}
-                                                    >
-                                                        <div className="flex items-center gap-3 p-3">
-                                                            {/* Checkbox */}
-                                                            <div
-                                                                className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
-                                                                    selectedUsers.includes(user.id)
-                                                                        ? 'scale-110 border-white bg-white'
-                                                                        : 'border-gray-300 group-hover:border-blue-500 dark:border-gray-600'
-                                                                }`}
-                                                            >
-                                                                {selectedUsers.includes(user.id) && (
-                                                                    <CheckCircle2 className="h-4 w-4 text-blue-600" />
-                                                                )}
-                                                            </div>
-
-                                                            {/* Avatar */}
-                                                            <div
-                                                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
-                                                                    selectedUsers.includes(user.id)
-                                                                        ? 'bg-white text-blue-600'
-                                                                        : 'bg-gradient-to-br from-blue-400 to-purple-500 text-white'
-                                                                }`}
-                                                            >
-                                                                {user.name.charAt(0).toUpperCase()}
-                                                            </div>
-
-                                                            {/* User Info */}
-                                                            <div className="min-w-0 flex-1">
-                                                                <p
-                                                                    className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}
-                                                                >
-                                                                    {user.name}
-                                                                </p>
-                                                                <p
-                                                                    className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}
-                                                                >
-                                                                    {displayPhoneNumber(user.phone)}
-                                                                </p>
-                                                            </div>
-                                                        </div>
+                                </CardHeader>
+                                <CardContent className="space-y-4 p-4">
+                                    {/* Recipient Type Selector */}
+                                    <div className="space-y-2">
+                                        <Label className="text-sm font-medium">Send Mode</Label>
+                                        <Select value={recipientType} onValueChange={handleRecipientTypeChange}>
+                                            <SelectTrigger className="border transition-colors hover:border-teal-500">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="single">
+                                                    <div className="flex items-center gap-2">
+                                                        <Phone className="h-4 w-4" />
+                                                        Single Recipient
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <div className="py-12 text-center">
-                                                    <Users className="mx-auto mb-3 h-16 w-16 text-gray-300 dark:text-gray-600" />
-                                                    <p className="text-gray-500 dark:text-gray-400">
-                                                        {searchQuery ? 'No guardians found' : 'No guardians available'}
+                                                </SelectItem>
+                                                <SelectItem value="multiple">
+                                                    <div className="flex items-center gap-2">
+                                                        <Users className="h-4 w-4" />
+                                                        Multiple Recipients
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="all">
+                                                    <div className="flex items-center gap-2">
+                                                        <Zap className="h-4 w-4" />
+                                                        Broadcast to All
+                                                    </div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {recipientType === 'all' ? (
+                                        <div className="rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-4 dark:border-teal-800 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                            <div className="flex items-start gap-3">
+                                                <div className="rounded-lg bg-teal-600 p-2">
+                                                    <Zap className="h-5 w-5 text-white" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-teal-900 dark:text-teal-100">Broadcast Mode</p>
+                                                    <p className="mt-1 text-sm text-teal-700 dark:text-teal-300">
+                                                        Your message will reach all {users.length} guardians with registered numbers
                                                     </p>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Message Composer & Summary */}
-                    <div className="space-y-4 lg:col-span-2">
-                        {/* Message Composer */}
-                        <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <CardHeader className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 py-4">
-                                <CardTitle className="flex items-center gap-2">
-                                    <Mail className="h-5 w-5 text-purple-600" />
-                                    Compose Message
-                                </CardTitle>
-                                <CardDescription>Write your message below</CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    {/* Message Textarea */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="flex items-center gap-2 text-sm font-medium">
-                                                Your Message
-                                                {isTyping && (
-                                                    <span className="flex items-center gap-1 text-xs text-blue-600">
-                                                        <span className="animate-pulse">●</span>
-                                                        typing...
-                                                    </span>
-                                                )}
-                                            </Label>
-                                            <span
-                                                className={`text-sm font-medium transition-colors ${
-                                                    characterCount > maxCharacters
-                                                        ? 'animate-pulse text-red-500'
-                                                        : characterCount > maxCharacters * 0.9
-                                                          ? 'text-orange-500'
-                                                          : 'text-gray-500'
-                                                }`}
-                                            >
-                                                {characterCount} / {maxCharacters}
-                                            </span>
-                                        </div>
-
-                                        <Textarea
-                                            placeholder="Type your message here..."
-                                            value={message}
-                                            onChange={handleMessageChange}
-                                            rows={8}
-                                            className="resize-none border-2 text-base transition-all focus:border-purple-500 focus:ring-4 focus:ring-purple-200"
-                                        />
-
-                                        <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                            <Sparkles className="h-3 w-3" />
-                                            Messages over 160 characters split into multiple SMS
-                                        </p>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-3">
-                                        <Button
-                                            type="submit"
-                                            disabled={
-                                                isSending ||
-                                                !message.trim() ||
-                                                (recipientType !== 'all' && selectedUsers.length === 0) ||
-                                                characterCount > maxCharacters
-                                            }
-                                            className="group flex-1 bg-gradient-to-r from-blue-600 to-purple-600 py-6 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
-                                        >
-                                            {isSending ? (
-                                                <>
-                                                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                                    Sending...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Send className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                                                    Send Message
-                                                </>
-                                            )}
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => {
-                                                setMessage('');
-                                                setSelectedUsers([]);
-                                                setCharacterCount(0);
-                                                setSearchQuery('');
-                                            }}
-                                            disabled={isSending}
-                                            className="border-2 px-6 py-6 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                        >
-                                            <X className="h-5 w-5" />
-                                        </Button>
-                                    </div>
-                                </form>
-                            </CardContent>
-                        </Card>
-
-                        {/* Retry Section - shown when last send failed */}
-                        {lastFormData && !showConfirmDialog && (
-                            <Card className="border-2 border-red-200 bg-red-50 shadow-lg dark:border-red-800 dark:bg-red-900/20">
-                                <CardContent className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <AlertTriangle className="h-5 w-5 text-red-600" />
-                                            <div>
-                                                <p className="font-semibold text-red-900 dark:text-red-100">Last send failed</p>
-                                                <p className="text-sm text-red-700 dark:text-red-300">
-                                                    Your message and recipients are still available
-                                                </p>
                                             </div>
                                         </div>
-                                        <Button onClick={handleRetry} variant="destructive" size="sm">
-                                            Retry Send
-                                        </Button>
+                                    ) : (
+                                        <>
+                                            {/* Search Bar */}
+                                            <div className="relative">
+                                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search children/guardian..."
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                    className="w-full rounded-lg border py-2.5 pr-10 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                                />
+                                                {searchQuery && (
+                                                    <button
+                                                        onClick={() => setSearchQuery('')}
+                                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Quick Actions */}
+                                            {recipientType === 'multiple' && filteredUsers.length > 0 && (
+                                                <div className="flex gap-2">
+                                                    <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs">
+                                                        Select All
+                                                    </Button>
+                                                    <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
+                                                        Clear All
+                                                    </Button>
+                                                </div>
+                                            )}
+
+                                            {/* User List */}
+                                            <div className="custom-scrollbar max-h-96 space-y-2 overflow-y-auto pr-2">
+                                                {filteredUsers.length > 0 ? (
+                                                    filteredUsers.map((user, index) => (
+                                                        <div
+                                                            key={user.id}
+                                                            className={`group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ${
+                                                                selectedUsers.includes(user.id)
+                                                                    ? 'scale-[1.02] bg-gradient-to-r from-teal-500 to-cyan-600 text-white shadow-lg'
+                                                                    : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700'
+                                                            }`}
+                                                            onClick={() => handleUserSelect(user.id)}
+                                                            style={{
+                                                                animationDelay: `${index * 50}ms`,
+                                                                animation: 'fadeInUp 0.3s ease-out forwards',
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center gap-3 p-3">
+                                                                {/* Checkbox */}
+                                                                <div
+                                                                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                                                                        selectedUsers.includes(user.id)
+                                                                            ? 'scale-110 border-white bg-white'
+                                                                            : 'border-gray-300 group-hover:border-teal-500 dark:border-gray-600'
+                                                                    }`}
+                                                                >
+                                                                    {selectedUsers.includes(user.id) && (
+                                                                        <CheckCircle2 className="h-4 w-4 text-teal-600" />
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Avatar */}
+                                                                <div
+                                                                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
+                                                                        selectedUsers.includes(user.id)
+                                                                            ? 'bg-white text-teal-600'
+                                                                            : 'bg-gradient-to-br from-teal-400 to-cyan-500 text-white'
+                                                                    }`}
+                                                                >
+                                                                    {user.name.charAt(0).toUpperCase()}
+                                                                </div>
+
+                                                                {/* User Info */}
+                                                                <div className="min-w-0 flex-1">
+                                                                    <p className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                                                                        {user.name}
+                                                                    </p>
+                                                                    <p className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-teal-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                                        {displayPhoneNumber(user.phone)}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl p-12">
+                                                        <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">
+                                                            <Users className="h-16 w-16 text-teal-600" />
+                                                        </div>
+                                                        <h3 className="mb-2 text-xl font-bold text-gray-900">
+                                                            {searchQuery ? 'No matching guardians found' : 'No guardians available'}
+                                                        </h3>
+                                                        <p className="max-w-md text-center text-gray-600">
+                                                            {searchQuery
+                                                                ? 'Try adjusting your search to find what you\'re looking for.'
+                                                                : 'There are no guardians with registered phone numbers yet.'}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Message Composer & Summary */}
+                        <div className="space-y-4 lg:col-span-2">
+                            {/* Message Composer */}
+                            <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
+                                    <CardTitle className="flex items-center gap-2">
+                                        <Mail className="h-5 w-5 text-teal-600" />
+                                        Compose Message
+                                    </CardTitle>
+                                    <CardDescription>Write your message below</CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-6">
+                                    <form onSubmit={handleSubmit} className="space-y-6">
+                                        {/* Message Textarea */}
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label className="flex items-center gap-2 text-sm font-medium">
+                                                    Your Message
+                                                    {isTyping && (
+                                                        <span className="flex items-center gap-1 text-xs text-teal-600">
+                                                            <span className="animate-pulse">●</span>
+                                                            typing...
+                                                        </span>
+                                                    )}
+                                                </Label>
+                                                <span
+                                                    className={`text-sm font-medium transition-colors ${
+                                                        characterCount > maxCharacters
+                                                            ? 'animate-pulse text-red-500'
+                                                            : characterCount > maxCharacters * 0.9
+                                                              ? 'text-orange-500'
+                                                              : 'text-gray-500'
+                                                    }`}
+                                                >
+                                                    {characterCount} / {maxCharacters}
+                                                </span>
+                                            </div>
+
+                                            <Textarea
+                                                placeholder="Type your message here..."
+                                                value={message}
+                                                onChange={handleMessageChange}
+                                                rows={8}
+                                                className="resize-none border text-base transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                            />
+
+                                            <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                                <Sparkles className="h-3 w-3" />
+                                                Messages over 160 characters split into multiple SMS
+                                            </p>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex items-center gap-3">
+                                            <Button
+                                                type="submit"
+                                                disabled={
+                                                    isSending ||
+                                                    !message.trim() ||
+                                                    (recipientType !== 'all' && selectedUsers.length === 0) ||
+                                                    characterCount > maxCharacters
+                                                }
+                                                className="group flex-1 bg-gradient-to-r from-teal-500 to-cyan-500 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                                            >
+                                                {isSending ? (
+                                                    <>
+                                                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                        Sending...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Send className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                                        Send Message
+                                                    </>
+                                                )}
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => {
+                                                    setMessage('');
+                                                    setSelectedUsers([]);
+                                                    setCharacterCount(0);
+                                                    setSearchQuery('');
+                                                }}
+                                                disabled={isSending}
+                                                className="border px-6 py-6 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </CardContent>
+                            </Card>
+
+                            {/* Retry Section - shown when last send failed */}
+                            {lastFormData && !showConfirmDialog && (
+                                <Card className="border border-red-200 bg-red-50 shadow-lg dark:border-red-800 dark:bg-red-900/20">
+                                    <CardContent className="p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <AlertTriangle className="h-5 w-5 text-red-600" />
+                                                <div>
+                                                    <p className="font-semibold text-red-900 dark:text-red-100">Last send failed</p>
+                                                    <p className="text-sm text-red-700 dark:text-red-300">
+                                                        Your message and recipients are still available
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button onClick={handleRetry} variant="destructive" size="sm">
+                                                Retry Send
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* Summary Card */}
+                            <Card className="overflow-hidden border-0 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
+                                <CardContent className="p-6">
+                                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                                        <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                            <div className="mb-1 flex items-center gap-2 text-teal-600 dark:text-teal-400">
+                                                <Users className="h-4 w-4" />
+                                                <span className="text-xs font-medium">Recipients</span>
+                                            </div>
+                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{getRecipientCount()}</div>
+                                        </div>
+
+                                        <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                            <div className="mb-1 flex items-center gap-2 text-cyan-600 dark:text-cyan-400">
+                                                <Mail className="h-4 w-4" />
+                                                <span className="text-xs font-medium">Characters</span>
+                                            </div>
+                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{characterCount}</div>
+                                        </div>
+
+                                        <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
+                                            <div className="mb-1 flex items-center gap-2 text-teal-600 dark:text-teal-400">
+                                                <MessageSquare className="h-4 w-4" />
+                                                <span className="text-xs font-medium">SMS Parts</span>
+                                            </div>
+                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.ceil(characterCount / 160) || 0}</div>
+                                        </div>
+
+                                        <div className="rounded-xl bg-gradient-to-br from-teal-600 to-cyan-600 p-4 shadow-md transition-shadow hover:shadow-lg">
+                                            <div className="mb-1 flex items-center gap-2 text-white">
+                                                <Zap className="h-4 w-4" />
+                                                <span className="text-xs font-medium">Total SMS</span>
+                                            </div>
+                                            <div className="text-2xl font-bold text-white">
+                                                {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
-                        )}
-
-                        {/* Summary Card */}
-                        <Card className="overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
-                            <CardContent className="p-6">
-                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
-                                        <div className="mb-1 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                                            <Users className="h-4 w-4" />
-                                            <span className="text-xs font-medium">Recipients</span>
-                                        </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{getRecipientCount()}</div>
-                                    </div>
-
-                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
-                                        <div className="mb-1 flex items-center gap-2 text-purple-600 dark:text-purple-400">
-                                            <Mail className="h-4 w-4" />
-                                            <span className="text-xs font-medium">Characters</span>
-                                        </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{characterCount}</div>
-                                    </div>
-
-                                    <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
-                                        <div className="mb-1 flex items-center gap-2 text-pink-600 dark:text-pink-400">
-                                            <MessageSquare className="h-4 w-4" />
-                                            <span className="text-xs font-medium">SMS Parts</span>
-                                        </div>
-                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.ceil(characterCount / 160) || 0}</div>
-                                    </div>
-
-                                    <div className="rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 p-4 shadow-md transition-shadow hover:shadow-lg">
-                                        <div className="mb-1 flex items-center gap-2 text-white">
-                                            <Zap className="h-4 w-4" />
-                                            <span className="text-xs font-medium">Total SMS</span>
-                                        </div>
-                                        <div className="text-2xl font-bold text-white">
-                                            {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -568,7 +609,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2">
-                            <Send className="h-5 w-5 text-blue-600" />
+                            <Send className="h-5 w-5 text-teal-600" />
                             Confirm SMS Send
                         </AlertDialogTitle>
                         <AlertDialogDescription>Please review the details before sending:</AlertDialogDescription>
@@ -579,9 +620,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Recipients</p>
                             <p className="text-sm text-gray-900 dark:text-white">
                                 {recipientType === 'all' ? (
-                                    <span className="font-semibold text-blue-600">{users.length} recipients (Broadcast)</span>
+                                    <span className="font-semibold text-teal-600">{users.length} recipients (Broadcast)</span>
                                 ) : (
-                                    <span className="font-semibold text-blue-600">{selectedUsers.length} recipient(s) selected</span>
+                                    <span className="font-semibold text-teal-600">{selectedUsers.length} recipient(s) selected</span>
                                 )}
                             </p>
                         </div>
@@ -592,13 +633,13 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                            <div className="rounded-lg bg-teal-50 p-3 dark:bg-teal-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">SMS Parts</p>
-                                <p className="text-xl font-bold text-blue-600">{Math.ceil(characterCount / 160) || 0}</p>
+                                <p className="text-xl font-bold text-teal-600">{Math.ceil(characterCount / 160) || 0}</p>
                             </div>
-                            <div className="rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
+                            <div className="rounded-lg bg-cyan-50 p-3 dark:bg-cyan-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
-                                <p className="text-xl font-bold text-purple-600">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
+                                <p className="text-xl font-bold text-cyan-600">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
                             </div>
                         </div>
 
@@ -617,7 +658,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                         <AlertDialogCancel onClick={cancelSend}>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={confirmSend}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                            className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600"
                         >
                             <Send className="mr-2 h-4 w-4" />
                             Confirm Send
@@ -627,28 +668,43 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
             </AlertDialog>
 
             <style>{`
-                @keyframes slideIn {
+                @keyframes fadeInUp {
                     from {
                         opacity: 0;
-                        transform: translateX(-20px);
+                        transform: translateY(20px);
                     }
                     to {
                         opacity: 1;
-                        transform: translateX(0);
+                        transform: translateY(0);
                     }
                 }
 
                 @keyframes shimmer {
-                    0% {
-                        transform: translateX(-100%);
-                    }
-                    100% {
-                        transform: translateX(100%);
-                    }
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
                 }
 
                 .animate-shimmer {
                     animation: shimmer 2s infinite;
+                }
+
+                .announcement-card {
+                    animation: fadeInUp 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+
+                .stat-card {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .stat-card:nth-child(1) { animation-delay: 0.1s; }
+                .stat-card:nth-child(2) { animation-delay: 0.2s; }
+                .stat-card:nth-child(3) { animation-delay: 0.3s; }
+                .stat-card:nth-child(4) { animation-delay: 0.4s; }
+                .stat-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
                 }
 
                 .custom-scrollbar::-webkit-scrollbar {
@@ -660,14 +716,24 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                 }
 
                 .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+                    background: linear-gradient(to bottom, #14b8a6, #06b6d4);
                     border-radius: 3px;
                 }
 
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: linear-gradient(to bottom, #2563eb, #7c3aed);
+                    background: linear-gradient(to bottom, #0d9488, #0891b2);
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(6px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out;
                 }
             `}</style>
         </AppLayout>
     );
 }
+
