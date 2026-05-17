@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,8 +21,8 @@ import { route } from '@/lib/routes';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Archive, Clock, HardDrive, Key, Loader2, Plus, Search, Shield, ShieldAlert, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 type User = {
     id: number;
@@ -61,13 +62,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [search, setSearch] = useState(filters.search || '');
     const [loading, setLoading] = useState(false);
 
-    // Modal states
     const [showCodeModal, setShowCodeModal] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
     const [codeSearch, setCodeSearch] = useState('');
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-    // Create User Modal state
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
     const [createError, setCreateError] = useState('');
@@ -77,18 +76,25 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [copiedLogin, setCopiedLogin] = useState(false);
     const [createLoading, setCreateLoading] = useState(false);
 
-    // Maintenance mode state
     const [maintenance, setMaintenance] = useState(false);
 
-    // Confirmation dialogs
     const [approveUserId, setApproveUserId] = useState<number | null>(null);
     const [rejectUserId, setRejectUserId] = useState<number | null>(null);
     const [archiveUserId, setArchiveUserId] = useState<number | null>(null);
     const [deleteCodeId, setDeleteCodeId] = useState<number | null>(null);
     const [maintenanceConfirm, setMaintenanceConfirm] = useState(false);
 
-    // Show barangay dropdown ONLY for nutribantay@gmail.com when creating Admin role
     const showBarangayDropdown = isSeededAdmin && newUser.role === 'Admin';
+
+    const stats = useMemo(() => {
+        const roles = new Set(users.flatMap((u) => u.roles));
+        const pending = users.filter((u) => u.status === 'pending').length;
+        return {
+            total: users.length,
+            roles: roles.size,
+            pending,
+        };
+    }, [users]);
 
     const copyCredentials = async () => {
         const login = `${generatedCode} - ${generatedPassword}`;
@@ -313,143 +319,270 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            {/* Header */}
-            <div className="m-4 mb-4 flex items-center justify-between">
-                <h1 className="text-xl font-bold">User List</h1>
-                <div className="flex gap-2">
-                    <Button
-                        onClick={() => {
-                            setCreateSuccess('');
-                            setCreateError('');
-                            setGeneratedCode('');
-                            setGeneratedPassword('');
-                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
-                            setShowCreateModal(true);
-                        }}
-                    >
-                        Create User
-                    </Button>
-                    <Button variant="secondary" asChild>
-                        <Link href={route('users.archived')}>View Archived Users</Link>
-                    </Button>
-                </div>
-            </div>
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
-            {/* Maintenance Toggle */}
-            <div className="m-4">
-                <Button
-                    onClick={toggleMaintenance}
-                    variant={maintenance ? 'destructive' : 'default'}
-                    className={maintenance ? '' : 'bg-green-600 hover:bg-green-700'}
-                >
-                    {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
-                </Button>
-            </div>
+                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
+                            <Users className="h-6 w-6 text-teal-600" />
+                            <span className="text-sm font-semibold text-teal-700">User Management</span>
+                        </div>
+                    </div>
 
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="m-4 flex items-center gap-2">
-                <Input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by ID, Name, Email, or Role"
-                    className="w-64"
-                />
-                <Button type="submit">Search</Button>
-            </form>
-
-            {/* Admin Codes Section */}
-            <div className="m-4 mb-6 rounded-lg border p-4">
-                <h2 className="mb-2 text-lg font-semibold">Admin Codes</h2>
-                <div className="mb-3 flex items-center gap-2">
-                    <Label htmlFor="count" className="text-gray-700">
-                        Number of Codes:
-                    </Label>
-                    <Input id="count" type="number" min="1" value={count} onChange={(e) => setCount(Number(e.target.value))} className="w-20" />
-                    <Button onClick={generateAdminCodes} disabled={loading} variant="default">
-                        {loading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Generating...
-                            </>
-                        ) : (
-                            'Generate'
-                        )}
-                    </Button>
-                    <Button onClick={openCodeModal} variant="secondary">
-                        View All Codes
-                    </Button>
-                </div>
-            </div>
-
-            {/* Users Table */}
-            <div className="m-4 overflow-x-auto rounded-lg border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Code</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {users.map((user) => (
-                            <TableRow key={user.id} className="hover:bg-muted/50">
-                                <TableCell>{user.id}</TableCell>
-                                <TableCell>{user.name}</TableCell>
-                                <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
-                                <TableCell>{user.email || '-'}</TableCell>
-                                <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
-                                <TableCell>
-                                    {user.status === 'pending' && (
-                                        <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
-                                            Pending
-                                        </Badge>
-                                    )}
-                                    {user.status === 'approved' && (
-                                        <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
-                                            Approved
-                                        </Badge>
-                                    )}
-                                    {user.status === 'rejected' && <Badge variant="destructive">Rejected</Badge>}
-                                    {!user.status && <span className="text-muted-foreground">-</span>}
-                                </TableCell>
-                                <TableCell>
-                                    <div className="flex gap-1">
-                                        {user.status === 'pending' && (
-                                            <>
-                                                <Button
-                                                    size="sm"
-                                                    variant="default"
-                                                    className="bg-green-600 hover:bg-green-700"
-                                                    onClick={() => setApproveUserId(user.id)}
-                                                >
-                                                    Approve
-                                                </Button>
-                                                <Button size="sm" variant="destructive" onClick={() => setRejectUserId(user.id)}>
-                                                    Reject
-                                                </Button>
-                                            </>
-                                        )}
-                                        <Button size="sm" variant="secondary" asChild>
-                                            <Link href={route('users.show', { user: user.id })}>View</Link>
-                                        </Button>
-                                        <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
-                                            <Link href={route('users.edit', { user: user.id })}>Edit</Link>
-                                        </Button>
-                                        <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
-                                            Archive
-                                        </Button>
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg" />
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
+                                        <HardDrive className="h-8 w-8 text-white" />
                                     </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                                </div>
+                                <div>
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                        User Management
+                                    </h1>
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
+                                        <Users className="h-4 w-4" />
+                                        Manage all registered users and registration codes
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Total Users</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600">{stats.total}</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <Users className="h-5 w-5 text-teal-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Roles</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{stats.roles}</p>
+                                </div>
+                                <div className="rounded-full bg-cyan-50 p-2.5">
+                                    <Shield className="h-5 w-5 text-cyan-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-yellow-100/50 bg-white p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Pending Approvals</p>
+                                    <p className="mt-1 text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                                </div>
+                                <div className="rounded-full bg-yellow-50 p-2.5">
+                                    <Clock className="h-5 w-5 text-yellow-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Admin Codes</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600">{codes.length}</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <Key className="h-5 w-5 text-teal-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Maintenance Toggle */}
+                    <div className="mb-8">
+                        <Button
+                            onClick={toggleMaintenance}
+                            variant={maintenance ? 'destructive' : 'default'}
+                            className={maintenance ? '' : 'bg-green-600 hover:bg-green-700 gap-2'}
+                        >
+                            <ShieldAlert className="h-4 w-4" />
+                            {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
+                        </Button>
+                    </div>
+
+                    {/* Admin Codes Section */}
+                    <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                            <CardTitle className="flex items-center gap-2">
+                                <Key className="h-5 w-5 text-teal-600" />
+                                Admin Codes
+                            </CardTitle>
+                            <CardDescription>Generate and manage registration codes for admin users</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <Label htmlFor="count" className="text-gray-700 whitespace-nowrap">
+                                    Number of Codes:
+                                </Label>
+                                <Input
+                                    id="count"
+                                    type="number"
+                                    min="1"
+                                    value={count}
+                                    onChange={(e) => setCount(Number(e.target.value))}
+                                    className="w-20 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                />
+                                <Button
+                                    onClick={generateAdminCodes}
+                                    disabled={loading}
+                                    className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Generating...
+                                        </>
+                                    ) : (
+                                        'Generate'
+                                    )}
+                                </Button>
+                                <Button onClick={openCodeModal} variant="outline" className="border hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    View All Codes
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* User List Section */}
+                    <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    <Users className="h-5 w-5 text-teal-600" />
+                                    User List
+                                </CardTitle>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => {
+                                            setCreateSuccess('');
+                                            setCreateError('');
+                                            setGeneratedCode('');
+                                            setGeneratedPassword('');
+                                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                                            setShowCreateModal(true);
+                                        }}
+                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                    >
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Create User
+                                    </Button>
+                                    <Button variant="outline" className="border hover:bg-gray-100 dark:hover:bg-gray-700" asChild>
+                                        <Link href={route('users.archived')}>
+                                            <Archive className="mr-2 h-4 w-4" />
+                                            View Archived
+                                        </Link>
+                                    </Button>
+                                </div>
+                            </div>
+                            <CardDescription>Manage all registered users in the system</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {/* Search Bar */}
+                            <div className="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
+                                <form onSubmit={handleSearch} className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Input
+                                            type="text"
+                                            value={search}
+                                            onChange={(e) => setSearch(e.target.value)}
+                                            placeholder="Search by ID, Name, Email, or Role"
+                                            className="w-full border py-2.5 pr-3 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                    >
+                                        <Search className="mr-2 h-4 w-4" />
+                                        Search
+                                    </Button>
+                                </form>
+                            </div>
+
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>ID</TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Code</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {users.map((user) => (
+                                        <TableRow key={user.id} className="hover:bg-muted/50">
+                                            <TableCell>{user.id}</TableCell>
+                                            <TableCell className="font-medium">{user.name}</TableCell>
+                                            <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
+                                            <TableCell>{user.email || '-'}</TableCell>
+                                            <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
+                                            <TableCell>
+                                                {user.status === 'pending' && (
+                                                    <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
+                                                        Pending
+                                                    </Badge>
+                                                )}
+                                                {user.status === 'approved' && (
+                                                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                                                        Approved
+                                                    </Badge>
+                                                )}
+                                                {user.status === 'rejected' && <Badge variant="destructive">Rejected</Badge>}
+                                                {!user.status && <span className="text-muted-foreground">-</span>}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-1">
+                                                    {user.status === 'pending' && (
+                                                        <>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="default"
+                                                                className="bg-green-600 hover:bg-green-700"
+                                                                onClick={() => setApproveUserId(user.id)}
+                                                            >
+                                                                Approve
+                                                            </Button>
+                                                            <Button size="sm" variant="destructive" onClick={() => setRejectUserId(user.id)}>
+                                                                Reject
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                    <Button size="sm" variant="secondary" asChild>
+                                                        <Link href={route('users.show', { user: user.id })}>View</Link>
+                                                    </Button>
+                                                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
+                                                        <Link href={route('users.edit', { user: user.id })}>Edit</Link>
+                                                    </Button>
+                                                    <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
+                                                        Archive
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
 
             {/* Approve Confirmation Dialog */}
@@ -548,9 +681,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             value={codeSearch}
                             onChange={(e) => setCodeSearch(e.target.value)}
                             placeholder="Search codes..."
-                            className="w-64"
+                            className="w-64 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                         />
-                        <Button onClick={copyAllCodes} variant="default">
+                        <Button
+                            onClick={copyAllCodes}
+                            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                        >
                             Copy All
                         </Button>
                     </div>
@@ -585,7 +721,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             <TableCell>{getStatusBadge(code.status)}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-1">
-                                                    <Button size="sm" variant="default" onClick={() => copyToClipboard(code.code)}>
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600"
+                                                        onClick={() => copyToClipboard(code.code)}
+                                                    >
                                                         {copiedCode === code.code ? 'Copied!' : 'Copy'}
                                                     </Button>
                                                     {(code.status === 'used' || code.status === 'expired') && (
@@ -648,6 +788,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 value={newUser.name}
                                 onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                                 placeholder="Full name"
+                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 required
                             />
                         </div>
@@ -660,6 +801,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 value={newUser.email}
                                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                                 placeholder="Email address"
+                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                             />
                         </div>
 
@@ -672,6 +814,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     value={newUser.password}
                                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                                     placeholder="Password"
+                                    className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                     required
                                 />
                                 <Button type="button" variant="secondary" onClick={generatePassword}>
@@ -686,7 +829,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 id="role"
                                 value={newUser.role}
                                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                                className="w-full rounded-lg border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 required
                             >
                                 <option value="Healthworker">Healthworker</option>
@@ -703,6 +846,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     value={newUser.barangay}
                                     onChange={(e) => setNewUser({ ...newUser, barangay: e.target.value })}
                                     placeholder="Enter barangay"
+                                    className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 />
                             </div>
                         )}
@@ -753,7 +897,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 'Create & Add Another'
                             )}
                         </Button>
-                        <Button onClick={() => handleCreateUser(true)} disabled={createLoading}>
+                        <Button
+                            onClick={() => handleCreateUser(true)}
+                            disabled={createLoading}
+                            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600"
+                        >
                             {createLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -766,6 +914,33 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .stat-card {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .stat-card:nth-child(1) { animation-delay: 0.1s; }
+                .stat-card:nth-child(2) { animation-delay: 0.2s; }
+                .stat-card:nth-child(3) { animation-delay: 0.3s; }
+                .stat-card:nth-child(4) { animation-delay: 0.4s; }
+                .stat-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+                }
+            `}</style>
         </AppLayout>
     );
 }

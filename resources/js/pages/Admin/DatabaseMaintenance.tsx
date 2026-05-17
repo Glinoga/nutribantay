@@ -17,7 +17,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
-import { AlertTriangle, CheckCircle2, Database, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
+import { AlertTriangle, Calendar, Database, FileText, HardDrive, Loader2, RefreshCw, Trash2, UploadCloud } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type Backup = {
@@ -41,16 +41,13 @@ export default function DatabaseMaintenance({ backups }: Props) {
     const [loading, setLoading] = useState(false);
     const [restoring, setRestoring] = useState(false);
 
-    // Restore confirmation state
     const [showRestoreDialog, setShowRestoreDialog] = useState(false);
     const [selectedRestoreBackup, setSelectedRestoreBackup] = useState<Backup | null>(null);
     const [confirmationText, setConfirmationText] = useState('');
 
-    // Delete confirmation state
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [selectedDeleteBackup, setSelectedDeleteBackup] = useState<Backup | null>(null);
 
-    // Listen for flash messages from the server
     useEffect(() => {
         if (flash?.success) {
             smartToast.success(flash.success);
@@ -87,7 +84,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
                 preserveScroll: true,
                 onSuccess: () => {
                     smartToast.dismiss(loadingToast);
-                    // Success message will be handled by the flash useEffect
                 },
                 onError: (errors) => {
                     smartToast.dismiss(loadingToast);
@@ -134,7 +130,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
                 preserveScroll: true,
                 onSuccess: () => {
                     smartToast.dismiss(loadingToast);
-                    // Success message handled by flash useEffect
                     closeRestoreDialog();
                     setTimeout(() => {
                         window.location.reload();
@@ -169,7 +164,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
             data: { backup_file: selectedDeleteBackup.path },
             preserveScroll: true,
             onSuccess: () => {
-                // Success message handled by flash useEffect
                 closeDeleteDialog();
             },
             onError: () => {
@@ -182,101 +176,152 @@ export default function DatabaseMaintenance({ backups }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Database Maintenance" />
 
-            <div className="m-4">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
-                            <Database className="h-7 w-7 text-blue-600" />
-                            Database Maintenance
-                        </h1>
-                        <p className="mt-1 text-sm text-gray-600">Backup and restore your database</p>
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+
+                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
+                            <Database className="h-6 w-6 text-teal-600" />
+                            <span className="text-sm font-semibold text-teal-700">Database Management</span>
+                        </div>
                     </div>
-                    <Button onClick={refreshBackupList} variant="outline" className="gap-2">
-                        <RefreshCw className="h-4 w-4" />
-                        Refresh
-                    </Button>
-                </div>
 
-                {/* Stats Card */}
-                <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Backups</CardTitle>
-                            <HardDrive className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{backups.length}</div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Size</CardTitle>
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{formatTotalSize(totalBackupsSize)}</div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Latest Backup</CardTitle>
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {backups.length > 0 ? new Date(backups[0].timestamp * 1000).toLocaleDateString() : 'None'}
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg" />
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
+                                        <HardDrive className="h-8 w-8 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                        Database Maintenance
+                                    </h1>
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
+                                        <Database className="h-4 w-4" />
+                                        Backup and restore your database
+                                    </p>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Stats Row */}
+                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Total Backups</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600">{backups.length}</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <HardDrive className="h-5 w-5 text-teal-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Total Size</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{formatTotalSize(totalBackupsSize)}</p>
+                                </div>
+                                <div className="rounded-full bg-cyan-50 p-2.5">
+                                    <FileText className="h-5 w-5 text-cyan-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Latest Backup</p>
+                                    <p className="mt-1 text-2xl font-bold text-green-600">
+                                        {backups.length > 0
+                                            ? new Date(backups[0].timestamp * 1000).toLocaleDateString()
+                                            : 'None'}
+                                    </p>
+                                </div>
+                                <div className="rounded-full bg-green-50 p-2.5">
+                                    <Calendar className="h-5 w-5 text-green-500" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-xs font-medium text-gray-500">Storage Engine</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600">SQLite</p>
+                                </div>
+                                <div className="rounded-full bg-teal-50 p-2.5">
+                                    <Database className="h-5 w-5 text-teal-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Create Backup Section */}
+                    <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                            <CardTitle className="flex items-center gap-2">
+                                <UploadCloud className="h-5 w-5 text-teal-600" />
+                                Create Database Backup
+                            </CardTitle>
+                            <CardDescription>
+                                Create a complete backup of your database. This backup can be used to restore your data if needed.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button
+                                onClick={handleBackup}
+                                disabled={loading}
+                                className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Creating Backup...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UploadCloud className="h-4 w-4" />
+                                        Run Backup Now
+                                    </>
+                                )}
+                            </Button>
                         </CardContent>
                     </Card>
-                </div>
 
-                {/* Backup Section */}
-                <Card className="mb-8">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <UploadCloud className="h-5 w-5 text-blue-600" />
-                            Create Database Backup
-                        </CardTitle>
-                        <CardDescription>
-                            Create a complete backup of your database. This backup can be used to restore your data if needed.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button onClick={handleBackup} disabled={loading} className="gap-2">
-                            {loading ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Creating Backup...
-                                </>
+                    {/* Backup List Section */}
+                    <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="flex items-center gap-2">
+                                    <HardDrive className="h-5 w-5 text-teal-600" />
+                                    Available Backups
+                                </CardTitle>
+                                <Button onClick={refreshBackupList} variant="outline" size="sm" className="gap-1">
+                                    <RefreshCw className="h-4 w-4" />
+                                    Refresh
+                                </Button>
+                            </div>
+                            <CardDescription>Manage your existing database backups</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {backups.length === 0 ? (
+                                <div className="flex min-h-[300px] flex-col items-center justify-center p-12">
+                                    <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">
+                                        <HardDrive className="h-16 w-16 text-teal-600" />
+                                    </div>
+                                    <h3 className="mb-2 text-xl font-bold text-gray-900">No backups available</h3>
+                                    <p className="max-w-md text-center text-gray-600">
+                                        Create your first backup above to start protecting your data.
+                                    </p>
+                                </div>
                             ) : (
-                                <>
-                                    <UploadCloud className="h-4 w-4" />
-                                    Run Backup Now
-                                </>
-                            )}
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                {/* Backup List Section */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <HardDrive className="h-5 w-5 text-blue-600" />
-                            Available Backups
-                        </CardTitle>
-                        <CardDescription>Manage your existing database backups</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {backups.length === 0 ? (
-                            <div className="py-8 text-center">
-                                <HardDrive className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                                <p className="text-gray-500">No backups available. Create your first backup above.</p>
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -288,7 +333,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                     </TableHeader>
                                     <TableBody>
                                         {backups.map((backup) => (
-                                            <TableRow key={backup.filename} className="hover:bg-gray-50">
+                                            <TableRow key={backup.filename}>
                                                 <TableCell className="font-medium">{backup.filename}</TableCell>
                                                 <TableCell>{backup.size}</TableCell>
                                                 <TableCell>{backup.date}</TableCell>
@@ -318,12 +363,11 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                         ))}
                                     </TableBody>
                                 </Table>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
+            </div>
 
             {/* Restore Confirmation Dialog */}
             <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
@@ -406,6 +450,33 @@ export default function DatabaseMaintenance({ backups }: Props) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .stat-card {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+                .stat-card:nth-child(1) { animation-delay: 0.1s; }
+                .stat-card:nth-child(2) { animation-delay: 0.2s; }
+                .stat-card:nth-child(3) { animation-delay: 0.3s; }
+                .stat-card:nth-child(4) { animation-delay: 0.4s; }
+                .stat-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+                }
+            `}</style>
         </AppLayout>
     );
 }

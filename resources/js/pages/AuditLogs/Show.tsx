@@ -1,7 +1,10 @@
-import { route } from '@/lib/routes';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, Activity, User, Globe, Monitor, FileText } from 'lucide-react';
 
 type AuditLog = {
     id: number;
@@ -25,140 +28,228 @@ type Props = {
     log: AuditLog;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Audit Logs',
-        href: route('audit-logs.index'),
-    },
-];
+const getActionColor = (action: string) => {
+    const colors: Record<string, string> = {
+        created: 'bg-green-100 text-green-800',
+        updated: 'bg-teal-100 text-teal-800',
+        deleted: 'bg-red-100 text-red-800',
+        archived: 'bg-orange-100 text-orange-800',
+        restored: 'bg-cyan-100 text-cyan-800',
+        permanently_deleted: 'bg-red-200 text-red-900',
+        maintenance_enabled: 'bg-yellow-100 text-yellow-800',
+        maintenance_disabled: 'bg-green-100 text-green-800',
+        backup_created: 'bg-teal-100 text-teal-800',
+    };
+    return colors[action] || 'bg-gray-100 text-gray-800';
+};
 
 export default function Show({ log }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Audit Logs', href: route('audit-logs.index') },
+        { title: `Log #${log.id}`, href: route('audit-logs.show', { auditLog: log.id }) },
+    ];
+
+    const oldValues = log.old_values;
+    const newValues = log.new_values;
+    const hasChanges =
+        oldValues && newValues && Object.keys(oldValues).length > 0 && Object.keys(newValues).length > 0;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Audit Log #${log.id}`} />
 
-            <div className="mx-auto max-w-4xl py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">Audit Log Details</h1>
-                    <Link href={route('audit-logs.index')} className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
-                        Back to List
-                    </Link>
-                </div>
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
-                <div className="space-y-6">
-                    {/* Main Information */}
-                    <div className="rounded-lg bg-white p-6 shadow">
-                        <h2 className="mb-4 text-lg font-semibold text-gray-900">Event Information</h2>
-                        <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                            <div>
-                                <dt className="text-sm font-medium text-gray-500">Timestamp</dt>
-                                <dd className="mt-1 text-sm text-gray-900">{log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}</dd>
-                            </div>
+                <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+                    {/* Pill Badge */}
+                    <div className="mb-6 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
+                            <Activity className="h-6 w-6 text-teal-600" />
+                            <span
+                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
+                                    log.action,
+                                )}`}
+                            >
+                                {log.action.replace(/_/g, ' ')}
+                            </span>
+                        </div>
+                    </div>
 
-                            <div>
-                                <dt className="text-sm font-medium text-gray-500">Action</dt>
-                                <dd className="mt-1">
-                                    <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs leading-5 font-semibold text-blue-800">
-                                        {log.action.replace(/_/g, ' ')}
-                                    </span>
-                                </dd>
-                            </div>
+                    {/* Header */}
+                    <div className="mb-8 flex items-center justify-between">
+                        <div>
+                            <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent">
+                                Audit Log Details
+                            </h1>
+                            <p className="mt-1 text-gray-600">Log #{log.id} — {new Date(log.created_at).toLocaleString()}</p>
+                        </div>
+                        <Link
+                            href={route('audit-logs.index')}
+                            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                            Back to List
+                        </Link>
+                    </div>
 
-                            <div>
-                                <dt className="text-sm font-medium text-gray-500">User</dt>
-                                <dd className="mt-1 text-sm text-gray-900">
-                                    {log.user ? (
-                                        <>
-                                            {log.user.name}
-                                            <span className="text-gray-500"> ({log.user.email})</span>
-                                        </>
-                                    ) : (
-                                        log.user_name || 'System'
-                                    )}
-                                </dd>
-                            </div>
-
-                            <div>
-                                <dt className="text-sm font-medium text-gray-500">Barangay</dt>
-                                <dd className="mt-1 text-sm text-gray-900">{log.barangay || '-'}</dd>
-                            </div>
-
-                            {log.model_type && (
-                                <>
+                    <div className="space-y-6">
+                        {/* Event Information */}
+                        <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <CardHeader className="border-b border-gray-100 dark:border-gray-700">
+                                <CardTitle className="flex items-center gap-2 text-lg">
+                                    <FileText className="h-5 w-5 text-teal-600" />
+                                    Event Information
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                <dl className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">Model Type</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">{log.model_type}</dd>
+                                        <dt className="text-sm font-medium text-gray-500">Timestamp</dt>
+                                        <dd className="mt-1 text-sm text-gray-900">
+                                            {log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}
+                                        </dd>
                                     </div>
 
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">Model ID</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">{log.model_id || '-'}</dd>
+                                        <dt className="text-sm font-medium text-gray-500">Action</dt>
+                                        <dd className="mt-1">
+                                            <span
+                                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
+                                                    log.action,
+                                                )}`}
+                                            >
+                                                {log.action.replace(/_/g, ' ')}
+                                            </span>
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt className="text-sm font-medium text-gray-500">User</dt>
+                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900">
+                                            <User className="h-4 w-4 text-gray-400" />
+                                            {log.user ? (
+                                                <>
+                                                    {log.user.name}
+                                                    <span className="text-gray-500">({log.user.email})</span>
+                                                </>
+                                            ) : (
+                                                log.user_name || 'System'
+                                            )}
+                                        </dd>
+                                    </div>
+
+                                    <div>
+                                        <dt className="text-sm font-medium text-gray-500">Barangay</dt>
+                                        <dd className="mt-1 text-sm text-gray-900">{log.barangay || '-'}</dd>
+                                    </div>
+
+                                    {log.model_type && (
+                                        <>
+                                            <div>
+                                                <dt className="text-sm font-medium text-gray-500">Model Type</dt>
+                                                <dd className="mt-1 text-sm text-gray-900">{log.model_type}</dd>
+                                            </div>
+
+                                            <div>
+                                                <dt className="text-sm font-medium text-gray-500">Model ID</dt>
+                                                <dd className="mt-1 text-sm text-gray-900">{log.model_id ?? '-'}</dd>
+                                            </div>
+
+                                            <div className="sm:col-span-2">
+                                                <dt className="text-sm font-medium text-gray-500">Model Name</dt>
+                                                <dd className="mt-1 text-sm text-gray-900">{log.model_name || '-'}</dd>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <div className="sm:col-span-2">
+                                        <dt className="text-sm font-medium text-gray-500">Description</dt>
+                                        <dd className="mt-1 text-sm text-gray-900">{log.description || '-'}</dd>
+                                    </div>
+
+                                    <div>
+                                        <dt className="text-sm font-medium text-gray-500">IP Address</dt>
+                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900">
+                                            <Globe className="h-4 w-4 text-gray-400" />
+                                            {log.ip_address || '-'}
+                                        </dd>
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <dt className="text-sm font-medium text-gray-500">Model Name</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">{log.model_name || '-'}</dd>
+                                        <dt className="text-sm font-medium text-gray-500">User Agent</dt>
+                                        <dd className="mt-1 flex items-start gap-2 text-sm text-gray-900">
+                                            <Monitor className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                                            <span className="break-all">{log.user_agent || '-'}</span>
+                                        </dd>
                                     </div>
-                                </>
-                            )}
+                                </dl>
+                            </CardContent>
+                        </Card>
 
-                            <div className="sm:col-span-2">
-                                <dt className="text-sm font-medium text-gray-500">Description</dt>
-                                <dd className="mt-1 text-sm text-gray-900">{log.description || '-'}</dd>
-                            </div>
-
-                            <div>
-                                <dt className="text-sm font-medium text-gray-500">IP Address</dt>
-                                <dd className="mt-1 text-sm text-gray-900">{log.ip_address || '-'}</dd>
-                            </div>
-
-                            <div className="sm:col-span-2">
-                                <dt className="text-sm font-medium text-gray-500">User Agent</dt>
-                                <dd className="mt-1 text-sm break-all text-gray-900">{log.user_agent || '-'}</dd>
-                            </div>
-                        </dl>
+                        {/* Changes Comparison */}
+                        {hasChanges && (
+                            <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                                <CardHeader className="border-b border-gray-100 dark:border-gray-700">
+                                    <CardTitle className="flex items-center gap-2 text-lg">
+                                        <Activity className="h-5 w-5 text-teal-600" />
+                                        Changes
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Field</TableHead>
+                                                <TableHead>Old Value</TableHead>
+                                                <TableHead>New Value</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {Object.keys(newValues).map((key) => (
+                                                <TableRow key={key}>
+                                                    <TableCell className="font-medium">{key}</TableCell>
+                                                    <TableCell>
+                                                        <span className="inline-block rounded bg-red-100 px-2 py-1 text-sm text-red-800">
+                                                            {oldValues && oldValues[key] !== undefined
+                                                                ? String(oldValues[key])
+                                                                : '-'}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <span className="inline-block rounded bg-green-100 px-2 py-1 text-sm text-green-800">
+                                                            {newValues[key] !== undefined ? String(newValues[key]) : '-'}
+                                                        </span>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
-
-                    {/* Changes Comparison */}
-                    {log.old_values && log.new_values && Object.keys(log.old_values).length > 0 && Object.keys(log.new_values).length > 0 && (
-                        <div className="rounded-lg bg-white p-6 shadow">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Changes</h2>
-                            <div className="overflow-hidden rounded-lg border border-gray-200">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">Field</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                Old Value
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                                New Value
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200 bg-white">
-                                        {Object.keys(log.new_values).map((key) => (
-                                            <tr key={key} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{key}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className="rounded bg-red-100 px-2 py-1">
-                                                        {log.old_values && log.old_values[key] !== undefined ? String(log.old_values[key]) : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-900">
-                                                    <span className="rounded bg-green-100 px-2 py-1">
-                                                        {log.new_values?.[key] !== undefined ? String(log.new_values[key]) : '-'}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .stat-card {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                    opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                }
+            `}</style>
         </AppLayout>
     );
 }
