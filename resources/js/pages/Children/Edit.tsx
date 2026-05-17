@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, router, useForm } from '@inertiajs/react';
@@ -27,7 +28,7 @@ interface Props {
     child: Child;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 export default function Edit({ child }: Props) {
     const [showModal, setShowModal] = useState(true);
@@ -56,11 +57,11 @@ export default function Edit({ child }: Props) {
             return;
         }
 
-        put(`/children/${child.id}`, {
+        put(route('children.update', { child: child.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.success('Child record updated successfully!');
-                router.visit(`/children/${child.id}`);
+                router.visit(route('children.show', { child: child.id }));
             },
             onError: () => {
                 smartToast.error('Failed to update record. Please try again.');
@@ -69,15 +70,15 @@ export default function Edit({ child }: Props) {
     };
 
     const handleClose = () => {
-        router.visit(`/children/${child.id}`);
+        router.visit(route('children.show', { child: child.id }));
     };
 
     return (
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: `${child.first_name} ${child.last_name}`, href: `/children/${child.id}` },
-                { title: 'Edit', href: `/children/${child.id}/edit` },
+                { title: `${child.first_name} ${child.last_name}`, href: route('children.show', { child: child.id }) },
+                { title: 'Edit', href: route('children.edit', { child: child.id }) },
             ]}
         >
             <Head title="Edit Child Record" />

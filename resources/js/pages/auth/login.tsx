@@ -3,7 +3,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { register } from '@/routes';
+import { route } from '@/lib/routes';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -23,7 +23,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/login');
+        post(route('login'));
     };
 
     return (
@@ -106,7 +106,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                         {/* Footer */}
                         <div className="mt-4 text-center text-sm text-gray-600">
                             Don't have an account?{' '}
-                            <TextLink href={register()} className="font-medium">
+                            <TextLink href={route('register')} className="font-medium">
                                 Sign Up
                             </TextLink>{' '}
                             |{' '}

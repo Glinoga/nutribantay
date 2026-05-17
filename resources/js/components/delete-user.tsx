@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -22,7 +23,7 @@ export default function DeleteUser() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        destroy('/settings/profile', {
+        destroy(route('profile.destroy'), {
             preserveScroll: true,
             onError: () => passwordInput.current?.focus(),
             onFinish: () => reset(),

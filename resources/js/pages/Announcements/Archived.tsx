@@ -16,6 +16,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArchiveRestore, Loader2, Megaphone, Trash2 } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type Category = {
@@ -38,8 +39,8 @@ type Announcement = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Announcements', href: '/admin/announcements' },
-    { title: 'Archived Announcements', href: '/admin/announcements-archived' },
+    { title: 'Announcements', href: route('announcements.index') },
+    { title: 'Archived Announcements', href: route('announcements.archived') },
 ];
 
 interface Props {
@@ -54,7 +55,7 @@ export default function Archived({ announcements }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(`/admin/announcements/${id}/restore`);
+            await router.post(route('announcements.restore', { id }),);
             smartToast.success('Announcement restored successfully!');
         } catch {
             smartToast.error('Failed to restore announcement.');
@@ -67,7 +68,7 @@ export default function Archived({ announcements }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(`/admin/announcements/${id}/force-delete`);
+            await router.delete(route('announcements.forceDelete', { id }),);
             smartToast.success('Announcement permanently deleted.');
         } catch {
             smartToast.error('Failed to delete announcement.');
@@ -104,7 +105,7 @@ export default function Archived({ announcements }: Props) {
                             {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'} archived
                         </p>
                         <Button variant="outline" size="sm" asChild>
-                            <Link href="/admin/announcements">
+                            <Link href={route('announcements.index')}>
                                 <Megaphone className="mr-1.5 h-4 w-4" />
                                 Back to Announcements
                             </Link>

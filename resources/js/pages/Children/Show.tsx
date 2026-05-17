@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -86,7 +87,7 @@ type Child = {
     healthlogs?: HealthLog[];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 export default function Show({ child }: { child: Child }) {
     const [notesOpen, setNotesOpen] = useState(false);
@@ -124,7 +125,7 @@ export default function Show({ child }: { child: Child }) {
             return;
         }
 
-        put(`/children/${child.id}`, {
+        put(route('children.update', { child: child.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.success('Child record updated successfully!');
@@ -161,7 +162,7 @@ export default function Show({ child }: { child: Child }) {
 
     const submitNote = (e: React.FormEvent) => {
         e.preventDefault();
-        router.post(`/children/${child.id}/notes`, { note: newNote });
+        router.post(route('children.notes.store', { child: child.id }), { note: newNote });
         setNewNote('');
     };
 
@@ -176,7 +177,7 @@ export default function Show({ child }: { child: Child }) {
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/children/${child.id}/notes/${noteId}`);
+                router.delete(route('children.notes.destroy', { child: child.id, note: noteId }));
             }
         });
     };
@@ -192,7 +193,7 @@ export default function Show({ child }: { child: Child }) {
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/healthlogs/${logId}`, {
+                router.delete(route('healthlogs.destroy', { healthlog: logId }), {
                     onSuccess: () => {
                         router.reload({ only: ['child'] });
                     },
@@ -206,7 +207,7 @@ export default function Show({ child }: { child: Child }) {
         setRecommendation(null);
 
         try {
-            const response = await axios.post('/recommendations', {
+            const response = await axios.post(route('recommendations.generate'), {
                 child_id: child.id,
             });
             setRecommendation(response.data.recommendation);
@@ -277,7 +278,7 @@ export default function Show({ child }: { child: Child }) {
     };
 
     return (
-        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: `/children/${child.id}` }]}>
+        <AppLayout breadcrumbs={[...breadcrumbs, { title: child.fullname, href: route('children.show', { child: child.id }) }]}>
             <Head title={`${child.fullname} - Child Details`} />
 
             <style>{`
@@ -370,7 +371,7 @@ export default function Show({ child }: { child: Child }) {
                         </button>
 
                         {canManageHealthlogs && (
-                            <Link href={`/children/${child.id}/healthlogs/create`}>
+                            <Link href={route('children.healthlogs.create', { child: child.id })}>
                                 <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                     <Plus className="h-4 w-4" />
                                     Add Health Log
@@ -378,14 +379,14 @@ export default function Show({ child }: { child: Child }) {
                             </Link>
                         )}
 
-                        <Link href={`/children/${child.id}/vaccines`}>
+                        <Link href={route('children.vaccines.index', { child: child.id })}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
                                 <Syringe className="h-4 w-4" />
                                 Vaccine Tracker
                             </button>
                         </Link>
 
-                        <Link href="/children">
+                        <Link href={route('children.index')}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
                                 <X className="h-4 w-4" />
                                 Back to List
@@ -699,7 +700,7 @@ export default function Show({ child }: { child: Child }) {
                             <p className="mb-4 text-sm text-gray-600">
                                 These records are from the old health log system.{' '}
                                 <Link
-                                    href={`/children/${child.id}/vaccines`}
+                                    href={route('children.vaccines.index', { child: child.id })}
                                     className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
                                 >
                                     Use the Vaccine Tracker
@@ -954,7 +955,7 @@ export default function Show({ child }: { child: Child }) {
 
                                 <div className="mt-6 flex gap-2">
                                     {canManageHealthlogs && (
-                                        <Link href={`/healthlogs/${selectedLog.id}/edit`}>
+                                        <Link href={route('healthlogs.edit', { healthlog: selectedLog.id })}>
                                             <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                                 <Edit2 className="h-4 w-4" />
                                                 Edit
@@ -1063,7 +1064,7 @@ export default function Show({ child }: { child: Child }) {
                                 <p className="mt-1 text-sm text-amber-700">
                                     Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
                                     health measurements, please{' '}
-                                    <Link href={`/children/${child.id}/healthlogs/create`} className="font-semibold text-teal-600 hover:underline">
+                                    <Link href={route('children.healthlogs.create', { child: child.id })} className="font-semibold text-teal-600 hover:underline">
                                         create a health log
                                     </Link>{' '}
                                     instead.
@@ -1273,7 +1274,7 @@ export default function Show({ child }: { child: Child }) {
                             <Button
                                 onClick={() => {
                                     setShowExportDialog(false);
-                                    window.location.href = `/children/${child.id}/print`;
+                                    window.location.href = route('children.show.print', { child: child.id });
                                 }}
                                 className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white hover:from-cyan-700 hover:to-cyan-500"
                             >
@@ -1283,7 +1284,7 @@ export default function Show({ child }: { child: Child }) {
                             <Button
                                 onClick={() => {
                                     setShowExportDialog(false);
-                                    window.location.href = `/children/${child.id}/export`;
+                                    window.location.href = route('children.export.single', { child: child.id });
                                 }}
                                 className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-700 hover:to-emerald-600"
                             >

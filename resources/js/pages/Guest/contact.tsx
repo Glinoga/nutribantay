@@ -215,8 +215,8 @@ export default function Contact() {
                                             </svg>
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Office Hours</h3>
-                                        <p className="mb-3 text-[var(--text-muted)]">Mon-Fri: 8AM - 5PM</p>
-                                        <span className="inline-block text-lg font-medium text-[var(--text)]">Saturday: 8AM - 12PM</span>
+                                        <p className="mb-3 text-[var(--text-muted)]">We are only available on:</p>
+                                        <span className="inline-block text-lg font-medium text-[var(--text)]">Mon-Fri: 8AM - 5PM</span>
                                     </div>
                                 </div>
                             </div>

@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
@@ -10,7 +11,7 @@ import { Loader2 } from 'lucide-react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Edit User',
-        href: '/users',
+        href: route('users.index'),
     },
 ];
 
@@ -45,7 +46,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        put(`/users/${user.id}`);
+        put(route('users.update', { user: user.id }));
     }
 
     return (
@@ -54,7 +55,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Edit User</h1>
                 <Button variant="secondary" asChild>
-                    <Link href="/users">Back</Link>
+                    <Link href={route('users.index')}>Back</Link>
                 </Button>
             </div>
             <form onSubmit={submit} className="mx-4 mt-8 max-w-xl space-y-6">
@@ -119,7 +120,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                 {/* Save Button */}
                 <div className="flex justify-end gap-2">
                     <Button variant="outline" asChild>
-                        <Link href="/users">Cancel</Link>
+                        <Link href={route('users.index')}>Cancel</Link>
                     </Button>
                     <Button type="submit" disabled={processing}>
                         {processing ? (

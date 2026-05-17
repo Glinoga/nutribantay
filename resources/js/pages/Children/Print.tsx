@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, Link } from '@inertiajs/react';
@@ -63,7 +64,7 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
-                <Link href="/children">
+                <Link href={route('children.index')}>
                     <Button variant="outline" className="cursor-pointer border-cyan-300">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Children

@@ -7,6 +7,7 @@ import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useEffect, useState } from 'react';
 
 type HealthLogForm = {
@@ -48,7 +49,7 @@ type EditProps = {
     child_id?: number;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
     const [showSuccess, setShowSuccess] = useState(false);
@@ -83,7 +84,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/healthlogs/${healthlog.id}`, {
+        put(route('healthlogs.update', { healthlog: healthlog.id }), {
             onSuccess: () => {
                 setShowSuccess(true);
                 smartToast.success('Health log updated successfully!');
@@ -102,8 +103,8 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: childName, href: `/children/${childId}` },
-                { title: 'Edit Health Log', href: `/healthlogs/${healthlog.id}/edit` },
+                { title: childName, href: route('children.show', { child: childId ?? 0 }) },
+                { title: 'Edit Health Log', href: route('healthlogs.edit', { healthlog: healthlog.id }) },
             ]}
         >
             <Head title={`Edit Health Log - ${childName}`} />
@@ -164,7 +165,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                     record for this child, please use the button below instead.
                                 </p>
                                 {childId && (
-                                    <Link href={`/children/${childId}/healthlogs/create`}>
+                                    <Link href={route('children.healthlogs.create', { child: childId })}>
                                         <Button className="mt-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:from-teal-600 hover:to-cyan-600">
                                             <Plus className="mr-2 h-4 w-4" />
                                             Add New Health Log
@@ -368,9 +369,9 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                 onClick={() => {
                                     const childId = healthlog.child_id ?? healthlog.child?.id;
                                     if (childId) {
-                                        router.visit(`/children/${childId}`);
+                                        router.visit(route('children.show', { child: childId }));
                                     } else {
-                                        router.visit('/children');
+                                        router.visit(route('children.index'));
                                     }
                                 }}
                                 className="px-8 py-5 text-lg font-bold"
@@ -383,7 +384,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => router.visit(`/children/${childId}`)}
+                                    onClick={() => router.visit(route('children.show', { child: childId }))}
                                     className="px-8 py-5 text-lg font-bold"
                                 >
                                     Cancel & Go to Profile

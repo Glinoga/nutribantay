@@ -12,8 +12,8 @@ import { CheckCircle2, Megaphone, OctagonAlert, Sparkles, X } from 'lucide-react
 import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Announcements', href: '/admin/announcements' },
-    { title: 'Create Announcement', href: '/admin/announcements/create' },
+    { title: 'Announcements', href: route('announcements.index') },
+    { title: 'Create Announcement', href: route('announcements.create') },
 ];
 
 interface Category {

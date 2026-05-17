@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber } from '@/lib/phoneUtils';
+import { route } from '@/lib/routes';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
@@ -136,7 +137,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
         const loadingToast = smartToast.loading('Sending SMS...');
 
         router.post(
-            '/admin/sendsms',
+            route('sms.send'),
             {
                 recipient_type: recipientType,
                 recipients: selectedUsers,

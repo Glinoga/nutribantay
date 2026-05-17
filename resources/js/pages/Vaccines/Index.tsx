@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Calendar, Clock, Edit2, Plus, Search, Shield, Syringe, Trash2, Users, X } from 'lucide-react';
@@ -36,7 +37,7 @@ type IndexProps = {
     stats: Stats;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Vaccines', href: '/vaccines' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Vaccines', href: route('vaccines.index') }];
 
 export default function Index({ vaccines, stats }: IndexProps) {
     const [showModal, setShowModal] = useState(false);
@@ -58,7 +59,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
         e.preventDefault();
 
         if (editingVaccine) {
-            put(`/vaccines/${editingVaccine.id}`, {
+            put(route('vaccines.update', { vaccine: editingVaccine.id }), {
                 onSuccess: () => {
                     setShowModal(false);
                     setEditingVaccine(null);
@@ -66,7 +67,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                 },
             });
         } else {
-            post('/vaccines', {
+            post(route('vaccines.store'), {
                 onSuccess: () => {
                     setShowModal(false);
                     reset();
@@ -113,7 +114,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
             background: 'hsl(178 100% 98%)',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/vaccines/${vaccine.id}`);
+                router.delete(route('vaccines.destroy', { vaccine: vaccine.id }));
             }
         });
     };

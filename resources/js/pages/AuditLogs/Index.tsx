@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -44,7 +45,7 @@ type Props = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Audit Logs',
-        href: '/audit-logs',
+        href: route('audit-logs.index'),
     },
 ];
 
@@ -73,7 +74,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
 
     const handleFilter = () => {
         router.get(
-            '/audit-logs',
+            route('audit-logs.index'),
             {
                 search: searchTerm,
                 action: selectedAction,
@@ -94,7 +95,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
         setSelectedModel('');
         setStartDate('');
         setEndDate('');
-        router.get('/audit-logs');
+        router.get(route('audit-logs.index'));
     };
 
     return (
@@ -115,7 +116,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                             if (selectedModel) params.append('model_type', selectedModel);
                             if (startDate) params.append('start_date', startDate);
                             if (endDate) params.append('end_date', endDate);
-                            window.location.href = `/audit-logs/export?${params.toString()}`;
+                            window.location.href = `${route('audit-logs.export')}?${params.toString()}`;
                         }}
                         className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
                     >
@@ -240,7 +241,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                         <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900">{log.model_type || '-'}</td>
                                         <td className="px-6 py-4 text-sm text-gray-900">{log.description || '-'}</td>
                                         <td className="px-6 py-4 text-sm whitespace-nowrap">
-                                            <Link href={`/audit-logs/${log.id}`} className="text-blue-600 hover:text-blue-900">
+                                            <Link href={route('audit-logs.show', { auditLog: log.id })} className="text-blue-600 hover:text-blue-900">
                                                 View Details
                                             </Link>
                                         </td>

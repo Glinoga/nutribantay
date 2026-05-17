@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Head, Link } from '@inertiajs/react';
@@ -125,7 +126,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
-                <Link href={`/children/${child.id}`}>
+                <Link href={route('children.show', { child: child.id })}>
                     <Button variant="outline" className="cursor-pointer border-cyan-300">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Profile

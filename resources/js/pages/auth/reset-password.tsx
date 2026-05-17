@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/reset-password');
+        post(route('password.store'));
     };
 
     return (

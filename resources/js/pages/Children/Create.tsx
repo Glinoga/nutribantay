@@ -8,6 +8,7 @@ import { displayPhoneNumber, formatPhoneNumber } from '@/lib/phoneUtils';
 import { SharedData } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { route } from '@/lib/routes';
 import { Baby, Calendar, CheckCircle2, MapPin, OctagonAlert, Phone, Ruler, Sparkles, User, Weight } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -45,11 +46,11 @@ export default function ChildrenCreate() {
             return;
         }
 
-        post('/children', {
+        post(route('children.store'), {
             onSuccess: () => {
                 smartToast.success('Child successfully registered! 🎉');
                 reset();
-                router.visit('/children');
+                router.visit(route('children.index'));
             },
             onError: () => {
                 smartToast.error('Failed to register child. Please check your inputs.');
@@ -58,7 +59,7 @@ export default function ChildrenCreate() {
     };
 
     const handleClose = () => {
-        router.visit('/children');
+        router.visit(route('children.index'));
     };
 
     // Calculate BMI if weight and height are provided

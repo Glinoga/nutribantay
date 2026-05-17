@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
+import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Share2, Sparkles, User } from 'lucide-react';
 import { useState } from 'react';
@@ -84,7 +85,7 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-8">
                         <Link
-                            href="/guest/announcements"
+                            href={route('guest.announcements')}
                             className="inline-flex items-center text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
                         >
                             <ArrowLeft size={20} className="mr-2" />
@@ -164,12 +165,12 @@ export default function ShowAnnouncement({ announcement }: ShowAnnouncementProps
                                 <p className="text-[var(--text-muted)]">Don&apos;t miss our latest updates and announcements</p>
                             </div>
                             <div className="flex gap-4">
-                                <Link href="/guest/announcements">
+                                <Link href={route('guest.announcements')}>
                                     <Button variant="outline" className="rounded-full">
                                         View All Announcements
                                     </Button>
                                 </Link>
-                                <Link href="/guest/contact">
+                                <Link href={route('guest.contact')}>
                                     <Button className="rounded-full bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90">
                                         Contact Us
                                     </Button>

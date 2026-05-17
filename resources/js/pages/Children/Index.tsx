@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
@@ -81,7 +82,7 @@ type IndexProps = {
     vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 type AuthProps = {
     auth?: {
@@ -128,7 +129,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
-        window.location.href = `/children/print?${params.toString()}`;
+        window.location.href = `${route('children.print')}?${params.toString()}`;
     };
 
     const handleExportCSV = () => {
@@ -136,7 +137,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
-        window.location.href = `/children/export?${params.toString()}`;
+        window.location.href = `${route('children.export')}?${params.toString()}`;
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,7 +167,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         setIsImporting(true);
 
         router.post(
-            '/children/import',
+            route('children.import'),
             { data: importData, force_import: forceImport },
             {
                 onSuccess: () => {
@@ -231,7 +232,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             background: 'hsl(178 100% 98%)',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/children/${child.id}`, {
+                router.delete(route('children.destroy', { child: child.id }), {
                     preserveScroll: true,
                     onSuccess: () => {
                         smartToast.success(`${child.fullname}'s record deleted successfully!`);
@@ -264,16 +265,30 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             const params: Record<string, string> = { search: searchQuery };
             if (activeSex) params.sex = activeSex;
             if (activeVaccine) params.vaccine_status = activeVaccine;
-            router.get('/children', params, { replace: true });
+router.get(route('children.index'), params, { replace: true });
         }
     };
+
+    const handleSort = (column: string) => {
+        // ... existing sort handlers ...
+        console.log('Sort by:', column);
+    };
+
+    const applyFilters = (sex?: string, vaccine?: string | null) => {
+        const params: Record<string, string> = {};
+        if (searchQuery) params.search = searchQuery;
+        if (sex) params.sex = sex;
+        if (vaccine) params.vaccine_status = vaccine;
+        router.get(route('children.index'), params, { replace: true });
+    };
+
 
     const handleSexFilter = (sexValue: string) => {
         const params: Record<string, string> = {};
         if (sexValue !== 'all') params.sex = sexValue;
         if (searchQuery) params.search = searchQuery;
         if (activeVaccine) params.vaccine_status = activeVaccine;
-        router.get('/children', params, { replace: true });
+        router.get(route('children.index'), params, { replace: true });
     };
 
     const handleVaccineFilter = (vaccineValue: string) => {
@@ -281,14 +296,14 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         if (vaccineValue !== 'all') params.vaccine_status = vaccineValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
-        router.get('/children', params, { replace: true });
+        router.get(route('children.index'), params, { replace: true });
     };
 
     const handlePageClick = (page: number) => {
         const params: Record<string, string | number> = { page, search: searchQuery };
         if (activeSex) params.sex = activeSex;
         if (activeVaccine) params.vaccine_status = activeVaccine;
-        router.get('/children', params, { replace: true });
+        router.get(route('children.index'), params, { replace: true });
     };
 
     const getPageNumbers = () => {
@@ -458,7 +473,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 <button
                                     onClick={() => {
                                         setSearchQuery('');
-                                        router.get('/children', { search: '', sex: '', vaccine_status: '' }, { replace: true });
+                                        router.get(route('children.index'), { search: '', sex: '', vaccine_status: '' }, { replace: true });
                                     }}
                                     className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                                 >
@@ -489,7 +504,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                              )}
 
                              {canManageChildren && (
-                                 <Link href="/children-archived">
+                                  <Link href={route('children.archived')}>
                                      <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
                                          <Trash2 className="mr-1.5 h-4 w-4" />
                                          View Archived
@@ -498,7 +513,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                              )}
 
                              {canManageChildren && (
-                                 <Link href="/children/create">
+                                  <Link href={route('children.create')}>
                                      <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
                                          <Plus className="mr-1.5 h-4 w-4" />
                                          Add Child
@@ -513,7 +528,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                             onClick={() => {
                                 const params: Record<string, string> = {};
                                 if (searchQuery) params.search = searchQuery;
-                                router.get('/children', params, { replace: true });
+                                router.get(route('children.index'), params, { replace: true });
                             }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                 !activeSex && !activeVaccine
@@ -687,7 +702,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                                                 <div className="border-t border-gray-100">
                                                     <Link
-                                                        href={`/children/${child.id}`}
+                                                        href={route('children.show', { child: child.id })}
                                                         className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
                                                     >
                                                         <Activity className="h-3.5 w-3.5" />
@@ -698,7 +713,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                 {canManageChildren && (
                                                     <div className="flex border-t border-gray-100">
                                                         <Link
-                                                            href={`/children/${child.id}/edit`}
+                                                            href={route('children.edit', { child: child.id })}
                                                             className="flex flex-1 items-center justify-center gap-1 border-r border-gray-100 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
                                                         >
                                                             <Edit2 className="h-3.5 w-3.5" />

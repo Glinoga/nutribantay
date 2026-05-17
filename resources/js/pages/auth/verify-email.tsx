@@ -1,4 +1,5 @@
 // Components
+import { route } from '@/lib/routes';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -10,11 +11,11 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/email/verification-notification');
+        post(route('verification.send'));
     };
 
     const handleLogout = () => {
-        post('/logout');
+        post(route('logout'));
     };
 
     return (

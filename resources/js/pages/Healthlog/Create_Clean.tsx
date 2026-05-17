@@ -7,6 +7,7 @@ import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Calculator, Check, Eye, Heart } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useEffect, useState } from 'react';
 
 type Child = {
@@ -49,7 +50,7 @@ type HealthLogForm = {
     deworming: boolean;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 export default function Create({
     child,
@@ -95,7 +96,7 @@ export default function Create({
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(`/children/${child.id}/healthlogs`, {
+        post(route('children.healthlogs.store', { child: child.id }), {
             onSuccess: () => {
                 setShowSuccess(true);
                 smartToast.success('Health log added successfully!');
@@ -110,8 +111,8 @@ export default function Create({
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: child.fullname, href: `/children/${child.id}` },
-                { title: 'Add Health Log', href: `/children/${child.id}/healthlogs/create` },
+                { title: child.fullname, href: route('children.show', { child: child.id }) },
+                { title: 'Add Health Log', href: route('children.healthlogs.create', { child: child.id }) },
             ]}
         >
             <Head title={`Add Health Log - ${child.fullname}`} />
@@ -565,7 +566,7 @@ export default function Create({
                                 Cancel & Go Back
                             </Button>
 
-                            <Link href={`/children/${child.id}`}>
+                            <Link href={route('children.show', { child: child.id })}>
                                 <Button type="button" variant="outline" className="px-8 py-5 text-lg font-bold">
                                     Cancel & Go to Profile
                                 </Button>

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Plus, Syringe, Trash2, X } from 'lucide-react';
@@ -77,7 +78,7 @@ const getTodayDate = () => {
     return today.toISOString().split('T')[0];
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: '/children' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
 export default function Vaccines({ child, child_vaccines, available_vaccines }: ChildVaccinesProps) {
     const [selectedVaccineId, setSelectedVaccineId] = useState<number | null>(null);
@@ -97,7 +98,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         e.preventDefault();
         if (!selectedVaccineId) return;
 
-        router.post(`/children/${child.id}/vaccines`, {
+        router.post(route('children.vaccines.store', { child: child.id }), {
             vaccine_id: selectedVaccineId,
         });
     };
@@ -150,13 +151,13 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         };
 
         if (editingDose) {
-            router.patch(`/children/${child.id}/vaccines/${editingDose.cv.id}/doses/${editingDose.dose.id}`, payload, {
+            router.patch(route('children.vaccines.doses.update', { child: child.id, childVaccine: editingDose.cv.id, dose: editingDose.dose.id }), payload, {
                 preserveScroll: true,
                 onSuccess: () => closeDoseModal(),
             });
         } else if (recordingDoseFor) {
             router.post(
-                `/children/${child.id}/vaccines/${recordingDoseFor.id}/doses`,
+                route('children.vaccines.doses.store', { child: child.id, childVaccine: recordingDoseFor.id }),
                 {
                     ...payload,
                     dose_number: Number(doseForm.data.dose_number),
@@ -187,7 +188,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             confirmButtonText: 'Yes, remove it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/children/${child.id}/vaccines/${cv.id}`);
+                router.delete(route('children.vaccines.destroy', { child: child.id, childVaccine: cv.id }));
             }
         });
     };
@@ -203,7 +204,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(`/children/${child.id}/vaccines/${cv.id}/doses/${dose.id}`);
+                router.delete(route('children.vaccines.doses.destroy', { child: child.id, childVaccine: cv.id, dose: dose.id }));
             }
         });
     };
@@ -212,8 +213,8 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         <AppLayout
             breadcrumbs={[
                 ...breadcrumbs,
-                { title: child.fullname, href: `/children/${child.id}` },
-                { title: 'Vaccines', href: `/children/${child.id}/vaccines` },
+                { title: child.fullname, href: route('children.show', { child: child.id }) },
+                { title: 'Vaccines', href: route('children.vaccines.index', { child: child.id }) },
             ]}
         >
             <Head title={`Vaccines - ${child.fullname}`} />
@@ -276,14 +277,14 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                     {/* Action Buttons */}
                     <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
-                        <Link href={`/children/${child.id}`}>
+                        <Link href={route('children.show', { child: child.id })}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg">
                                 <X className="h-4 w-4" />
                                 Back to Child
                             </button>
                         </Link>
 
-                        <Link href="/children">
+                        <Link href={route('children.index')}>
                             <button className="action-btn inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
                                 <X className="h-4 w-4" />
                                 Back to List

@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
@@ -27,7 +28,7 @@ type Props = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Audit Logs',
-        href: '/audit-logs',
+        href: route('audit-logs.index'),
     },
 ];
 
@@ -39,7 +40,7 @@ export default function Show({ log }: Props) {
             <div className="mx-auto max-w-4xl py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-900">Audit Log Details</h1>
-                    <Link href="/audit-logs" className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
+                    <Link href={route('audit-logs.index')} className="rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700">
                         Back to List
                     </Link>
                 </div>

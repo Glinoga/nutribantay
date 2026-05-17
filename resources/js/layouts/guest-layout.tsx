@@ -1,4 +1,4 @@
-import { login, register } from '@/routes';
+import { route } from '@/lib/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
@@ -131,13 +131,13 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 ) : (
                                     <>
                                         <Link
-                                            href={login()}
+                                            href={route('login')}
                                             className="hidden md:inline-flex rounded-full border-2 border-[var(--primary)] bg-transparent px-4 py-1.5 text-sm font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-md md:px-6 md:py-2 md:text-base"
                                         >
                                             Log in
                                         </Link>
                                         <Link
-                                            href={register()}
+                                            href={route('register')}
                                             className="hidden md:inline-flex rounded-full bg-[var(--primary)] px-4 py-1.5 text-sm font-medium text-white transition-all hover:shadow-md md:px-6 md:py-2 md:text-base"
                                         >
                                             Register
@@ -206,14 +206,14 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     ) : (
                                         <div className="flex flex-col space-y-2">
                                             <Link
-                                                href={login()}
+                                                href={route('login')}
                                                 className="inline-block rounded-full border-2 border-[var(--primary)] px-6 py-2 text-center font-medium text-[var(--primary)]"
                                                 onClick={() => setMobileMenuOpen(false)}
                                             >
                                                 Log in
                                             </Link>
                                             <Link
-                                                href={register()}
+                                                href={route('register')}
                                                 className="inline-block rounded-full bg-[var(--primary)] px-6 py-2 text-center font-medium text-white"
                                                 onClick={() => setMobileMenuOpen(false)}
                                             >
@@ -323,7 +323,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     </li>
                                     <li>
                                         <Link
-                                            href="/announcements"
+                                            href={route('guest.announcements')}
                                             className="flex items-center text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
                                         >
                                             <svg
@@ -343,7 +343,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     </li>
                                     <li>
                                         <Link
-                                            href="/contact"
+                                            href={route('guest.contact')}
                                             className="flex items-center text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
                                         >
                                             <svg

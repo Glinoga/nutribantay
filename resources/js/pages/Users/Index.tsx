@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { route } from '@/lib/routes';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -44,7 +45,7 @@ type RegistrationCode = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User Management',
-        href: '/users',
+        href: route('users.index'),
     },
 ];
 
@@ -119,7 +120,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         setCreateError('');
 
         try {
-            const res = await axios.post('/users/store-bulk', {
+            const res = await axios.post(route('users.storeBulk'), {
                 name: newUser.name,
                 email: newUser.email || null,
                 password: newUser.password,
@@ -272,12 +273,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get('/users', { search }, { preserveState: true });
+        router.get(route('users.index'), { search }, { preserveState: true });
     };
 
     const handleApprove = async (userId: number) => {
         try {
-            await router.post(`/users/${userId}/approve`);
+            await router.post(route('users.approve', { id: userId }));
             smartToast.success('User approved successfully!');
         } catch (err) {
             smartToast.error('Failed to approve user.');
@@ -288,7 +289,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
     const handleReject = async (userId: number) => {
         try {
-            await router.post(`/users/${userId}/reject`);
+            await router.post(route('users.reject', { id: userId }));
             smartToast.success('User rejected.');
         } catch (err) {
             smartToast.error('Failed to reject user.');
@@ -299,7 +300,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
     const handleArchive = async (userId: number) => {
         try {
-            await router.delete(`/users/${userId}`);
+            await router.delete(route('users.destroy', { user: userId }));
             smartToast.success('User archived successfully.');
         } catch (err) {
             smartToast.error('Failed to archive user.');
@@ -329,7 +330,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         Create User
                     </Button>
                     <Button variant="secondary" asChild>
-                        <Link href="/users/archived">View Archived Users</Link>
+                        <Link href={route('users.archived')}>View Archived Users</Link>
                     </Button>
                 </div>
             </div>
@@ -435,10 +436,10 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             </>
                                         )}
                                         <Button size="sm" variant="secondary" asChild>
-                                            <Link href={`/users/${user.id}`}>View</Link>
+                                            <Link href={route('users.show', { user: user.id })}>View</Link>
                                         </Button>
                                         <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
-                                            <Link href={`/users/${user.id}/edit`}>Edit</Link>
+                                            <Link href={route('users.edit', { user: user.id })}>Edit</Link>
                                         </Button>
                                         <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
                                             Archive

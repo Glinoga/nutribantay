@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -29,7 +30,7 @@ type Backup = {
     source: string;
 };
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Database Maintenance', href: '/admin/database' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Database Maintenance', href: route('admin.database.index') }];
 
 interface Props {
     backups: Backup[];
@@ -80,7 +81,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
         const loadingToast = smartToast.loading('Creating backup — this may take a few seconds...');
 
         router.post(
-            '/admin/database/backup',
+            route('admin.database.backup'),
             {},
             {
                 preserveScroll: true,
@@ -124,7 +125,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
         const loadingToast = smartToast.loading('Restoring database...');
 
         router.post(
-            '/admin/database/restore',
+            route('admin.database.restore'),
             {
                 backup_file: selectedRestoreBackup.path,
                 confirmation: confirmationText,
@@ -164,7 +165,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
     const handleDelete = () => {
         if (!selectedDeleteBackup) return;
 
-        router.delete('/admin/database/delete', {
+        router.delete(route('admin.database.delete'), {
             data: { backup_file: selectedDeleteBackup.path },
             preserveScroll: true,
             onSuccess: () => {

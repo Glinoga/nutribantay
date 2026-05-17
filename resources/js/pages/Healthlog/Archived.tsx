@@ -15,6 +15,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type HealthLog = {
@@ -28,8 +29,8 @@ type HealthLog = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Health Logs', href: '/children' },
-    { title: 'Archived Health Logs', href: '/healthlogs-archived' },
+    { title: 'Health Logs', href: route('children.index') },
+    { title: 'Archived Health Logs', href: route('healthlogs.archived') },
 ];
 
 interface Props {
@@ -44,7 +45,7 @@ export default function Archived({ healthlogs }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(`/healthlogs/${id}/restore`);
+            await router.post(route('healthlogs.restore', { id }),);
             smartToast.success('Health log restored successfully!');
         } catch (err) {
             smartToast.error('Failed to restore health log.');
@@ -57,7 +58,7 @@ export default function Archived({ healthlogs }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(`/healthlogs/${id}/force-delete`);
+            await router.delete(route('healthlogs.forceDelete', { id }),);
             smartToast.success('Health log permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete health log.');
@@ -73,7 +74,7 @@ export default function Archived({ healthlogs }: Props) {
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Archived Health Logs</h1>
                 <Button variant="secondary" asChild>
-                    <Link href="/children">Back to Children</Link>
+                    <Link href={route('children.index')}>Back to Children</Link>
                 </Button>
             </div>
 

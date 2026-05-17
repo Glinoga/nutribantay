@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: '/admin/announcements' }];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Announcements', href: route('announcements.index') }];
 
 interface Category {
     id: number;
@@ -140,7 +140,7 @@ export default function Index(props: IndexProps) {
 
         setDeletingId(announcement.id);
 
-        router.delete(`/admin/announcements/${announcement.id}`, {
+        router.delete(route('announcements.destroy', { announcement: announcement.id }), {
             preserveScroll: true,
             onSuccess: () => {
                 setDeletingId(null);
@@ -340,7 +340,7 @@ export default function Index(props: IndexProps) {
                                 </Button>
                             </Link>
 
-                            <Link href="/admin/announcements-archived">
+                            <Link href={route('announcements.archived')}>
                                 <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
                                     <Trash2 className="mr-1.5 h-4 w-4" />
                                     View Archived

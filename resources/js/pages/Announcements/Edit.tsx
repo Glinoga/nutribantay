@@ -138,7 +138,7 @@ export default function Edit({ announcement, categories }: EditProps) {
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Announcements', href: '/admin/announcements' },
+        { title: 'Announcements', href: route('announcements.index') },
     ];
 
     return (

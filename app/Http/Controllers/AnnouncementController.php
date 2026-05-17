@@ -71,7 +71,7 @@ class AnnouncementController extends Controller
             ->latest('date')
             ->paginate(9);
 
-        return Inertia::render('guest/announcements', [
+        return Inertia::render('Guest/announcements', [
             'announcements' => $announcements->items(),
             'pagination' => [
                 'current_page' => $announcements->currentPage(),
@@ -94,7 +94,7 @@ class AnnouncementController extends Controller
 
         $announcement->load('category');
 
-        return Inertia::render('guest/showannouncement', [
+        return Inertia::render('Guest/showannouncement', [
             'announcement' => $announcement,
         ]);
     }

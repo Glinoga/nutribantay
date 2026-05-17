@@ -3,7 +3,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { login } from '@/routes';
+import { route } from '@/lib/routes';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
@@ -117,7 +117,7 @@ export default function Register() {
                                 {/* Footer */}
                                 <div className="mt-4 text-center text-sm text-gray-600">
                                     Already have an account?{' '}
-                                    <TextLink href={login()} className="font-medium">
+                                    <TextLink href={route('login')} className="font-medium">
                                         Log In
                                     </TextLink>
                                 </div>

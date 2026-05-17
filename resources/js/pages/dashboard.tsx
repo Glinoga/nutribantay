@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
@@ -92,7 +93,7 @@ type DashboardProps = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
 ];
 
@@ -102,7 +103,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
 
     const handlePrint = () => {
-        window.open(`/dashboard/print?period=${printPeriod}`, '_blank');
+        window.open(`${route('dashboard.print')}?period=${printPeriod}`, '_blank');
     };
 
     const trendData = trendRange === '6months' ? trends.monthly_6months : trends.monthly_1year;
@@ -214,7 +215,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                                         </Button>
                                         <Button
                                             onClick={() => {
-                                                window.location.href = `/dashboard/export?period=${printPeriod}`;
+                                                window.location.href = `${route('dashboard.export')}?period=${printPeriod}`;
                                             }}
                                             className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white transition-all duration-200 hover:from-emerald-700 hover:to-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                                         >
@@ -300,7 +301,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                                         )}
                                     </div>
                                     <div className="mt-4 flex gap-2">
-                                        <Link href="/children?vaccine_status=overdue">
+                                        <Link href={`${route('children.index')}?vaccine_status=overdue`}>
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
@@ -310,7 +311,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                                                 View Overdue
                                             </Button>
                                         </Link>
-                                        <Link href="/children?vaccine_status=upcoming">
+                                        <Link href={`${route('children.index')}?vaccine_status=upcoming`}>
                                             <Button
                                                 size="sm"
                                                 className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
@@ -346,7 +347,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                                                             >
                                                                 <td className="px-4 py-2">
                                                                     <Link
-                                                                        href={`/children/${fu.child_id}`}
+                                                                        href={route('children.show', { child: fu.child_id })}
                                                                         className="cursor-pointer rounded text-cyan-600 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
                                                                     >
                                                                         {fu.child_name}

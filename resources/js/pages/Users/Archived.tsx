@@ -15,6 +15,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type User = {
@@ -27,7 +28,7 @@ type User = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Archived Users',
-        href: '/users/archived',
+        href: route('users.archived'),
     },
 ];
 
@@ -43,7 +44,7 @@ export default function Archived({ users }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(`/users/${id}/restore`);
+            await router.post(route('users.restore', { id }),);
             smartToast.success('User restored successfully!');
         } catch (err) {
             smartToast.error('Failed to restore user.');
@@ -56,7 +57,7 @@ export default function Archived({ users }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(`/users/${id}/force-delete`);
+            await router.delete(route('users.forceDelete', { id }),);
             smartToast.success('User permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete user.');
@@ -72,7 +73,7 @@ export default function Archived({ users }: Props) {
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Archived Users</h1>
                 <Button variant="secondary" asChild>
-                    <Link href="/users">Back to Users</Link>
+                    <Link href={route('users.index')}>Back to Users</Link>
                 </Button>
             </div>
 

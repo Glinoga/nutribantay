@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'User',
-        href: '/users',
+        href: route('users.index'),
     },
 ];
 
@@ -55,10 +56,10 @@ export default function Show({ user }: UserShowProps) {
                 <h1 className="text-xl font-bold">User Details</h1>
                 <div className="flex gap-2">
                     <Button variant="secondary" asChild>
-                        <Link href="/users">Back</Link>
+                        <Link href={route('users.index')}>Back</Link>
                     </Button>
                     <Button asChild>
-                        <Link href={`/users/${user.id}/edit`}>Edit User</Link>
+                        <Link href={route('users.edit', { user: user.id })}>Edit User</Link>
                     </Button>
                 </div>
             </div>

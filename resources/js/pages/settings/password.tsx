@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -14,7 +15,7 @@ import { Label } from '@/components/ui/label';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Password settings',
-        href: '/settings/password',
+        href: route('password.edit'),
     },
 ];
 
@@ -29,7 +30,7 @@ export default function Password() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put('/settings/password', {
+        put(route('password.update'), {
             preserveScroll: true,
             onError: (errors) => {
                 if (errors.password) {

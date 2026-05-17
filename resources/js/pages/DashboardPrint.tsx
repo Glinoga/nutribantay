@@ -1,3 +1,4 @@
+import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -121,7 +122,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <Printer className="mr-2 h-4 w-4" />
                     Print Report
                 </Button>
-                <Link href="/dashboard">
+                <Link href={route('dashboard')}>
                     <Button
                         variant="outline"
                         className="cursor-pointer border-cyan-300 transition-all duration-200 hover:bg-cyan-50 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"

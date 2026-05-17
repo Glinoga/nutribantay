@@ -13,7 +13,6 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { route } from '@/lib/routes';
-import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, ShieldCheck, UserCog, UserPen } from 'lucide-react';
@@ -52,8 +51,8 @@ export function AppSidebar() {
 
     // Base menu items available to everyone
     const mainNavItems: NavItem[] = [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-        { title: 'Child Profiles', href: '/children', icon: UserPen },
+        { title: 'Dashboard', href: route('dashboard'), icon: LayoutGrid },
+        { title: 'Child Profiles', href: route('children.index'), icon: UserPen },
         { title: 'Vaccines', href: route('vaccines.index'), icon: ShieldCheck },
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
         { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
@@ -62,9 +61,9 @@ export function AppSidebar() {
     // Admin-only menu items
     const adminNavItems: NavItem[] = isAdmin
         ? [
-              { title: 'User Management', href: '/users', icon: UserCog },
-              { title: 'Data Management', href: '/admin/database', icon: Database },
-              { title: 'Audit Logs', href: '/audit-logs', icon: FileTextIcon },
+              { title: 'User Management', href: route('users.index'), icon: UserCog },
+              { title: 'Data Management', href: route('admin.database.index'), icon: Database },
+              { title: 'Audit Logs', href: route('audit-logs.index'), icon: FileTextIcon },
           ]
         : [];
 
@@ -80,7 +79,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild className="transition-all duration-200 hover:bg-sidebar-accent">
-                            <Link href={dashboard()} prefetch className="flex items-center gap-2">
+                            <Link href={route('dashboard')} prefetch className="flex items-center gap-2">
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

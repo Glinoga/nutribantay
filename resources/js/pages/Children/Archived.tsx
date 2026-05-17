@@ -15,6 +15,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
+import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type Child = {
@@ -29,8 +30,8 @@ type Child = {
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Children', href: '/children' },
-    { title: 'Archived Children', href: '/children-archived' },
+    { title: 'Children', href: route('children.index') },
+    { title: 'Archived Children', href: route('children.archived') },
 ];
 
 interface Props {
@@ -45,7 +46,7 @@ export default function Archived({ children }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(`/children/${id}/restore`);
+            await router.post(route('children.restore', { id }),);
             smartToast.success('Child restored successfully!');
         } catch (err) {
             smartToast.error('Failed to restore child.');
@@ -58,7 +59,7 @@ export default function Archived({ children }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(`/children/${id}/force-delete`);
+            await router.delete(route('children.forceDelete', { id }),);
             smartToast.success('Child permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete child.');
@@ -74,7 +75,7 @@ export default function Archived({ children }: Props) {
             <div className="m-4 mb-4 flex items-center justify-between">
                 <h1 className="text-xl font-bold">Archived Children</h1>
                 <Button variant="secondary" asChild>
-                    <Link href="/children">Back to Children</Link>
+                    <Link href={route('children.index')}>Back to Children</Link>
                 </Button>
             </div>
 
