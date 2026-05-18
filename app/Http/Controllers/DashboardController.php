@@ -155,7 +155,6 @@ class DashboardController extends Controller
             $handle = fopen('php://output', 'w');
 
             fputcsv($handle, ['Report Period', ucfirst($period)]);
-            fputcsv($handle, ['Barangay', $barangay]);
             fputcsv($handle, ['Date Range', $range['start']->format('Y-m-d').' to '.$range['end']->format('Y-m-d')]);
             fputcsv($handle, ['Generated', Carbon::now()->format('Y-m-d H:i:s')]);
             fputcsv($handle, []);

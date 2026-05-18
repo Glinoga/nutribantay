@@ -206,7 +206,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                         type="number"
                                         step="0.01"
                                         value={data.weight}
-                                        onChange={(e) => setData('weight', e.target.value)}
+                                        onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                         className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         placeholder="Enter weight"
                                     />
@@ -222,7 +222,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                         type="number"
                                         step="0.01"
                                         value={data.height}
-                                        onChange={(e) => setData('height', e.target.value)}
+                                        onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                         className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         placeholder="Enter height"
                                     />

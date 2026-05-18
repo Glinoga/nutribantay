@@ -167,7 +167,7 @@ export default function Show({ user }: UserShowProps) {
                         )}
 
                         {/* Additional Information Card */}
-                        {(user.barangay || user.registration_code) && (
+                        {user.registration_code && (
                             <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                                 <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:border-gray-700">
                                     <CardTitle className="flex items-center gap-2">
@@ -177,15 +177,6 @@ export default function Show({ user }: UserShowProps) {
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <dl className="grid grid-cols-2 gap-4">
-                                        {user.barangay && (
-                                            <div>
-                                                <Label className="text-muted-foreground">Barangay</Label>
-                                                <dd className="mt-1 flex items-center gap-2">
-                                                    <MapPin className="h-4 w-4 text-gray-400" />
-                                                    {user.barangay}
-                                                </dd>
-                                            </div>
-                                        )}
                                         {user.registration_code && (
                                             <div>
                                                 <Label className="text-muted-foreground">Registration Code</Label>

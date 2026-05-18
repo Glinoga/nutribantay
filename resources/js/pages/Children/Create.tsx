@@ -26,7 +26,6 @@ export default function ChildrenCreate() {
         weight: '',
         height: '',
         contact_number: '',
-        barangay: typeof auth.user?.barangay === 'string' ? auth.user.barangay : '',
     });
 
     const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,7 +214,7 @@ export default function ChildrenCreate() {
                                         type="text"
                                         placeholder="First name"
                                         value={data.first_name}
-                                        onChange={(e) => setData('first_name', e.target.value)}
+                                        onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                         onFocus={() => setFocusedField('first_name')}
                                         onBlur={() => setFocusedField(null)}
                                         className={`border-2 text-base font-medium transition-all ${
@@ -228,7 +227,7 @@ export default function ChildrenCreate() {
                                         type="text"
                                         placeholder="Middle initial (optional)"
                                         value={data.middle_initial}
-                                        onChange={(e) => setData('middle_initial', e.target.value)}
+                                        onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
                                         onFocus={() => setFocusedField('middle_initial')}
                                         onBlur={() => setFocusedField(null)}
                                         maxLength={5}
@@ -242,7 +241,7 @@ export default function ChildrenCreate() {
                                         type="text"
                                         placeholder="Last name"
                                         value={data.last_name}
-                                        onChange={(e) => setData('last_name', e.target.value)}
+                                        onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                         onFocus={() => setFocusedField('last_name')}
                                         onBlur={() => setFocusedField(null)}
                                         className={`border-2 text-base font-medium transition-all ${
@@ -315,7 +314,7 @@ export default function ChildrenCreate() {
                                     step="0.1"
                                     placeholder="Enter weight"
                                     value={data.weight}
-                                    onChange={(e) => setData('weight', e.target.value)}
+                                    onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                     onFocus={() => setFocusedField('weight')}
                                     onBlur={() => setFocusedField(null)}
                                     min="0"
@@ -340,7 +339,7 @@ export default function ChildrenCreate() {
                                     step="0.1"
                                     placeholder="Enter height"
                                     value={data.height}
-                                    onChange={(e) => setData('height', e.target.value)}
+                                    onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                     onFocus={() => setFocusedField('height')}
                                     onBlur={() => setFocusedField(null)}
                                     min="0"
@@ -369,7 +368,7 @@ export default function ChildrenCreate() {
                             </div>
                         )}
 
-                        {/* Contact Number & Barangay Grid */}
+                        {/* Contact Number Grid */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div
                                 className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
@@ -393,22 +392,6 @@ export default function ChildrenCreate() {
                                 <p className="mt-2 text-xs text-gray-500">Format: +63 XXX XXX XXXX</p>
                             </div>
 
-                            <div
-                                className="form-field group rounded-2xl border-2 border-gray-200 bg-gray-50 p-6 shadow-md"
-                                style={{ animationDelay: '300ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-600">
-                                    <MapPin className="h-5 w-5 text-gray-500" />
-                                    Barangay
-                                </Label>
-                                <Input
-                                    type="text"
-                                    value={data.barangay ?? ''}
-                                    readOnly
-                                    className="cursor-not-allowed border-2 border-gray-300 bg-gray-100 text-base font-medium text-gray-600"
-                                />
-                                <p className="mt-2 text-xs text-gray-500">Auto-assigned from your account</p>
-                            </div>
                         </div>
 
                         {/* Action Buttons */}

@@ -20,15 +20,11 @@ class SMSController extends Controller
     {
         $user = auth()->user();
 
-        // Get all children with contact numbers - Healthworkers limited to their barangay
+        // Get all children with contact numbers - scoped to user's barangay
         $query = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
             ->whereNotNull('contact_number')
-            ->where('contact_number', '!=', '');
-
-        // Healthworkers can only see children in their barangay
-        if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
-            $query->where('barangay', $user->barangay);
-        }
+            ->where('contact_number', '!=', '')
+            ->where('barangay', $user->barangay);
 
         $children = $query->get()
             ->map(function ($child) {
@@ -79,24 +75,16 @@ class SMSController extends Controller
 
             if ($validated['recipient_type'] === 'all') {
                 $query = Child::whereNotNull('contact_number')
-                    ->where('contact_number', '!=', '');
-
-                // Healthworkers can only send to their barangay
-                if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
-                    $query->where('barangay', $user->barangay);
-                }
+                    ->where('contact_number', '!=', '')
+                    ->where('barangay', $user->barangay);
 
                 $phones = $query->pluck('contact_number')
                     ->toArray();
             } else {
                 $query = Child::whereIn('id', $validated['recipients'])
                     ->whereNotNull('contact_number')
-                    ->where('contact_number', '!=', '');
-
-                // Healthworkers can only send to their barangay
-                if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin')) {
-                    $query->where('barangay', $user->barangay);
-                }
+                    ->where('contact_number', '!=', '')
+                    ->where('barangay', $user->barangay);
 
                 $phones = $query->pluck('contact_number')
                     ->toArray();

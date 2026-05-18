@@ -23,21 +23,17 @@ type HealthLog = {
 
 type Child = {
     id: number;
-    slug?: string;
+    slug: string;
     fullname: string;
-    first_name: string;
-    middle_initial: string | null;
-    last_name: string;
     sex: string;
-    age: number | null;
-    birthdate: string | null;
+    age: number;
     weight: number | null;
     height: number | null;
     bmi: number | null;
-    barangay: string | null;
     address: string | null;
     contact_number: string | null;
     created_at: string | null;
+    birthdate: string | null;
     healthlogs: HealthLog[];
 };
 
@@ -164,10 +160,6 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                         <div className="flex justify-between">
                             <span className="text-cyan-700">Birthdate:</span>
                             <span className="font-medium">{child.birthdate ?? '-'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Barangay:</span>
-                            <span className="font-medium">{child.barangay ?? '-'}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-cyan-700">Address:</span>

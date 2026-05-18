@@ -7,15 +7,12 @@ import { ArrowLeft, Baby, Printer } from 'lucide-react';
 type Child = {
     id: number;
     fullname: string;
-    first_name: string;
-    last_name: string;
     sex: string;
     age: number | null;
     birthdate: string | null;
     weight: number | null;
     height: number | null;
     bmi: number | null;
-    barangay: string | null;
     address: string | null;
     contact_number: string | null;
 };
@@ -24,7 +21,6 @@ type Filters = {
     search?: string;
     sex?: string;
     vaccine_status?: string;
-    barangay?: string;
 };
 
 type ChildrenPrintProps = {
@@ -38,7 +34,6 @@ const getFilterSummary = (filters: Filters) => {
     if (filters.search) parts.push(`Search: "${filters.search}"`);
     if (filters.sex) parts.push(`Sex: ${filters.sex}`);
     if (filters.vaccine_status) parts.push(`Vaccine: ${filters.vaccine_status}`);
-    if (filters.barangay) parts.push(`Barangay: ${filters.barangay}`);
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
@@ -92,7 +87,6 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Weight (kg)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Height (cm)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">BMI</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Barangay</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Contact</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -106,7 +100,6 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                                     <TableCell className="px-4 py-2">{child.weight ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.height ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.bmi ?? '-'}</TableCell>
-                                    <TableCell className="px-4 py-2">{child.barangay ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.contact_number ?? '-'}</TableCell>
                                 </TableRow>
                             ))}

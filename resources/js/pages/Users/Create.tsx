@@ -79,7 +79,7 @@ export default function Create() {
                                             id="name"
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
+                                            onChange={(e) => setData('name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                             placeholder="Enter full name"
                                             className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                             required

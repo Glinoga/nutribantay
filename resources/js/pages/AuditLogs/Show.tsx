@@ -19,7 +19,6 @@ type AuditLog = {
     new_values: Record<string, string | number | boolean | null> | null;
     ip_address: string | null;
     user_agent: string | null;
-    barangay: string | null;
     created_at: string;
     user?: { id: number; name: string; email: string } | null;
 };
@@ -137,11 +136,6 @@ export default function Show({ log }: Props) {
                                                 log.user_name || 'System'
                                             )}
                                         </dd>
-                                    </div>
-
-                                    <div>
-                                        <dt className="text-sm font-medium text-gray-500">Barangay</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">{log.barangay || '-'}</dd>
                                     </div>
 
                                     {log.model_type && (

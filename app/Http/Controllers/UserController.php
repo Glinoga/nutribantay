@@ -47,12 +47,10 @@ class UserController extends Controller
                 'name' => $u->name,
                 'email' => $u->email,
                 'roles' => $u->getRoleNames()->toArray(),
-                'barangay' => $u->barangay,
                 'status' => $u->status,
                 'registration_code' => $u->registrationCode?->code,
             ]),
             'filters' => $request->only('search'),
-            'isSeededAdmin' => $user->email === 'nutribantay@gmail.com',
         ]);
     }
 
@@ -114,25 +112,10 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:10',
             'role' => 'required|string|exists:roles,name',
-            'barangay' => 'nullable|string|max:255',
         ]);
 
         $admin = auth()->user();
-
-        // Determine barangay: nutribantay@gmail.com can select, others auto-inherit
         $barangay = $admin->barangay;
-        $isSeededAdmin = $admin->email === 'nutribantay@gmail.com';
-
-        // If seeded admin and barangay is provided and role is Admin, use selected barangay
-        if ($isSeededAdmin && $request->filled('barangay')) {
-            $barangayInput = $request->barangay;
-            // Add "Barangay" prefix if not present
-            if (! preg_match('/^Barangay\s*/i', $barangayInput)) {
-                $barangay = 'Barangay '.$barangayInput;
-            } else {
-                $barangay = $barangayInput;
-            }
-        }
 
         // Generate registration code (8 random characters like before)
         $code = strtoupper(Str::random(8));
@@ -174,7 +157,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
 
         return Inertia::render('Users/Show', [
             'user' => $user,
@@ -186,13 +169,10 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $user = User::find($id);
-        $currentUser = auth()->user();
-        $isSeededAdmin = $currentUser->email === 'nutribantay@gmail.com';
+        $user = User::where('barangay', auth()->user()->barangay)->find($id);
 
         return Inertia::render('Users/Edit', [
             'user' => $user,
-            'isSeededAdmin' => $isSeededAdmin,
         ]);
     }
 
@@ -206,7 +186,6 @@ class UserController extends Controller
             'email' => 'nullable',
             'password' => 'nullable|string|min:10',
             'role' => 'required|string|exists:roles,name',
-            'barangay' => 'nullable|string|max:255',
         ]);
 
         $user = auth()->user();
@@ -233,17 +212,6 @@ class UserController extends Controller
 
         $targetUser->save();
 
-        // Also update barangay if provided and admin role
-        if ($user->email === 'nutribantay@gmail.com' && $request->filled('barangay')) {
-            $barangayValue = $request->barangay;
-            // Add "Barangay" prefix if not present
-            if (! preg_match('/^Barangay\s*/i', $barangayValue)) {
-                $barangayValue = 'Barangay '.$barangayValue;
-            }
-            $targetUser->barangay = $barangayValue;
-            $targetUser->save();
-        }
-
         // Assign role with Spatie
         $targetUser->syncRoles([$request->role]);
 
@@ -255,7 +223,7 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
         $user->delete(); // This will trigger the auditable trait's deleted event
 
         return to_route('users.index')->with('success', 'User archived successfully.');
@@ -266,7 +234,7 @@ class UserController extends Controller
      */
     public function restore(string $id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->where('barangay', auth()->user()->barangay)->findOrFail($id);
 
         // Restore the user - this will automatically trigger the auditable trait's restored event
         $user->restore();
@@ -279,7 +247,7 @@ class UserController extends Controller
      */
     public function forceDelete(string $id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->where('barangay', auth()->user()->barangay)->findOrFail($id);
 
         // Force delete - this will trigger the auditable trait's forceDeleted event
         $user->forceDelete();
@@ -289,11 +257,7 @@ class UserController extends Controller
 
     public function approve(string $id)
     {
-        $user = User::findOrFail($id);
-
-        if ($user->barangay !== auth()->user()->barangay) {
-            abort(403, 'You cannot approve users from other barangays.');
-        }
+        $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
 
         $user->update(['status' => 'approved']);
 
@@ -302,11 +266,7 @@ class UserController extends Controller
 
     public function reject(string $id)
     {
-        $user = User::findOrFail($id);
-
-        if ($user->barangay !== auth()->user()->barangay) {
-            abort(403, 'You cannot reject users from other barangays.');
-        }
+        $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
 
         $user->update(['status' => 'rejected']);
 

@@ -21,7 +21,6 @@ interface Child {
     birthdate?: string;
     weight?: number;
     height?: number;
-    barangay?: string;
     contact_number?: string;
 }
 
@@ -42,7 +41,6 @@ export default function Edit({ child }: Props) {
         birthdate: child.birthdate || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
-        barangay: child.barangay ?? '',
         contact_number: child.contact_number ?? '',
     });
 
@@ -159,7 +157,7 @@ export default function Edit({ child }: Props) {
                                                 type="text"
                                                 placeholder="First name"
                                                 value={data.first_name}
-                                                onChange={(e) => setData('first_name', e.target.value)}
+                                                onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                             <Input
@@ -167,14 +165,14 @@ export default function Edit({ child }: Props) {
                                                 placeholder="M.I. (optional)"
                                                 maxLength={5}
                                                 value={data.middle_initial}
-                                                onChange={(e) => setData('middle_initial', e.target.value)}
+                                                onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                             <Input
                                                 type="text"
                                                 placeholder="Last name"
                                                 value={data.last_name}
-                                                onChange={(e) => setData('last_name', e.target.value)}
+                                                onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
@@ -198,15 +196,6 @@ export default function Edit({ child }: Props) {
                                             </Select>
                                         </div>
 
-                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4">
-                                            <Label className="mb-2 block text-sm font-bold text-gray-800">Barangay</Label>
-                                            <Input
-                                                type="text"
-                                                value={data.barangay}
-                                                readOnly
-                                                className="w-full cursor-not-allowed rounded-md border-teal-200 bg-gray-100 text-sm font-bold text-gray-600"
-                                            />
-                                        </div>
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4">
@@ -227,7 +216,7 @@ export default function Edit({ child }: Props) {
                                                 step="0.1"
                                                 placeholder="Enter weight"
                                                 value={data.weight}
-                                                onChange={(e) => setData('weight', e.target.value)}
+                                                onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
@@ -239,7 +228,7 @@ export default function Edit({ child }: Props) {
                                                 step="0.1"
                                                 placeholder="Enter height"
                                                 value={data.height}
-                                                onChange={(e) => setData('height', e.target.value)}
+                                                onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
@@ -251,7 +240,7 @@ export default function Edit({ child }: Props) {
                                             type="text"
                                             placeholder="e.g., 09171234567"
                                             value={data.contact_number}
-                                            onChange={(e) => setData('contact_number', e.target.value)}
+                                            onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
                                             className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             maxLength={11}
                                         />

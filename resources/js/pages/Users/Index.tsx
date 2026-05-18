@@ -68,7 +68,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+    const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'Healthworker' });
     const [createError, setCreateError] = useState('');
     const [createSuccess, setCreateSuccess] = useState('');
     const [generatedCode, setGeneratedCode] = useState('');
@@ -83,8 +83,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [archiveUserId, setArchiveUserId] = useState<number | null>(null);
     const [deleteCodeId, setDeleteCodeId] = useState<number | null>(null);
     const [maintenanceConfirm, setMaintenanceConfirm] = useState(false);
-
-    const showBarangayDropdown = isSeededAdmin && newUser.role === 'Admin';
 
     const stats = useMemo(() => {
         const roles = new Set(users.flatMap((u) => u.roles));
@@ -145,7 +143,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 setGeneratedPassword('');
                 router.reload();
             } else {
-                setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
             }
         } catch (err: unknown) {
             let message = 'Failed to create user';
@@ -433,7 +431,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     type="number"
                                     min="1"
                                     value={count}
-                                    onChange={(e) => setCount(Number(e.target.value))}
+                                    onChange={(e) => setCount(Number(e.target.value.replace(/\D/g, '')))}
                                     className="w-20 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 />
                                 <Button
@@ -472,7 +470,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             setCreateError('');
                                             setGeneratedCode('');
                                             setGeneratedPassword('');
-                                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
                                             setShowCreateModal(true);
                                         }}
                                         className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
@@ -699,7 +697,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Code</TableHead>
-                                    <TableHead>Barangay</TableHead>
                                     <TableHead>Expires</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Actions</TableHead>
@@ -708,7 +705,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <TableBody>
                                 {filteredCodes.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
                                             No codes found.
                                         </TableCell>
                                     </TableRow>
@@ -716,7 +713,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     filteredCodes.map((code) => (
                                         <TableRow key={code.id} className="hover:bg-muted/50">
                                             <TableCell className="font-mono">{code.code}</TableCell>
-                                            <TableCell>{code.barangay}</TableCell>
                                             <TableCell>{code.expires_at ? new Date(code.expires_at).toLocaleString() : 'No expiry'}</TableCell>
                                             <TableCell>{getStatusBadge(code.status)}</TableCell>
                                             <TableCell>
@@ -786,7 +782,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 id="name"
                                 type="text"
                                 value={newUser.name}
-                                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                                onChange={(e) => setNewUser({ ...newUser, name: e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, '') })}
                                 placeholder="Full name"
                                 className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 required
@@ -828,7 +824,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <select
                                 id="role"
                                 value={newUser.role}
-                                onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
+                                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                                 className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 required
                             >
@@ -836,20 +832,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 <option value="Admin">Admin</option>
                             </select>
                         </div>
-
-                        {showBarangayDropdown && (
-                            <div>
-                                <Label htmlFor="barangay">Barangay</Label>
-                                <Input
-                                    id="barangay"
-                                    type="text"
-                                    value={newUser.barangay}
-                                    onChange={(e) => setNewUser({ ...newUser, barangay: e.target.value })}
-                                    placeholder="Enter barangay"
-                                    className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                />
-                            </div>
-                        )}
 
                         {createError && <div className="text-sm text-destructive">{createError}</div>}
 
@@ -876,7 +858,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         <Button
                             variant="outline"
                             onClick={() => {
-                                setNewUser({ name: '', email: '', password: '', role: 'Healthworker', barangay: '' });
+                                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
                                 setCreateSuccess('');
                                 setCreateError('');
                                 setGeneratedCode('');

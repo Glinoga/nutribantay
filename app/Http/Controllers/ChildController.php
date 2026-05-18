@@ -156,7 +156,6 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
-                'barangay' => $child->barangay,
 
                 'creator' => [
                     'name' => $child->creator?->name,
@@ -201,7 +200,6 @@ class ChildController extends Controller
                 'sex' => $child->sex,
                 'age' => $child->age,
                 'deleted_at' => $child->deleted_at,
-                'barangay' => $child->barangay,
             ]),
         ]);
     }
@@ -211,21 +209,7 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::query();
-
-        // 🔒 Healthworker restricted to own barangay
-        if (! $user->hasRole('Admin')) {
-            $query->where('barangay', $user->barangay);
-        }
-
-        // ✅ Barangay filter (both roles can use it)
-        if ($request->barangay) {
-            if ($user->hasRole('Admin')) {
-                $query->where('barangay', $request->barangay);
-            } else {
-                $query->where('barangay', $user->barangay);
-            }
-        }
+        $query = Child::where('barangay', $user->barangay);
 
         //  Search filter (matches index)
         if ($request->search) {
@@ -390,7 +374,6 @@ class ChildController extends Controller
                 'Age (months)',
                 'Sex',
                 'Birthdate',
-                'Barangay',
                 'Weight (kg)',
                 'Height (cm)',
                 'BMI',
@@ -405,7 +388,6 @@ class ChildController extends Controller
                     $child->age,
                     $child->sex,
                     $child->birthdate?->format('Y-m-d'),
-                    $child->barangay,
                     $child->weight,
                     $child->height,
                     $child->bmi,
@@ -424,8 +406,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only edit children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -438,7 +419,6 @@ class ChildController extends Controller
                 'last_name' => $child->last_name,
                 'sex' => $child->sex,
                 'birthdate' => $child->birthdate,
-                'barangay' => $child->barangay,
                 'contact_number' => $child->contact_number,
                 'weight' => $child->weight,
                 'height' => $child->height,
@@ -450,8 +430,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only update children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -461,7 +440,6 @@ class ChildController extends Controller
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'birthdate' => 'nullable|date',
-            'barangay' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
@@ -470,7 +448,7 @@ class ChildController extends Controller
         $child->update(array_merge(
             $request->only([
                 'first_name', 'middle_initial', 'last_name',
-                'sex', 'birthdate', 'barangay', 'contact_number',
+                'sex', 'birthdate', 'contact_number',
                 'weight', 'height',
             ]),
             ['updated_by' => auth()->id()]
@@ -486,7 +464,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -506,8 +484,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only view children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -529,7 +506,6 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
-                'barangay' => $child->barangay,
                 'created_at' => $child->created_at,
                 'updated_at' => $child->updated_at,
                 'creator' => ['name' => $child->creator?->name],
@@ -578,12 +554,7 @@ class ChildController extends Controller
     public function restore($id)
     {
         $user = auth()->user();
-        $child = Child::onlyTrashed()->findOrFail($id);
-
-        // Healthworker can only restore children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
-            abort(403);
-        }
+        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->findOrFail($id);
 
         $child->restore();
 
@@ -596,12 +567,7 @@ class ChildController extends Controller
     public function forceDelete($id)
     {
         $user = auth()->user();
-        $child = Child::onlyTrashed()->findOrFail($id);
-
-        // Healthworker can only force-delete children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
-            abort(403);
-        }
+        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->findOrFail($id);
 
         $child->forceDelete();
 
@@ -615,8 +581,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only add notes to children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -702,15 +667,7 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::query();
-
-        if (! $user->hasRole('Admin')) {
-            $query->where('barangay', $user->barangay);
-        }
-
-        if ($request->barangay && $user->hasRole('Admin')) {
-            $query->where('barangay', $request->barangay);
-        }
+        $query = Child::where('barangay', $user->barangay);
 
         if ($request->search) {
             $search = $request->search;
@@ -769,14 +726,13 @@ class ChildController extends Controller
             'weight' => $child->weight,
             'height' => $child->height,
             'bmi' => $child->bmi,
-            'barangay' => $child->barangay,
             'address' => $child->address,
             'contact_number' => $child->contact_number,
         ]);
 
         return Inertia::render('Children/Print', [
             'children' => $children,
-            'filters' => $request->only(['search', 'sex', 'vaccine_status', 'barangay']),
+            'filters' => $request->only(['search', 'sex', 'vaccine_status']),
             'generated_at' => now()->format('Y-m-d H:i:s'),
         ]);
     }
@@ -788,7 +744,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -808,7 +764,6 @@ class ChildController extends Controller
                 'weight' => $child->weight,
                 'height' => $child->height,
                 'bmi' => $child->bmi,
-                'barangay' => $child->barangay,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
                 'created_at' => $child->created_at?->format('Y-m-d H:i:s'),
@@ -836,7 +791,7 @@ class ChildController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -864,7 +819,7 @@ class ChildController extends Controller
             fputcsv($file, ['Child Information']);
             fputcsv($file, [
                 'ID', 'Full Name', 'Age (months)', 'Sex', 'Birthdate',
-                'Barangay', 'Address', 'Contact Number',
+                'Address', 'Contact Number',
                 'Weight (kg)', 'Height (cm)', 'BMI',
             ]);
             fputcsv($file, [
@@ -873,7 +828,6 @@ class ChildController extends Controller
                 $child->age,
                 $child->sex,
                 $child->birthdate?->format('Y-m-d'),
-                $child->barangay,
                 $child->address,
                 $child->contact_number,
                 $child->weight,

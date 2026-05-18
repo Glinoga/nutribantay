@@ -77,7 +77,6 @@ type Child = {
     birthdate: string | null;
     weight: number | null;
     height: number | null;
-    barangay: string | null;
     address: string | null;
     contact_number: string | null;
     creator?: { name: string | null };
@@ -110,7 +109,6 @@ export default function Show({ child }: { child: Child }) {
         birthdate: child.birthdate || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
-        barangay: child.barangay ?? '',
         contact_number: child.contact_number ?? '',
     });
 
@@ -409,7 +407,6 @@ export default function Show({ child }: { child: Child }) {
                                         { label: 'Age', value: `${child.age ?? 'N/A'} months` },
                                         { label: 'Weight', value: `${child.weight ?? 'N/A'} kg` },
                                         { label: 'Height', value: `${child.height ?? 'N/A'} cm` },
-                                        { label: 'Barangay', value: child.barangay ?? 'N/A' },
                                         { label: 'Address', value: child.address ?? 'N/A' },
                                         { label: 'Contact Number', value: child.contact_number ?? 'N/A' },
                                         { label: 'Created by', value: child.creator?.name ?? 'N/A' },
@@ -1103,7 +1100,7 @@ export default function Show({ child }: { child: Child }) {
                                             type="text"
                                             placeholder="First name"
                                             value={data.first_name}
-                                            onChange={(e) => setData('first_name', e.target.value)}
+                                            onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                             className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
@@ -1114,7 +1111,7 @@ export default function Show({ child }: { child: Child }) {
                                             placeholder="M.I. (optional)"
                                             maxLength={5}
                                             value={data.middle_initial}
-                                            onChange={(e) => setData('middle_initial', e.target.value)}
+                                            onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
                                             className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
@@ -1124,7 +1121,7 @@ export default function Show({ child }: { child: Child }) {
                                             type="text"
                                             placeholder="Last name"
                                             value={data.last_name}
-                                            onChange={(e) => setData('last_name', e.target.value)}
+                                            onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                             className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
@@ -1132,41 +1129,25 @@ export default function Show({ child }: { child: Child }) {
                             </div>
                         </div>
 
-                        {/* Sex & Barangay */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Sex</h3>
-                                </div>
-                                <div className="p-6">
-                                    <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                        <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
-                                            <SelectValue placeholder="Select sex" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="Male" className="font-medium">
-                                                Male
-                                            </SelectItem>
-                                            <SelectItem value="Female" className="font-medium">
-                                                Female
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                        {/* Sex */}
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                <h3 className="text-lg font-bold text-gray-900">Sex</h3>
                             </div>
-
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Barangay</h3>
-                                </div>
-                                <div className="p-6">
-                                    <Input
-                                        type="text"
-                                        value={data.barangay}
-                                        readOnly
-                                        className="w-full cursor-not-allowed rounded-md border-gray-200 bg-gray-100 text-sm font-medium text-gray-600"
-                                    />
-                                </div>
+                            <div className="p-6">
+                                <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
+                                    <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
+                                        <SelectValue placeholder="Select sex" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Male" className="font-medium">
+                                            Male
+                                        </SelectItem>
+                                        <SelectItem value="Female" className="font-medium">
+                                            Female
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
 
@@ -1197,7 +1178,7 @@ export default function Show({ child }: { child: Child }) {
                                         step="0.1"
                                         placeholder="Enter weight"
                                         value={data.weight}
-                                        onChange={(e) => setData('weight', e.target.value)}
+                                        onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                         className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     />
                                 </div>
@@ -1213,7 +1194,7 @@ export default function Show({ child }: { child: Child }) {
                                         step="0.1"
                                         placeholder="Enter height"
                                         value={data.height}
-                                        onChange={(e) => setData('height', e.target.value)}
+                                        onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
                                         className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     />
                                 </div>
@@ -1226,14 +1207,14 @@ export default function Show({ child }: { child: Child }) {
                                 <h3 className="text-lg font-bold text-gray-900">Contact Number</h3>
                             </div>
                             <div className="p-6">
-                                <Input
-                                    type="text"
-                                    placeholder="e.g., 09171234567"
-                                    value={data.contact_number}
-                                    onChange={(e) => setData('contact_number', e.target.value)}
-                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    maxLength={11}
-                                />
+                                    <Input
+                                        type="text"
+                                        placeholder="e.g., 09171234567"
+                                        value={data.contact_number}
+                                        onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        maxLength={11}
+                                    />
                             </div>
                         </div>
 

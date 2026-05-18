@@ -15,7 +15,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -61,7 +61,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay ) {
             abort(403);
         }
 
@@ -89,7 +89,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay ) {
             abort(403);
         }
 
@@ -106,7 +106,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay ) {
             abort(403);
         }
 
@@ -147,7 +147,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay ) {
             abort(403);
         }
 
@@ -178,7 +178,7 @@ class ChildVaccineController extends Controller
     {
         $user = auth()->user();
 
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay ) {
             abort(403);
         }
 

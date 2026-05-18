@@ -37,7 +37,6 @@ type PrintData = {
         vitamin_a_given: number;
         deworming_given: number;
     };
-    barangay: string;
     generated_at: string;
     trends: {
         trend: Array<{ label: string; count: number }>;
@@ -137,8 +136,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             <div className="mb-8 text-center">
                 <h1 className="mb-4 text-3xl font-bold text-cyan-900">Nutribantay</h1>
                 <h2 className="text-2xl font-bold text-cyan-900">Dashboard Report</h2>
-                <p className="mt-2 text-lg text-cyan-700">Barangay: {data.barangay}</p>
-                <p className="text-lg text-cyan-600 capitalize">{period} Report</p>
+                <p className="mt-2 text-lg text-cyan-600 capitalize">{period} Report</p>
                 <p className="mt-1 text-sm text-cyan-700">
                     {data.summary.period_start} to {data.summary.period_end}
                 </p>
@@ -292,7 +290,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableCaption className="text-cyan-700">
-                                    List of children registered in {data.barangay} for the selected period.
+                                    List of children registered for the selected period.
                                 </TableCaption>
                                 <TableHeader>
                                     <TableRow className="bg-cyan-50">

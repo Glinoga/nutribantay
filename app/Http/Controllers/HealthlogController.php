@@ -16,8 +16,7 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only create healthlogs for children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -69,8 +68,7 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only add healthlogs for children in their barangay, Admin has full access
-        if ($child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -143,8 +141,7 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only edit healthlogs for children in their barangay, Admin has full access
-        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($healthlog->child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -158,8 +155,7 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only update healthlogs for children in their barangay, Admin has full access
-        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($healthlog->child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -229,8 +225,7 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        // Healthworker can only delete healthlogs for children in their barangay, Admin has full access
-        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
+        if ($healthlog->child->barangay !== $user->barangay) {
             abort(403);
         }
 
@@ -272,11 +267,9 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        $healthlog = HealthLog::onlyTrashed()->findOrFail($id);
-
-        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
-            abort(403);
-        }
+        $healthlog = HealthLog::onlyTrashed()
+            ->whereHas('child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->findOrFail($id);
 
         $healthlog->restore();
 
@@ -287,11 +280,9 @@ class HealthlogController extends Controller
     {
         $user = auth()->user();
 
-        $healthlog = HealthLog::onlyTrashed()->findOrFail($id);
-
-        if ($healthlog->child->barangay !== $user->barangay && ! $user->hasRole('Admin')) {
-            abort(403);
-        }
+        $healthlog = HealthLog::onlyTrashed()
+            ->whereHas('child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->findOrFail($id);
 
         $healthlog->forceDelete();
 

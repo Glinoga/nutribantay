@@ -11,7 +11,7 @@ class ChildVaccinePolicy
 {
     private function canAccess(User $user, Child $child): bool
     {
-        return $child->barangay === $user->barangay || $user->hasRole('Admin');
+        return $child->barangay === $user->barangay;
     }
 
     public function index(User $user, Child $child): bool

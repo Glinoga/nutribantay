@@ -19,16 +19,11 @@ class RecommendationController extends Controller
         $apiKey = config('openai.api_key');
 
         // Step 1: Validate and fetch child (no eager load - load healthLogs only when needed)
-        $child = Child::find($request->child_id);
+        $user = auth()->user();
+        $child = Child::where('barangay', $user->barangay)->find($request->child_id);
 
         if (! $child || ! $child->birthdate) {
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
-        }
-
-        // Authorization: healthworkers restricted to their barangay
-        $user = auth()->user();
-        if ($user->hasRole('Healthworker') && ! $user->hasRole('Admin') && $child->barangay !== $user->barangay) {
-            return response()->json(['recommendation' => '❌ You can only generate recommendations for children in your barangay.'], 403);
         }
 
         // Step 2: Calculate age accurately

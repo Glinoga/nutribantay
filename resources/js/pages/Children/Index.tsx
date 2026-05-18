@@ -49,7 +49,6 @@ type Child = {
     height?: number | null;
     contact_number?: string;
     address?: string | null;
-    barangay?: string | null;
     creator?: { name: string | null };
     vaccine_alert?: 'overdue' | 'upcoming' | 'mixed' | null;
 };
@@ -87,7 +86,7 @@ const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route(
 
 type AuthProps = {
     auth?: {
-        user?: { id: number; name: string; email: string; barangay?: string };
+        user?: { id: number; name: string; email: string };
         roles?: string[];
     };
 };
@@ -114,7 +113,6 @@ export default function Index({ children, pagination, search = '', sex = '', fla
     const [previewData, setPreviewData] = useState<any[]>([]);
     const [importData, setImportData] = useState<any[]>([]);
     const [isImporting, setIsImporting] = useState(false);
-    const [forceImport, setForceImport] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
 
     const closeModal = () => {
@@ -122,7 +120,6 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         setSelectedFile(null);
         setPreviewData([]);
         setImportData([]);
-        setForceImport(false);
     };
 
     const handleExportPrint = () => {
@@ -169,7 +166,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
         router.post(
             route('children.import'),
-            { data: importData, force_import: forceImport },
+            { data: importData },
             {
                 onSuccess: () => {
                     setIsImporting(false);
@@ -464,7 +461,7 @@ router.get(route('children.index'), params, { replace: true });
                             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search by name, ID, or barangay..."
+                                placeholder="Search by name or ID..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearch}
@@ -688,10 +685,6 @@ router.get(route('children.index'), params, { replace: true });
                                                                 {calculateAgeFromBirthdate(child.birthdate) ?? child.age ?? '-'} months old
                                                             </span>
                                                         </div>
-                                                        <div className="flex items-center gap-2 text-gray-600">
-                                                            <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
-                                                            <span className="truncate">{child.barangay ?? 'No barangay'}</span>
-                                                        </div>
                                                         {child.contact_number && (
                                                             <div className="flex items-center gap-2 text-gray-600">
                                                                 <Phone className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
@@ -893,16 +886,6 @@ router.get(route('children.index'), params, { replace: true });
                                             </div>
                                         </div>
                                     )}
-
-                                    <label className="mb-4 flex cursor-pointer items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={forceImport}
-                                            onChange={(e) => setForceImport(e.target.checked)}
-                                            className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                                        />
-                                        <span className="text-sm text-gray-700">Force import (include duplicates)</span>
-                                    </label>
 
                                     <div className="flex justify-end gap-2">
                                         <button

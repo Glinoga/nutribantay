@@ -268,7 +268,7 @@ export default function Contact() {
                                                     id="first_name"
                                                     maxLength={50}
                                                     value={data.first_name}
-                                                    onChange={(e) => setData('first_name', e.target.value)}
+                                                    onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                                     required
                                                 />
                                             </div>
@@ -281,7 +281,7 @@ export default function Contact() {
                                                     id="last_name"
                                                     maxLength={50}
                                                     value={data.last_name}
-                                                    onChange={(e) => setData('last_name', e.target.value)}
+                                                    onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                                     required
                                                 />
                                             </div>
@@ -310,7 +310,7 @@ export default function Contact() {
                                                     id="phone"
                                                     maxLength={15}
                                                     value={data.phone}
-                                                    onChange={(e) => setData('phone', e.target.value)}
+                                                    onChange={(e) => setData('phone', e.target.value.replace(/\D/g, ''))}
                                                 />
                                             </div>
                                         </div>

@@ -46,7 +46,6 @@ type ChildVaccinesProps = {
         id: number;
         slug?: string;
         fullname: string;
-        barangay: string;
     };
     child_vaccines: ChildVaccine[];
     available_vaccines: Vaccine[];

@@ -1,11 +1,13 @@
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { route } from '@/lib/routes';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface LoginProps {
     status?: string;
@@ -15,6 +17,8 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword, isMaintenanceMode, maintenance }: LoginProps) {
+    const [termsAccepted, setTermsAccepted] = useState(false);
+
     const { data, setData, post, processing, errors } = useForm({
         login: '',
         password: '',
@@ -23,6 +27,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!termsAccepted) return;
         post(route('login'));
     };
 
@@ -96,8 +101,73 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                 <InputError message={errors.password} />
                             </div>
 
+                            {/* Terms & Conditions Checkbox */}
+                            <div className="flex items-start gap-2">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={termsAccepted}
+                                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                />
+                                <Label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
+                                    I agree to the{' '}
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <button type="button" className="cursor-pointer text-sm underline text-teal-600 hover:text-teal-700">
+                                                Terms & Conditions
+                                            </button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl p-6">
+                                            <DialogHeader>
+                                                <DialogTitle className="text-xl font-bold text-teal-700">Terms & Conditions</DialogTitle>
+                                            </DialogHeader>
+                                            <div className="space-y-4 text-sm text-gray-700">
+                                                <h3 className="font-semibold text-gray-900">1. Acceptance of Terms</h3>
+                                                <p>
+                                                    By accessing and using NutriBantay, you agree to be bound by these Terms & Conditions. If you do not
+                                                    agree with any part of these terms, you must not use the system.
+                                                </p>
+
+                                                <h3 className="font-semibold text-gray-900">2. System Use</h3>
+                                                <p>
+                                                    NutriBantay is a barangay health tracking system intended for authorized health workers and
+                                                    administrators. You are responsible for maintaining the confidentiality of your account
+                                                    credentials.
+                                                </p>
+
+                                                <h3 className="font-semibold text-gray-900">3. Data Privacy</h3>
+                                                <p>
+                                                    All personal and health data stored in NutriBantay is treated as confidential and is protected
+                                                    under applicable data privacy laws. Access to data is limited to authorized personnel only.
+                                                </p>
+
+                                                <h3 className="font-semibold text-gray-900">4. Acceptable Use</h3>
+                                                <p>
+                                                    You agree to use NutriBantay solely for its intended purpose — monitoring and managing child
+                                                    nutrition and health records. Any unauthorized access, data extraction, or misuse of the system
+                                                    is strictly prohibited.
+                                                </p>
+
+                                                <h3 className="font-semibold text-gray-900">5. Limitation of Liability</h3>
+                                                <p>
+                                                    NutriBantay is provided &quot;as is&quot; without warranties of any kind. The barangay and its
+                                                    developers shall not be held liable for any damages arising from the use of the system.
+                                                </p>
+
+                                                <h3 className="font-semibold text-gray-900">6. Changes to Terms</h3>
+                                                <p>
+                                                    We reserve the right to update these terms at any time. Continued use of the system after
+                                                    changes constitutes acceptance of the updated terms.
+                                                </p>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </Label>
+                            </div>
+
                             {/* Submit */}
-                            <Button type="submit" className="w-full" disabled={processing}>
+                            <Button type="submit" className="w-full" disabled={processing || !termsAccepted}>
                                 {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                                 Log in
                             </Button>
@@ -108,11 +178,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                             Don't have an account?{' '}
                             <TextLink href={route('register')} className="font-medium">
                                 Sign Up
-                            </TextLink>{' '}
-                            |{' '}
-                            <a href="#" className="text-sm underline">
-                                Terms & Conditions
-                            </a>
+                            </TextLink>
                         </div>
                     </form>
 

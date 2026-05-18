@@ -45,11 +45,9 @@ class AuditLogController extends Controller
             $query->dateRange($request->start_date, $request->end_date);
         }
 
-        // Restrict by barangay for non-admin users
+        // Restrict by barangay
         $user = auth()->user();
-        if ($user && ! $user->hasRole('Admin')) {
-            $query->byBarangay($user->barangay);
-        }
+        $query->byBarangay($user->barangay);
 
         $logs = $query->paginate(20);
 
@@ -80,6 +78,8 @@ class AuditLogController extends Controller
      */
     public function show(AuditLog $auditLog)
     {
+        abort_if($auditLog->barangay !== auth()->user()->barangay, 403);
+
         $auditLog->load('user');
 
         return Inertia::render('AuditLogs/Show', [
@@ -124,11 +124,9 @@ class AuditLogController extends Controller
             $query->dateRange($request->start_date, $request->end_date);
         }
 
-        // Restrict by barangay for non-admin users
+        // Restrict by barangay
         $user = auth()->user();
-        if ($user && ! $user->hasRole('Admin')) {
-            $query->byBarangay($user->barangay);
-        }
+        $query->byBarangay($user->barangay);
 
         $filename = 'audit_logs_'.now()->format('Y_m_d_His').'.csv';
 
@@ -140,7 +138,7 @@ class AuditLogController extends Controller
         $callback = function () use ($query) {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Timestamp', 'User', 'Action', 'Type', 'Model Name', 'Description', 'IP Address', 'Barangay']);
+            fputcsv($handle, ['Timestamp', 'User', 'Action', 'Type', 'Model Name', 'Description', 'IP Address']);
 
             $query->chunk(500, function ($logs) use ($handle) {
                 foreach ($logs as $log) {
@@ -152,7 +150,6 @@ class AuditLogController extends Controller
                         $log->model_name ?? '-',
                         str_replace('"', '""', $log->description ?? '-'),
                         $log->ip_address ?? '-',
-                        $log->barangay ?? '-',
                     ]);
                 }
             });

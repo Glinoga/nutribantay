@@ -86,7 +86,6 @@ type DashboardProps = {
     stats: Stats;
     trends: TrendData;
     vaccine_followups: VaccineFollowups;
-    user_barangay: string;
     is_admin: boolean;
 };
 
@@ -97,7 +96,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ stats, trends, vaccine_followups, user_barangay }: DashboardProps) {
+export default function Dashboard({ stats, trends, vaccine_followups }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
@@ -160,10 +159,6 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-3xl font-bold text-cyan-900">Dashboard</h1>
-                                <p className="mt-1 flex items-center gap-2 text-cyan-700">
-                                    <Shield className="h-4 w-4 text-cyan-600" />
-                                    Barangay: {user_barangay}
-                                </p>
                             </div>
                             <Dialog open={showPrintModal} onOpenChange={setShowPrintModal}>
                                 <DialogTrigger asChild>

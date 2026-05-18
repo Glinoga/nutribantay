@@ -23,6 +23,7 @@ class ProfileController extends Controller
             'status' => $request->session()->get('status'),
             'auth' => [
                 'user' => $request->user()->only(['id', 'name', 'email', 'barangay', 'email_verified_at']),
+                'roles' => $request->user()->getRoleNames()->toArray(),
             ],
 
         ]);

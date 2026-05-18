@@ -268,7 +268,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                                 type="text"
                                                 placeholder="Enter author name"
                                                 value={data.author}
-                                                onChange={(e) => setData('author', e.target.value)}
+                                                onChange={(e) => setData('author', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>

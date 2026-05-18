@@ -22,27 +22,21 @@ type UserEditProps = {
         name: string;
         email?: string;
         role?: string;
-        barangay?: string;
     };
-    isSeededAdmin?: boolean;
 };
 
 type UserFormData = {
     name: string;
     email: string;
     role: string;
-    barangay: string;
 };
 
-export default function Edit({ user, isSeededAdmin }: UserEditProps) {
+export default function Edit({ user }: UserEditProps) {
     const { data, setData, errors, put, processing } = useForm<UserFormData>({
         name: user.name || '',
         email: user.email || '',
         role: user.role || 'healthworker',
-        barangay: user.barangay ? user.barangay.replace(/^Barangay\s*/i, '') : '',
     });
-
-    const canEditBarangay = isSeededAdmin === true;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
@@ -99,7 +93,7 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                                             id="name"
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
+                                            onChange={(e) => setData('name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                             placeholder="Enter full name"
                                             className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                             required
@@ -134,24 +128,6 @@ export default function Edit({ user, isSeededAdmin }: UserEditProps) {
                                             </SelectContent>
                                         </Select>
                                         {errors.role && <p className="mt-1 text-sm text-destructive">{errors.role}</p>}
-                                    </div>
-
-                                    {/* Barangay */}
-                                    <div>
-                                        <Label htmlFor="barangay">Barangay</Label>
-                                        <Input
-                                            id="barangay"
-                                            type="text"
-                                            value={data.barangay.replace(/^Barangay\s*/i, '')}
-                                            onChange={(e) => setData('barangay', e.target.value)}
-                                            placeholder="Enter barangay"
-                                            readOnly={!canEditBarangay}
-                                            className={`border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 ${
-                                                !canEditBarangay ? 'cursor-not-allowed bg-muted' : ''
-                                            }`}
-                                        />
-                                        {errors.barangay && <p className="mt-1 text-sm text-destructive">{errors.barangay}</p>}
-                                        {!canEditBarangay && <p className="mt-1 text-xs text-muted-foreground">Only the main admin can edit this field.</p>}
                                     </div>
 
                                     {/* Save Button */}

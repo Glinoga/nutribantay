@@ -47,7 +47,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 id="name"
                                 className="mt-1 block w-full"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) => setData('name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
@@ -94,15 +94,6 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 )}
                             </div>
                         )}
-
-                        <Label htmlFor="barangay">Barangay Number</Label>
-                        <Input
-                            id="barangay"
-                            type="text"
-                            value={String(auth.user.barangay || '')}
-                            readOnly
-                            className="mt-1 block w-full cursor-not-allowed bg-gray-100"
-                        />
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save</Button>
