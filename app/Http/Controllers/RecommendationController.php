@@ -253,13 +253,18 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
     private function validateRecommendation(string $recommendation, int $ageInMonths = 0): true|string
     {
-        // For 0-5 months, check that no solid foods are suggested
+        // For 0-5 months, check that meal plan lines don't contain solid foods
+        // (restrictions/disclaimers may mention foods to avoid — that's fine)
         if ($ageInMonths < 6) {
             $solidFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'itlog', 'karne', 'isda', 'manok', 'gulay', 'prutas'];
-            $recLower = strtolower($recommendation);
-            foreach ($solidFoods as $food) {
-                if (strpos($recLower, $food) !== false) {
-                    return self::VALIDATION_FAILED.': May solid food sa 0-5 months - dapat GATAS LAMANG!';
+            foreach (preg_split('/\R/', $recommendation) as $line) {
+                if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                    $lineLower = strtolower($line);
+                    foreach ($solidFoods as $food) {
+                        if (strpos($lineLower, $food) !== false) {
+                            return self::VALIDATION_FAILED.': May solid food sa 0-5 months meal plan - dapat GATAS LAMANG!';
+                        }
+                    }
                 }
             }
         }
