@@ -143,7 +143,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
             </div>
 
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-lg border border-cyan-200 bg-white p-6 print:bg-white">
+                <div className="rounded-md border border-cyan-200 bg-white p-6 print:bg-white">
                     <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900">
                         <Baby className="h-5 w-5 text-cyan-600" />
                         Personal Information
@@ -184,7 +184,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     </div>
                 </div>
 
-                <div className="rounded-lg border border-cyan-200 bg-white p-6 print:bg-white">
+                <div className="rounded-md border border-cyan-200 bg-white p-6 print:bg-white">
                     <h3 className="mb-4 text-lg font-bold text-cyan-900">Current Measurements</h3>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
@@ -212,7 +212,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div className="rounded-lg border border-cyan-200 bg-white p-4 print:bg-white">
+                        <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white">
                             <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Weight, Height & BMI Over Time</h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 <Line
@@ -240,7 +240,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                             </div>
                         </div>
 
-                        <div className="rounded-lg border border-cyan-200 bg-white p-4 print:bg-white">
+                        <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white">
                             <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Nutrition Status Distribution</h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 {hasNutritionData ? (

@@ -192,7 +192,7 @@ export default function Create({ categories }: CreateProps) {
                                 placeholder="Enter announcement title"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                className="rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                         </div>
 
@@ -203,7 +203,7 @@ export default function Create({ categories }: CreateProps) {
                                 </Label>
                                 <p className="mb-2 text-xs text-gray-500">Select the category for this announcement</p>
                                 <Select value={data.category_id} onValueChange={(value) => setData('category_id', value)}>
-                                    <SelectTrigger className="w-full rounded-lg border-teal-200 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                                    <SelectTrigger className="w-full rounded-md border-teal-200 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
                                         <SelectValue placeholder="Select category" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -224,7 +224,7 @@ export default function Create({ categories }: CreateProps) {
                                     placeholder="Enter author name"
                                     value={data.author}
                                     onChange={(e) => setData('author', e.target.value)}
-                                    className="rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -239,7 +239,7 @@ export default function Create({ categories }: CreateProps) {
                                     value={data.date}
                                     onChange={(e) => setData('date', e.target.value)}
                                     min={new Date().toISOString().split('T')[0]}
-                                    className="mt-2 rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="mt-2 rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                 />
                                 <p className="mt-1 text-xs text-gray-500">Select today to publish immediately, or choose a future date to schedule</p>
                             </div>
@@ -251,7 +251,7 @@ export default function Create({ categories }: CreateProps) {
                                     value={data.end_date}
                                     onChange={(e) => setData('end_date', e.target.value)}
                                     min={data.date || new Date().toISOString().split('T')[0]}
-                                    className="mt-2 rounded-lg border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="mt-2 rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                 />
                                 <p className="mt-1 text-xs text-gray-500">Optional: When the announcement should no longer be shown</p>
                             </div>
@@ -266,7 +266,7 @@ export default function Create({ categories }: CreateProps) {
                                 value={data.summary}
                                 onChange={(e) => setData('summary', e.target.value)}
                                 rows={3}
-                                className="rounded-lg border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                         </div>
 
@@ -279,16 +279,16 @@ export default function Create({ categories }: CreateProps) {
                                 value={data.content}
                                 onChange={(e) => setData('content', e.target.value)}
                                 rows={6}
-                                className="rounded-lg border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                         </div>
 
                         <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm" style={{ animationDelay: '0.3s' }}>
                             <Label className="mb-2 block text-sm font-bold text-gray-800">Upload Image</Label>
-                            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2 rounded-lg border-teal-200 text-sm transition-colors file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100" />
+                            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2 rounded-md border-teal-200 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100" />
                             {preview && (
                                 <div className="relative mt-4 inline-block">
-                                    <img src={preview} alt="Preview" className="max-h-64 rounded-lg border" />
+                                    <img src={preview} alt="Preview" className="max-h-64 rounded-md border" />
                                     <button
                                         type="button"
                                         onClick={removeImage}

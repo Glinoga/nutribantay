@@ -90,7 +90,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                 style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
                 {showHeader && (
-                    <header className="fixed top-0 z-50 z-[1001] w-full bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm">
+                    <header className="fixed top-0 z-50 z-[1001] w-full bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm dark:bg-[var(--bg)]/70 dark:border-b dark:border-[var(--border)]">
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
                                 <Link href="/" className="flex items-center gap-2">

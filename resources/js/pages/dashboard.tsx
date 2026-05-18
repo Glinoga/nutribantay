@@ -233,40 +233,40 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
                         <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                             <CardHeader className="pb-2">
                                 <CardDescription className="flex items-center gap-2">
-                                    <Baby className="h-4 w-4 text-cyan-600" />
+                                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                                     Children Today
                                 </CardDescription>
-                                <CardTitle className="text-3xl text-cyan-900">{stats.daily.children_registered}</CardTitle>
+                                <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.daily.children_registered}</CardTitle>
                             </CardHeader>
                         </Card>
 
                         <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                             <CardHeader className="pb-2">
                                 <CardDescription className="flex items-center gap-2">
-                                    <Activity className="h-4 w-4 text-cyan-500" />
+                                    <Activity className="h-4 w-4 text-cyan-500 dark:text-cyan-400" />
                                     Health Logs Today
                                 </CardDescription>
-                                <CardTitle className="text-3xl text-cyan-900">{stats.daily.healthlogs}</CardTitle>
+                                <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.daily.healthlogs}</CardTitle>
                             </CardHeader>
                         </Card>
 
                         <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                             <CardHeader className="pb-2">
                                 <CardDescription className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-cyan-600" />
+                                    <Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                                     This Week
                                 </CardDescription>
-                                <CardTitle className="text-3xl text-cyan-900">{stats.weekly.healthlogs}</CardTitle>
+                                <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.weekly.healthlogs}</CardTitle>
                             </CardHeader>
                         </Card>
 
                         <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                             <CardHeader className="pb-2">
                                 <CardDescription className="flex items-center gap-2">
-                                    <TrendingUp className="h-4 w-4 text-cyan-500" />
+                                    <TrendingUp className="h-4 w-4 text-cyan-500 dark:text-cyan-400" />
                                     This Month
                                 </CardDescription>
-                                <CardTitle className="text-3xl text-cyan-900">{stats.monthly.healthlogs}</CardTitle>
+                                <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.monthly.healthlogs}</CardTitle>
                             </CardHeader>
                         </Card>
                     </div>
@@ -324,7 +324,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, user_baran
 
                                     {vaccine_followups.follow_ups.length > 0 && (
                                         <div
-                                            className="mt-4 max-h-64 overflow-y-auto rounded-lg border border-amber-200"
+                                            className="mt-4 max-h-64 overflow-y-auto rounded-md border border-amber-200"
                                             role="region"
                                             aria-label="Vaccine follow-ups table"
                                         >

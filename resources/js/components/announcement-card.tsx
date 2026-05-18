@@ -58,8 +58,8 @@ export default function AnnouncementCard({
     };
 
     const cardClasses = isAdmin
-        ? 'group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl'
-        : 'group flex h-full flex-col relative overflow-hidden rounded-2xl bg-white/80 shadow-md backdrop-blur-sm transition-all hover:shadow-xl';
+        ? 'group flex h-full flex-col relative overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-xl dark:bg-[var(--bg-light)]'
+        : 'group flex h-full flex-col relative overflow-hidden rounded-2xl bg-white/80 shadow-md backdrop-blur-sm transition-all hover:shadow-xl dark:bg-[var(--bg)]/80';
 
     return (
         <div className={`${cardClasses} ${className}`} style={style}>
@@ -80,8 +80,8 @@ export default function AnnouncementCard({
                         loading="lazy"
                     />
                 ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50">
-                        <Megaphone className="h-14 w-14 text-teal-300" />
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]">
+                        <Megaphone className="h-14 w-14 text-teal-300 dark:text-[var(--text-muted)]" />
                     </div>
                 )}
             </div>
@@ -104,11 +104,11 @@ export default function AnnouncementCard({
                     )}
                 </div>
 
-                <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600">
+                <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600 dark:text-[var(--text)] dark:group-hover:text-[var(--primary)]">
                     {announcement.title}
                 </h3>
 
-                <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-[var(--text-muted)]">
                     <div className="flex items-center gap-1.5">
                         <Calendar className="h-4 w-4 shrink-0" />
                         <span>{announcement.date}</span>
@@ -121,10 +121,10 @@ export default function AnnouncementCard({
                     )}
                 </div>
 
-                <div className="mb-3 h-px shrink-0 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+                <div className="mb-3 h-px shrink-0 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-[var(--border-muted)]" />
 
                 <p
-                    className="mb-5 flex-1 text-sm text-gray-700"
+                    className="mb-5 flex-1 text-sm text-gray-700 dark:text-[var(--text-muted)]"
                     style={{
                         display: '-webkit-box',
                         WebkitLineClamp: lineClamp,
@@ -140,7 +140,7 @@ export default function AnnouncementCard({
                         {!isAdmin && onShare && (
                             <button
                                 onClick={handleShare}
-                                className="flex cursor-pointer items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-teal-600"
+                                className="flex cursor-pointer items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-teal-600 dark:text-[var(--text-muted)] dark:hover:text-[var(--primary)]"
                             >
                                 {copied ? (
                                     <Check className="h-4 w-4 text-green-500" />

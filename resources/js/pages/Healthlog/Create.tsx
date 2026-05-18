@@ -197,25 +197,25 @@ export default function Create({
                                 <h2 className="text-lg font-bold text-gray-900">Child Information</h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3 lg:grid-cols-5">
-                                <div className="rounded-lg bg-gray-50 p-3">
+                                <div className="rounded-md bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Full Name</p>
                                     <p className="mt-1 font-semibold text-gray-900">{child.fullname}</p>
                                 </div>
-                                <div className="rounded-lg bg-gray-50 p-3">
+                                <div className="rounded-md bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Sex</p>
                                     <p className="mt-1 font-semibold text-gray-900">{child.sex}</p>
                                 </div>
-                                <div className="rounded-lg bg-gray-50 p-3">
+                                <div className="rounded-md bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Birthdate</p>
                                     <p className="mt-1 font-semibold text-gray-900">
                                         {child.birthdate ? new Date(child.birthdate).toLocaleDateString() : 'N/A'}
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-gray-50 p-3">
+                                <div className="rounded-md bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Current Weight (kg)</p>
                                     <p className="mt-1 font-semibold text-gray-900">{child.weight ?? 'N/A'}</p>
                                 </div>
-                                <div className="rounded-lg bg-gray-50 p-3">
+                                <div className="rounded-md bg-gray-50 p-3">
                                     <p className="text-xs font-medium text-gray-500">Current Height (cm)</p>
                                     <p className="mt-1 font-semibold text-gray-900">{child.height ?? 'N/A'}</p>
                                 </div>
@@ -250,7 +250,7 @@ export default function Create({
                                                         setSelectedRecord(record);
                                                         setShowRecordSelector(false);
                                                     }}
-                                                    className={`cursor-pointer rounded-lg border-l-4 p-3 transition-all duration-200 hover:bg-[#22D3EE]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0891B2] ${
+                                                    className={`cursor-pointer rounded-md border-l-4 p-3 transition-all duration-200 hover:bg-[#22D3EE]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0891B2] ${
                                                         selectedRecord?.id === record.id || (!selectedRecord && index === 0)
                                                             ? 'border-[#0891B2] bg-[#ECFEFF] ring-2 ring-[#0891B2]/20'
                                                             : 'border-transparent hover:border-[#22D3EE]/50'
@@ -322,15 +322,15 @@ export default function Create({
                                     <div>
                                         <h3 className="mb-2 text-sm font-semibold text-gray-700">Measurements</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">Weight (kg)</p>
                                                 <p className="mt-1 font-semibold text-gray-900">{selectedRecord.weight ?? 'N/A'}</p>
                                             </div>
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">Height (cm)</p>
                                                 <p className="mt-1 font-semibold text-gray-900">{selectedRecord.height ?? 'N/A'}</p>
                                             </div>
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">BMI</p>
                                                 <p className="mt-1 font-semibold text-gray-900">{selectedRecord.bmi ?? 'N/A'}</p>
                                             </div>
@@ -341,7 +341,7 @@ export default function Create({
                                     {selectedRecord.nutrition_status && (
                                         <div>
                                             <h3 className="mb-2 text-sm font-semibold text-gray-700">Nutrition Status</h3>
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="font-semibold text-gray-900">{selectedRecord.nutrition_status}</p>
                                             </div>
                                         </div>
@@ -352,34 +352,34 @@ export default function Create({
                                         <h3 className="mb-2 text-sm font-semibold text-gray-700">Supplementary Programs</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             {selectedRecord.micronutrient_powder && (
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">MNP</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.micronutrient_powder}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.rutf && (
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">RUTF</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.rutf}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.rusf && (
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">RUSF</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.rusf}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.complementary_food && (
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Complementary Food</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.complementary_food}</p>
                                                 </div>
                                             )}
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">Vitamin A</p>
                                                 <p className="mt-1 font-semibold text-gray-900">{selectedRecord.vitamin_a ? 'Yes' : 'No'}</p>
                                             </div>
-                                            <div className="rounded-lg bg-gray-50 p-3">
+                                            <div className="rounded-md bg-gray-50 p-3">
                                                 <p className="text-xs font-medium text-gray-500">Deworming</p>
                                                 <p className="mt-1 font-semibold text-gray-900">{selectedRecord.deworming ? 'Yes' : 'No'}</p>
                                             </div>
@@ -391,21 +391,21 @@ export default function Create({
                                         <div>
                                             <h3 className="mb-2 text-sm font-semibold text-gray-700">Vaccination</h3>
                                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Vaccine Name</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.vaccine_name}</p>
                                                 </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Dose Number</p>
                                                     <p className="mt-1 font-semibold text-gray-900">{selectedRecord.dose_number ?? 'N/A'}</p>
                                                 </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Date Given</p>
                                                     <p className="mt-1 font-semibold text-gray-900">
                                                         {selectedRecord.date_given ? new Date(selectedRecord.date_given).toLocaleDateString() : 'N/A'}
                                                     </p>
                                                 </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Next Due Date</p>
                                                     <p className="mt-1 font-semibold text-gray-900">
                                                         {selectedRecord.next_due_date
@@ -413,7 +413,7 @@ export default function Create({
                                                             : 'N/A'}
                                                     </p>
                                                 </div>
-                                                <div className="rounded-lg bg-gray-50 p-3">
+                                                <div className="rounded-md bg-gray-50 p-3">
                                                     <p className="text-xs font-medium text-gray-500">Status</p>
                                                     <span
                                                         className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -577,7 +577,7 @@ export default function Create({
                             {/* Checkboxes */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
                                 <div className="flex gap-6">
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
                                         <Checkbox
                                             id="vitamin_a"
                                             checked={data.vitamin_a}
@@ -587,7 +587,7 @@ export default function Create({
                                         <span className="text-sm font-medium text-gray-700">Vitamin A Supplementation</span>
                                     </label>
 
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
                                         <Checkbox
                                             id="deworming"
                                             checked={data.deworming}

@@ -75,16 +75,16 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                     animation: fadeInUp 0.6s ease-out forwards;
                 }
                 .glass-card {
-                    background: rgba(255, 255, 255, 0.7);
+                    background: color-mix(in srgb, var(--bg-light) 70%, transparent);
                     backdrop-filter: blur(12px);
                     -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
                 }
             `}</style>
 
             {/* Maintenance Message Banner */}
             {maintenance && (
-                <div className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800" role="alert">
+                <div className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300" role="alert">
                     <div className="flex items-center">
                         <svg className="mr-3 h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                             <path
@@ -182,9 +182,9 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             announcements.map((announcement) => (
                                 <div
                                     key={announcement.id}
-                                    className="card-hover group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm"
+                                    className="card-hover group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm dark:bg-[var(--bg-light)]/80"
                                 >
-                                    <div className="absolute inset-0 bg-[(--bg-light)]"></div>
+                                    <div className="absolute inset-0 bg-[var(--bg-light)] dark:bg-[var(--bg)]"></div>
                                     <div className="absolute top-0 right-0 left-0 z-10 p-6">
                                         <span
                                             className={`inline-block rounded-full ${getCategoryColorClass(announcement.category.color)} px-3 py-1 text-xs font-medium text-white`}

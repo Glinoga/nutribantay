@@ -78,7 +78,7 @@ export default function Archived({ healthlogs }: Props) {
                 </Button>
             </div>
 
-            <div className="m-4 overflow-x-auto rounded-lg border">
+            <div className="m-4 overflow-x-auto rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>

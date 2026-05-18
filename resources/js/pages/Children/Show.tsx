@@ -357,7 +357,7 @@ export default function Show({ child }: { child: Child }) {
                     <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
                         <button
                             onClick={() => setShowEditModal(true)}
-                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
                         >
                             <Edit2 className="h-4 w-4" />
                             Edit Record
@@ -365,7 +365,7 @@ export default function Show({ child }: { child: Child }) {
 
                         <button
                             onClick={() => setShowExportDialog(true)}
-                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-cyan-400 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-cyan-700 hover:to-cyan-500 hover:shadow-lg"
+                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-md bg-gradient-to-r from-cyan-600 to-cyan-400 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-cyan-700 hover:to-cyan-500 hover:shadow-lg"
                         >
                             <Download className="h-4 w-4" />
                             Export / Print
@@ -373,7 +373,7 @@ export default function Show({ child }: { child: Child }) {
 
                         {canManageHealthlogs && (
                             <Link href={route('children.healthlogs.create', { child: child.slug })}>
-                                <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
+                                <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                     <Plus className="h-4 w-4" />
                                     Add Health Log
                                 </button>
@@ -381,14 +381,14 @@ export default function Show({ child }: { child: Child }) {
                         )}
 
                         <Link href={route('children.vaccines.index', { child: child.slug })}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
                                 <Syringe className="h-4 w-4" />
                                 Vaccine Tracker
                             </button>
                         </Link>
 
                         <Link href={route('children.index')}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
                                 <X className="h-4 w-4" />
                                 Back to List
                             </button>
@@ -415,14 +415,14 @@ export default function Show({ child }: { child: Child }) {
                                         { label: 'Created by', value: child.creator?.name ?? 'N/A' },
                                         { label: 'Updated by', value: child.updater?.name ?? 'N/A' },
                                     ].map((item, idx) => (
-                                        <div key={idx} className="rounded-lg bg-gray-50 p-3">
+                                        <div key={idx} className="rounded-md bg-gray-50 p-3">
                                             <p className="text-xs font-medium text-gray-500">{item.label}</p>
                                             <p className="mt-1 text-sm font-semibold text-gray-900">{item.value}</p>
                                         </div>
                                     ))}
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div className="rounded-lg bg-gray-50 p-3">
+                                    <div className="rounded-md bg-gray-50 p-3">
                                         <p className="text-xs font-medium text-gray-500">Created at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900">
                                             {child.created_at
@@ -430,7 +430,7 @@ export default function Show({ child }: { child: Child }) {
                                                 : 'N/A'}
                                         </p>
                                     </div>
-                                    <div className="rounded-lg bg-gray-50 p-3">
+                                    <div className="rounded-md bg-gray-50 p-3">
                                         <p className="text-xs font-medium text-gray-500">Last updated at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900">
                                             {child.updated_at
@@ -454,7 +454,7 @@ export default function Show({ child }: { child: Child }) {
                             <div className="mb-4 flex gap-2">
                                 <button
                                     onClick={() => setTrendRange('6months')}
-                                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                                    className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                                         trendRange === '6months'
                                             ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
                                             : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
@@ -464,7 +464,7 @@ export default function Show({ child }: { child: Child }) {
                                 </button>
                                 <button
                                     onClick={() => setTrendRange('1year')}
-                                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                                    className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                                         trendRange === '1year'
                                             ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
                                             : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
@@ -637,13 +637,13 @@ export default function Show({ child }: { child: Child }) {
                                                             <div className="flex items-center justify-center gap-2">
                                                                 <button
                                                                     onClick={() => setSelectedLog(log)}
-                                                                    className="cursor-pointer rounded-lg p-1.5 text-teal-600 transition-colors hover:bg-teal-50"
+                                                                    className="cursor-pointer rounded-md p-1.5 text-teal-600 transition-colors hover:bg-teal-50"
                                                                 >
                                                                     <Edit2 className="h-4 w-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => deleteHealthLog(log.id)}
-                                                                    className="cursor-pointer rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                                    className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </button>
@@ -672,14 +672,14 @@ export default function Show({ child }: { child: Child }) {
                                                 <button
                                                     onClick={() => setLogPage((p) => Math.max(1, p - 1))}
                                                     disabled={logPage === 1}
-                                                    className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     Previous
                                                 </button>
                                                 <button
                                                     onClick={() => setLogPage((p) => Math.min(totalPages, p + 1))}
                                                     disabled={logPage === totalPages}
-                                                    className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                                                 >
                                                     Next
                                                 </button>
@@ -773,7 +773,7 @@ export default function Show({ child }: { child: Child }) {
                             <button
                                 onClick={handleRecommendation}
                                 disabled={loading || healthlogs.length === 0}
-                                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading ? 'Analyzing...' : 'Generate Recommendation'}
                             </button>
@@ -783,7 +783,7 @@ export default function Show({ child }: { child: Child }) {
                             )}
 
                             {recommendation && (
-                                <div className="mt-4 rounded-lg bg-white p-4 shadow-inner">
+                                <div className="mt-4 rounded-md bg-white p-4 shadow-inner">
                                     <h3 className="mb-2 font-semibold text-gray-900">Recommendation:</h3>
                                     <p className="text-sm whitespace-pre-line text-gray-700">{recommendation}</p>
                                 </div>
@@ -802,7 +802,7 @@ export default function Show({ child }: { child: Child }) {
                                     <h2 className="text-xl font-bold text-gray-900">Health Log Details</h2>
                                     <button
                                         onClick={() => setSelectedLog(null)}
-                                        className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                                        className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
@@ -812,7 +812,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Measurements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Measurements</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4 sm:grid-cols-3">
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-3">
                                             <div>
                                                 <p className="text-sm text-gray-500">Weight</p>
                                                 <p className="font-medium text-gray-900">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
@@ -831,7 +831,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Nutrition Status */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Nutrition Status</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4 sm:grid-cols-4">
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-4">
                                             {[
                                                 {
                                                     label: 'Overall',
@@ -861,7 +861,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Supplements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Supplements & Programs</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4">
                                             {[
                                                 { label: 'Vitamin A', value: selectedLog.vitamin_a },
                                                 { label: 'Deworming', value: selectedLog.deworming },
@@ -891,7 +891,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Vaccine */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Vaccination</h3>
-                                        <div className="rounded-lg bg-gray-50 p-4">
+                                        <div className="rounded-md bg-gray-50 p-4">
                                             {selectedLog.vaccine_name ? (
                                                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                                                     {[
@@ -939,7 +939,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Metadata */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700">Record Info</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4">
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4">
                                             <div>
                                                 <p className="text-sm text-gray-500">Created By</p>
                                                 <p className="font-medium text-gray-900">{selectedLog.user?.name ?? '-'}</p>
@@ -957,7 +957,7 @@ export default function Show({ child }: { child: Child }) {
                                 <div className="mt-6 flex gap-2">
                                     {canManageHealthlogs && (
                                         <Link href={route('healthlogs.edit', { healthlog: selectedLog.id })}>
-                                            <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
+                                            <button className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                                 <Edit2 className="h-4 w-4" />
                                                 Edit
                                             </button>
@@ -965,7 +965,7 @@ export default function Show({ child }: { child: Child }) {
                                     )}
                                     <button
                                         onClick={() => setSelectedLog(null)}
-                                        className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
+                                        className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
                                     >
                                         Close
                                     </button>
@@ -976,7 +976,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Floating Notes Button */}
                     <button
-                        className="fixed top-36 right-4 z-50 cursor-pointer rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-xl"
+                        className="fixed top-36 right-4 z-50 cursor-pointer rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-xl"
                         onClick={() => setNotesOpen(!notesOpen)}
                     >
                         Notes ({child.notes?.length || 0})
@@ -992,7 +992,7 @@ export default function Show({ child }: { child: Child }) {
                             <h2 className="text-xl font-bold text-gray-900">Notes</h2>
                             <button
                                 onClick={() => setNotesOpen(false)}
-                                className="cursor-pointer rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                                className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -1002,11 +1002,11 @@ export default function Show({ child }: { child: Child }) {
                             <textarea
                                 value={newNote}
                                 onChange={(e) => setNewNote(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                 rows={3}
                                 placeholder="Add a new note..."
                             />
-                            <button className="mt-2 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
+                            <button className="mt-2 inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                 <Plus className="h-4 w-4" />
                                 Add Note
                             </button>
@@ -1014,7 +1014,7 @@ export default function Show({ child }: { child: Child }) {
 
                         {child.notes?.length ? (
                             child.notes.map((note) => (
-                                <div key={note.id} className="mb-3 rounded-lg bg-gray-50 p-3">
+                                <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3">
                                     <p className="text-sm text-gray-700">{note.note}</p>
                                     <small className="mt-1 block text-gray-500">
                                         {note.created_at
@@ -1049,7 +1049,7 @@ export default function Show({ child }: { child: Child }) {
                     <DialogHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
                         <DialogTitle className="text-center text-2xl font-bold text-gray-900">Edit Child Record</DialogTitle>
                         <DialogDescription className="mt-2 text-center text-sm text-gray-600">
-                            <span className="inline-flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-1.5 text-amber-800">
+                            <span className="inline-flex items-center gap-2 rounded-md bg-amber-50 px-3 py-1.5 text-amber-800">
                                 <AlertTriangle className="h-4 w-4" />
                                 Only edit if you entered wrong data. Otherwise, create a health log.
                             </span>
@@ -1057,7 +1057,7 @@ export default function Show({ child }: { child: Child }) {
                     </DialogHeader>
 
                     {/* Confirmation Alert */}
-                    <div className="mx-6 mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <div className="mx-6 mt-4 rounded-md border border-amber-200 bg-amber-50 p-4">
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
                             <div>
@@ -1075,7 +1075,7 @@ export default function Show({ child }: { child: Child }) {
                     </div>
 
                     {Object.keys(errors).length > 0 && (
-                        <div className="mx-6 mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                        <div className="mx-6 mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
                             <div className="flex items-center gap-2">
                                 <OctagonAlert className="h-5 w-5 flex-shrink-0" />
                                 <div>
@@ -1104,7 +1104,7 @@ export default function Show({ child }: { child: Child }) {
                                             placeholder="First name"
                                             value={data.first_name}
                                             onChange={(e) => setData('first_name', e.target.value)}
-                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
                                     <div>
@@ -1115,7 +1115,7 @@ export default function Show({ child }: { child: Child }) {
                                             maxLength={5}
                                             value={data.middle_initial}
                                             onChange={(e) => setData('middle_initial', e.target.value)}
-                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
                                     <div>
@@ -1125,7 +1125,7 @@ export default function Show({ child }: { child: Child }) {
                                             placeholder="Last name"
                                             value={data.last_name}
                                             onChange={(e) => setData('last_name', e.target.value)}
-                                            className="mt-1 rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
                                 </div>
@@ -1140,7 +1140,7 @@ export default function Show({ child }: { child: Child }) {
                                 </div>
                                 <div className="p-6">
                                     <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                        <SelectTrigger className="w-full rounded-lg border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
+                                        <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
                                             <SelectValue placeholder="Select sex" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -1164,7 +1164,7 @@ export default function Show({ child }: { child: Child }) {
                                         type="text"
                                         value={data.barangay}
                                         readOnly
-                                        className="w-full cursor-not-allowed rounded-lg border-gray-200 bg-gray-100 text-sm font-medium text-gray-600"
+                                        className="w-full cursor-not-allowed rounded-md border-gray-200 bg-gray-100 text-sm font-medium text-gray-600"
                                     />
                                 </div>
                             </div>
@@ -1180,7 +1180,7 @@ export default function Show({ child }: { child: Child }) {
                                     type="date"
                                     value={data.birthdate}
                                     onChange={(e) => setData('birthdate', e.target.value)}
-                                    className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                 />
                             </div>
                         </div>
@@ -1198,7 +1198,7 @@ export default function Show({ child }: { child: Child }) {
                                         placeholder="Enter weight"
                                         value={data.weight}
                                         onChange={(e) => setData('weight', e.target.value)}
-                                        className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -1214,7 +1214,7 @@ export default function Show({ child }: { child: Child }) {
                                         placeholder="Enter height"
                                         value={data.height}
                                         onChange={(e) => setData('height', e.target.value)}
-                                        className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -1231,7 +1231,7 @@ export default function Show({ child }: { child: Child }) {
                                     placeholder="e.g., 09171234567"
                                     value={data.contact_number}
                                     onChange={(e) => setData('contact_number', e.target.value)}
-                                    className="rounded-lg border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     maxLength={11}
                                 />
                             </div>
@@ -1242,7 +1242,7 @@ export default function Show({ child }: { child: Child }) {
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                className="rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
                             >
                                 {processing ? 'Saving...' : 'Save Changes'}
                             </Button>
@@ -1250,7 +1250,7 @@ export default function Show({ child }: { child: Child }) {
                                 type="button"
                                 onClick={handleEditClose}
                                 variant="outline"
-                                className="rounded-lg px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
+                                className="rounded-md px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
                             >
                                 Cancel
                             </Button>

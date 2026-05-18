@@ -283,7 +283,7 @@ export default function Index(props: IndexProps) {
                     </div>
 
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total</p>
@@ -295,7 +295,7 @@ export default function Index(props: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Active</p>
@@ -307,7 +307,7 @@ export default function Index(props: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Upcoming</p>
@@ -319,7 +319,7 @@ export default function Index(props: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Categories</p>
@@ -340,7 +340,7 @@ export default function Index(props: IndexProps) {
                                 placeholder="Search announcements..."
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-white dark:bg-gray-800/80 dark:text-gray-100 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                             {searchInput && (
                                 <button
@@ -359,7 +359,7 @@ export default function Index(props: IndexProps) {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <div className="flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                            <div className="flex overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
                                 <button
                                     onClick={() => handleViewChange('card')}
                                     className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${

@@ -224,7 +224,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Users</p>
@@ -235,7 +235,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Selected</p>
@@ -246,7 +246,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">SMS Credits</p>
@@ -257,7 +257,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Send Mode</p>
@@ -321,7 +321,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                     {recipientType === 'all' ? (
                                         <div className="rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-cyan-50 p-4 dark:border-teal-800 dark:from-teal-900/20 dark:to-cyan-900/20">
                                             <div className="flex items-start gap-3">
-                                                <div className="rounded-lg bg-teal-600 p-2">
+                                                <div className="rounded-md bg-teal-600 p-2">
                                                     <Zap className="h-5 w-5 text-white" />
                                                 </div>
                                                 <div>
@@ -342,7 +342,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                     placeholder="Search children/guardian..."
                                                     value={searchQuery}
                                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                                    className="w-full rounded-lg border py-2.5 pr-10 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                                    className="w-full rounded-md border py-2.5 pr-10 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                                 />
                                                 {searchQuery && (
                                                     <button
@@ -386,7 +386,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                             <div className="flex items-center gap-3 p-3">
                                                                 {/* Checkbox */}
                                                                 <div
-                                                                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                                                                    className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${
                                                                         selectedUsers.includes(user.id)
                                                                             ? 'scale-110 border-white bg-white'
                                                                             : 'border-gray-300 group-hover:border-teal-500 dark:border-gray-600'
@@ -616,7 +616,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                     </AlertDialogHeader>
 
                     <div className="space-y-3 py-4">
-                        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                        <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-800">
                             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Recipients</p>
                             <p className="text-sm text-gray-900 dark:text-white">
                                 {recipientType === 'all' ? (
@@ -627,24 +627,24 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             </p>
                         </div>
 
-                        <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                        <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-800">
                             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Message</p>
                             <p className="line-clamp-3 text-sm text-gray-900 dark:text-white">{message}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-lg bg-teal-50 p-3 dark:bg-teal-900/20">
+                            <div className="rounded-md bg-teal-50 p-3 dark:bg-teal-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">SMS Parts</p>
                                 <p className="text-xl font-bold text-teal-600">{Math.ceil(characterCount / 160) || 0}</p>
                             </div>
-                            <div className="rounded-lg bg-cyan-50 p-3 dark:bg-cyan-900/20">
+                            <div className="rounded-md bg-cyan-50 p-3 dark:bg-cyan-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
                                 <p className="text-xl font-bold text-cyan-600">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
                             </div>
                         </div>
 
                         {credits > 0 && getRecipientCount() * (Math.ceil(characterCount / 160) || 0) > credits && (
-                            <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
+                            <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
                                 <AlertTriangle className="h-4 w-4 text-amber-600" />
                                 <p className="text-sm text-amber-800 dark:text-amber-200">
                                     Warning: You may not have enough credits. Required: {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}

@@ -410,7 +410,7 @@ router.get(route('children.index'), params, { replace: true });
                     </div>
 
                     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Children</p>
@@ -422,7 +422,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Male</p>
@@ -434,7 +434,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Female</p>
@@ -446,7 +446,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Avg BMI</p>
@@ -468,7 +468,7 @@ router.get(route('children.index'), params, { replace: true });
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearch}
-                                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-white dark:bg-gray-800/80 dark:text-gray-100 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                             {searchQuery && (
                                 <button
@@ -487,7 +487,7 @@ router.get(route('children.index'), params, { replace: true });
                             {canExportChildren && (
                                 <button
                                     onClick={() => setShowExportDialog(true)}
-                                    className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                    className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
                                 >
                                     <Download className="mr-1.5 inline h-4 w-4" />
                                     Export / Print
@@ -496,8 +496,8 @@ router.get(route('children.index'), params, { replace: true });
 
 {canManageChildren && (
                                  <button
-                                     onClick={openImportModal}
-                                     className="cursor-pointer rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                      onClick={openImportModal}
+                                      className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
                                  >
                                      <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
                                      Upload Excel
@@ -608,7 +608,7 @@ router.get(route('children.index'), params, { replace: true });
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
+                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
                     )}
 
                     {children.length === 0 ? (
@@ -664,17 +664,17 @@ router.get(route('children.index'), params, { replace: true });
                                                     </div>
 
                                                     <div className="mb-3 grid grid-cols-3 gap-2">
-                                                        <div className="rounded-lg bg-gray-50 p-2 text-center">
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
                                                             <Scale className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
                                                             <p className="text-xs font-semibold text-gray-900">{child.weight ?? '-'}</p>
                                                             <p className="text-[10px] text-gray-500">kg</p>
                                                         </div>
-                                                        <div className="rounded-lg bg-gray-50 p-2 text-center">
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
                                                             <Ruler className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
                                                             <p className="text-xs font-semibold text-gray-900">{child.height ?? '-'}</p>
                                                             <p className="text-[10px] text-gray-500">cm</p>
                                                         </div>
-                                                        <div className="rounded-lg bg-gray-50 p-2 text-center">
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
                                                             <Activity className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
                                                             <p className="text-xs font-semibold text-gray-900">{bmi ?? '-'}</p>
                                                             <p className="text-[10px] text-gray-500">BMI</p>
@@ -744,7 +744,7 @@ router.get(route('children.index'), params, { replace: true });
                     <button
                         onClick={() => handlePageClick(pagination.current_page - 1)}
                         disabled={pagination.current_page === 1}
-                        className="page-btn flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Prev
@@ -773,7 +773,7 @@ router.get(route('children.index'), params, { replace: true });
                     <button
                         onClick={() => handlePageClick(pagination.current_page + 1)}
                         disabled={pagination.current_page === pagination.last_page}
-                        className="page-btn flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
                         Next
                         <ChevronRight className="h-4 w-4" />
@@ -844,14 +844,14 @@ router.get(route('children.index'), params, { replace: true });
                                 <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-12">
                                     <Upload className="mb-4 h-10 w-10 text-gray-400" />
                                     <p className="mb-4 text-gray-600">Click to select an Excel file</p>
-                                    <label className="cursor-pointer rounded-lg bg-teal-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-teal-600">
+                                    <label className="cursor-pointer rounded-md bg-teal-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-teal-600">
                                         Select File
                                         <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleFileSelect} />
                                     </label>
                                 </div>
                             ) : (
                                 <div>
-                                    <div className="mb-4 flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                    <div className="mb-4 flex items-center justify-between rounded-md bg-gray-50 p-3">
                                         <div className="flex items-center gap-3">
                                             <FileSpreadsheet className="h-6 w-6 text-green-600" />
                                             <div>
@@ -867,7 +867,7 @@ router.get(route('children.index'), params, { replace: true });
                                     {previewData.length > 0 && (
                                         <div className="mb-4">
                                             <p className="mb-2 text-sm font-medium text-gray-700">Preview ({importData.length} total rows):</p>
-                                            <div className="max-h-48 overflow-auto rounded-lg border border-gray-200">
+                                            <div className="max-h-48 overflow-auto rounded-md border border-gray-200">
                                                 <table className="min-w-full text-xs">
                                                     <thead className="sticky top-0 bg-gray-50">
                                                         <tr>
@@ -907,14 +907,14 @@ router.get(route('children.index'), params, { replace: true });
                                     <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() => setSelectedFile(null)}
-                                            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                                            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
                                         >
                                             Different File
                                         </button>
                                         <button
                                             onClick={handleConfirmImport}
                                             disabled={isImporting || importData.length === 0}
-                                            className="rounded-lg bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                            className="rounded-md bg-teal-500 px-4 py-2 text-sm font-medium text-white hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             {isImporting ? 'Importing...' : `Import ${importData.length} Records`}
                                         </button>

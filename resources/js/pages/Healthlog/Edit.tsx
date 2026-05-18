@@ -238,7 +238,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                         type="text"
                                         value={data.bmi}
                                         readOnly
-                                        className="mt-1 w-full cursor-not-allowed rounded-lg border bg-gray-100 font-semibold text-gray-900"
+                                        className="mt-1 w-full cursor-not-allowed rounded-md border bg-gray-100 font-semibold text-gray-900"
                                     />
                                     <p className="mt-1 text-xs text-gray-500">Calculated automatically from weight and height</p>
                                 </div>
@@ -259,7 +259,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                     type="text"
                                     value={data.nutrition_status}
                                     readOnly
-                                    className="mt-1 w-full cursor-not-allowed rounded-lg border bg-gray-100 font-semibold text-gray-900"
+                                    className="mt-1 w-full cursor-not-allowed rounded-md border bg-gray-100 font-semibold text-gray-900"
                                 />
                                 <p className="mt-1 text-xs text-gray-500">Calculated automatically after saving based on WHO growth standards</p>
                             </div>
@@ -331,7 +331,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                             {/* Checkboxes */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
                                 <div className="flex gap-6">
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
                                         <Checkbox
                                             id="vitamin_a"
                                             checked={data.vitamin_a}
@@ -341,7 +341,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                         <span className="text-sm font-medium text-gray-700">Vitamin A Supplementation</span>
                                     </label>
 
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
                                         <Checkbox
                                             id="deworming"
                                             checked={data.deworming}

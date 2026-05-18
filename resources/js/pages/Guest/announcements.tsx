@@ -116,14 +116,14 @@ export default function Announcements({ announcements, pagination, categories }:
                     animation: fadeInUp 0.6s ease-out forwards;
                 }
                 .glass-card {
-                    background: rgba(255, 255, 255, 0.7);
+                    background: color-mix(in srgb, var(--bg-light) 70%, transparent);
                     backdrop-filter: blur(12px);
                     -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
                 }
             `}</style>
 
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] dark:via-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
                 <div className="absolute top-0 left-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -135,7 +135,7 @@ export default function Announcements({ announcements, pagination, categories }:
                 </div>
 
                 <div className="container mx-auto px-6 text-center lg:px-8">
-                    <span className="mb-2 inline-block rounded-full bg-white/80 px-4 py-1 text-sm font-medium text-[var(--primary)] shadow-sm backdrop-blur-sm">
+                    <span className="mb-2 inline-block rounded-full bg-white/80 px-4 py-1 text-sm font-medium text-[var(--primary)] shadow-sm backdrop-blur-sm dark:bg-[var(--bg-light)]/80">
                         COMMUNITY UPDATES
                     </span>
                     <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
@@ -180,7 +180,7 @@ export default function Announcements({ announcements, pagination, categories }:
 
                         <div className="mt-4 flex flex-wrap items-center gap-2 md:mt-0">
                             <button
-                                className={`cursor-pointer rounded-full border ${activeFilter === null ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md' : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]'} px-4 py-2 text-sm font-medium transition-all`}
+                                className={`cursor-pointer rounded-full border ${activeFilter === null ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md' : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:bg-[var(--bg-light)]'} px-4 py-2 text-sm font-medium transition-all`}
                                 onClick={() => handleFilterClick(null)}
                             >
                                 All
@@ -195,7 +195,7 @@ export default function Announcements({ announcements, pagination, categories }:
                                         className={`cursor-pointer inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                                             isActive
                                                 ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md'
-                                                : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)]'
+                                                : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:bg-[var(--bg-light)]'
                                         }`}
                                         onClick={() => handleFilterClick(category.name)}
                                     >
@@ -221,7 +221,7 @@ export default function Announcements({ announcements, pagination, categories }:
                                 renderActions={() => (
                                     <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
                                         <Button
-                                            className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white"
+                                            className="rounded-full border border-[var(--border-muted)] bg-white px-4 py-2 text-sm font-medium text-[var(--primary)] shadow-sm transition-all hover:border-[var(--primary)] hover:bg-[var(--primary)] hover:text-white dark:bg-[var(--bg-light)]"
                                             size="sm"
                                         >
                                             Read More

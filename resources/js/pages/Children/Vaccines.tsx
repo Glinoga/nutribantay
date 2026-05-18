@@ -279,14 +279,14 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     {/* Action Buttons */}
                     <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
                         <Link href={route('children.show', { child: child.slug })}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg">
                                 <X className="h-4 w-4" />
                                 Back to Child
                             </button>
                         </Link>
 
                         <Link href={route('children.index')}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
                                 <X className="h-4 w-4" />
                                 Back to List
                             </button>
@@ -404,7 +404,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                                  <div className="flex items-center justify-center">
                                                                      <button
                                                                          onClick={() => handleDeleteDose(cv, dose)}
-                                                                         className="cursor-pointer rounded-lg p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                                         className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
                                                                      >
                                                                          <Trash2 className="h-4 w-4" />
                                                                      </button>
@@ -443,7 +443,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                         <form onSubmit={submitDose} className="space-y-4">
                             {Object.keys(errors).length > 0 && (
-                                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{Object.values(errors)[0]}</div>
+                                <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">{Object.values(errors)[0]}</div>
                             )}
 
                             {/* Dose Number - only show when creating new dose */}
@@ -463,14 +463,14 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                             {/* Info banner when editing a pending/scheduled dose */}
                             {editingDose && !editingDose.dose.date_given && (
-                                <div className="rounded-lg bg-green-50 p-3 text-sm text-green-800">
+                                <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
                                     This dose was scheduled. Set the date it was given to complete it.
                                 </div>
                             )}
 
                             {/* Yes/No radio buttons - when creating new dose OR editing pending dose */}
                             {(!editingDose || (editingDose && !editingDose.dose.date_given)) && (
-                                <div className="rounded-lg bg-blue-50 p-4">
+                                <div className="rounded-md bg-blue-50 p-4">
                                     <Label className="font-medium text-blue-900">Has this dose been given?</Label>
                                     <div className="mt-3 flex gap-4">
                                         <label className="flex cursor-pointer items-center gap-2">
@@ -545,7 +545,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                 <textarea
                                     value={doseForm.data.remarks}
                                     onChange={(e) => doseForm.setData('remarks', e.target.value)}
-                                    className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                     rows={2}
                                     placeholder="Any notes or observations..."
                                 />

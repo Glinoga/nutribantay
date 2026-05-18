@@ -84,10 +84,10 @@ export default function Contact() {
                     animation: fadeInUp 0.6s ease-out forwards;
                 }
                 .glass-card {
-                    background: rgba(255, 255, 255, 0.7);
+                    background: color-mix(in srgb, var(--bg-light) 70%, transparent);
                     backdrop-filter: blur(12px);
                     -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
                 }
             `}</style>
             {/* Hero Section */}
@@ -134,7 +134,7 @@ export default function Contact() {
 
                         {/* Contact Cards */}
                         <div className="relative">
-                            <div className="relative z-10 overflow-hidden rounded-2xl bg-white/70 p-1 shadow-xl backdrop-blur-sm">
+                            <div className="relative z-10 overflow-hidden rounded-2xl bg-white/70 p-1 shadow-xl backdrop-blur-sm dark:bg-[var(--bg)]/70">
                                 <div className="grid gap-px rounded-xl bg-[var(--border)] sm:grid-cols-2">
                                     {/* Call Us Card */}
                                     <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
@@ -340,6 +340,7 @@ export default function Contact() {
                                                 value={data.message}
                                                 onChange={(e) => setData('message', e.target.value)}
                                                 required
+                                                className="bg-transparent"
                                             />
                                         </div>
 
@@ -475,7 +476,7 @@ export default function Contact() {
                                 <details className="group">
                                     <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
                                         <span>{faq.question}</span>
-                                        <span className="ml-6 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180">
+                                        <span className="ml-6 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180 dark:from-[var(--bg)] dark:to-[var(--bg)] dark:text-[var(--primary)]">
                                             <ChevronDown className="h-5 w-5" />
                                         </span>
                                     </summary>

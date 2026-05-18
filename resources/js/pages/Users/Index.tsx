@@ -356,7 +356,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Users</p>
@@ -367,7 +367,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Roles</p>
@@ -378,7 +378,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-yellow-100/50 bg-white p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-yellow-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Pending Approvals</p>
@@ -389,7 +389,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Admin Codes</p>
@@ -829,7 +829,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 id="role"
                                 value={newUser.role}
                                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value, barangay: '' })}
-                                className="w-full rounded-lg border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
                                 required
                             >
                                 <option value="Healthworker">Healthworker</option>
@@ -854,7 +854,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         {createError && <div className="text-sm text-destructive">{createError}</div>}
 
                         {createSuccess && generatedCode && (
-                            <div className="rounded-lg bg-green-50 p-3 text-sm">
+                            <div className="rounded-md bg-green-50 p-3 text-sm">
                                 <p className="mb-2 font-medium text-green-800">User created successfully!</p>
                                 <div className="flex items-center justify-between gap-2">
                                     <div>

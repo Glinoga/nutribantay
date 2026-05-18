@@ -40,12 +40,12 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
 
     return (
         <div className="flex items-center justify-center pt-4 pb-8">
-            <div className="inline-flex items-center gap-1 rounded-xl bg-white/70 px-2 py-2 shadow-lg backdrop-blur-sm border border-white/30 sm:px-3">
+            <div className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2 py-2 shadow-lg backdrop-blur-sm border border-white/30 sm:px-3">
                 <button
                     onClick={() => onPageChange(current_page - 1)}
                     disabled={current_page === 1}
                     className={cn(
-                        'flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-2 text-sm font-medium sm:px-3',
+                        'flex cursor-pointer items-center gap-1 rounded-md border px-2 py-2 text-sm font-medium sm:px-3',
                         'border-teal-200 bg-white text-teal-700',
                         'transition-all duration-200',
                         'hover:bg-teal-50 hover:border-teal-300',
@@ -90,7 +90,7 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
                     onClick={() => onPageChange(current_page + 1)}
                     disabled={current_page === last_page}
                     className={cn(
-                        'flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-2 text-sm font-medium sm:px-3',
+                        'flex cursor-pointer items-center gap-1 rounded-md border px-2 py-2 text-sm font-medium sm:px-3',
                         'border-teal-200 bg-white text-teal-700',
                         'transition-all duration-200',
                         'hover:bg-teal-50 hover:border-teal-300',

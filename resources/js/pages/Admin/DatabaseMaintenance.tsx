@@ -213,7 +213,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Backups</p>
@@ -224,7 +224,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Size</p>
@@ -235,7 +235,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Latest Backup</p>
@@ -250,7 +250,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Storage Engine</p>
@@ -379,7 +379,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                         </AlertDialogTitle>
                         <AlertDialogDescription asChild>
                             <div className="space-y-3">
-                                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">
+                                <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
                                     <p className="mb-2 font-semibold">This action is IRREVERSIBLE and will:</p>
                                     <ul className="ml-4 list-disc space-y-1">
                                         <li>Completely replace your current database</li>

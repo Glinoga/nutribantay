@@ -220,6 +220,44 @@ class DashboardController extends Controller
 
         $totalChildren = $healthLogs->count();
 
+        // All health logs in period for trend data (count of visits over time)
+        $allLogs = HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+            ->where('created_at', '>=', $range['start'])
+            ->where('created_at', '<=', $range['end'])
+            ->get();
+
+        $trend = [];
+        if ($allLogs->isNotEmpty()) {
+            $grouped = match ($period) {
+                'daily' => $allLogs->groupBy(fn ($log) => $log->created_at->format('Y-m-d H:00')),
+                'weekly' => $allLogs->groupBy(fn ($log) => $log->created_at->format('Y-m-d')),
+                'monthly' => $allLogs->groupBy(fn ($log) => $log->created_at->format('o-W')),
+                default => $allLogs->groupBy(fn ($log) => $log->created_at->format('Y-m')),
+            };
+
+            foreach ($grouped as $key => $logs) {
+                $label = match ($period) {
+                    'daily' => Carbon::parse($key)->format('g A'),
+                    'weekly' => Carbon::parse($key)->format('D M d'),
+                    'monthly' => 'Week '.substr($key, 5),
+                    default => Carbon::parse($key.'-01')->format('M Y'),
+                };
+                $trend[] = ['label' => $label, 'count' => $logs->count()];
+            }
+        }
+
+        $trends = [
+            'trend' => $trend,
+            'status_distribution' => [
+                'normal' => $healthLogs->where('nutrition_status', 'Normal')->count(),
+                'underweight' => $healthLogs->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
+                'overweight' => $healthLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
+                'stunted' => $healthLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+            ],
+            'vitamin_a_percentage' => $totalChildren > 0 ? round(($healthLogs->where('vitamin_a', true)->count() / $totalChildren) * 100) : 0,
+            'deworming_percentage' => $totalChildren > 0 ? round(($healthLogs->where('deworming', true)->count() / $totalChildren) * 100) : 0,
+        ];
+
         return Inertia::render('DashboardPrint', [
             'period' => $period,
             'data' => [
@@ -252,6 +290,7 @@ class DashboardController extends Controller
                 ],
                 'barangay' => $barangay,
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'trends' => $trends,
             ],
         ]);
     }

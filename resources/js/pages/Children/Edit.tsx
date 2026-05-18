@@ -139,7 +139,7 @@ export default function Edit({ child }: Props) {
                                 </DialogHeader>
 
                                 {Object.keys(errors).length > 0 && (
-                                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                                    <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
                                         <div className="list-inside list-none">
                                             <OctagonAlert className="mr-2 inline-block" size={24} />
                                             {Object.entries(errors).map(([field, msg]) => (
@@ -160,7 +160,7 @@ export default function Edit({ child }: Props) {
                                                 placeholder="First name"
                                                 value={data.first_name}
                                                 onChange={(e) => setData('first_name', e.target.value)}
-                                                className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                             <Input
                                                 type="text"
@@ -168,14 +168,14 @@ export default function Edit({ child }: Props) {
                                                 maxLength={5}
                                                 value={data.middle_initial}
                                                 onChange={(e) => setData('middle_initial', e.target.value)}
-                                                className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                             <Input
                                                 type="text"
                                                 placeholder="Last name"
                                                 value={data.last_name}
                                                 onChange={(e) => setData('last_name', e.target.value)}
-                                                className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
                                     </div>
@@ -184,7 +184,7 @@ export default function Edit({ child }: Props) {
                                         <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4">
                                             <Label className="mb-2 block text-sm font-bold text-gray-800">Sex</Label>
                                             <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                                <SelectTrigger className="w-full rounded-lg border-teal-200 bg-white text-sm font-bold transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
+                                                <SelectTrigger className="w-full rounded-md border-teal-200 bg-white text-sm font-bold transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
                                                     <SelectValue placeholder="Select sex" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -204,7 +204,7 @@ export default function Edit({ child }: Props) {
                                                 type="text"
                                                 value={data.barangay}
                                                 readOnly
-                                                className="w-full cursor-not-allowed rounded-lg border-teal-200 bg-gray-100 text-sm font-bold text-gray-600"
+                                                className="w-full cursor-not-allowed rounded-md border-teal-200 bg-gray-100 text-sm font-bold text-gray-600"
                                             />
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@ export default function Edit({ child }: Props) {
                                             type="date"
                                             value={data.birthdate}
                                             onChange={(e) => setData('birthdate', e.target.value)}
-                                            className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                         />
                                     </div>
 
@@ -228,7 +228,7 @@ export default function Edit({ child }: Props) {
                                                 placeholder="Enter weight"
                                                 value={data.weight}
                                                 onChange={(e) => setData('weight', e.target.value)}
-                                                className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
 
@@ -240,7 +240,7 @@ export default function Edit({ child }: Props) {
                                                 placeholder="Enter height"
                                                 value={data.height}
                                                 onChange={(e) => setData('height', e.target.value)}
-                                                className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             />
                                         </div>
                                     </div>
@@ -252,7 +252,7 @@ export default function Edit({ child }: Props) {
                                             placeholder="e.g., 09171234567"
                                             value={data.contact_number}
                                             onChange={(e) => setData('contact_number', e.target.value)}
-                                            className="rounded-lg border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                                             maxLength={11}
                                         />
                                     </div>
@@ -261,7 +261,7 @@ export default function Edit({ child }: Props) {
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-10 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                            className="rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-10 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
                                         >
                                             {processing ? 'Saving...' : 'Save Changes'}
                                         </Button>
@@ -269,7 +269,7 @@ export default function Edit({ child }: Props) {
                                             type="button"
                                             onClick={handleClose}
                                             variant="outline"
-                                            className="rounded-lg px-10 py-5 text-lg font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
+                                            className="rounded-md px-10 py-5 text-lg font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
                                         >
                                             Cancel
                                         </Button>

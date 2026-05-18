@@ -190,7 +190,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                     </div>
 
                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Total Vaccines</p>
@@ -202,7 +202,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-blue-100/50 bg-white p-4 shadow-md">
+                        <div className="stat-card rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Children Vaccinated</p>
@@ -214,7 +214,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-purple-100/50 bg-white p-4 shadow-md">
+                        <div className="stat-card rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Most Popular</p>
@@ -227,7 +227,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white p-4 shadow-md">
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500">Recently Added</p>
@@ -242,7 +242,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
+                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
                     )}
 
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -253,7 +253,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                                 placeholder="Search vaccines by name or description..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-white dark:bg-gray-800/80 dark:text-gray-100 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                             {search && (
                                 <button
