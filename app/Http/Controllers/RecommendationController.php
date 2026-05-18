@@ -321,11 +321,15 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             }
         }
 
-        // Check for processed foods (banned)
+        // Check for processed foods (banned) — only in meal plan lines, not in restrictions/disclaimers
         $bannedFoods = ['Pancit Canton', 'De Lata', 'soft drinks', 'instant noodles'];
-        foreach ($bannedFoods as $banned) {
-            if (stripos($recommendation, $banned) !== false) {
-                return self::VALIDATION_FAILED.': Banned food found: '.$banned;
+        foreach (preg_split('/\R/', $recommendation) as $line) {
+            if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                foreach ($bannedFoods as $banned) {
+                    if (stripos($line, $banned) !== false) {
+                        return self::VALIDATION_FAILED.': Banned food found in meal: '.$banned;
+                    }
+                }
             }
         }
 
