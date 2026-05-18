@@ -34,10 +34,10 @@ class RecommendationController extends Controller
         $months = $totalMonths % 12;
         $ageFormatted = "{$years} taon, {$months} buwan";
 
-        // Step 3: Get child data
+        // Step 3: Get child data — healthlog first, fall back to child record
         $latestHealthLog = $child->healthLogs()->latest()->first();
-        $bmi = $request->bmi ?? $latestHealthLog?->bmi ?? 0;
-        $nutritionStatus = $request->nutrition_status ?? $latestHealthLog?->nutrition_status ?? 'Normal';
+        $bmi = $request->bmi ?? $latestHealthLog?->bmi ?? $child->bmi ?? 0;
+        $nutritionStatus = $request->nutrition_status ?? $latestHealthLog?->nutrition_status ?? $child->nutrition_status ?? 'Normal';
 
         // Step 4: Get Vitamin A and Deworming status from health log (latest one)
         $vitaminAStatus = $latestHealthLog?->vitamin_a ? 'Yes' : 'No';

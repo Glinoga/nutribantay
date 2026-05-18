@@ -769,15 +769,11 @@ export default function Show({ child }: { child: Child }) {
 
                             <button
                                 onClick={handleRecommendation}
-                                disabled={loading || healthlogs.length === 0}
+                                disabled={loading}
                                 className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading ? 'Analyzing...' : 'Generate Recommendation'}
                             </button>
-
-                            {healthlogs.length === 0 && (
-                                <p className="mt-2 text-sm text-gray-500">Add a health log first to generate recommendations.</p>
-                            )}
 
                             {recommendation && (
                                 <div className="mt-4 rounded-md bg-white p-4 shadow-inner">
