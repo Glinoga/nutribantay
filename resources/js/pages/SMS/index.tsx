@@ -188,7 +188,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
             <Head title="Send SMS" />
 
             <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Pill Badge */}

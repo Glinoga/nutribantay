@@ -52,7 +52,12 @@ class IprogsmsService
 
         $body = $response->json();
 
-        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+        // IPROG returns {"status": 200, "message_id": "iSms-XXX"} on success
+        // and {"status": 500, "message": "Invalid Token"} or {"status": "error"} on failure
+        $statusCode = $body['status'] ?? null;
+        $isSuccess = $response->successful()
+            && ($statusCode === 200 || $statusCode === '200')
+            && isset($body['message_id']);
 
         return [
             'success' => $isSuccess,
@@ -79,7 +84,11 @@ class IprogsmsService
 
         $body = $response->json();
 
-        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+        // IPROG returns {"status": 200, "message_ids": "..."} on bulk success
+        $statusCode = $body['status'] ?? null;
+        $isSuccess = $response->successful()
+            && ($statusCode === 200 || $statusCode === '200')
+            && isset($body['message_ids']);
 
         // If bulk fails, try individual sends with retry
         if (! $isSuccess) {
@@ -148,11 +157,12 @@ class IprogsmsService
         // IPROG returns: {"status": "success", "data": {"load_balance": 5.0}}
         $credits = $body['data']['load_balance'] ?? $body['credits'] ?? $body['balance'] ?? 0;
 
-        $isSuccess = $response->successful() && ($body['status'] ?? 'success') !== 'error';
+        // Credits endpoint uses string "success" / "error" for status (not integer)
+        $isSuccess = $response->successful() && ($body['status'] ?? '') === 'success';
 
         return [
             'success' => $isSuccess,
-            'credits' => $isSuccess ? (int) $credits : 0,
+            'credits' => $isSuccess ? (float) $credits : 0,
             'response' => $body,
         ];
     }
@@ -169,8 +179,12 @@ class IprogsmsService
 
         $body = $response->json();
 
+        $statusCode = $body['status'] ?? null;
+        $isSuccess = $response->successful()
+            && ($statusCode === 200 || $statusCode === '200' || $statusCode === 'success');
+
         return [
-            'success' => $response->successful() && ($body['status'] ?? 'success') !== 'error',
+            'success' => $isSuccess,
             'response' => $body,
         ];
     }
