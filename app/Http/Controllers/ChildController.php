@@ -9,6 +9,7 @@ use App\Models\Child;
 use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
 use App\Models\HealthLog;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -653,36 +654,46 @@ class ChildController extends Controller
                 ! empty($row['height']) && floatval($row['height']) > 0 &&
                 ! empty($row['birthdate'])
             ) {
-                $evaluation = GrowthHelper::evaluateChild(
-                    $sex,
-                    $row['birthdate'],
-                    $row['weight'],
-                    $row['height']
-                );
-
-                HealthLog::create([
-                    'child_id' => $child->id,
-                    'user_id' => $user->id,
-                    'age_in_months' => $evaluation['age_months'],
-                    'weight' => $row['weight'],
-                    'height' => $row['height'],
-                    'bmi' => $evaluation['bmi'],
-                    'status_wfa' => $evaluation['status_wfa'],
-                    'status_lfa' => $evaluation['status_lfa'],
-                    'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
-                    'nutrition_status' => $evaluation['overall'],
-                    'recommendation' => AIRecommender::getRecommendation(
-                        $evaluation['overall'],
+                try {
+                    $evaluation = GrowthHelper::evaluateChild(
                         $sex,
-                        $evaluation['age_months'],
-                        $evaluation['bmi']
-                    ),
-                ]);
+                        $row['birthdate'],
+                        $row['weight'],
+                        $row['height']
+                    );
 
-                $child->update([
-                    'nutrition_status' => $evaluation['overall'],
-                    'updated_by' => $user->id,
-                ]);
+                    $overall = $evaluation['overall'] ?? 'Normal';
+
+                    HealthLog::create([
+                        'child_id' => $child->id,
+                        'user_id' => $user->id,
+                        'age_in_months' => $evaluation['age_months'],
+                        'weight' => $row['weight'],
+                        'height' => $row['height'],
+                        'bmi' => $evaluation['bmi'],
+                        'status_wfa' => $evaluation['status_wfa'],
+                        'status_lfa' => $evaluation['status_lfa'],
+                        'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
+                        'nutrition_status' => $overall,
+                        'recommendation' => AIRecommender::getRecommendation(
+                            $overall,
+                            $sex,
+                            $evaluation['age_months'] ?? 0,
+                            $evaluation['bmi'] ?? 0
+                        ),
+                    ]);
+
+                    $child->update([
+                        'nutrition_status' => $overall,
+                        'updated_by' => $user->id,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to create healthlog for imported child', [
+                        'child_id' => $child->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
             }
 
             $created++;
