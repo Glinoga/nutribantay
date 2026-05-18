@@ -264,9 +264,10 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             }
         }
 
-        // Check for duplicate base foods in meal plan (12+ months only)
+        // Check for duplicate base foods in meal plan (12-23 months only)
         // For 6-11 months, NCS only recommends lugaw — duplicates are expected and correct
-        if ($ageInMonths >= 12) {
+        // For 24+ months, all NCS meals use kanin as base — duplicates are expected and correct
+        if ($ageInMonths >= 12 && $ageInMonths < 24) {
             $mealPlanPatterns = [
                 '/Umaga:.*?Lugaw/i',
                 '/Umaga:.*?Kanin/i',
