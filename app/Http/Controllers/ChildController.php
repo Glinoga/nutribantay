@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AIRecommender;
+use App\Helpers\GrowthHelper;
 use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
+use App\Models\HealthLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -631,7 +634,7 @@ class ChildController extends Controller
 
             $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
 
-            Child::create([
+            $child = Child::create([
                 'first_name' => $row['first_name'],
                 'middle_initial' => $row['middle_initial'] ?? null,
                 'last_name' => $row['last_name'],
@@ -644,6 +647,43 @@ class ChildController extends Controller
                 'address' => $row['address'] ?? null,
                 'contact_number' => null,
             ]);
+
+            if (
+                ! empty($row['weight']) && floatval($row['weight']) > 0 &&
+                ! empty($row['height']) && floatval($row['height']) > 0 &&
+                ! empty($row['birthdate'])
+            ) {
+                $evaluation = GrowthHelper::evaluateChild(
+                    $sex,
+                    $row['birthdate'],
+                    $row['weight'],
+                    $row['height']
+                );
+
+                HealthLog::create([
+                    'child_id' => $child->id,
+                    'user_id' => $user->id,
+                    'age_in_months' => $evaluation['age_months'],
+                    'weight' => $row['weight'],
+                    'height' => $row['height'],
+                    'bmi' => $evaluation['bmi'],
+                    'status_wfa' => $evaluation['status_wfa'],
+                    'status_lfa' => $evaluation['status_lfa'],
+                    'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
+                    'nutrition_status' => $evaluation['overall'],
+                    'recommendation' => AIRecommender::getRecommendation(
+                        $evaluation['overall'],
+                        $sex,
+                        $evaluation['age_months'],
+                        $evaluation['bmi']
+                    ),
+                ]);
+
+                $child->update([
+                    'nutrition_status' => $evaluation['overall'],
+                    'updated_by' => $user->id,
+                ]);
+            }
 
             $created++;
         }
