@@ -85,6 +85,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
     const [recordingDoseFor, setRecordingDoseFor] = useState<ChildVitamin | null>(null);
     const [editingDose, setEditingDose] = useState<{ cv: ChildVitamin; dose: Dose } | null>(null);
     const [administeredChoice, setAdministeredChoice] = useState<'yes' | 'no' | null>(null);
+    const [viewingDose, setViewingDose] = useState<{ cv: ChildVitamin; dose: Dose } | null>(null);
     const errors = usePage<{ errors: Record<string, string> }>().props.errors;
 
     const doseForm = useForm({
@@ -413,7 +414,8 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                                                     {cv.doses.map((dose, doseIdx) => (
                                                         <tr
                                                             key={dose.id}
-                                                            className={`border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${doseIdx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
+                                                            onClick={() => setViewingDose({ cv, dose })}
+                                                            className={`cursor-pointer border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${doseIdx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
                                                         >
                                                             <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
                                                                 {dose.dose_number}
@@ -434,7 +436,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                                                             <td className="px-4 py-3">
                                                                 <div className="flex items-center justify-center">
                                                                     <button
-                                                                        onClick={() => handleDeleteDose(cv, dose)}
+                                                                        onClick={(e) => { e.stopPropagation(); handleDeleteDose(cv, dose); }}
                                                                         className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
                                                                     >
                                                                         <Trash2 className="h-4 w-4" />
@@ -586,6 +588,76 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                                 </Button>
                             </div>
                         </form>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {/* Dose Detail Modal */}
+            {viewingDose && (
+                <Dialog open={true} onOpenChange={() => setViewingDose(null)}>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold text-gray-900">
+                                Dose #{viewingDose.dose.dose_number} — {viewingDose.cv.vitamin.name}
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Dose Number</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{viewingDose.dose.dose_number}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Date Given</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{viewingDose.dose.date_given ?? '-'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Next Due Date</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{viewingDose.dose.next_due_date ?? '-'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                                    <Badge className={getDoseBadgeClass(viewingDose.dose.dose_status)}>{viewingDose.dose.dose_status}</Badge>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Administered By</p>
+                                    <p className="font-medium text-gray-900 dark:text-gray-100">{viewingDose.dose.administered_by ?? '-'}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Remarks</p>
+                                <p className="mt-1 whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-sm text-gray-900 dark:bg-gray-700 dark:text-gray-100">
+                                    {viewingDose.dose.remarks || 'No remarks.'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                            <Button
+                                onClick={() => {
+                                    openEditDose(viewingDose.cv, viewingDose.dose);
+                                    setViewingDose(null);
+                                }}
+                                className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:from-teal-600 hover:to-cyan-600"
+                            >
+                                Edit
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    handleDeleteDose(viewingDose.cv, viewingDose.dose);
+                                    setViewingDose(null);
+                                }}
+                                variant="destructive"
+                                className="flex-1"
+                            >
+                                Delete
+                            </Button>
+                            <Button variant="outline" onClick={() => setViewingDose(null)} className="flex-1">
+                                Close
+                            </Button>
+                        </div>
                     </DialogContent>
                 </Dialog>
             )}
