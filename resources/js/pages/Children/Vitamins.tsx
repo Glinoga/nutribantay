@@ -110,7 +110,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
         if (pendingDose) {
             openEditDose(cv, pendingDose);
         } else {
-            const nextDose = cv.doses.length + 1;
+            const nextDose = cv.doses.length === 0 ? 1 : Math.max(...cv.doses.map((d) => d.dose_number)) + 1;
             setRecordingDoseFor(cv);
             setEditingDose(null);
             setAdministeredChoice(null);
