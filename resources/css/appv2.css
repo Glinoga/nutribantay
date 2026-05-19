@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.bunny.net/css?family=montserrat:400,500,600,700,800');
 @import 'leaflet/dist/leaflet.css';
 @plugin 'tailwindcss-animate';
 
@@ -27,7 +27,7 @@ body {
     --info: hsl(217 22% 41%);
 
     /* Fonts */
-    --font-sans: 'Montserrat', 'sans serif';
+    --font-sans: 'Montserrat', sans-serif;
 
     /* Font Sizes */
     --font-logo: 3.5rem;
