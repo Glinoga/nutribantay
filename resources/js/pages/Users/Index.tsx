@@ -448,7 +448,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         'Generate'
                                     )}
                                 </Button>
-                                <Button onClick={openCodeModal} variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700">
+                                <Button onClick={openCodeModal} variant="outline">
                                     View All Codes
                                 </Button>
                             </div>
@@ -478,7 +478,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         <Plus className="mr-2 h-4 w-4" />
                                         Create User
                                     </Button>
-                                    <Button variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700" asChild>
+                                    <Button variant="outline" asChild>
                                         <Link href={route('users.archived')}>
                                             <Archive className="mr-2 h-4 w-4" />
                                             View Archived
@@ -563,10 +563,10 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                             </Button>
                                                         </>
                                                     )}
-                                                    <Button size="sm" variant="secondary" asChild>
+                                                    <Button size="sm" variant="outline" asChild>
                                                         <Link href={route('users.show', { user: user.id })}>View</Link>
                                                     </Button>
-                                                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" asChild>
+                                                    <Button size="sm" variant="default" className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg" asChild>
                                                         <Link href={route('users.edit', { user: user.id })}>Edit</Link>
                                                     </Button>
                                                     <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>

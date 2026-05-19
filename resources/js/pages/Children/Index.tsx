@@ -23,6 +23,7 @@ import {
     Ruler,
     Scale,
     Search,
+    Sparkles,
     Trash2,
     Upload,
     User,
@@ -356,12 +357,18 @@ router.get(route('children.index'), params, { replace: true });
                 .stat-card {
                     animation: fadeInUp 0.5s ease-out forwards;
                     opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .stat-card:nth-child(1) { animation-delay: 0.1s; }
                 .stat-card:nth-child(2) { animation-delay: 0.2s; }
                 .stat-card:nth-child(3) { animation-delay: 0.3s; }
                 .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+                .stat-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+                }
 
                 .filter-pill {
                     transition: all 0.2s ease;
@@ -389,18 +396,35 @@ router.get(route('children.index'), params, { replace: true });
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <div className="mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                            <Baby className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Baby className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                             <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Health Records</span>
                         </div>
+                    </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
-                                Children Registry
-                            </span>
-                        </h1>
-                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Track and manage children&apos;s health, nutrition, and growth records</p>
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
+                                        <Baby className="h-8 w-8 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
+                                        Children Registry
+                                    </h1>
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
+                                        <Sparkles className="h-4 w-4" />
+                                        Track and manage children&apos;s health, nutrition, and growth records
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">

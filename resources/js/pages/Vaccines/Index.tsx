@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { Calendar, Clock, Edit2, Plus, Search, Shield, Syringe, Trash2, Users, X } from 'lucide-react';
+import { Calendar, Clock, Edit2, Plus, Search, Shield, Sparkles, Syringe, Trash2, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
@@ -158,36 +158,57 @@ export default function Index({ vaccines, stats }: IndexProps) {
                 .stat-card {
                     animation: fadeInUp 0.5s ease-out forwards;
                     opacity: 0;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .stat-card:nth-child(1) { animation-delay: 0.1s; }
                 .stat-card:nth-child(2) { animation-delay: 0.2s; }
                 .stat-card:nth-child(3) { animation-delay: 0.3s; }
                 .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+                .stat-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+                }
             `}</style>
 
             <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <div className="fade-in-up mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                            <Shield className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Shield className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                             <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Vaccine Catalog</span>
                         </div>
+                    </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
-                                Manage Vaccines
-                            </span>
-                        </h1>
-                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">
-                            Manage available vaccines for child vaccination tracking and immunization records
-                        </p>
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
+                                        <Shield className="h-8 w-8 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
+                                        Manage Vaccines
+                                    </h1>
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
+                                        <Sparkles className="h-4 w-4" />
+                                        Manage available vaccines for child vaccination tracking and immunization records
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md dark:border-teal-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Vaccines</p>
@@ -199,7 +220,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md dark:border-blue-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg dark:border-blue-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Children Vaccinated</p>
@@ -211,7 +232,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md dark:border-purple-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg dark:border-purple-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Most Popular</p>
@@ -224,7 +245,7 @@ export default function Index({ vaccines, stats }: IndexProps) {
                             </div>
                         </div>
 
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md dark:border-green-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Recently Added</p>

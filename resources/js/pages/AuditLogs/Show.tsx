@@ -84,7 +84,7 @@ export default function Show({ log }: Props) {
                         </div>
                         <Link
                             href={route('audit-logs.index')}
-                            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                            className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
                         >
                             <ArrowLeft className="h-4 w-4" />
                             Back to List

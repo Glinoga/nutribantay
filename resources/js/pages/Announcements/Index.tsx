@@ -268,18 +268,35 @@ export default function Index(props: IndexProps) {
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="mb-8 text-center">
-                            <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 dark:border-teal-800/50 bg-white/90 dark:bg-gray-800/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                                <Megaphone className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Announcement Management</span>
+                    {/* Pill Badge */}
+                    <div className="mb-6 pt-8 text-center">
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 dark:border-teal-800/50 bg-white/90 dark:bg-gray-800/90 px-6 py-3 shadow-lg backdrop-blur-sm">
+                            <Megaphone className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Announcement Management</span>
                         </div>
+                    </div>
 
-                            <h1 className="mb-3 bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
-                            Manage Announcements
-                        </h1>
-                            <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
-                            Create, edit, and manage announcements to keep your community informed
-                        </p>
+                    {/* Glassmorphic Header Card */}
+                    <div className="relative mb-8 text-center">
+                        <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <div className="flex items-center justify-center gap-4">
+                                <div className="relative">
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
+                                    <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
+                                        <Megaphone className="h-8 w-8 text-white" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
+                                        Manage Announcements
+                                    </h1>
+                                    <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
+                                        <Sparkles className="h-4 w-4" />
+                                        Create, edit, and manage announcements to keep your community informed
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
