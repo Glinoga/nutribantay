@@ -13,6 +13,15 @@ type HealthLog = {
     height: number | null;
     bmi: number | null;
     nutrition_status: string | null;
+    vitamin_a: boolean | null;
+    deworming: boolean | null;
+    micronutrient_powder: string | null;
+    rutf: string | null;
+    rusf: string | null;
+    complementary_food: string | null;
+    status_wfa: string | null;
+    status_lfa: string | null;
+    status_wfl_wfh: string | null;
     vaccine_name: string | null;
     dose_number: number | null;
     date_given: string | null;
@@ -272,6 +281,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Height (cm)</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">BMI</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Nutr. Status</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Vit A</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Deworm</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">MNP</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Vaccine</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Dose</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Date Given</TableHead>
@@ -291,6 +303,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                                 {log.nutrition_status ?? '-'}
                                             </span>
                                         </TableCell>
+                                        <TableCell className="px-4 py-2">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell className="px-4 py-2">{log.deworming ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell className="px-4 py-2">{log.micronutrient_powder ?? '-'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.vaccine_name ?? '-'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.dose_number ?? '-'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.date_given ?? '-'}</TableCell>

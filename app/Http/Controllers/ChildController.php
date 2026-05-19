@@ -623,6 +623,9 @@ class ChildController extends Controller
 
         $child->restore();
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return redirect()->route('children.index')->with('success', 'Child restored successfully!');
     }
 
@@ -635,6 +638,9 @@ class ChildController extends Controller
         $child = Child::onlyTrashed()->where('barangay', $user->barangay)->findOrFail($id);
 
         $child->forceDelete();
+
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
 
         return redirect()->route('children.archived')->with('success', 'Child permanently deleted!');
     }
@@ -884,6 +890,15 @@ class ChildController extends Controller
                     'height' => $log->height,
                     'bmi' => $log->bmi,
                     'nutrition_status' => $log->nutrition_status,
+                    'vitamin_a' => $log->vitamin_a,
+                    'deworming' => $log->deworming,
+                    'micronutrient_powder' => $log->micronutrient_powder,
+                    'rutf' => $log->rutf,
+                    'rusf' => $log->rusf,
+                    'complementary_food' => $log->complementary_food,
+                    'status_wfa' => $log->status_wfa,
+                    'status_lfa' => $log->status_lfa,
+                    'status_wfl_wfh' => $log->status_wfl_wfh,
                     'vaccine_name' => $log->vaccine_name,
                     'dose_number' => $log->dose_number,
                     'date_given' => $log->date_given?->format('Y-m-d'),

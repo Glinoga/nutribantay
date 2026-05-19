@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\ChildVitamin;
 use App\Models\ChildVitaminDose;
@@ -82,6 +83,9 @@ class ChildVitaminController extends Controller
             'vitamin_id' => $request->vitamin_id,
         ]);
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return back()->with('success', 'Vitamin added to child.');
     }
 
@@ -98,6 +102,9 @@ class ChildVitaminController extends Controller
         }
 
         $childVitamin->delete();
+
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
 
         return back()->with('success', 'Vitamin removed from child.');
     }
@@ -140,6 +147,9 @@ class ChildVitaminController extends Controller
             'administered_by' => $user->id,
         ]);
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return back()->with('success', 'Dose recorded successfully.');
     }
 
@@ -171,6 +181,9 @@ class ChildVitaminController extends Controller
             'remarks' => $request->remarks,
         ]);
 
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
+
         return back()->with('success', 'Dose updated successfully.');
     }
 
@@ -191,6 +204,9 @@ class ChildVitaminController extends Controller
         }
 
         $dose->delete();
+
+        RefreshDashboardForBarangay::dispatch($child->barangay)
+            ->delay(now()->addSeconds(10));
 
         return back()->with('success', 'Dose deleted.');
     }

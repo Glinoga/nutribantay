@@ -396,6 +396,9 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
                                                             Administered By
                                                         </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                            Remarks
+                                                        </th>
                                                         <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
                                                             Actions
                                                         </th>
@@ -419,6 +422,9 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                             </td>
                                                             <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
                                                                 {dose.administered_by ?? '-'}
+                                                            </td>
+                                                            <td className="max-w-[200px] truncate px-4 py-3 text-gray-900 dark:text-gray-200" title={dose.remarks ?? ''}>
+                                                                {dose.remarks ?? '-'}
                                                             </td>
                                                             <td className="px-4 py-3">
                                                                 <div className="flex items-center justify-center">
