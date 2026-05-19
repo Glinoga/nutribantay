@@ -47,10 +47,10 @@ type ShowPrintProps = {
 };
 
 const getStatusColor = (status: string | null) => {
-    if (status === 'Normal') return 'bg-green-100 text-green-800';
-    if (status === 'Underweight') return 'bg-yellow-100 text-yellow-800';
-    if (status === 'Overweight') return 'bg-red-100 text-red-800';
-    return 'bg-orange-100 text-orange-800';
+    if (status === 'Normal') return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+    if (status === 'Underweight') return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+    if (status === 'Overweight') return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+    return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
 };
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
@@ -109,7 +109,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
     };
 
     return (
-        <div className="min-h-screen bg-cyan-50 p-8 font-sans print:bg-white">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans print:bg-white print:text-black dark:bg-gray-900 sm:p-6 lg:p-8">
             <Head title={`${child.fullname} - Print`} />
 
             <style>{`
@@ -122,13 +122,13 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 }
             `}</style>
 
-            <div className="no-print mb-8 flex items-center justify-between">
-                <Button onClick={() => window.print()} className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md">
+            <div className="no-print mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Button onClick={() => window.print()} className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md dark:from-cyan-500 dark:to-cyan-300 dark:text-gray-900">
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
                 <Link href={route('children.show', { child: child.slug })}>
-                    <Button variant="outline" className="cursor-pointer border-cyan-300">
+                    <Button variant="outline" className="cursor-pointer border-cyan-300 dark:border-cyan-700">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Profile
                     </Button>
@@ -136,63 +136,63 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
             </div>
 
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-3xl font-bold text-cyan-900">Nutribantay</h1>
-                <h2 className="text-2xl font-bold text-cyan-900">Child Profile</h2>
-                <p className="mt-2 text-lg text-cyan-700">{child.fullname}</p>
-                <p className="mt-1 text-sm text-cyan-700">Generated on {generated_at}</p>
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-3xl">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-2xl">Child Profile</h2>
+                <p className="mt-2 text-base text-cyan-700 dark:text-cyan-300 sm:text-lg">{child.fullname}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
             </div>
 
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-md border border-cyan-200 bg-white p-6 print:bg-white">
-                    <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900">
-                        <Baby className="h-5 w-5 text-cyan-600" />
+                <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                    <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-cyan-900 dark:text-cyan-100 sm:text-lg">
+                        <Baby className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0" />
                         Personal Information
                     </h3>
                     <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Full Name:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Full Name:</span>
                             <span className="font-medium">{child.fullname}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Age:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Age:</span>
                             <span className="font-medium">{child.age ?? '-'} months</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Sex:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Sex:</span>
                             <span className="font-medium">{child.sex}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Birthdate:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Birthdate:</span>
                             <span className="font-medium">{child.birthdate ?? '-'}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Address:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Address:</span>
                             <span className="font-medium">{child.address ?? '-'}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Contact:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Contact:</span>
                             <span className="font-medium">{child.contact_number ?? '-'}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Registered:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Registered:</span>
                             <span className="font-medium">{child.created_at ?? '-'}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="rounded-md border border-cyan-200 bg-white p-6 print:bg-white">
-                    <h3 className="mb-4 text-lg font-bold text-cyan-900">Current Measurements</h3>
+                <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+                    <h3 className="mb-4 text-base font-bold text-cyan-900 dark:text-cyan-100 sm:text-lg">Current Measurements</h3>
                     <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Weight:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Weight:</span>
                             <span className="font-medium">{child.weight ?? '-'} kg</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">Height:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Height:</span>
                             <span className="font-medium">{child.height ?? '-'} cm</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-cyan-700">BMI:</span>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">BMI:</span>
                             <span className="font-medium">{child.bmi ?? '-'}</span>
                         </div>
                     </div>
@@ -203,13 +203,13 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
             {healthlogs.length > 0 && (
                 <div className="chart-container mb-8">
                     <div className="mb-4 flex items-center gap-2">
-                        <TrendingUp className="h-6 w-6 text-cyan-900" />
-                        <h3 className="text-xl font-bold text-cyan-900">Growth Charts</h3>
+                    <TrendingUp className="h-6 w-6 text-cyan-900 dark:text-cyan-100 shrink-0" />
+                    <h3 className="text-lg font-bold text-cyan-900 dark:text-cyan-100 sm:text-xl">Growth Charts</h3>
                     </div>
-
+ 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white">
-                            <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Weight, Height & BMI Over Time</h4>
+                        <div className="rounded-md border border-cyan-200 bg-white p-3 print:bg-white dark:border-gray-700 dark:bg-gray-800 sm:p-4">
+                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 dark:text-cyan-100 sm:text-sm">Weight, Height & BMI Over Time</h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 <Line
                                     data={lineChartData}
@@ -235,9 +235,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                 />
                             </div>
                         </div>
-
-                        <div className="rounded-md border border-cyan-200 bg-white p-4 print:bg-white">
-                            <h4 className="mb-4 text-center text-sm font-semibold text-cyan-900">Nutrition Status Distribution</h4>
+ 
+                        <div className="rounded-md border border-cyan-200 bg-white p-3 print:bg-white dark:border-gray-700 dark:bg-gray-800 sm:p-4">
+                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 dark:text-cyan-100 sm:text-sm">Nutrition Status Distribution</h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 {hasNutritionData ? (
                                     <Doughnut
@@ -254,7 +254,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                         }}
                                     />
                                 ) : (
-                                    <div className="flex h-full items-center justify-center text-sm text-gray-500">
+                                    <div className="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                                         No nutrition status data available.
                                     </div>
                                 )}
@@ -266,38 +266,45 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
 
             {healthlogs.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="mb-4 text-xl font-bold text-cyan-900">Health Logs</h3>
+                    <h3 className="mb-4 text-lg font-bold text-cyan-900 dark:text-cyan-100 sm:text-xl">Health Logs</h3>
                     <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-cyan-50">
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Date</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Weight (kg)</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Height (cm)</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">BMI</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Nutr. Status</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Vit A</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Deworm</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">MNP</TableHead>
+                                <TableRow className="bg-cyan-50 dark:bg-gray-800">
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Date</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Height</TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">BMI</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Vit A</TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Deworm</TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">MNP</TableHead>
 
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {healthlogs.map((log, index) => (
-                                    <TableRow key={index} className="hover:bg-cyan-50/50 print:text-xs">
-                                        <TableCell className="px-4 py-2">{log.created_at ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.weight ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.height ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.bmi ?? '-'}</TableCell>
+                                    <TableRow key={index} className="hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs">
                                         <TableCell className="px-4 py-2">
-                                            <span className={`rounded px-2 py-1 text-xs font-medium ${getStatusColor(log.nutrition_status)}`}>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span>{log.created_at ?? '-'}</span>
+                                                <span className="text-xs text-cyan-700 dark:text-cyan-300 sm:hidden">
+                                                    {log.weight ?? '-'}kg · {log.bmi ?? '-'} · {log.nutrition_status ?? '-'}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-4 py-2">{log.weight ?? '-'}</TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.height ?? '-'}</TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.bmi ?? '-'}</TableCell>
+                                        <TableCell className="px-4 py-2">
+                                            <span className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap ${getStatusColor(log.nutrition_status)}`}>
                                                 {log.nutrition_status ?? '-'}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="px-4 py-2">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.deworming ? 'Yes' : 'No'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.micronutrient_powder ?? '-'}</TableCell>
-
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.deworming ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder ?? '-'}</TableCell>
+ 
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -306,10 +313,10 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 </div>
             )}
 
-            <div className="mt-8 border-t border-cyan-200 pt-4 text-center text-sm text-cyan-700">
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 dark:border-gray-700 dark:text-cyan-300 sm:mt-8 sm:pt-4">
                 <p>Generated on {generated_at}</p>
                 <p className="mt-1 flex items-center justify-center gap-2">
-                    <Baby className="h-4 w-4 text-cyan-600" />
+                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
                     Nutribantay - Nutrition Monitoring System
                 </p>
             </div>

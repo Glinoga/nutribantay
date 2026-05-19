@@ -40,7 +40,7 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
 
     return (
         <div className="flex items-center justify-center pt-4 pb-8">
-            <div className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2 py-2 shadow-lg backdrop-blur-sm border border-white/30 sm:px-3">
+            <div className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2 py-2 shadow-lg backdrop-blur-sm border border-white/30 sm:px-3 dark:bg-gray-800/70 dark:border-gray-700/50">
                 <button
                     onClick={() => onPageChange(current_page - 1)}
                     disabled={current_page === 1}
@@ -50,6 +50,8 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
                         'transition-all duration-200',
                         'hover:bg-teal-50 hover:border-teal-300',
                         'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'dark:border-teal-800 dark:bg-gray-800 dark:text-teal-300',
+                        'dark:hover:bg-teal-900/30 dark:hover:border-teal-700',
                     )}
                     aria-label="Previous page"
                 >
@@ -67,7 +69,7 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
                                     'cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200',
                                     page === current_page
                                         ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
-                                        : 'border border-teal-200 bg-white text-teal-700 hover:bg-teal-50 hover:border-teal-300',
+                                        : 'border border-teal-200 bg-white text-teal-700 hover:bg-teal-50 hover:border-teal-300 dark:border-teal-800 dark:bg-gray-800 dark:text-teal-300 dark:hover:bg-teal-900/30 dark:hover:border-teal-700',
                                 )}
                                 aria-label={`Go to page ${page}`}
                                 aria-current={page === current_page ? 'page' : undefined}
@@ -75,14 +77,14 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
                                 {page}
                             </button>
                         ) : (
-                            <span key={idx} className="cursor-default px-2 py-1.5 text-sm text-teal-400 select-none">
+                            <span key={idx} className="cursor-default px-2 py-1.5 text-sm text-teal-400 select-none dark:text-teal-500">
                                 ...
                             </span>
                         ),
                     )}
                 </div>
 
-                <span className="sm:hidden text-sm text-teal-600 font-medium px-2">
+                <span className="sm:hidden text-sm text-teal-600 font-medium px-2 dark:text-teal-400">
                     Page {current_page} of {last_page}
                 </span>
 
@@ -95,6 +97,8 @@ function Pagination({ pagination, onPageChange }: PaginationProps) {
                         'transition-all duration-200',
                         'hover:bg-teal-50 hover:border-teal-300',
                         'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'dark:border-teal-800 dark:bg-gray-800 dark:text-teal-300',
+                        'dark:hover:bg-teal-900/30 dark:hover:border-teal-700',
                     )}
                     aria-label="Next page"
                 >

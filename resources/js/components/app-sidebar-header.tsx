@@ -6,7 +6,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/50 px-6 transition-all duration-200 ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
             <div className="flex items-center gap-2">
-                <SidebarTrigger className="-ml-1 cursor-pointer transition-transform duration-200 hover:scale-105" />
+                <SidebarTrigger className="-ml-1 min-h-11 min-w-11 cursor-pointer transition-transform duration-200 hover:scale-105 md:min-h-0 md:min-w-0" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
         </header>

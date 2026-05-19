@@ -105,7 +105,7 @@ export default function Show({ user }: UserShowProps) {
                                 <CardDescription>User account details</CardDescription>
                             </CardHeader>
                             <CardContent className="p-6">
-                                <dl className="grid grid-cols-2 gap-4">
+                                <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div>
                                         <Label className="text-muted-foreground">Name</Label>
                                         <dd className="mt-1 flex items-center gap-2 font-medium">
@@ -145,7 +145,7 @@ export default function Show({ user }: UserShowProps) {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <dl className="grid grid-cols-2 gap-4">
+                                    <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         {user.roles && (
                                             <div>
                                                 <Label className="text-muted-foreground">Role</Label>
@@ -176,7 +176,7 @@ export default function Show({ user }: UserShowProps) {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <dl className="grid grid-cols-2 gap-4">
+                                    <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         {user.registration_code && (
                                             <div>
                                                 <Label className="text-muted-foreground">Registration Code</Label>

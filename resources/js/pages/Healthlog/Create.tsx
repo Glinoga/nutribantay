@@ -594,7 +594,7 @@ export default function Create({
 
                             {/* Checkboxes */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
-                                <div className="flex gap-6">
+                                <div className="flex flex-wrap gap-6">
                                     <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
                                         <Checkbox
                                             id="vitamin_a"
@@ -619,21 +619,21 @@ export default function Create({
                         </div>
 
                         {/* Buttons */}
-                        <div className="fade-in-up flex gap-3" style={{ animationDelay: '0.3s' }}>
+                        <div className="fade-in-up flex flex-col gap-3 sm:flex-row sm:flex-wrap" style={{ animationDelay: '0.3s' }}>
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:px-8 sm:py-5 sm:text-lg"
                             >
                                 {processing ? 'Saving...' : 'Save Health Log'}
                             </Button>
 
-                            <Button type="button" variant="outline" onClick={() => window.history.back()} className="px-8 py-5 text-lg font-bold">
+                            <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto px-6 py-3 text-base font-bold sm:px-8 sm:py-5 sm:text-lg">
                                 Cancel & Go Back
                             </Button>
 
-                            <Link href={route('children.show', { child: child.slug })}>
-                                <Button type="button" variant="outline" className="px-8 py-5 text-lg font-bold">
+                            <Link href={route('children.show', { child: child.slug })} className="w-full sm:w-auto">
+                                <Button type="button" variant="outline" className="w-full px-6 py-3 text-base font-bold sm:px-8 sm:py-5 sm:text-lg">
                                     Cancel & Go to Profile
                                 </Button>
                             </Link>

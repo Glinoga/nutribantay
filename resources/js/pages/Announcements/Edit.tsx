@@ -348,11 +348,11 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                         )}
                                     </div>
 
-                                    <div className="flex justify-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-700">
+                                    <div className="flex flex-wrap justify-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-700">
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-10 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                            className="w-full sm:w-auto rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:px-10 sm:py-5 sm:text-lg"
                                         >
                                             {processing ? (
                                                 <>
@@ -368,7 +368,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                             onClick={handleClose}
                                             disabled={processing}
                                             variant="outline"
-                                            className="rounded-md px-10 py-5 text-lg font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg dark:text-gray-100 dark:hover:bg-gray-700"
+                                            className="w-full sm:w-auto rounded-md px-6 py-3 text-base font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg dark:text-gray-100 dark:hover:bg-gray-700 sm:px-10 sm:py-5 sm:text-lg"
                                         >
                                             Cancel
                                         </Button>

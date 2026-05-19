@@ -880,7 +880,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Floating Notes Button */}
                     <button
-                        className="fixed top-36 right-4 z-50 cursor-pointer rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-xl"
+                        className="fixed top-24 right-4 z-50 cursor-pointer rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-xl sm:top-36"
                         onClick={() => setNotesOpen(!notesOpen)}
                     >
                         Notes ({child.notes?.length || 0})
@@ -888,7 +888,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 h-full w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
+                        className={`fixed top-0 right-0 z-40 h-full max-w-[calc(100vw-2rem)] w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >

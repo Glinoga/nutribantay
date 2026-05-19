@@ -335,7 +335,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
 
                             {/* Checkboxes */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
-                                <div className="flex gap-6">
+                                <div className="flex flex-wrap gap-6">
                                     <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
                                         <Checkbox
                                             id="vitamin_a"

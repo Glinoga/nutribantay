@@ -317,7 +317,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -332,7 +332,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     {/* Glassmorphic Header Card */}
                     <div className="relative mb-8 text-center">
                         <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <div className="relative">
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg" />
                                     <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
@@ -414,7 +414,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
                     {/* Admin Codes Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
                             <CardTitle className="flex items-center gap-2">
                                 <Key className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                 Admin Codes
@@ -457,13 +457,14 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
                     {/* User List Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
-                            <div className="flex items-center justify-between">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
+                            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <CardTitle className="flex items-center gap-2">
                                     <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                     User List
                                 </CardTitle>
-                                <div className="flex gap-2">
+                                <CardDescription>Manage all registered users in the system</CardDescription>
+                                <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                                     <Button
                                         onClick={() => {
                                             setCreateSuccess('');
@@ -473,12 +474,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
                                             setShowCreateModal(true);
                                         }}
-                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                        className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
                                     >
                                         <Plus className="mr-2 h-4 w-4" />
                                         Create User
                                     </Button>
-                                    <Button variant="outline" asChild>
+                                    <Button variant="outline" asChild className="w-full sm:w-auto">
                                         <Link href={route('users.archived')}>
                                             <Archive className="mr-2 h-4 w-4" />
                                             View Archived
@@ -486,13 +487,13 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     </Button>
                                 </div>
                             </div>
-                            <CardDescription>Manage all registered users in the system</CardDescription>
+                            
                         </CardHeader>
                         <CardContent className="p-0">
                             {/* Search Bar */}
                             <div className="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
-                                <form onSubmit={handleSearch} className="flex items-center gap-2">
-                                    <div className="relative flex-1">
+                                <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                    <div className="relative min-w-0 flex-1">
                                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                         <Input
                                             type="text"
@@ -504,7 +505,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                        className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
                                     >
                                         <Search className="mr-2 h-4 w-4" />
                                         Search
@@ -512,83 +513,85 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </form>
                             </div>
 
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>ID</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Code</TableHead>
-                                        <TableHead>Email</TableHead>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {users.map((user) => (
-                                        <TableRow key={user.id} className="hover:bg-muted/50">
-                                            <TableCell>{user.id}</TableCell>
-                                            <TableCell className="font-medium">{user.name}</TableCell>
-                                            <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
-                                            <TableCell>{user.email || '-'}</TableCell>
-                                            <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
-                                            <TableCell>
-                                                {user.status === 'pending' && (
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="border-yellow-300 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                                    >
-                                                        Pending
-                                                    </Badge>
-                                                )}
-                                                {user.status === 'approved' && (
-                                                    <Badge
-                                                        variant="default"
-                                                        className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
-                                                    >
-                                                        Approved
-                                                    </Badge>
-                                                )}
-                                                {user.status === 'rejected' && <Badge variant="destructive">Rejected</Badge>}
-                                                {!user.status && <span className="text-muted-foreground">-</span>}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-1">
-                                                    {user.status === 'pending' && (
-                                                        <>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="default"
-                                                                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-                                                                onClick={() => setApproveUserId(user.id)}
-                                                            >
-                                                                Approve
-                                                            </Button>
-                                                            <Button size="sm" variant="destructive" onClick={() => setRejectUserId(user.id)}>
-                                                                Reject
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                    <Button size="sm" variant="outline" asChild>
-                                                        <Link href={route('users.show', { user: user.id })}>View</Link>
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="default"
-                                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
-                                                        asChild
-                                                    >
-                                                        <Link href={route('users.edit', { user: user.id })}>Edit</Link>
-                                                    </Button>
-                                                    <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
-                                                        Archive
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>ID</TableHead>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Code</TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead>Role</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {users.map((user) => (
+                                            <TableRow key={user.id} className="hover:bg-muted/50">
+                                                <TableCell>{user.id}</TableCell>
+                                                <TableCell className="font-medium">{user.name}</TableCell>
+                                                <TableCell className="font-mono">{user.registration_code || '-'}</TableCell>
+                                                <TableCell>{user.email || '-'}</TableCell>
+                                                <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
+                                                <TableCell>
+                                                    {user.status === 'pending' && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="border-yellow-300 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                                        >
+                                                            Pending
+                                                        </Badge>
+                                                    )}
+                                                    {user.status === 'approved' && (
+                                                        <Badge
+                                                            variant="default"
+                                                            className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
+                                                        >
+                                                            Approved
+                                                        </Badge>
+                                                    )}
+                                                    {user.status === 'rejected' && <Badge variant="destructive">Rejected</Badge>}
+                                                    {!user.status && <span className="text-muted-foreground">-</span>}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex flex-wrap justify-end gap-1">
+                                                        {user.status === 'pending' && (
+                                                            <>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="default"
+                                                                    className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                                                                    onClick={() => setApproveUserId(user.id)}
+                                                                >
+                                                                    Approve
+                                                                </Button>
+                                                                <Button size="sm" variant="destructive" onClick={() => setRejectUserId(user.id)}>
+                                                                    Reject
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                        <Button size="sm" variant="outline" asChild>
+                                                            <Link href={route('users.show', { user: user.id })}>View</Link>
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="default"
+                                                            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                                            asChild
+                                                        >
+                                                            <Link href={route('users.edit', { user: user.id })}>Edit</Link>
+                                                        </Button>
+                                                        <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
+                                                            Archive
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -682,7 +685,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
             {/* Codes Modal */}
             <Dialog open={showCodeModal} onOpenChange={setShowCodeModal}>
-                <DialogContent className="max-h-[80vh] max-w-4xl overflow-y-auto">
+                <DialogContent className="max-h-[80vh] sm:max-w-4xl overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Registration Codes</DialogTitle>
                         <DialogDescription>View and manage registration codes for admin users.</DialogDescription>
@@ -827,7 +830,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                     required
                                 />
-                                <Button type="button" variant="secondary" onClick={generatePassword}>
+                                <Button type="button" className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600" onClick={generatePassword}>
                                     Generate
                                 </Button>
                             </div>
@@ -887,7 +890,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         >
                             Cancel
                         </Button>
-                        <Button variant="secondary" onClick={() => handleCreateUser(false)} disabled={createLoading}>
+                        <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600" onClick={() => handleCreateUser(false)} disabled={createLoading}>
                             {createLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

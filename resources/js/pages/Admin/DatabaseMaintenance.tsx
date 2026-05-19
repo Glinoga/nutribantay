@@ -176,7 +176,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Database Maintenance" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -191,7 +191,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                     {/* Glassmorphic Header Card */}
                     <div className="relative mb-8 text-center">
                         <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <div className="relative">
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg" />
                                     <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
@@ -263,7 +263,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Create Backup Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:from-teal-900/20 dark:to-cyan-900/20">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                             <CardTitle className="flex items-center gap-2">
                                 <UploadCloud className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                 Create Database Backup
@@ -295,7 +295,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Backup List Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:from-teal-900/20 dark:to-cyan-900/20">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="flex items-center gap-2">
                                     <HardDrive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
@@ -320,15 +320,16 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                     </p>
                                 </div>
                             ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[40%]">Filename</TableHead>
-                                            <TableHead>Size</TableHead>
-                                            <TableHead>Created</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-[40%]">Filename</TableHead>
+                                                <TableHead>Size</TableHead>
+                                                <TableHead>Created</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
                                     <TableBody>
                                         {backups.map((backup) => (
                                             <TableRow key={backup.filename}>
@@ -361,6 +362,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                         ))}
                                     </TableBody>
                                 </Table>
+                            </div>
                             )}
                         </CardContent>
                     </Card>

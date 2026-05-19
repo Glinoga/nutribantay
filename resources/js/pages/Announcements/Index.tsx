@@ -280,7 +280,7 @@ export default function Index(props: IndexProps) {
 
             `}</style>
 
-            <div className="relative overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 pt-8 pb-16 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative bg-gradient-to-br from-teal-50 via-white to-cyan-50 pt-8 pb-16 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -295,7 +295,7 @@ export default function Index(props: IndexProps) {
                     {/* Glassmorphic Header Card */}
                     <div className="relative mb-8 text-center">
                         <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <div className="relative">
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
                                     <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
@@ -395,7 +395,7 @@ export default function Index(props: IndexProps) {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             <div className="flex overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700">
                                 <button
                                     onClick={() => handleViewChange('card')}
@@ -547,7 +547,7 @@ export default function Index(props: IndexProps) {
                         </div>
                     ) : (
                         <div key="list" className="animate-fadeIn">
-                            <div className="overflow-hidden rounded-xl bg-white shadow-md dark:bg-gray-800">
+                            <div className="overflow-x-auto rounded-xl bg-white shadow-md dark:bg-gray-800">
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">

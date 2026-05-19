@@ -411,7 +411,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -426,7 +426,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                     {/* Glassmorphic Header Card */}
                     <div className="relative mb-8 text-center">
                         <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <div className="relative">
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg"></div>
                                     <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
@@ -520,7 +520,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                             )}
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {canExportChildren && (
                                 <button
                                     onClick={() => setShowExportDialog(true)}
@@ -543,7 +543,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                             {canManageChildren && (
                                 <Link href={route('children.archived')}>
-                                    <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
+                                    <Button className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
                                         <Trash2 className="mr-1.5 h-4 w-4" />
                                         View Archived
                                     </Button>
@@ -552,7 +552,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                             {canManageChildren && (
                                 <Link href={route('children.create')}>
-                                    <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
+                                    <Button className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
                                         <Plus className="mr-1.5 h-4 w-4" />
                                         Add Child
                                     </Button>
@@ -831,10 +831,10 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        Prev
+                        <span className="hidden sm:inline">Prev</span>
                     </button>
 
-                    <div className="flex items-center gap-1">
+                    <div className="hidden sm:flex items-center gap-1">
                         {getPageNumbers().map((page, idx) =>
                             typeof page === 'number' ? (
                                 <button
@@ -856,12 +856,16 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         )}
                     </div>
 
+                    <span className="sm:hidden text-sm text-gray-600 font-medium dark:text-gray-400">
+                        Page {pagination.current_page} of {pagination.last_page}
+                    </span>
+
                     <button
                         onClick={() => handlePageClick(pagination.current_page + 1)}
                         disabled={pagination.current_page === pagination.last_page}
                         className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
-                        Next
+                        <span className="hidden sm:inline">Next</span>
                         <ChevronRight className="h-4 w-4" />
                     </button>
                 </div>
@@ -885,7 +889,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         </div>
                         <div className="p-4">
                             <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">Choose an option:</p>
-                            <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                                 <Button
                                     onClick={() => {
                                         setShowExportDialog(false);

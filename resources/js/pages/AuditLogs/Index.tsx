@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -154,7 +154,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Audit Logs" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -169,7 +169,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                     {/* Glassmorphic Header Card */}
                     <div className="relative mb-8 text-center">
                         <div className="relative mx-auto max-w-2xl rounded-3xl border border-white/20 bg-white/80 p-6 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                            <div className="flex items-center justify-center gap-4">
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <div className="relative">
                                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 opacity-50 blur-lg" />
                                     <div className="relative rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-500 p-4 shadow-lg">
@@ -239,7 +239,14 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
 
                     {/* Filters */}
                     <Card className="mb-6 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardContent className="p-4">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
+                            <CardTitle className="flex items-center gap-2">
+                                <Search className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                                Filters
+                            </CardTitle>
+                            <CardDescription>Filter audit logs by date, action, and type</CardDescription>
+                        </CardHeader>
+                        <CardContent className="px-4 py-0 sm:px-6 sm:pb-4">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
                                 <div>
                                     <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
@@ -303,7 +310,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                     />
                                 </div>
                             </div>
-                            <div className="mt-4 flex items-center justify-between">
+                            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                                 <div className="flex gap-2">
                                     <Button
                                         onClick={handleFilter}
@@ -334,48 +341,57 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
 
                     {/* Logs Table */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
+                            <CardTitle className="flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                                Audit Logs
+                            </CardTitle>
+                            <CardDescription>System activity and change history</CardDescription>
+                        </CardHeader>
                         <CardContent className="p-0">
                             {logs.data.length > 0 ? (
                                 <>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Timestamp</TableHead>
-                                                <TableHead>User</TableHead>
-                                                <TableHead>Action</TableHead>
-                                                <TableHead>Type</TableHead>
-                                                <TableHead>Description</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {logs.data.map((log) => (
-                                                <TableRow key={log.id}>
-                                                    <TableCell className="font-medium">{new Date(log.created_at).toLocaleString()}</TableCell>
-                                                    <TableCell>{log.user?.name || log.user_name || 'System'}</TableCell>
-                                                    <TableCell>
-                                                        <span
-                                                            className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
-                                                                log.action,
-                                                            )}`}
-                                                        >
-                                                            {log.action.replace(/_/g, ' ')}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell>{log.model_type || '-'}</TableCell>
-                                                    <TableCell className="max-w-xs truncate">{log.description || '-'}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        <Link
-                                                            href={route('audit-logs.show', { auditLog: log.id })}
-                                                            className="text-sm font-medium text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300"
-                                                        >
-                                                            View Details
-                                                        </Link>
-                                                    </TableCell>
+                                    <div className="overflow-x-auto">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>Timestamp</TableHead>
+                                                    <TableHead>User</TableHead>
+                                                    <TableHead>Action</TableHead>
+                                                    <TableHead>Type</TableHead>
+                                                    <TableHead>Description</TableHead>
+                                                    <TableHead className="text-right">Actions</TableHead>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {logs.data.map((log) => (
+                                                    <TableRow key={log.id}>
+                                                        <TableCell className="font-medium">{new Date(log.created_at).toLocaleString()}</TableCell>
+                                                        <TableCell>{log.user?.name || log.user_name || 'System'}</TableCell>
+                                                        <TableCell>
+                                                            <span
+                                                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
+                                                                    log.action,
+                                                                )}`}
+                                                            >
+                                                                {log.action.replace(/_/g, ' ')}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>{log.model_type || '-'}</TableCell>
+                                                        <TableCell className="max-w-[40vw] truncate sm:max-w-xs">{log.description || '-'}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            <Link
+                                                                href={route('audit-logs.show', { auditLog: log.id })}
+                                                                className="text-sm font-medium text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300"
+                                                            >
+                                                                View Details
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
                                     <Pagination pagination={pagination} onPageChange={handlePageChange} />
                                 </>
                             ) : (

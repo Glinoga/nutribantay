@@ -105,7 +105,7 @@ export default function Archived({ users }: Props) {
 
                     {/* Table Card */}
                     <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:border-gray-700">
+                        <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:border-gray-700">
                             <CardTitle className="flex items-center gap-2">
                                 <Archive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                 Archived Users

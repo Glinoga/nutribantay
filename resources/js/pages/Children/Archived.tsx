@@ -15,7 +15,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 
 type Child = {
@@ -73,10 +73,12 @@ export default function Archived({ children }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Archived Children" />
-            <div className="m-4 mb-4 flex items-center justify-between">
+            <div className="m-4 mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h1 className="text-xl font-bold">Archived Children</h1>
-                <Button variant="secondary" asChild>
-                    <Link href={route('children.index')}>Back to Children</Link>
+                <Button variant="outline" size="sm" asChild>
+                    <Link href={route('children.index')}>
+                     <ArrowLeft className="mr-2 h-4 w-4" />
+                     Back to Children</Link>
                 </Button>
             </div>
 
@@ -108,7 +110,7 @@ export default function Archived({ children }: Props) {
                                     <TableCell>{child.age ?? '-'}</TableCell>
                                     <TableCell>{new Date(child.deleted_at).toLocaleDateString()}</TableCell>
                                     <TableCell>
-                                        <div className="flex gap-1">
+                                        <div className="flex flex-wrap gap-1">
                                             <Button
                                                 size="sm"
                                                 variant="default"
@@ -136,7 +138,10 @@ export default function Archived({ children }: Props) {
                                                         Deleting...
                                                     </>
                                                 ) : (
-                                                    'Delete Permanently'
+                                                    <>
+                                                        <span className="hidden sm:inline">Delete </span>
+                                                        Permanently
+                                                    </>
                                                 )}
                                             </Button>
                                         </div>

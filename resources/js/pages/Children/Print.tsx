@@ -39,7 +39,7 @@ const getFilterSummary = (filters: Filters) => {
 
 export default function ChildrenPrint({ children, filters, generated_at }: ChildrenPrintProps) {
     return (
-        <div className="min-h-screen bg-cyan-50 p-8 font-sans print:bg-white">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans print:bg-white print:text-black dark:bg-gray-900 sm:p-6 lg:p-8">
             <Head title="Children Records - Print" />
 
             <style>{`
@@ -51,16 +51,16 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                 }
             `}</style>
 
-            <div className="no-print mb-8 flex items-center justify-between">
+            <div className="no-print mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button
                     onClick={() => window.print()}
-                    className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500"
+                    className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 dark:from-cyan-500 dark:to-cyan-300 dark:text-gray-900"
                 >
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
                 <Link href={route('children.index')}>
-                    <Button variant="outline" className="cursor-pointer border-cyan-300">
+                    <Button variant="outline" className="cursor-pointer border-cyan-300 dark:border-cyan-700">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Children
                     </Button>
@@ -68,39 +68,46 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
             </div>
 
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-3xl font-bold text-cyan-900">Nutribantay</h1>
-                <h2 className="text-2xl font-bold text-cyan-900">Children Records</h2>
-                <p className="mt-2 text-lg text-cyan-700 capitalize">{getFilterSummary(filters)}</p>
-                <p className="mt-1 text-sm text-cyan-700">Generated on {generated_at}</p>
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-3xl">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-2xl">Children Records</h2>
+                <p className="mt-2 text-base text-cyan-700 capitalize dark:text-cyan-300 sm:text-lg">{getFilterSummary(filters)}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
             </div>
 
             <div className="mb-8">
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableCaption className="text-cyan-700">Total: {children.length} children</TableCaption>
+                        <TableCaption className="text-cyan-700 dark:text-cyan-300">Total: {children.length} children</TableCaption>
                         <TableHeader>
-                            <TableRow className="bg-cyan-50">
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Name</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Age (mos)</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Sex</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Birthdate</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Weight (kg)</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Height (cm)</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">BMI</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Contact</TableHead>
+                            <TableRow className="bg-cyan-50 dark:bg-gray-800">
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Sex</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Birthdate</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Height</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">BMI</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">Contact</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {children.map((child) => (
-                                <TableRow key={child.id} className="transition-colors hover:bg-cyan-50/50 print:text-xs">
-                                    <TableCell className="px-4 py-2 font-medium">{child.fullname}</TableCell>
+                                <TableRow key={child.id} className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs">
+                                    <TableCell className="px-4 py-2 font-medium">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span>{child.fullname}</span>
+                                            <span className="text-xs text-cyan-700 dark:text-cyan-300 sm:hidden">
+                                                {child.age ?? '-'}mo · {child.weight ?? '-'}kg · {child.sex}
+                                            </span>
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="px-4 py-2">{child.age ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.sex}</TableCell>
-                                    <TableCell className="px-4 py-2">{child.birthdate ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.birthdate ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.weight ?? '-'}</TableCell>
-                                    <TableCell className="px-4 py-2">{child.height ?? '-'}</TableCell>
-                                    <TableCell className="px-4 py-2">{child.bmi ?? '-'}</TableCell>
-                                    <TableCell className="px-4 py-2">{child.contact_number ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.height ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.bmi ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 md:table-cell">{child.contact_number ?? '-'}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -108,10 +115,10 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                 </div>
             </div>
 
-            <div className="mt-8 border-t border-cyan-200 pt-4 text-center text-sm text-cyan-700">
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 dark:border-gray-700 dark:text-cyan-300 sm:mt-8 sm:pt-4">
                 <p>Generated on {generated_at}</p>
                 <p className="mt-1 flex items-center justify-center gap-2">
-                    <Baby className="h-4 w-4 text-cyan-600" />
+                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System
                 </p>
             </div>
