@@ -99,20 +99,20 @@ class ChildController extends Controller
         $vitaminStatus = $request->vitamin_status;
 
         if ($vitaminStatus === 'overdue') {
-            $overdueVitaminChildIds = ChildVitaminDose::select('cvd.child_id')
+            $overdueVitaminChildIds = ChildVitaminDose::select('cv.child_id')
                 ->join('child_vitamins as cv', 'child_vitamin_doses.child_vitamin_id', '=', 'cv.id')
                 ->whereNull('child_vitamin_doses.date_given')
                 ->whereNotNull('child_vitamin_doses.next_due_date')
                 ->where('child_vitamin_doses.next_due_date', '<', $now->toDateString());
             $query->whereIn('id', $overdueVitaminChildIds);
         } elseif ($vitaminStatus === 'upcoming') {
-            $upcomingVitaminChildIds = ChildVitaminDose::select('cvd.child_id')
+            $upcomingVitaminChildIds = ChildVitaminDose::select('cv.child_id')
                 ->join('child_vitamins as cv', 'child_vitamin_doses.child_vitamin_id', '=', 'cv.id')
                 ->whereNull('child_vitamin_doses.date_given')
                 ->whereNotNull('child_vitamin_doses.next_due_date')
                 ->where('child_vitamin_doses.next_due_date', '>=', $now->toDateString())
                 ->whereNotIn('cv.child_id', function ($q) use ($now) {
-                    $q->select('cvd2.child_id')
+                    $q->select('cv2.child_id')
                         ->from('child_vitamin_doses as cvd2')
                         ->join('child_vitamins as cv2', 'cvd2.child_vitamin_id', '=', 'cv2.id')
                         ->whereNull('cvd2.date_given')
