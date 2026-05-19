@@ -50,7 +50,7 @@ class IprogsmsService
             'message' => $message,
         ]);
 
-        $body = $response->json();
+        $body = $response->json() ?? [];
 
         // IPROG returns {"status": 200, "message_id": "iSms-XXX"} on success
         // and {"status": 500, "message": "Invalid Token"} or {"status": "error"} on failure
@@ -63,7 +63,7 @@ class IprogsmsService
             'success' => $isSuccess,
             'phone' => $normalizedPhone,
             'response' => $body,
-            'error' => $isSuccess ? null : ($body['message'] ?? $body['error'] ?? 'Unknown error'),
+            'error' => $isSuccess ? null : $this->resolveErrorMessage($body),
         ];
     }
 
@@ -82,7 +82,7 @@ class IprogsmsService
             'message' => $message,
         ]);
 
-        $body = $response->json();
+        $body = $response->json() ?? [];
 
         // IPROG returns {"status": 200, "message_ids": "..."} on bulk success
         $statusCode = $body['status'] ?? null;
@@ -141,6 +141,22 @@ class IprogsmsService
             'failed_phones' => $failed,
             'error' => count($failed) > 0 ? 'Some messages failed to send' : null,
         ];
+    }
+
+    /**
+     * Safely coerce an API response body into a plain error string.
+     * The IPROG API occasionally returns 'message' or 'error' as arrays,
+     * which would cause "Array to string conversion" if concatenated directly.
+     */
+    private function resolveErrorMessage(array $body): string
+    {
+        $raw = $body['message'] ?? $body['error'] ?? 'Unknown error';
+
+        if (is_array($raw)) {
+            return json_encode($raw) ?: 'Unknown error';
+        }
+
+        return (string) $raw;
     }
 
     /**
