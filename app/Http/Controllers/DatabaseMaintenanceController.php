@@ -421,7 +421,7 @@ class DatabaseMaintenanceController extends Controller
                         'full_path' => $file,
                         'size' => $this->formatBytes($size),
                         'size_bytes' => $size,
-                        'date' => Carbon::createFromTimestamp($timestamp)->format('Y-m-d H:i:s'),
+                        'date' => Carbon::createFromTimestamp($timestamp, config('app.timezone'))->format('Y-m-d H:i:s'),
                         'timestamp' => $timestamp,
                         'source' => $source,
                     ];
