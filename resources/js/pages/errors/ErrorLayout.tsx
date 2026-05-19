@@ -19,21 +19,12 @@ export default function ErrorLayout({ title, children }: PropsWithChildren<Error
                     @media (prefers-reduced-motion: reduce) { .error-animate { animation: none; } .error-float { animation: none; } }
                 `}</style>
             </Head>
-            <div
-                className="flex min-h-screen flex-col bg-background text-foreground"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
-            >
-                <main className="flex flex-1 items-center justify-center px-4 py-12">
-                    {children}
-                </main>
+            <div className="flex min-h-screen flex-col bg-background text-foreground" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <main className="flex flex-1 items-center justify-center px-4 py-12">{children}</main>
                 <footer className="border-t border-border py-6 text-center">
                     <p className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} NutriBantay.
-                        Need help?{' '}
-                        <a
-                            href="mailto:nutribantay@gmail.com"
-                            className="font-medium text-primary hover:underline"
-                        >
+                        &copy; {new Date().getFullYear()} NutriBantay. Need help?{' '}
+                        <a href="mailto:nutribantay@gmail.com" className="font-medium text-primary hover:underline">
                             Contact Support
                         </a>
                     </p>

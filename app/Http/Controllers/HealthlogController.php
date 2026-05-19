@@ -6,8 +6,12 @@ use App\Helpers\AIRecommender;
 use App\Helpers\GrowthHelper;
 use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
+use App\Models\ChildVitamin;
+use App\Models\ChildVitaminDose;
 use App\Models\HealthLog;
+use App\Models\Vitamin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class HealthlogController extends Controller
@@ -118,17 +122,38 @@ class HealthlogController extends Controller
             );
         }
 
-        HealthLog::create($validated);
+        DB::transaction(function () use ($validated, $child) {
+            HealthLog::create($validated);
 
-        // Auto-update child's current weight/height/nutrition_status with latest health log
-        if (! empty($validated['weight']) && ! empty($validated['height'])) {
-            $child->update([
-                'weight' => $validated['weight'],
-                'height' => $validated['height'],
-                'nutrition_status' => $validated['nutrition_status'] ?? null,
-                'updated_by' => auth()->id(),
-            ]);
-        }
+            // Auto-create Vitamin Tracker dose when Vitamin A is checked
+            if (! empty($validated['vitamin_a'])) {
+                $vitamin = Vitamin::where('name', 'Vitamin A')->first();
+                if ($vitamin) {
+                    $childVitamin = ChildVitamin::firstOrCreate([
+                        'child_id' => $child->id,
+                        'vitamin_id' => $vitamin->id,
+                    ]);
+                    $nextDoseNumber = ($childVitamin->doses()->max('dose_number') ?? 0) + 1;
+                    ChildVitaminDose::create([
+                        'child_vitamin_id' => $childVitamin->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
+            }
+
+            // Auto-update child's current weight/height/nutrition_status with latest health log
+            if (! empty($validated['weight']) && ! empty($validated['height'])) {
+                $child->update([
+                    'weight' => $validated['weight'],
+                    'height' => $validated['height'],
+                    'nutrition_status' => $validated['nutrition_status'] ?? null,
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        });
 
         RefreshDashboardForBarangay::dispatch($child->barangay)
             ->delay(now()->addSeconds(10));
@@ -202,17 +227,39 @@ class HealthlogController extends Controller
             );
         }
 
-        $healthlog->update($validated);
+        DB::transaction(function () use ($validated, $healthlog, $child, $weight, $height) {
+            $previousVitaminA = $healthlog->vitamin_a;
+            $healthlog->update($validated);
 
-        // Sync nutrition_status to child if weight/height were updated
-        if ($weight !== null && $height !== null) {
-            $child->update([
-                'weight' => $validated['weight'],
-                'height' => $validated['height'],
-                'nutrition_status' => $validated['nutrition_status'] ?? null,
-                'updated_by' => auth()->id(),
-            ]);
-        }
+            // Auto-create Vitamin Tracker dose when Vitamin A transitions from false to true
+            if (! empty($validated['vitamin_a']) && ! $previousVitaminA) {
+                $vitamin = Vitamin::where('name', 'Vitamin A')->first();
+                if ($vitamin) {
+                    $childVitamin = ChildVitamin::firstOrCreate([
+                        'child_id' => $child->id,
+                        'vitamin_id' => $vitamin->id,
+                    ]);
+                    $nextDoseNumber = ($childVitamin->doses()->max('dose_number') ?? 0) + 1;
+                    ChildVitaminDose::create([
+                        'child_vitamin_id' => $childVitamin->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
+            }
+
+            // Sync nutrition_status to child if weight/height were updated
+            if ($weight !== null && $height !== null) {
+                $child->update([
+                    'weight' => $validated['weight'],
+                    'height' => $validated['height'],
+                    'nutrition_status' => $validated['nutrition_status'] ?? null,
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        });
 
         RefreshDashboardForBarangay::dispatch($child->barangay)
             ->delay(now()->addSeconds(10));

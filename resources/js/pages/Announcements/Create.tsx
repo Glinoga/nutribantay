@@ -147,25 +147,23 @@ export default function Create({ categories }: CreateProps) {
 
                 <div className="relative mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
                     <div className="fade-in-up mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 dark:border-teal-800/50 bg-white/90 dark:bg-gray-800/90 px-5 py-2 shadow-lg backdrop-blur-sm">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
                             <Megaphone className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                             <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">New Announcement</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 dark:text-gray-50 md:text-4xl">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300 bg-clip-text text-transparent">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 Create Announcement
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">
-                            Create a new announcement to keep your community informed
-                        </p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Create a new announcement to keep your community informed</p>
                     </div>
 
                     {Object.keys(errors).length > 0 && (
-                        <div className="fade-in-up mb-6 rounded-xl border-2 border-red-200 dark:border-red-800 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/20 p-6 shadow-lg">
+                        <div className="fade-in-up mb-6 rounded-xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-red-100 p-6 shadow-lg dark:border-red-800 dark:from-red-900/20 dark:to-red-900/20">
                             <div className="flex items-start gap-3">
-                                <div className="rounded-full bg-red-200 dark:bg-red-900/30 p-2">
+                                <div className="rounded-full bg-red-200 p-2 dark:bg-red-900/30">
                                     <OctagonAlert className="h-6 w-6 text-red-600 dark:text-red-400" />
                                 </div>
                                 <div className="flex-1">
@@ -183,7 +181,7 @@ export default function Create({ categories }: CreateProps) {
                     )}
 
                     <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-5">
-                        <div className="fade-in-up rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                        <div className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                             <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
                                 Announcement Title <span className="text-red-500">*</span>
                             </Label>
@@ -192,18 +190,18 @@ export default function Create({ categories }: CreateProps) {
                                 placeholder="Enter announcement title"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
-                                className="rounded-md border-teal-200 dark:border-teal-700 bg-white dark:bg-gray-700 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700"
                             />
                         </div>
 
                         <div className="fade-in-up grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: '0.1s' }}>
-                            <div className="rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                                 <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
                                     Category <span className="text-red-500">*</span>
                                 </Label>
                                 <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Select the category for this announcement</p>
                                 <Select value={data.category_id} onValueChange={(value) => setData('category_id', value)}>
-                                    <SelectTrigger className="w-full rounded-md border-teal-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20">
+                                    <SelectTrigger className="w-full rounded-md border-teal-200 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                                         <SelectValue placeholder="Select category" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -216,7 +214,7 @@ export default function Create({ categories }: CreateProps) {
                                 </Select>
                             </div>
 
-                            <div className="rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                                 <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Author</Label>
                                 <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Who is publishing this announcement</p>
                                 <Input
@@ -224,13 +222,13 @@ export default function Create({ categories }: CreateProps) {
                                     placeholder="Enter author name"
                                     value={data.author}
                                     onChange={(e) => setData('author', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                    className="rounded-md border-teal-200 dark:border-teal-700 bg-white dark:bg-gray-700 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700"
                                 />
                             </div>
                         </div>
 
                         <div className="fade-in-up grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: '0.15s' }}>
-                            <div className="rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                                 <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
                                     Publication Date <span className="text-red-500">*</span>
                                 </Label>
@@ -239,25 +237,32 @@ export default function Create({ categories }: CreateProps) {
                                     value={data.date}
                                     onChange={(e) => setData('date', e.target.value)}
                                     min={new Date().toISOString().split('T')[0]}
-                                    className="mt-2 rounded-md border-teal-200 dark:border-teal-700 bg-white dark:bg-gray-700 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="mt-2 rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Select today to publish immediately, or choose a future date to schedule</p>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Select today to publish immediately, or choose a future date to schedule
+                                </p>
                             </div>
 
-                            <div className="rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                            <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                                 <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">End Date</Label>
                                 <Input
                                     type="date"
                                     value={data.end_date}
                                     onChange={(e) => setData('end_date', e.target.value)}
                                     min={data.date || new Date().toISOString().split('T')[0]}
-                                    className="mt-2 rounded-md border-teal-200 dark:border-teal-700 bg-white dark:bg-gray-700 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="mt-2 rounded-md border-teal-200 bg-white text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Optional: When the announcement should no longer be shown</p>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Optional: When the announcement should no longer be shown
+                                </p>
                             </div>
                         </div>
 
-                        <div className="fade-in-up rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm" style={{ animationDelay: '0.2s' }}>
+                        <div
+                            className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800"
+                            style={{ animationDelay: '0.2s' }}
+                        >
                             <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
                                 Summary <span className="text-red-500">*</span>
                             </Label>
@@ -266,11 +271,14 @@ export default function Create({ categories }: CreateProps) {
                                 value={data.summary}
                                 onChange={(e) => setData('summary', e.target.value)}
                                 rows={3}
-                                className="rounded-md border-teal-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             />
                         </div>
 
-                        <div className="fade-in-up rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm" style={{ animationDelay: '0.25s' }}>
+                        <div
+                            className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800"
+                            style={{ animationDelay: '0.25s' }}
+                        >
                             <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
                                 Content <span className="text-red-500">*</span>
                             </Label>
@@ -279,13 +287,22 @@ export default function Create({ categories }: CreateProps) {
                                 value={data.content}
                                 onChange={(e) => setData('content', e.target.value)}
                                 rows={6}
-                                className="rounded-md border-teal-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             />
                         </div>
 
-                        <div className="fade-in-up rounded-xl border border-teal-100 dark:border-teal-800 bg-white dark:bg-gray-800 p-5 shadow-sm" style={{ animationDelay: '0.3s' }}>
+                        <div
+                            className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800"
+                            style={{ animationDelay: '0.3s' }}
+                        >
                             <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Upload Image</Label>
-                            <Input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="mt-2 rounded-md border-teal-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 dark:file:bg-teal-900/30 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 dark:file:text-teal-400 hover:file:bg-teal-100 dark:hover:file:bg-teal-900/50" />
+                            <Input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="mt-2 rounded-md border-teal-200 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:file:bg-teal-900/30 dark:file:text-teal-400 dark:hover:file:bg-teal-900/50"
+                            />
                             {preview && (
                                 <div className="relative mt-4 inline-block">
                                     <img src={preview} alt="Preview" className="max-h-64 rounded-md border" />
@@ -300,7 +317,10 @@ export default function Create({ categories }: CreateProps) {
                             )}
                         </div>
 
-                        <div className="fade-in-up flex flex-col gap-4 border-t border-gray-200 dark:border-gray-600 pt-8 sm:flex-row sm:justify-center" style={{ animationDelay: '0.35s' }}>
+                        <div
+                            className="fade-in-up flex flex-col gap-4 border-t border-gray-200 pt-8 sm:flex-row sm:justify-center dark:border-gray-600"
+                            style={{ animationDelay: '0.35s' }}
+                        >
                             <Button
                                 type="submit"
                                 disabled={processing}
@@ -326,19 +346,24 @@ export default function Create({ categories }: CreateProps) {
                                 type="button"
                                 onClick={handleCancel}
                                 disabled={processing}
-                                className="rounded-full border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-12 py-6 text-lg font-bold text-gray-700 dark:text-gray-200 shadow-md transition-all hover:scale-105 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-lg"
+                                className="rounded-full border-2 border-gray-300 bg-white px-12 py-6 text-lg font-bold text-gray-700 shadow-md transition-all hover:scale-105 hover:border-gray-400 hover:bg-gray-50 hover:shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-500 dark:hover:bg-gray-700"
                             >
                                 Cancel
                             </Button>
                         </div>
 
-                        <div className="fade-in-up rounded-xl border-2 border-teal-100 dark:border-teal-800 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 p-5" style={{ animationDelay: '0.4s' }}>
+                        <div
+                            className="fade-in-up rounded-xl border-2 border-teal-100 bg-gradient-to-br from-teal-50 to-cyan-50 p-5 dark:border-teal-800 dark:from-teal-900/20 dark:to-cyan-900/20"
+                            style={{ animationDelay: '0.4s' }}
+                        >
                             <div className="flex items-start gap-3">
                                 <Sparkles className="h-5 w-5 flex-shrink-0 text-teal-600 dark:text-teal-400" />
                                 <div>
                                     <p className="font-semibold text-teal-800 dark:text-teal-200">Quick Tips:</p>
                                     <ul className="mt-2 space-y-1 text-sm text-teal-700 dark:text-teal-300">
-                                        <li>• All fields marked with <span className="text-red-500">*</span> are required</li>
+                                        <li>
+                                            • All fields marked with <span className="text-red-500">*</span> are required
+                                        </li>
                                         <li>• Set an end date to automatically expire announcements</li>
                                     </ul>
                                 </div>

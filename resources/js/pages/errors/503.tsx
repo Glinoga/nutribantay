@@ -11,7 +11,7 @@ export default function ServiceUnavailable() {
                 <div className="error-float mx-auto mb-6 flex justify-center">
                     <UnavailableIllustration className="h-32 w-32" />
                 </div>
-                <div className="mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-8xl font-extrabold leading-none tracking-tighter text-transparent">
+                <div className="mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-8xl leading-none font-extrabold tracking-tighter text-transparent">
                     {config.code}
                 </div>
                 <h1 className="mb-3 text-2xl font-bold text-foreground">{config.title}</h1>

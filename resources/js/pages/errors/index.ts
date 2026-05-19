@@ -18,12 +18,12 @@ export const errorConfigs: Record<number, ErrorConfig> = {
     403: {
         code: 403,
         title: 'Forbidden',
-        description: 'You don\'t have permission to access this page. If you believe this is a mistake, please contact your administrator.',
+        description: "You don't have permission to access this page. If you believe this is a mistake, please contact your administrator.",
     },
     404: {
         code: 404,
         title: 'Page Not Found',
-        description: 'The page you\'re looking for doesn\'t exist or has been moved. Please check the URL or navigate back to a known page.',
+        description: "The page you're looking for doesn't exist or has been moved. Please check the URL or navigate back to a known page.",
     },
     419: {
         code: 419,
@@ -33,16 +33,16 @@ export const errorConfigs: Record<number, ErrorConfig> = {
     429: {
         code: 429,
         title: 'Too Many Requests',
-        description: 'You\'ve made too many requests in a short period. Please wait a moment before trying again.',
+        description: "You've made too many requests in a short period. Please wait a moment before trying again.",
     },
     500: {
         code: 500,
         title: 'Server Error',
-        description: 'Something went wrong on our end. We\'ve been notified and are working to fix the issue. Please try again later.',
+        description: "Something went wrong on our end. We've been notified and are working to fix the issue. Please try again later.",
     },
     503: {
         code: 503,
         title: 'Service Unavailable',
-        description: 'We\'re currently undergoing maintenance to improve your experience. Please check back shortly.',
+        description: "We're currently undergoing maintenance to improve your experience. Please check back shortly.",
     },
 };

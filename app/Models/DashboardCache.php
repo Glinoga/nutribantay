@@ -17,6 +17,8 @@ class DashboardCache extends Model
         'monthly_logs',
         'vaccine_overdue',
         'vaccine_upcoming',
+        'vitamin_overdue',
+        'vitamin_upcoming',
         'today_children',
         'today_health_logs',
         'week_health_logs',

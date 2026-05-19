@@ -5,9 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber, formatPhoneNumber } from '@/lib/phoneUtils';
+import { route } from '@/lib/routes';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, useForm } from '@inertiajs/react';
-import { route } from '@/lib/routes';
 import { Baby, Calendar, CheckCircle2, OctagonAlert, Phone, Ruler, Sparkles, User, Weight } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -251,7 +251,9 @@ export default function ChildrenCreate() {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Status</p>
-                                                    <p className={`text-xl font-bold ${getBMIStatus(Number(bmi)).color}`}>{getBMIStatus(Number(bmi)).text}</p>
+                                                    <p className={`text-xl font-bold ${getBMIStatus(Number(bmi)).color}`}>
+                                                        {getBMIStatus(Number(bmi)).text}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -306,7 +308,9 @@ export default function ChildrenCreate() {
                                             <div>
                                                 <p className="font-semibold text-teal-800 dark:text-teal-400">Quick Tips:</p>
                                                 <ul className="mt-1 space-y-1 text-sm text-teal-700 dark:text-teal-300">
-                                                    <li>• All fields marked with <span className="text-red-500">*</span> are required</li>
+                                                    <li>
+                                                        • All fields marked with <span className="text-red-500">*</span> are required
+                                                    </li>
                                                     <li>• Contact number helps us reach guardians for important updates</li>
                                                     <li>• Weight and height are used to calculate BMI automatically</li>
                                                 </ul>

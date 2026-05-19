@@ -21,12 +21,14 @@ export default function Register() {
             {/* Content Layer */}
             <div className="relative z-10 flex w-11/12 max-w-5xl flex-col overflow-hidden rounded-2xl shadow-lg md:flex-row">
                 {/* Left Panel */}
-                <div className="flex w-full items-center justify-center bg-black p-6 text-white dark:text-gray-200 md:w-1/2 md:p-10">
-                    <h1 className="text-center text-2xl leading-snug font-extrabold md:text-left md:text-3xl">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY</h1>
+                <div className="flex w-full items-center justify-center bg-black p-6 text-white md:w-1/2 md:p-10 dark:text-gray-200">
+                    <h1 className="text-center text-2xl leading-snug font-extrabold md:text-left md:text-3xl">
+                        NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY
+                    </h1>
                 </div>
 
                 {/* Right Panel */}
-                <div className="flex w-full flex-col justify-center bg-[#E8F8F8] p-6 dark:bg-gray-900 dark:text-gray-100 md:w-1/2 md:p-12">
+                <div className="flex w-full flex-col justify-center bg-[#E8F8F8] p-6 md:w-1/2 md:p-12 dark:bg-gray-900 dark:text-gray-100">
                     <h2 className="mb-6 text-2xl font-bold">Sign Up</h2>
 
                     <Form method="post" action="register" resetOnSuccess={['password', 'password_confirmation']} className="flex flex-col gap-6">

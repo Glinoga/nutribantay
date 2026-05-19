@@ -11,11 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type HealthLog = {
@@ -45,7 +45,7 @@ export default function Archived({ healthlogs }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(route('healthlogs.restore', { id }),);
+            await router.post(route('healthlogs.restore', { id }));
             smartToast.success('Health log restored successfully!');
         } catch (err) {
             smartToast.error('Failed to restore health log.');
@@ -58,7 +58,7 @@ export default function Archived({ healthlogs }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('healthlogs.forceDelete', { id }),);
+            await router.delete(route('healthlogs.forceDelete', { id }));
             smartToast.success('Health log permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete health log.');
@@ -111,12 +111,7 @@ export default function Archived({ healthlogs }: Props) {
                                     <TableCell>{new Date(log.deleted_at).toLocaleDateString()}</TableCell>
                                     <TableCell>
                                         <div className="flex gap-1">
-                                            <Button
-                                                size="sm"
-                                                variant="default"
-                                                onClick={() => setRestoreId(log.id)}
-                                                disabled={loading === log.id}
-                                            >
+                                            <Button size="sm" variant="default" onClick={() => setRestoreId(log.id)} disabled={loading === log.id}>
                                                 {loading === log.id ? (
                                                     <>
                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -126,12 +121,7 @@ export default function Archived({ healthlogs }: Props) {
                                                     'Restore'
                                                 )}
                                             </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                onClick={() => setDeleteId(log.id)}
-                                                disabled={loading === log.id}
-                                            >
+                                            <Button size="sm" variant="destructive" onClick={() => setDeleteId(log.id)} disabled={loading === log.id}>
                                                 {loading === log.id ? (
                                                     <>
                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -155,16 +145,11 @@ export default function Archived({ healthlogs }: Props) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Restore Health Log</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to restore this health log? It will be visible again.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Are you sure you want to restore this health log? It will be visible again.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => restoreId && handleRestore(restoreId)}
-                            className="bg-green-600 hover:bg-green-700"
-                        >
+                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} className="bg-green-600 hover:bg-green-700">
                             Restore
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -182,10 +167,7 @@ export default function Archived({ healthlogs }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => deleteId && handleForceDelete(deleteId)}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>

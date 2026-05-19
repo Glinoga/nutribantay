@@ -84,7 +84,10 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
 
             {/* Maintenance Message Banner */}
             {maintenance && (
-                <div className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300" role="alert">
+                <div
+                    className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300"
+                    role="alert"
+                >
                     <div className="flex items-center">
                         <svg className="mr-3 h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                             <path
@@ -244,7 +247,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
             </section>
 
             {/* Call to Action Section */}
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 dark:to-gray-900 py-16">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 dark:to-gray-900">
                 <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20 dark:bg-teal-400 dark:opacity-30" />
                 <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20 dark:bg-cyan-400 dark:opacity-30" />
                 <div className="relative container mx-auto px-6 text-center lg:px-8">

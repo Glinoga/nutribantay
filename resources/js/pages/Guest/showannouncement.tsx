@@ -98,7 +98,7 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                 }
             `}</style>
 
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] dark:via-[var(--bg)] pt-24 pb-12">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-12 dark:via-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-8">
                         <Link
@@ -162,11 +162,13 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                         {announcement.end_date && (
                             <div className="mt-12 rounded-2xl border border-amber-200 bg-amber-50/80 p-6 backdrop-blur-sm dark:border-amber-700 dark:bg-amber-900/20">
                                 <h3 className="mb-2 font-semibold text-amber-800 dark:text-amber-300">Event Duration</h3>
-                                <p className="text-amber-700 dark:text-amber-400">This announcement is valid until {formatDate(announcement.end_date)}</p>
+                                <p className="text-amber-700 dark:text-amber-400">
+                                    This announcement is valid until {formatDate(announcement.end_date)}
+                                </p>
                             </div>
                         )}
 
-                        <div className="mt-16 relative overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] to-teal-900 p-8 text-center">
+                        <div className="relative mt-16 overflow-hidden rounded-2xl bg-gradient-to-br from-[var(--primary)] to-teal-900 p-8 text-center">
                             <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
                             <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
                             <div className="relative">
@@ -174,7 +176,10 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                 <p className="mb-6 text-white/80">Don&apos;t miss our latest updates and announcements</p>
                                 <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
                                     <Link href={route('guest.announcements')}>
-                                        <Button variant="outline" className="cursor-pointer rounded-full border-white/60 bg-transparent text-white hover:bg-white hover:text-[var(--primary)]">
+                                        <Button
+                                            variant="outline"
+                                            className="cursor-pointer rounded-full border-white/60 bg-transparent text-white hover:bg-white hover:text-[var(--primary)]"
+                                        >
                                             View All Announcements
                                         </Button>
                                     </Link>

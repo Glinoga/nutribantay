@@ -10,7 +10,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, Shield, TrendingUp } from 'lucide-react';
+import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
@@ -82,10 +82,24 @@ type VaccineFollowups = {
     follow_ups: VaccineFollowup[];
 };
 
+type VitaminFollowups = {
+    overdue_count: number;
+    due_this_month_count: number;
+    follow_ups: {
+        child_id: number;
+        child_name: string;
+        vitamin_name: string;
+        dose_number: number;
+        next_due_date: string;
+        status: string;
+    }[];
+};
+
 type DashboardProps = {
     stats: Stats;
     trends: TrendData;
     vaccine_followups: VaccineFollowups;
+    vitamin_followups: VitaminFollowups;
     is_admin: boolean;
 };
 
@@ -96,7 +110,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ stats, trends, vaccine_followups }: DashboardProps) {
+export default function Dashboard({ stats, trends, vaccine_followups, vitamin_followups }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
@@ -279,7 +293,11 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                     {/* Vaccine Follow-ups Alert */}
                     {vaccine_followups.overdue_count > 0 || vaccine_followups.due_this_month_count > 0 ? (
                         <div className="mb-8">
-                            <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20" role="alert" aria-live="assertive">
+                            <Alert
+                                className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20"
+                                role="alert"
+                                aria-live="assertive"
+                            >
                                 <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                                 <AlertTitle className="text-amber-900 dark:text-amber-100">Vaccine Follow-ups Needed</AlertTitle>
                                 <AlertDescription className="text-amber-700 dark:text-amber-300">
@@ -327,11 +345,21 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                                 <table className="w-full text-sm">
                                                     <thead className="sticky top-0 bg-amber-100/50 dark:bg-amber-900/30">
                                                         <tr>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Child</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Vaccine</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Dose</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Due Date</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Status</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">
+                                                                Child
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">
+                                                                Vaccine
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">
+                                                                Dose
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">
+                                                                Due Date
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">
+                                                                Status
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -392,6 +420,38 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                         </div>
                     ) : null}
 
+                    {/* Vitamin Follow-ups Alert */}
+                    {vitamin_followups.overdue_count > 0 || vitamin_followups.due_this_month_count > 0 ? (
+                        <div className="mb-8">
+                            <Alert
+                                className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20"
+                                role="alert"
+                                aria-live="assertive"
+                            >
+                                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                                <AlertTitle className="text-orange-900 dark:text-orange-100">Vitamin Follow-ups Needed</AlertTitle>
+                                <AlertDescription className="text-orange-700 dark:text-orange-300">
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                        {vitamin_followups.overdue_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=overdue`}>
+                                                <Badge className="cursor-pointer bg-red-100 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50">
+                                                    {vitamin_followups.overdue_count} overdue
+                                                </Badge>
+                                            </Link>
+                                        )}
+                                        {vitamin_followups.due_this_month_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
+                                                <Badge className="cursor-pointer bg-amber-100 text-amber-800 transition-all duration-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50">
+                                                    {vitamin_followups.due_this_month_count} due this month
+                                                </Badge>
+                                            </Link>
+                                        )}
+                                    </div>
+                                </AlertDescription>
+                            </Alert>
+                        </div>
+                    ) : null}
+
                     {/* Age Breakdown */}
                     <div className="mb-8">
                         <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Age Breakdown</h2>
@@ -436,7 +496,9 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                             <Card className="min-h-[44px] cursor-pointer border-yellow-200 bg-yellow-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 dark:border-yellow-800 dark:bg-yellow-900/20">
                                 <CardHeader>
                                     <CardDescription className="text-yellow-600 dark:text-yellow-400">Underweight</CardDescription>
-                                    <CardTitle className="text-3xl text-yellow-600 dark:text-yellow-400">{stats.nutrition_status.underweight}</CardTitle>
+                                    <CardTitle className="text-3xl text-yellow-600 dark:text-yellow-400">
+                                        {stats.nutrition_status.underweight}
+                                    </CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer border-red-200 bg-red-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-800 dark:bg-red-900/20">
@@ -462,14 +524,18 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                 <CardHeader>
                                     <CardDescription>Vitamin A Given</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">({stats.vitamin_a.percentage}%)</CardDescription>
+                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
+                                        ({stats.vitamin_a.percentage}%)
+                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>Deworming Given</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">({stats.deworming.percentage}%)</CardDescription>
+                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
+                                        ({stats.deworming.percentage}%)
+                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">

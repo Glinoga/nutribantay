@@ -44,12 +44,14 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
             {/* Content Layer */}
             <div className="relative z-10 flex w-11/12 max-w-5xl flex-col overflow-hidden rounded-2xl shadow-lg md:flex-row">
                 {/* Left Panel */}
-                <div className="flex w-full items-center justify-center bg-black p-6 text-white dark:text-gray-200 md:w-1/2 md:p-10">
-                    <h1 className="text-center text-2xl leading-snug font-extrabold md:text-left md:text-3xl">NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY</h1>
+                <div className="flex w-full items-center justify-center bg-black p-6 text-white md:w-1/2 md:p-10 dark:text-gray-200">
+                    <h1 className="text-center text-2xl leading-snug font-extrabold md:text-left md:text-3xl">
+                        NUTRIBANTAY: A TRACKING SYSTEM FOR BARANGAY 176B IN CALOOCAN CITY
+                    </h1>
                 </div>
 
                 {/* Right Panel */}
-                <div className="flex w-full flex-col justify-center bg-[#E8F8F8] p-6 dark:bg-gray-900 dark:text-gray-100 md:w-1/2 md:p-12">
+                <div className="flex w-full flex-col justify-center bg-[#E8F8F8] p-6 md:w-1/2 md:p-12 dark:bg-gray-900 dark:text-gray-100">
                     <h2 className="mb-6 text-2xl font-bold">Log In</h2>
 
                     {/* Maintenance Mode Warning from Logout */}
@@ -114,7 +116,7 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                     I agree to the{' '}
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <button type="button" className="cursor-pointer text-sm underline text-teal-600 hover:text-teal-700">
+                                            <button type="button" className="cursor-pointer text-sm text-teal-600 underline hover:text-teal-700">
                                                 Terms & Conditions
                                             </button>
                                         </DialogTrigger>
@@ -125,8 +127,8 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                             <div className="space-y-4 text-sm text-gray-700">
                                                 <h3 className="font-semibold text-gray-900">1. Acceptance of Terms</h3>
                                                 <p>
-                                                    By accessing and using NutriBantay, you agree to be bound by these Terms & Conditions. If you do not
-                                                    agree with any part of these terms, you must not use the system.
+                                                    By accessing and using NutriBantay, you agree to be bound by these Terms & Conditions. If you do
+                                                    not agree with any part of these terms, you must not use the system.
                                                 </p>
 
                                                 <h3 className="font-semibold text-gray-900">2. System Use</h3>
@@ -145,8 +147,8 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                                 <h3 className="font-semibold text-gray-900">4. Acceptable Use</h3>
                                                 <p>
                                                     You agree to use NutriBantay solely for its intended purpose — monitoring and managing child
-                                                    nutrition and health records. Any unauthorized access, data extraction, or misuse of the system
-                                                    is strictly prohibited.
+                                                    nutrition and health records. Any unauthorized access, data extraction, or misuse of the system is
+                                                    strictly prohibited.
                                                 </p>
 
                                                 <h3 className="font-semibold text-gray-900">5. Limitation of Liability</h3>
@@ -157,8 +159,8 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
 
                                                 <h3 className="font-semibold text-gray-900">6. Changes to Terms</h3>
                                                 <p>
-                                                    We reserve the right to update these terms at any time. Continued use of the system after
-                                                    changes constitutes acceptance of the updated terms.
+                                                    We reserve the right to update these terms at any time. Continued use of the system after changes
+                                                    constitutes acceptance of the updated terms.
                                                 </p>
                                             </div>
                                         </DialogContent>

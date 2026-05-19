@@ -12,11 +12,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Archive, ArrowLeft, Loader2, Trash2, Users } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type User = {
@@ -75,12 +75,12 @@ export default function Archived({ users }: Props) {
             <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
-                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 text-center">
                         <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                                <Archive className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Archived Users</span>
+                            <Archive className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Archived Users</span>
                         </div>
                     </div>
 

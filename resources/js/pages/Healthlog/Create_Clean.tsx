@@ -3,11 +3,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Calculator, Check, Eye, Heart } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useEffect, useState } from 'react';
 
 type Child = {

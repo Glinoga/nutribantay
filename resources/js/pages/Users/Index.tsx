@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
 import { route } from '@/lib/routes';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -324,8 +324,8 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     {/* Pill Badge */}
                     <div className="mb-6 pt-8 text-center">
                         <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                                <Users className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">User Management</span>
+                            <Users className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">User Management</span>
                         </div>
                     </div>
 
@@ -354,7 +354,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
@@ -365,7 +365,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Roles</p>
@@ -376,7 +376,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-yellow-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-yellow-100/50 bg-white p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
@@ -387,7 +387,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Admin Codes</p>
@@ -405,7 +405,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         <Button
                             onClick={toggleMaintenance}
                             variant={maintenance ? 'destructive' : 'default'}
-                            className={maintenance ? '' : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 gap-2 dark:bg-green-700 dark:hover:bg-green-600'}
+                            className={maintenance ? '' : 'gap-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'}
                         >
                             <ShieldAlert className="h-4 w-4" />
                             {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
@@ -423,7 +423,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap items-center gap-3">
-                                <Label htmlFor="count" className="text-gray-700 whitespace-nowrap dark:text-gray-300">
+                                <Label htmlFor="count" className="whitespace-nowrap text-gray-700 dark:text-gray-300">
                                     Number of Codes:
                                 </Label>
                                 <Input
@@ -470,7 +470,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             setCreateError('');
                                             setGeneratedCode('');
                                             setGeneratedPassword('');
-                                setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                                            setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
                                             setShowCreateModal(true);
                                         }}
                                         className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
@@ -534,12 +534,18 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
                                             <TableCell>
                                                 {user.status === 'pending' && (
-                                                    <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="border-yellow-300 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                                    >
                                                         Pending
                                                     </Badge>
                                                 )}
                                                 {user.status === 'approved' && (
-                                                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400">
+                                                    <Badge
+                                                        variant="default"
+                                                        className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
+                                                    >
                                                         Approved
                                                     </Badge>
                                                 )}
@@ -566,7 +572,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                     <Button size="sm" variant="outline" asChild>
                                                         <Link href={route('users.show', { user: user.id })}>View</Link>
                                                     </Button>
-                                                    <Button size="sm" variant="default" className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg" asChild>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="default"
+                                                        className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                                        asChild
+                                                    >
                                                         <Link href={route('users.edit', { user: user.id })}>Edit</Link>
                                                     </Button>
                                                     <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
@@ -594,7 +605,10 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => approveUserId && handleApprove(approveUserId)} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+                        <AlertDialogAction
+                            onClick={() => approveUserId && handleApprove(approveUserId)}
+                            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                        >
                             Approve
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -810,12 +824,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     value={newUser.password}
                                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                                     placeholder="Password"
-                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
-                                required
-                            />
-                            <Button type="button" variant="secondary" onClick={generatePassword}>
-                                Generate
-                            </Button>
+                                    className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                                    required
+                                />
+                                <Button type="button" variant="secondary" onClick={generatePassword}>
+                                    Generate
+                                </Button>
                             </div>
                         </div>
 
@@ -845,7 +859,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             {generatedCode} - {generatedPassword}
                                         </p>
                                     </div>
-                                    <Button size="sm" className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" onClick={copyCredentials}>
+                                    <Button
+                                        size="sm"
+                                        className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                                        onClick={copyCredentials}
+                                    >
                                         {copiedLogin ? 'Copied!' : 'Copy'}
                                     </Button>
                                 </div>

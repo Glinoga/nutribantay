@@ -16,11 +16,11 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber } from '@/lib/phoneUtils';
 import { route } from '@/lib/routes';
+import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { type BreadcrumbItem } from '@/types';
 
 interface User {
     id: number;
@@ -224,7 +224,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
@@ -235,7 +235,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Selected</p>
@@ -246,7 +246,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">SMS Credits</p>
@@ -257,11 +257,11 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Send Mode</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400 capitalize">{recipientType}</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 capitalize dark:text-teal-400">{recipientType}</p>
                                 </div>
                                 <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
                                     <MessageSquare className="h-5 w-5 text-teal-500 dark:text-teal-400" />
@@ -284,7 +284,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             </CardTitle>
                                             <CardDescription className="dark:text-gray-400">Select who receives your message</CardDescription>
                                         </div>
-                                        <div className="rounded-full bg-teal-600 px-3 py-1 text-sm font-semibold text-white">{getRecipientCount()}</div>
+                                        <div className="rounded-full bg-teal-600 px-3 py-1 text-sm font-semibold text-white">
+                                            {getRecipientCount()}
+                                        </div>
                                     </div>
                                 </CardHeader>
                                 <CardContent className="space-y-4 p-4">
@@ -357,10 +359,22 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             {/* Quick Actions */}
                                             {recipientType === 'multiple' && filteredUsers.length > 0 && (
                                                 <div className="flex gap-2">
-                                                    <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={selectAllFiltered}
+                                                        className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                                    >
                                                         Select All
                                                     </Button>
-                                                    <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                                                    <Button
+                                                        type="button"
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={deselectAll}
+                                                        className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                                    >
                                                         Clear All
                                                     </Button>
                                                 </div>
@@ -410,10 +424,14 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                                                                 {/* User Info */}
                                                                 <div className="min-w-0 flex-1">
-                                                                    <p className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                                                                    <p
+                                                                        className={`truncate font-medium ${selectedUsers.includes(user.id) ? 'text-white' : 'text-gray-900 dark:text-white'}`}
+                                                                    >
                                                                         {user.name}
                                                                     </p>
-                                                                    <p className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-teal-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                                    <p
+                                                                        className={`truncate text-sm ${selectedUsers.includes(user.id) ? 'text-teal-100' : 'text-gray-500 dark:text-gray-400'}`}
+                                                                    >
                                                                         {displayPhoneNumber(user.phone)}
                                                                     </p>
                                                                 </div>
@@ -430,7 +448,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                         </h3>
                                                         <p className="max-w-md text-center text-gray-600 dark:text-gray-300">
                                                             {searchQuery
-                                                                ? 'Try adjusting your search to find what you\'re looking for.'
+                                                                ? "Try adjusting your search to find what you're looking for."
                                                                 : 'There are no guardians with registered phone numbers yet.'}
                                                         </p>
                                                     </div>
@@ -584,7 +602,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                 <MessageSquare className="h-4 w-4" />
                                                 <span className="text-xs font-medium">SMS Parts</span>
                                             </div>
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">{Math.ceil(characterCount / 160) || 0}</div>
+                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                                {Math.ceil(characterCount / 160) || 0}
+                                            </div>
                                         </div>
 
                                         <div className="rounded-xl bg-gradient-to-br from-teal-600 to-cyan-600 p-4 shadow-md transition-shadow hover:shadow-lg">
@@ -622,7 +642,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 {recipientType === 'all' ? (
                                     <span className="font-semibold text-teal-600 dark:text-teal-400">{users.length} recipients (Broadcast)</span>
                                 ) : (
-                                    <span className="font-semibold text-teal-600 dark:text-teal-400">{selectedUsers.length} recipient(s) selected</span>
+                                    <span className="font-semibold text-teal-600 dark:text-teal-400">
+                                        {selectedUsers.length} recipient(s) selected
+                                    </span>
                                 )}
                             </p>
                         </div>
@@ -639,7 +661,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             </div>
                             <div className="rounded-md bg-cyan-50 p-3 dark:bg-cyan-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
-                                <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
+                                <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400">
+                                    {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
+                                </p>
                             </div>
                         </div>
 
@@ -736,4 +760,3 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
         </AppLayout>
     );
 }
-

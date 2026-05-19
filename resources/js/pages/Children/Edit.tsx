@@ -195,7 +195,6 @@ export default function Edit({ child }: Props) {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">

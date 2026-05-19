@@ -3,19 +3,9 @@ import { Textarea } from '@/components/ui/textarea';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { useForm } from '@inertiajs/react';
-import {
-    CheckCircle,
-    ChevronDown,
-    Clock,
-    Mail,
-    MapPin,
-    MessageSquare,
-    Phone,
-    Send,
-    User,
-} from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { CheckCircle, ChevronDown, Clock, Mail, MapPin, MessageSquare, Phone, Send, User } from 'lucide-react';
 import { useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 
@@ -91,7 +81,10 @@ export default function Contact() {
                 }
             `}</style>
             {/* Hero Section */}
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28" style={{ animationDelay: '0.1s' }}>
+            <section
+                className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28"
+                style={{ animationDelay: '0.1s' }}
+            >
                 <div className="absolute top-20 right-20 -z-10 h-64 w-64 rounded-full bg-[var(--primary)] opacity-10 blur-3xl"></div>
                 <div className="absolute bottom-10 left-10 -z-10 h-48 w-48 rounded-full bg-[var(--secondary)] opacity-10 blur-3xl"></div>
                 <div className="absolute -top-10 -left-10 -z-10 h-40 w-40 rounded-full border border-[var(--primary)] opacity-20"></div>
@@ -249,12 +242,14 @@ export default function Contact() {
 
                             {/* Form */}
                             <div className="md:col-span-3">
-                                <div className="overflow-hidden rounded-2xl glass-card p-8 shadow-sm">
+                                <div className="glass-card overflow-hidden rounded-2xl p-8 shadow-sm">
                                     {submitted && (
-                                        <div className="mb-6 animate-in slide-in-from-top-2 rounded-xl bg-green-50 p-6 text-center dark:bg-green-900/30">
+                                        <div className="mb-6 rounded-xl bg-green-50 p-6 text-center animate-in slide-in-from-top-2 dark:bg-green-900/30">
                                             <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
                                             <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">Message Sent!</h3>
-                                            <p className="mt-1 text-green-700 dark:text-green-300">Thank you for reaching out. We will get back to you soon.</p>
+                                            <p className="mt-1 text-green-700 dark:text-green-300">
+                                                Thank you for reaching out. We will get back to you soon.
+                                            </p>
                                         </div>
                                     )}
                                     <form className="space-y-5" onSubmit={handleSubmit}>
@@ -503,7 +498,10 @@ export default function Contact() {
             </section>
 
             {/* CTA Section */}
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white" style={{ animationDelay: '0.5s' }}>
+            <section
+                className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white"
+                style={{ animationDelay: '0.5s' }}
+            >
                 <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
                 <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
 

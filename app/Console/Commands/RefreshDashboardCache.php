@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Child;
 use App\Models\ChildVaccineDose;
+use App\Models\ChildVitaminDose;
 use App\Models\DashboardCache;
 use App\Models\HealthLog;
 use Carbon\Carbon;
@@ -124,6 +125,14 @@ class RefreshDashboardCache extends Command
         $overdueCount = $pendingDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isPast())->count();
         $upcomingCount = $pendingDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isFuture())->count();
 
+        $pendingVitaminDoses = ChildVitaminDose::whereNull('date_given')
+            ->whereNotNull('next_due_date')
+            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $barangay))
+            ->get();
+
+        $vitaminOverdue = $pendingVitaminDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isPast())->count();
+        $vitaminUpcoming = $pendingVitaminDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isFuture())->count();
+
         DashboardCache::updateOrCreate(
             ['barangay' => $barangay],
             [
@@ -134,6 +143,8 @@ class RefreshDashboardCache extends Command
                 'monthly_logs' => $monthlyLogs,
                 'vaccine_overdue' => $overdueCount,
                 'vaccine_upcoming' => $upcomingCount,
+                'vitamin_overdue' => $vitaminOverdue,
+                'vitamin_upcoming' => $vitaminUpcoming,
                 'today_children' => $todayChildren,
                 'today_health_logs' => $todayHealthLogs,
                 'week_health_logs' => $weekHealthLogs,

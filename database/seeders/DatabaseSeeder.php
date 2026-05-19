@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
         $this->call(DashboardTestSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(AnnouncementSeeder::class);
+        $this->call(VaccineSeeder::class);
+        $this->call(VitaminSeeder::class);
         $this->call(AddPhoneNumbersSeeder::class);
     }
 }

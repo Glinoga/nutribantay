@@ -11,11 +11,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type Child = {
@@ -47,7 +47,7 @@ export default function Archived({ children }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(route('children.restore', { id }),);
+            await router.post(route('children.restore', { id }));
             smartToast.success('Child restored successfully!');
         } catch (err) {
             smartToast.error('Failed to restore child.');
@@ -60,7 +60,7 @@ export default function Archived({ children }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('children.forceDelete', { id }),);
+            await router.delete(route('children.forceDelete', { id }));
             smartToast.success('Child permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete child.');
@@ -101,47 +101,47 @@ export default function Archived({ children }: Props) {
                             </TableRow>
                         ) : (
                             children.map((child) => (
-<TableRow key={child.id} className="hover:bg-muted/50">
-                                     <TableCell>{child.id}</TableCell>
-                                     <TableCell>{child.fullname}</TableCell>
-                                     <TableCell>{child.sex}</TableCell>
-                                     <TableCell>{child.age ?? '-'}</TableCell>
-                                     <TableCell>{new Date(child.deleted_at).toLocaleDateString()}</TableCell>
-                                     <TableCell>
-                                         <div className="flex gap-1">
-                                             <Button
-                                                 size="sm"
-                                                 variant="default"
-                                                 onClick={() => setRestoreId(child.id)}
-                                                 disabled={loading === child.id}
-                                             >
-                                                 {loading === child.id ? (
-                                                     <>
-                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                                                         Restoring...
-                                                     </>
-                                                 ) : (
-                                                     'Restore'
-                                                 )}
-                                             </Button>
-                                             <Button
-                                                 size="sm"
-                                                 variant="destructive"
-                                                 onClick={() => setDeleteId(child.id)}
-                                                 disabled={loading === child.id}
-                                             >
-                                                 {loading === child.id ? (
-                                                     <>
-                                                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                                                         Deleting...
-                                                     </>
-                                                 ) : (
-                                                     'Delete Permanently'
-                                                 )}
-                                             </Button>
-                                         </div>
-                                     </TableCell>
-                                 </TableRow>
+                                <TableRow key={child.id} className="hover:bg-muted/50">
+                                    <TableCell>{child.id}</TableCell>
+                                    <TableCell>{child.fullname}</TableCell>
+                                    <TableCell>{child.sex}</TableCell>
+                                    <TableCell>{child.age ?? '-'}</TableCell>
+                                    <TableCell>{new Date(child.deleted_at).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-1">
+                                            <Button
+                                                size="sm"
+                                                variant="default"
+                                                onClick={() => setRestoreId(child.id)}
+                                                disabled={loading === child.id}
+                                            >
+                                                {loading === child.id ? (
+                                                    <>
+                                                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                        Restoring...
+                                                    </>
+                                                ) : (
+                                                    'Restore'
+                                                )}
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => setDeleteId(child.id)}
+                                                disabled={loading === child.id}
+                                            >
+                                                {loading === child.id ? (
+                                                    <>
+                                                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                        Deleting...
+                                                    </>
+                                                ) : (
+                                                    'Delete Permanently'
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
                             ))
                         )}
                     </TableBody>
@@ -159,10 +159,7 @@ export default function Archived({ children }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => restoreId && handleRestore(restoreId)}
-                            className="bg-green-600 hover:bg-green-700"
-                        >
+                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} className="bg-green-600 hover:bg-green-700">
                             Restore
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -180,10 +177,7 @@ export default function Archived({ children }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => deleteId && handleForceDelete(deleteId)}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>

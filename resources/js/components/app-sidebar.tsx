@@ -15,7 +15,7 @@ import {
 import { route } from '@/lib/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, ShieldCheck, UserCog, UserPen } from 'lucide-react';
+import { Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, Pill, ShieldCheck, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -54,6 +54,7 @@ export function AppSidebar() {
         { title: 'Dashboard', href: route('dashboard'), icon: LayoutGrid },
         { title: 'Child Profiles', href: route('children.index'), icon: UserPen },
         { title: 'Vaccines', href: route('vaccines.index'), icon: ShieldCheck },
+        { title: 'Vitamins', href: route('vitamins.index'), icon: Pill },
         { title: 'Announcements', href: route('announcements.index'), icon: Megaphone },
         { title: 'Send SMS', href: route('sms.index'), icon: MessageSquare },
     ];

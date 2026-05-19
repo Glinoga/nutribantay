@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
-use App\Models\ChildVaccine;
-use App\Models\ChildVaccineDose;
-use App\Models\Vaccine;
+use App\Models\ChildVitamin;
+use App\Models\ChildVitaminDose;
+use App\Models\Vitamin;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ChildVaccineController extends Controller
+class ChildVitaminController extends Controller
 {
     public function index(Child $child)
     {
@@ -19,26 +19,26 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
-        $childVaccines = ChildVaccine::where('child_id', $child->id)
-            ->with(['vaccine', 'doses.administeredBy:id,name'])
+        $childVitamins = ChildVitamin::where('child_id', $child->id)
+            ->with(['vitamin', 'doses.administeredBy:id,name'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $availableVaccines = Vaccine::whereNotIn(
+        $availableVitamins = Vitamin::whereNotIn(
             'id',
-            $childVaccines->pluck('vaccine_id')
+            $childVitamins->pluck('vitamin_id')
         )->orderBy('name')->get();
 
-        return Inertia::render('Children/Vaccines', [
+        return Inertia::render('Children/Vitamins', [
             'child' => [
                 'id' => $child->id,
                 'slug' => $child->slug,
                 'fullname' => $child->fullname,
                 'barangay' => $child->barangay,
             ],
-            'child_vaccines' => $childVaccines->map(fn ($cv) => [
+            'child_vitamins' => $childVitamins->map(fn ($cv) => [
                 'id' => $cv->id,
-                'vaccine' => $cv->vaccine,
+                'vitamin' => $cv->vitamin,
                 'progress' => $cv->progress,
                 'doses' => $cv->doses->map(fn ($dose) => [
                     'id' => $dose->id,
@@ -50,7 +50,7 @@ class ChildVaccineController extends Controller
                     'administered_by' => $dose->administeredBy?->name,
                 ]),
             ]),
-            'available_vaccines' => $availableVaccines->map(fn ($v) => [
+            'available_vitamins' => $availableVitamins->map(fn ($v) => [
                 'id' => $v->id,
                 'name' => $v->name,
             ]),
@@ -66,26 +66,26 @@ class ChildVaccineController extends Controller
         }
 
         $request->validate([
-            'vaccine_id' => 'required|exists:vaccines,id',
+            'vitamin_id' => 'required|exists:vitamins,id',
         ]);
 
-        $existing = ChildVaccine::where('child_id', $child->id)
-            ->where('vaccine_id', $request->vaccine_id)
+        $existing = ChildVitamin::where('child_id', $child->id)
+            ->where('vitamin_id', $request->vitamin_id)
             ->first();
 
         if ($existing) {
-            return back()->with('error', 'Vaccine is already assigned to this child.');
+            return back()->with('error', 'Vitamin is already assigned to this child.');
         }
 
-        ChildVaccine::create([
+        ChildVitamin::create([
             'child_id' => $child->id,
-            'vaccine_id' => $request->vaccine_id,
+            'vitamin_id' => $request->vitamin_id,
         ]);
 
-        return back()->with('success', 'Vaccine added to child.');
+        return back()->with('success', 'Vitamin added to child.');
     }
 
-    public function destroy(Child $child, ChildVaccine $childVaccine)
+    public function destroy(Child $child, ChildVitamin $childVitamin)
     {
         $user = auth()->user();
 
@@ -93,16 +93,16 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
-        if ($childVaccine->child_id !== $child->id) {
+        if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
 
-        $childVaccine->delete();
+        $childVitamin->delete();
 
-        return back()->with('success', 'Vaccine removed from child.');
+        return back()->with('success', 'Vitamin removed from child.');
     }
 
-    public function recordDose(Request $request, Child $child, ChildVaccine $childVaccine)
+    public function recordDose(Request $request, Child $child, ChildVitamin $childVitamin)
     {
         $user = auth()->user();
 
@@ -110,7 +110,7 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
-        if ($childVaccine->child_id !== $child->id) {
+        if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
 
@@ -123,16 +123,16 @@ class ChildVaccineController extends Controller
 
         $doseNumber = (int) $request->dose_number;
 
-        $duplicate = ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
+        $duplicate = ChildVitaminDose::where('child_vitamin_id', $childVitamin->id)
             ->where('dose_number', $doseNumber)
             ->exists();
 
         if ($duplicate) {
-            return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vaccine.']);
+            return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vitamin.']);
         }
 
-        ChildVaccineDose::create([
-            'child_vaccine_id' => $childVaccine->id,
+        ChildVitaminDose::create([
+            'child_vitamin_id' => $childVitamin->id,
             'dose_number' => $doseNumber,
             'date_given' => $request->date_given ? $request->date_given : null,
             'next_due_date' => $request->next_due_date ? $request->next_due_date : null,
@@ -143,7 +143,7 @@ class ChildVaccineController extends Controller
         return back()->with('success', 'Dose recorded successfully.');
     }
 
-    public function updateDose(Request $request, Child $child, ChildVaccine $childVaccine, ChildVaccineDose $dose)
+    public function updateDose(Request $request, Child $child, ChildVitamin $childVitamin, ChildVitaminDose $dose)
     {
         $user = auth()->user();
 
@@ -151,11 +151,11 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
-        if ($childVaccine->child_id !== $child->id) {
+        if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
 
-        if ($dose->child_vaccine_id !== $childVaccine->id) {
+        if ($dose->child_vitamin_id !== $childVitamin->id) {
             abort(404);
         }
 
@@ -174,7 +174,7 @@ class ChildVaccineController extends Controller
         return back()->with('success', 'Dose updated successfully.');
     }
 
-    public function destroyDose(Child $child, ChildVaccine $childVaccine, ChildVaccineDose $dose)
+    public function destroyDose(Child $child, ChildVitamin $childVitamin, ChildVitaminDose $dose)
     {
         $user = auth()->user();
 
@@ -182,11 +182,11 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
-        if ($childVaccine->child_id !== $child->id) {
+        if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
 
-        if ($dose->child_vaccine_id !== $childVaccine->id) {
+        if ($dose->child_vitamin_id !== $childVitamin->id) {
             abort(404);
         }
 

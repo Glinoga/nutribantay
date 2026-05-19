@@ -5,11 +5,7 @@ interface IllustrationProps {
 }
 
 function IllustrationWrapper({ className, children }: React.PropsWithChildren<IllustrationProps>) {
-    return (
-        <div className={cn('mx-auto', className)}>
-            {children}
-        </div>
-    );
+    return <div className={cn('mx-auto', className)}>{children}</div>;
 }
 
 export function BadRequestIllustration({ className }: IllustrationProps) {
@@ -21,8 +17,22 @@ export function BadRequestIllustration({ className }: IllustrationProps) {
                 <circle cx="60" cy="60" r="40" stroke="var(--warning, #a68a3e)" strokeWidth="2" fill="none" opacity="0.2" />
                 <path d="M60 40V60" stroke="var(--warning, #a68a3e)" strokeWidth="4" strokeLinecap="round" />
                 <circle cx="60" cy="72" r="3" fill="var(--warning, #a68a3e)" />
-                <path d="M40 45L48 40L52 50" stroke="var(--warning, #a68a3e)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-                <path d="M80 45L72 40L68 50" stroke="var(--warning, #a68a3e)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+                <path
+                    d="M40 45L48 40L52 50"
+                    stroke="var(--warning, #a68a3e)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.5"
+                />
+                <path
+                    d="M80 45L72 40L68 50"
+                    stroke="var(--warning, #a68a3e)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.5"
+                />
             </svg>
         </IllustrationWrapper>
     );
@@ -39,7 +49,14 @@ export function UnauthorizedIllustration({ className }: IllustrationProps) {
                 <rect x="54" y="56" width="12" height="4" rx="2" fill="var(--warning, #a68a3e)" />
                 <path d="M60 70V90" stroke="var(--warning, #a68a3e)" strokeWidth="4" strokeLinecap="round" />
                 <path d="M45 95H75" stroke="var(--warning, #a68a3e)" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-                <path d="M50 75L60 85L70 75" stroke="var(--warning, #a68a3e)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" />
+                <path
+                    d="M50 75L60 85L70 75"
+                    stroke="var(--warning, #a68a3e)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.4"
+                />
             </svg>
         </IllustrationWrapper>
     );
@@ -68,7 +85,14 @@ export function NotFoundIllustration({ className }: IllustrationProps) {
                 <circle cx="52" cy="52" r="22" stroke="var(--info, #5a7db0)" strokeWidth="3" fill="none" />
                 <circle cx="52" cy="52" r="14" stroke="var(--info, #5a7db0)" strokeWidth="2" fill="none" opacity="0.4" />
                 <path d="M68 68L95 95" stroke="var(--info, #5a7db0)" strokeWidth="4" strokeLinecap="round" />
-                <path d="M52 42V52L60 58" stroke="var(--info, #5a7db0)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+                <path
+                    d="M52 42V52L60 58"
+                    stroke="var(--info, #5a7db0)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.6"
+                />
                 <path d="M35 30L28 25" stroke="var(--info, #5a7db0)" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
                 <path d="M30 35L22 32" stroke="var(--info, #5a7db0)" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
                 <path d="M75 30L82 25" stroke="var(--info, #5a7db0)" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
@@ -80,7 +104,15 @@ export function NotFoundIllustration({ className }: IllustrationProps) {
 export function ExpiredIllustration({ className }: IllustrationProps) {
     return (
         <IllustrationWrapper className={className}>
-            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Session expired">
+            <svg
+                width="120"
+                height="120"
+                viewBox="0 0 120 120"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Session expired"
+            >
                 <title>Session Expired</title>
                 <circle cx="60" cy="60" r="45" stroke="var(--warning, #a68a3e)" strokeWidth="3" fill="none" />
                 <path d="M60 35V60L75 70" stroke="var(--warning, #a68a3e)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -120,7 +152,14 @@ export function ServerErrorIllustration({ className }: IllustrationProps) {
                 <rect x="38" y="32" width="44" height="8" rx="2" stroke="var(--destructive, #c14646)" strokeWidth="2" fill="none" opacity="0.4" />
                 <circle cx="60" cy="55" r="3" fill="var(--destructive, #c14646)" />
                 <rect x="50" y="65" width="20" height="4" rx="2" fill="var(--destructive, #c14646)" opacity="0.7" />
-                <path d="M55 75L60 80L65 75" stroke="var(--destructive, #c14646)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+                <path
+                    d="M55 75L60 80L65 75"
+                    stroke="var(--destructive, #c14646)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    opacity="0.5"
+                />
                 <path d="M45 90H75" stroke="var(--destructive, #c14646)" strokeWidth="2.5" strokeLinecap="round" opacity="0.4" />
                 <path d="M35 18L30 12" stroke="var(--destructive, #c14646)" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
                 <path d="M85 18L90 12" stroke="var(--destructive, #c14646)" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
@@ -133,7 +172,15 @@ export function ServerErrorIllustration({ className }: IllustrationProps) {
 export function UnavailableIllustration({ className }: IllustrationProps) {
     return (
         <IllustrationWrapper className={className}>
-            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Service unavailable">
+            <svg
+                width="120"
+                height="120"
+                viewBox="0 0 120 120"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-label="Service unavailable"
+            >
                 <title>Service Unavailable</title>
                 <circle cx="60" cy="60" r="45" stroke="var(--info, #5a7db0)" strokeWidth="3" fill="none" />
                 <path d="M40 55C42 48 48 42 55 40" stroke="var(--info, #5a7db0)" strokeWidth="2.5" strokeLinecap="round" opacity="0.5" />

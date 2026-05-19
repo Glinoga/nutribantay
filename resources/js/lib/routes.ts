@@ -127,6 +127,22 @@ export function route(name: string, params?: Record<string, string | number | nu
         'categories.update': '/categories/{category}',
         'categories.destroy': '/categories/{category}',
 
+        // Vitamins
+        'vitamins.index': '/vitamins',
+        'vitamins.create': '/vitamins/create',
+        'vitamins.store': '/vitamins',
+        'vitamins.edit': '/vitamins/{vitamin}/edit',
+        'vitamins.update': '/vitamins/{vitamin}',
+        'vitamins.destroy': '/vitamins/{vitamin}',
+
+        // Child Vitamins
+        'children.vitamins.index': '/children/{child}/vitamins',
+        'children.vitamins.store': '/children/{child}/vitamins',
+        'children.vitamins.destroy': '/children/{child}/vitamins/{childVitamin}',
+        'children.vitamins.doses.store': '/children/{child}/vitamins/{childVitamin}/doses',
+        'children.vitamins.doses.update': '/children/{child}/vitamins/{childVitamin}/doses/{dose}',
+        'children.vitamins.doses.destroy': '/children/{child}/vitamins/{childVitamin}/doses/{dose}',
+
         // Recommendations
         'recommendations.generate': '/recommendations',
 

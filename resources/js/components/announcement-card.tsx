@@ -97,11 +97,7 @@ export default function AnnouncementCard({
                     >
                         {announcement.category.name}
                     </Badge>
-                    {announcement.is_expired && (
-                        <Badge className="bg-red-500 font-semibold text-white shadow-sm">
-                            Expired
-                        </Badge>
-                    )}
+                    {announcement.is_expired && <Badge className="bg-red-500 font-semibold text-white shadow-sm">Expired</Badge>}
                 </div>
 
                 <h3 className="mb-3 text-lg font-bold text-gray-900 transition-colors group-hover:text-teal-600 dark:text-[var(--text)] dark:group-hover:text-[var(--primary)]">
@@ -142,19 +138,11 @@ export default function AnnouncementCard({
                                 onClick={handleShare}
                                 className="flex cursor-pointer items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-teal-600 dark:text-[var(--text-muted)] dark:hover:text-[var(--primary)]"
                             >
-                                {copied ? (
-                                    <Check className="h-4 w-4 text-green-500" />
-                                ) : (
-                                    <Share2 className="h-4 w-4" />
-                                )}
-                                <span className={copied ? 'text-green-500' : ''}>
-                                    {copied ? 'Copied!' : 'Share'}
-                                </span>
+                                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
+                                <span className={copied ? 'text-green-500' : ''}>{copied ? 'Copied!' : 'Share'}</span>
                             </button>
                         )}
-                        <div className={!isAdmin && onShare ? 'ml-auto' : ''}>
-                            {renderActions()}
-                        </div>
+                        <div className={!isAdmin && onShare ? 'ml-auto' : ''}>{renderActions()}</div>
                     </div>
                 </div>
             </div>

@@ -8,11 +8,13 @@ use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
+use App\Models\ChildVitamin;
+use App\Models\ChildVitaminDose;
 use App\Models\HealthLog;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ChildController extends Controller
@@ -93,6 +95,33 @@ class ChildController extends Controller
             $query->whereIn('id', $upcomingOnlyChildIdsQuery);
         }
 
+        // Vitamin status filter
+        $vitaminStatus = $request->vitamin_status;
+
+        if ($vitaminStatus === 'overdue') {
+            $overdueVitaminChildIds = ChildVitaminDose::select('cvd.child_id')
+                ->join('child_vitamins as cv', 'child_vitamin_doses.child_vitamin_id', '=', 'cv.id')
+                ->whereNull('child_vitamin_doses.date_given')
+                ->whereNotNull('child_vitamin_doses.next_due_date')
+                ->where('child_vitamin_doses.next_due_date', '<', $now->toDateString());
+            $query->whereIn('id', $overdueVitaminChildIds);
+        } elseif ($vitaminStatus === 'upcoming') {
+            $upcomingVitaminChildIds = ChildVitaminDose::select('cvd.child_id')
+                ->join('child_vitamins as cv', 'child_vitamin_doses.child_vitamin_id', '=', 'cv.id')
+                ->whereNull('child_vitamin_doses.date_given')
+                ->whereNotNull('child_vitamin_doses.next_due_date')
+                ->where('child_vitamin_doses.next_due_date', '>=', $now->toDateString())
+                ->whereNotIn('cv.child_id', function ($q) use ($now) {
+                    $q->select('cvd2.child_id')
+                        ->from('child_vitamin_doses as cvd2')
+                        ->join('child_vitamins as cv2', 'cvd2.child_vitamin_id', '=', 'cv2.id')
+                        ->whereNull('cvd2.date_given')
+                        ->whereNotNull('cvd2.next_due_date')
+                        ->where('cvd2.next_due_date', '<', $now->toDateString());
+                });
+            $query->whereIn('id', $upcomingVitaminChildIds);
+        }
+
         $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
 
         // Get all pending vaccine doses for this barangay (for stats and badges)
@@ -125,6 +154,32 @@ class ChildController extends Controller
         $upcomingCount = $upcomingOnlyChildIds->count();
         $mixedCount = $mixedChildIds->count();
 
+        // Get all pending vitamin doses for this barangay (for stats and badges)
+        $pendingVitaminDoses = ChildVitaminDose::whereNull('date_given')
+            ->whereNotNull('next_due_date')
+            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->with(['childVitamin.child:id,barangay'])
+            ->cursor()
+            ->groupBy('childVitamin.child_id');
+
+        $vitaminOverdueChildIds = collect([]);
+        $vitaminUpcomingChildIds = collect([]);
+
+        foreach ($pendingVitaminDoses as $childId => $doses) {
+            $hasOverdue = $doses->some(fn ($dose) => $dose->next_due_date && $dose->next_due_date->lt($now));
+            $hasUpcoming = $doses->some(fn ($dose) => $dose->next_due_date && ! $dose->next_due_date->lt($now));
+
+            if ($hasOverdue) {
+                $vitaminOverdueChildIds->push($childId);
+            }
+            if ($hasUpcoming) {
+                $vitaminUpcomingChildIds->push($childId);
+            }
+        }
+
+        $vitaminOverdueCount = $vitaminOverdueChildIds->count();
+        $vitaminUpcomingCount = $vitaminUpcomingChildIds->count();
+
         $avgBmi = Child::where('barangay', $user->barangay)
             ->whereNotNull('weight')
             ->whereNotNull('height')
@@ -141,6 +196,8 @@ class ChildController extends Controller
             'vaccine_overdue' => $overdueCount,
             'vaccine_upcoming' => $upcomingCount,
             'vaccine_mixed' => $mixedCount,
+            'vitamin_overdue' => $vitaminOverdueCount,
+            'vitamin_upcoming' => $vitaminUpcomingCount,
         ];
 
         return Inertia::render('Children/Index', [
@@ -169,6 +226,9 @@ class ChildController extends Controller
                     : ($overdueChildIds->contains($child->id)
                         ? 'overdue'
                         : ($upcomingOnlyChildIds->contains($child->id) ? 'upcoming' : null)),
+                'vitamin_alert' => $vitaminOverdueChildIds->contains($child->id)
+                    ? 'overdue'
+                    : ($vitaminUpcomingChildIds->contains($child->id) ? 'upcoming' : null),
             ]),
             'pagination' => [
                 'current_page' => $children->currentPage(),
@@ -181,6 +241,7 @@ class ChildController extends Controller
             'search' => $request->search,
             'sex' => $request->sex,
             'vaccine_status' => $vaccineStatus,
+            'vitamin_status' => $vitaminStatus,
         ]);
     }
 
@@ -853,6 +914,11 @@ class ChildController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $childVitamins = ChildVitamin::where('child_id', $child->id)
+            ->with(['vitamin', 'doses.administeredBy:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $filename = 'child_'.$child->id.'_export_'.now()->format('Y-m-d').'.csv';
 
         $headers = [
@@ -860,7 +926,7 @@ class ChildController extends Controller
             'Content-Disposition' => "attachment; filename=$filename",
         ];
 
-        $callback = function () use ($child, $childVaccines) {
+        $callback = function () use ($child, $childVaccines, $childVitamins) {
             $file = fopen('php://output', 'w');
 
             // UTF-8 BOM for Excel compatibility
@@ -952,6 +1018,46 @@ class ChildController extends Controller
                         foreach ($cv->doses as $dose) {
                             fputcsv($file, [
                                 $cv->vaccine?->name ?? '-',
+                                $dose->dose_number,
+                                $dose->date_given?->format('Y-m-d') ?: '—',
+                                $dose->next_due_date?->format('Y-m-d') ?: '—',
+                                $dose->dose_status,
+                                $dose->administeredBy?->name ?? '—',
+                                $dose->remarks ?: '—',
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Blank separator row
+            fputcsv($file, []);
+
+            // ── Section 4: Vitamin History ──
+            fputcsv($file, ['Vitamin History']);
+            fputcsv($file, [
+                'Vitamin Name', 'Dose #', 'Date Given',
+                'Next Due Date', 'Status', 'Administered By', 'Remarks',
+            ]);
+
+            if ($childVitamins->isEmpty()) {
+                fputcsv($file, ['No vitamins recorded.']);
+            } else {
+                foreach ($childVitamins as $cvt) {
+                    if ($cvt->doses->isEmpty()) {
+                        fputcsv($file, [
+                            $cvt->vitamin?->name ?? '-',
+                            '—',
+                            '—',
+                            '—',
+                            'Not Started',
+                            '—',
+                            '—',
+                        ]);
+                    } else {
+                        foreach ($cvt->doses as $dose) {
+                            fputcsv($file, [
+                                $cvt->vitamin?->name ?? '-',
                                 $dose->dose_number,
                                 $dose->date_given?->format('Y-m-d') ?: '—',
                                 $dose->next_due_date?->format('Y-m-d') ?: '—',

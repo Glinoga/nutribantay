@@ -14,10 +14,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
         <>
             <Head title={title}>
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=montserrat:400,500,600,700,800"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=montserrat:400,500,600,700,800" rel="stylesheet" />
                 <style>{`
                     html, body, #app {
                         font-family: 'Montserrat', sans-serif !important;
@@ -90,12 +87,12 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                 style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
                 {showHeader && (
-                    <header className="fixed top-0 z-50 z-[1001] w-full bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm dark:bg-[var(--bg)]/70 dark:border-b dark:border-[var(--border)]">
+                    <header className="fixed top-0 z-50 z-[1001] w-full border-b border-white/30 bg-white/70 shadow-sm backdrop-blur-xl dark:border-b dark:border-[var(--border)] dark:bg-[var(--bg)]/70">
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
                                 <Link href="/" className="flex items-center gap-2">
                                     <img src="/NutriBantay Logo.png" alt="NutriBantay" className="h-8 w-auto md:h-10" />
-                                    <span className="text-xl font-bold md:text-2xl gradient-text">NutriBantay</span>
+                                    <span className="gradient-text text-xl font-bold md:text-2xl">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
                                     <Link
@@ -125,7 +122,17 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                                     aria-label="Toggle navigation menu"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
                                         {mobileMenuOpen ? (
                                             <>
                                                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -180,9 +187,9 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                     <div className="mx-auto max-w-7xl px-6">
                         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-3">
                             <div>
-                                <div className="flex items-center gap-3 mb-3">
+                                <div className="mb-3 flex items-center gap-3">
                                     <img src="/NutriBantay Logo.png" alt="NutriBantay" className="h-10 w-auto" />
-                                    <h3 className="text-2xl font-bold gradient-text">NutriBantay</h3>
+                                    <h3 className="gradient-text text-2xl font-bold">NutriBantay</h3>
                                 </div>
                                 <div className="section-divider"></div>
                                 <p className="mb-4 text-[var(--text-muted)]">
@@ -194,7 +201,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Follow NutriBantay on Facebook"
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-all hover:bg-gradient-to-r hover:from-teal-600 hover:to-cyan-500 hover:shadow-md hover:scale-110"
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-all hover:scale-110 hover:bg-gradient-to-r hover:from-teal-600 hover:to-cyan-500 hover:shadow-md"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"

@@ -73,7 +73,7 @@ export default function Announcements({ announcements, pagination, categories }:
                 announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (announcement.category?.name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase())
+                (announcement.category?.name?.toLowerCase() ?? '').includes(searchQuery.toLowerCase());
 
             const matchesCategory = activeFilter === null || (announcement.category && announcement.category.name === activeFilter);
 
@@ -123,7 +123,7 @@ export default function Announcements({ announcements, pagination, categories }:
                 }
             `}</style>
 
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] dark:via-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20">
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-20 md:pt-28 md:pb-20 dark:via-[var(--bg)]">
                 <div className="absolute top-0 left-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -151,7 +151,7 @@ export default function Announcements({ announcements, pagination, categories }:
                             id="announcement-search"
                             type="text"
                             placeholder="Search announcements..."
-                            className="w-full bg-transparent px-4 py-3 text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-teal-500/50 rounded-full"
+                            className="w-full rounded-full bg-transparent px-4 py-3 text-[var(--text)] focus:ring-2 focus:ring-teal-500/50 focus:outline-none"
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
@@ -192,17 +192,14 @@ export default function Announcements({ announcements, pagination, categories }:
                                 return (
                                     <button
                                         key={category.id}
-                                        className={`cursor-pointer inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                                        className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                                             isActive
                                                 ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md'
                                                 : 'border-[var(--border)] bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:bg-[var(--bg-light)]'
                                         }`}
                                         onClick={() => handleFilterClick(category.name)}
                                     >
-                                        <span
-                                            className="h-2.5 w-2.5 rounded-full"
-                                            style={{ backgroundColor: catColor }}
-                                        />
+                                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: catColor }} />
                                         {category.name}
                                     </button>
                                 );
@@ -234,12 +231,9 @@ export default function Announcements({ announcements, pagination, categories }:
 
                     {pagination.total > 0 && (
                         <div className="mb-6 text-center text-sm text-[var(--text-muted)]">
-                            Showing{' '}
-                            <span className="font-medium text-[var(--text)]">{pagination.from}</span>
-                            –<span className="font-medium text-[var(--text)]">{pagination.to}</span>
-                            {' '}of{' '}
-                            <span className="font-medium text-[var(--text)]">{pagination.total}</span>{' '}
-                            announcement{pagination.total !== 1 ? 's' : ''}
+                            Showing <span className="font-medium text-[var(--text)]">{pagination.from}</span>–
+                            <span className="font-medium text-[var(--text)]">{pagination.to}</span> of{' '}
+                            <span className="font-medium text-[var(--text)]">{pagination.total}</span> announcement{pagination.total !== 1 ? 's' : ''}
                         </div>
                     )}
 

@@ -3,11 +3,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Calculator, Check, Eye, Heart } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useEffect, useState } from 'react';
 
 type Child = {
@@ -324,11 +324,15 @@ export default function Create({
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Weight (kg)</p>
-                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.weight ?? 'N/A'}</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                    {selectedRecord.weight ?? 'N/A'}
+                                                </p>
                                             </div>
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Height (cm)</p>
-                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.height ?? 'N/A'}</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                    {selectedRecord.height ?? 'N/A'}
+                                                </p>
                                             </div>
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">BMI</p>
@@ -354,7 +358,9 @@ export default function Create({
                                             {selectedRecord.micronutrient_powder && (
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">MNP</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.micronutrient_powder}</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                        {selectedRecord.micronutrient_powder}
+                                                    </p>
                                                 </div>
                                             )}
                                             {selectedRecord.rutf && (
@@ -372,16 +378,22 @@ export default function Create({
                                             {selectedRecord.complementary_food && (
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Complementary Food</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.complementary_food}</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                        {selectedRecord.complementary_food}
+                                                    </p>
                                                 </div>
                                             )}
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vitamin A</p>
-                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.vitamin_a ? 'Yes' : 'No'}</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                    {selectedRecord.vitamin_a ? 'Yes' : 'No'}
+                                                </p>
                                             </div>
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Deworming</p>
-                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.deworming ? 'Yes' : 'No'}</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                    {selectedRecord.deworming ? 'Yes' : 'No'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -393,11 +405,15 @@ export default function Create({
                                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vaccine Name</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.vaccine_name}</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                        {selectedRecord.vaccine_name}
+                                                    </p>
                                                 </div>
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Dose Number</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.dose_number ?? 'N/A'}</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                                                        {selectedRecord.dose_number ?? 'N/A'}
+                                                    </p>
                                                 </div>
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date Given</p>
@@ -507,7 +523,9 @@ export default function Create({
                                     readOnly
                                     className="mt-1 w-full cursor-not-allowed bg-gray-100 font-semibold text-gray-900 dark:bg-gray-600 dark:text-gray-100"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Calculated automatically after saving based on WHO growth standards</p>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Calculated automatically after saving based on WHO growth standards
+                                </p>
                             </div>
                         </div>
 

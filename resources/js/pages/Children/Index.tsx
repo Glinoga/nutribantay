@@ -1,10 +1,11 @@
-import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { readExcel } from '@/utils/excel';
 import smartToast from '@/utils/smartToast';
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Activity,
@@ -16,7 +17,6 @@ import {
     Download,
     Edit2,
     FileSpreadsheet,
-    MapPin,
     Phone,
     Plus,
     Printer,
@@ -31,7 +31,6 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
 type Child = {
     id: number;
@@ -49,6 +48,7 @@ type Child = {
     address?: string | null;
     creator?: { name: string | null };
     vaccine_alert?: 'overdue' | 'upcoming' | 'mixed' | null;
+    vitamin_alert?: 'overdue' | 'upcoming' | null;
 };
 
 type Pagination = {
@@ -68,6 +68,8 @@ type Stats = {
     vaccine_overdue: number;
     vaccine_upcoming: number;
     vaccine_mixed: number;
+    vitamin_overdue: number;
+    vitamin_upcoming: number;
 };
 
 type IndexProps = {
@@ -78,6 +80,7 @@ type IndexProps = {
     flash?: { success?: string };
     stats: Stats;
     vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
+    vitamin_status?: 'overdue' | 'upcoming' | null;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
@@ -89,7 +92,7 @@ type AuthProps = {
     };
 };
 
-export default function Index({ children, pagination, search = '', sex = '', flash, stats, vaccine_status = null }: IndexProps) {
+export default function Index({ children, pagination, search = '', sex = '', flash, stats, vaccine_status = null, vitamin_status = null }: IndexProps) {
     const { auth } = usePage<AuthProps>().props;
     const [searchQuery, setSearchQuery] = useState(search);
 
@@ -99,6 +102,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
     const activeSex = sex || '';
     const activeVaccine = vaccine_status || '';
+    const activeVitamin = vitamin_status || '';
 
     const roles = auth?.roles ?? [];
     const isHealthworker = roles.includes('Healthworker');
@@ -125,6 +129,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
+        if (activeVitamin) params.set('vitamin_status', activeVitamin);
         window.location.href = `${route('children.print')}?${params.toString()}`;
     };
 
@@ -133,6 +138,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
+        if (activeVitamin) params.set('vitamin_status', activeVitamin);
         window.location.href = `${route('children.export')}?${params.toString()}`;
     };
 
@@ -261,7 +267,8 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             const params: Record<string, string> = { search: searchQuery };
             if (activeSex) params.sex = activeSex;
             if (activeVaccine) params.vaccine_status = activeVaccine;
-router.get(route('children.index'), params, { replace: true });
+            if (activeVitamin) params.vitamin_status = activeVitamin;
+            router.get(route('children.index'), params, { replace: true });
         }
     };
 
@@ -275,15 +282,16 @@ router.get(route('children.index'), params, { replace: true });
         if (searchQuery) params.search = searchQuery;
         if (sex) params.sex = sex;
         if (vaccine) params.vaccine_status = vaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
         router.get(route('children.index'), params, { replace: true });
     };
-
 
     const handleSexFilter = (sexValue: string) => {
         const params: Record<string, string> = {};
         if (sexValue !== 'all') params.sex = sexValue;
         if (searchQuery) params.search = searchQuery;
         if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -292,6 +300,16 @@ router.get(route('children.index'), params, { replace: true });
         if (vaccineValue !== 'all') params.vaccine_status = vaccineValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
+        router.get(route('children.index'), params, { replace: true });
+    };
+
+    const handleVitaminFilter = (vitaminValue: string) => {
+        const params: Record<string, string> = {};
+        if (vitaminValue !== 'all') params.vitamin_status = vitaminValue;
+        if (searchQuery) params.search = searchQuery;
+        if (activeSex) params.sex = activeSex;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -299,6 +317,7 @@ router.get(route('children.index'), params, { replace: true });
         const params: Record<string, string | number> = { page, search: searchQuery };
         if (activeSex) params.sex = activeSex;
         if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -428,7 +447,7 @@ router.get(route('children.index'), params, { replace: true });
                     </div>
 
                     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Children</p>
@@ -440,7 +459,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg dark:border-blue-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg dark:border-blue-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Male</p>
@@ -452,7 +471,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg dark:border-pink-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg dark:border-pink-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Female</p>
@@ -464,7 +483,7 @@ router.get(route('children.index'), params, { replace: true });
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg dark:border-purple-800/50">
+                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg dark:border-purple-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg BMI</p>
@@ -486,7 +505,7 @@ router.get(route('children.index'), params, { replace: true });
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearch}
-                                className="w-full rounded-md border border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                             />
                             {searchQuery && (
                                 <button
@@ -512,33 +531,33 @@ router.get(route('children.index'), params, { replace: true });
                                 </button>
                             )}
 
-{canManageChildren && (
-                                 <button
-                                      onClick={openImportModal}
-                                      className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                                 >
-                                      <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
-                                     Upload Excel
-                                 </button>
-                             )}
+                            {canManageChildren && (
+                                <button
+                                    onClick={openImportModal}
+                                    className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                >
+                                    <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
+                                    Upload Excel
+                                </button>
+                            )}
 
-                             {canManageChildren && (
-                                  <Link href={route('children.archived')}>
-                                     <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
-                                         <Trash2 className="mr-1.5 h-4 w-4" />
-                                         View Archived
-                                     </Button>
-                                 </Link>
-                             )}
+                            {canManageChildren && (
+                                <Link href={route('children.archived')}>
+                                    <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
+                                        <Trash2 className="mr-1.5 h-4 w-4" />
+                                        View Archived
+                                    </Button>
+                                </Link>
+                            )}
 
-                             {canManageChildren && (
-                                  <Link href={route('children.create')}>
-                                     <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
-                                         <Plus className="mr-1.5 h-4 w-4" />
-                                         Add Child
-                                     </Button>
-                                 </Link>
-                             )}
+                            {canManageChildren && (
+                                <Link href={route('children.create')}>
+                                    <Button className="bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
+                                        <Plus className="mr-1.5 h-4 w-4" />
+                                        Add Child
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -550,30 +569,30 @@ router.get(route('children.index'), params, { replace: true });
                                 router.get(route('children.index'), params, { replace: true });
                             }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                !activeSex && !activeVaccine
+                                !activeSex && !activeVaccine && !activeVitamin
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                             }`}
-                         >
-                             All ({stats.total})
-                         </button>
-                         <button
-                             onClick={() => handleSexFilter('Male')}
-                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                 activeSex === 'Male'
-                                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                             }`}
-                         >
-                             Male ({stats.male})
-                         </button>
-                         <button
-                             onClick={() => handleSexFilter('Female')}
-                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                 activeSex === 'Female'
-                                     ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                             }`}
+                            }`}
+                        >
+                            All ({stats.total})
+                        </button>
+                        <button
+                            onClick={() => handleSexFilter('Male')}
+                            className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                activeSex === 'Male'
+                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
+                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                        >
+                            Male ({stats.male})
+                        </button>
+                        <button
+                            onClick={() => handleSexFilter('Female')}
+                            className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                activeSex === 'Female'
+                                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
+                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                            }`}
                         >
                             Female ({stats.female})
                         </button>
@@ -623,10 +642,43 @@ router.get(route('children.index'), params, { replace: true });
                                 Mixed ({stats.vaccine_mixed})
                             </button>
                         )}
+
+                        <div className="mx-2 h-6 w-px bg-gray-300" aria-hidden="true" />
+
+                        {stats.vitamin_overdue > 0 && (
+                            <button
+                                onClick={() => handleVitaminFilter('overdue')}
+                                className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    activeVitamin === 'overdue'
+                                        ? 'bg-gradient-to-r from-orange-600 to-orange-500 text-white shadow-md'
+                                        : 'border border-orange-200 bg-white text-orange-700 hover:bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400 dark:hover:bg-orange-900/30'
+                                }`}
+                                aria-pressed={activeVitamin === 'overdue'}
+                            >
+                                <AlertTriangle className="h-3.5 w-3.5" />
+                                Vitamin Overdue ({stats.vitamin_overdue})
+                            </button>
+                        )}
+                        {stats.vitamin_upcoming > 0 && (
+                            <button
+                                onClick={() => handleVitaminFilter('upcoming')}
+                                className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                    activeVitamin === 'upcoming'
+                                        ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-md'
+                                        : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30'
+                                }`}
+                                aria-pressed={activeVitamin === 'upcoming'}
+                            >
+                                <Calendar className="h-3.5 w-3.5" />
+                                Vitamin Due Soon ({stats.vitamin_upcoming})
+                            </button>
+                        )}
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
+                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">
+                            {flash.success}
+                        </div>
                     )}
 
                     {children.length === 0 ? (
@@ -659,7 +711,9 @@ router.get(route('children.index'), params, { replace: true });
                                                                 {child.fullname.charAt(0).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <p className="truncate text-sm font-bold text-gray-900 dark:text-gray-100">{child.fullname}</p>
+                                                                <p className="truncate text-sm font-bold text-gray-900 dark:text-gray-100">
+                                                                    {child.fullname}
+                                                                </p>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</p>
                                                                 {child.vaccine_alert && (
                                                                     <div className="mt-0.5 flex items-center gap-1">
@@ -675,6 +729,18 @@ router.get(route('children.index'), params, { replace: true });
                                                                                 Vaccine Due Soon
                                                                             </span>
                                                                         )}
+                                                                        {child.vitamin_alert === 'overdue' && (
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-orange-100 px-1.5 py-0.5 text-[10px] font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                                                                                <AlertTriangle className="h-3 w-3" />
+                                                                                Vitamin Overdue
+                                                                            </span>
+                                                                        )}
+                                                                        {child.vitamin_alert === 'upcoming' && (
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                                                                <Calendar className="h-3 w-3" />
+                                                                                Vitamin Due Soon
+                                                                            </span>
+                                                                        )}
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -684,12 +750,16 @@ router.get(route('children.index'), params, { replace: true });
                                                     <div className="mb-3 grid grid-cols-3 gap-2">
                                                         <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
                                                             <Scale className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">{child.weight ?? '-'}</p>
+                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+                                                                {child.weight ?? '-'}
+                                                            </p>
                                                             <p className="text-[10px] text-gray-500 dark:text-gray-400">kg</p>
                                                         </div>
                                                         <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
                                                             <Ruler className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">{child.height ?? '-'}</p>
+                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+                                                                {child.height ?? '-'}
+                                                            </p>
                                                             <p className="text-[10px] text-gray-500 dark:text-gray-400">cm</p>
                                                         </div>
                                                         <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
@@ -771,7 +841,9 @@ router.get(route('children.index'), params, { replace: true });
                                     key={idx}
                                     onClick={() => handlePageClick(page)}
                                     className={`page-btn rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                                        page === pagination.current_page ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                                        page === pagination.current_page
+                                            ? 'bg-teal-500 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                     }`}
                                 >
                                     {page}
@@ -803,7 +875,7 @@ router.get(route('children.index'), params, { replace: true });
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Export / Print</h2>
                                 <p className="text-sm text-cyan-700 dark:text-cyan-400">
                                     {searchQuery || activeSex || activeVaccine
-                                        ? `Filters: ${[searchQuery, activeSex, activeVaccine].filter(Boolean).join(', ')}`
+                                                    ? `Filters: ${[searchQuery, activeSex, activeVaccine, activeVitamin].filter(Boolean).join(', ')}`
                                         : 'All children'}
                                 </p>
                             </div>
@@ -873,22 +945,35 @@ router.get(route('children.index'), params, { replace: true });
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">{(selectedFile.size / 1024).toFixed(1)} KB</p>
                                             </div>
                                         </div>
-                                        <button onClick={() => setSelectedFile(null)} className="rounded p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600">
+                                        <button
+                                            onClick={() => setSelectedFile(null)}
+                                            className="rounded p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600"
+                                        >
                                             <X className="h-4 w-4" />
                                         </button>
                                     </div>
 
                                     {previewData.length > 0 && (
                                         <div className="mb-4">
-                                            <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Preview ({importData.length} total rows):</p>
+                                            <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Preview ({importData.length} total rows):
+                                            </p>
                                             <div className="max-h-48 overflow-auto rounded-md border border-gray-200 dark:border-gray-600">
                                                 <table className="min-w-full text-xs">
                                                     <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700">
                                                         <tr>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Name</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Gender</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Weight</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Height</th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Name
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Gender
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Weight
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Height
+                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -897,9 +982,15 @@ router.get(route('children.index'), params, { replace: true });
                                                                 <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
                                                                     {row.first_name} {row.last_name}
                                                                 </td>
-                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.sex || '-'}</td>
-                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.weight || '-'}</td>
-                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.height || '-'}</td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.sex || '-'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.weight || '-'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.height || '-'}
+                                                                </td>
                                                             </tr>
                                                         ))}
                                                     </tbody>

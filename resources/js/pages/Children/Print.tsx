@@ -1,6 +1,6 @@
-import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
 

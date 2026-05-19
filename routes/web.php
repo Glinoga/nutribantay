@@ -5,6 +5,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\ChildVaccineController;
+use App\Http\Controllers\ChildVitaminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatabaseMaintenanceController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\SMSController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VaccineController;
+use App\Http\Controllers\VitaminController;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -110,6 +112,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     */
     Route::middleware(['role:Admin|Healthworker'])->group(function () {
         Route::resource('vaccines', VaccineController::class)->except(['show']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | VITAMIN CATALOG (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::resource('vitamins', VitaminController::class)->except(['show']);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | CHILD VITAMIN TRACKING (Admin + Healthworker)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::get('/children/{child}/vitamins', [ChildVitaminController::class, 'index'])->name('children.vitamins.index');
+        Route::post('/children/{child}/vitamins', [ChildVitaminController::class, 'store'])->name('children.vitamins.store');
+        Route::delete('/children/{child}/vitamins/{childVitamin}', [ChildVitaminController::class, 'destroy'])->name('children.vitamins.destroy');
+        Route::post('/children/{child}/vitamins/{childVitamin}/doses', [ChildVitaminController::class, 'recordDose'])->name('children.vitamins.doses.store');
+        Route::patch('/children/{child}/vitamins/{childVitamin}/doses/{dose}', [ChildVitaminController::class, 'updateDose'])->name('children.vitamins.doses.update');
+        Route::delete('/children/{child}/vitamins/{childVitamin}/doses/{dose}', [ChildVitaminController::class, 'destroyDose'])->name('children.vitamins.doses.destroy');
     });
 
     /*

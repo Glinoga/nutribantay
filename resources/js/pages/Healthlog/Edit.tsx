@@ -3,11 +3,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { AlertTriangle, ArrowLeft, Calculator, Check, Heart, Plus } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useEffect, useState } from 'react';
 
 type HealthLogForm = {
@@ -156,7 +156,10 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                     </div>
 
                     {/* Data Correction Message */}
-                    <div className="fade-in-up mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20" style={{ animationDelay: '0.1s' }}>
+                    <div
+                        className="fade-in-up mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+                        style={{ animationDelay: '0.1s' }}
+                    >
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
                             <div className="flex-1">
@@ -261,7 +264,9 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                     readOnly
                                     className="mt-1 w-full cursor-not-allowed rounded-md border bg-gray-100 font-semibold text-gray-900 dark:bg-gray-600 dark:text-gray-100"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Calculated automatically after saving based on WHO growth standards</p>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Calculated automatically after saving based on WHO growth standards
+                                </p>
                             </div>
                         </div>
 

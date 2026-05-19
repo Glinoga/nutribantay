@@ -9,10 +9,7 @@ export default function Welcome() {
         <>
             <Head title="Welcome">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link
-                    href="https://fonts.bunny.net/css?family=montserrat:400,500,600,700,800"
-                    rel="stylesheet"
-                />
+                <link href="https://fonts.bunny.net/css?family=montserrat:400,500,600,700,800" rel="stylesheet" />
                 <style>{`
                     html, body, #app {
                         font-family: 'Montserrat', sans-serif !important;
@@ -107,23 +104,29 @@ export default function Welcome() {
                     </h1>
                     <div className="glass-card mx-auto mt-6 max-w-xl rounded-2xl p-6 text-center">
                         <p className="text-base leading-relaxed text-[hsl(179,40%,22%)]">
-                            Barangay 176B is a vibrant community located in Caloocan City. This nutrition tracking system,
-                            NutriBantay, aims to help residents monitor and improve their nutritional health.
-                            Explore the highlights of our barangay below!
+                            Barangay 176B is a vibrant community located in Caloocan City. This nutrition tracking system, NutriBantay, aims to help
+                            residents monitor and improve their nutritional health. Explore the highlights of our barangay below!
                         </p>
                     </div>
                 </section>
 
                 {/* Highlights Section */}
                 <section className="animate-fade-in-up mb-8 w-full max-w-4xl" style={{ animationDelay: '0.5s' }}>
-                    <h3 className="mb-8 text-center text-xl font-semibold text-[hsl(181,100%,2%)]">
-                        Barangay Highlights
-                    </h3>
+                    <h3 className="mb-8 text-center text-xl font-semibold text-[hsl(181,100%,2%)]">Barangay Highlights</h3>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                         {/* Health Center */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
                                     <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                 </svg>
                             </div>
@@ -134,7 +137,16 @@ export default function Welcome() {
                         {/* Community Hall */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
                                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                                     <polyline points="9 22 9 12 15 12 15 22" />
                                 </svg>
@@ -146,7 +158,16 @@ export default function Welcome() {
                         {/* Playground */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
                                     <circle cx="12" cy="12" r="10" />
                                     <path d="M8 14s1.5 2 4 2 4-2 4-2" />
                                     <line x1="9" y1="9" x2="9.01" y2="9" />

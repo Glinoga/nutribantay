@@ -69,6 +69,11 @@ class DashboardController extends Controller
                     'mixed_count' => 0,
                     'follow_ups' => [],
                 ],
+                'vitamin_followups' => [
+                    'overdue_count' => 0,
+                    'due_this_month_count' => 0,
+                    'follow_ups' => [],
+                ],
                 'user_barangay' => $barangay,
                 'is_admin' => $isAdmin,
             ]);
@@ -131,6 +136,11 @@ class DashboardController extends Controller
                 'overdue_count' => $cache->vaccine_overdue,
                 'due_this_month_count' => $cache->vaccine_upcoming,
                 'mixed_count' => 0,
+                'follow_ups' => [],
+            ],
+            'vitamin_followups' => [
+                'overdue_count' => $cache->vitamin_overdue ?? 0,
+                'due_this_month_count' => $cache->vitamin_upcoming ?? 0,
                 'follow_ups' => [],
             ],
             'user_barangay' => $barangay,

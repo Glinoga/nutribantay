@@ -36,12 +36,12 @@ export default function Create() {
             <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
-                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 text-center">
-                            <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                                <Users className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">User Management</span>
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Users className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">User Management</span>
                         </div>
                     </div>
 
@@ -121,7 +121,10 @@ export default function Create() {
                                     <div>
                                         <Label htmlFor="role">Role</Label>
                                         <Select value={data.role} onValueChange={(value) => setData('role', value)} required>
-                                            <SelectTrigger id="role" className="w-full border transition-all hover:border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                            <SelectTrigger
+                                                id="role"
+                                                className="w-full border transition-all hover:border-teal-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                            >
                                                 <SelectValue placeholder="Select Role" />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -133,7 +136,11 @@ export default function Create() {
                                     </div>
 
                                     <div className="flex justify-end gap-2">
-                        <Button variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700" asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                                            asChild
+                                        >
                                             <Link href={route('users.index')}>Cancel</Link>
                                         </Button>
                                         <Button

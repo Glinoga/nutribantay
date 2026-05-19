@@ -71,6 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     ])->toResponse($request)->setStatusCode($status);
                 }
             }
+
             return $response;
         });
     })->create();

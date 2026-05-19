@@ -9,10 +9,10 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Plus, Syringe, Trash2, X } from 'lucide-react';
+import { Pill, Plus, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
-type Vaccine = {
+type Vitamin = {
     id: number;
     name: string;
 };
@@ -27,9 +27,9 @@ type Dose = {
     administered_by: string | null;
 };
 
-type ChildVaccine = {
+type ChildVitamin = {
     id: number;
-    vaccine: Vaccine;
+    vitamin: Vitamin;
     progress: {
         completed: number;
         total: number;
@@ -38,14 +38,14 @@ type ChildVaccine = {
     doses: Dose[];
 };
 
-type ChildVaccinesProps = {
+type ChildVitaminsProps = {
     child: {
         id: number;
         slug?: string;
         fullname: string;
     };
-    child_vaccines: ChildVaccine[];
-    available_vaccines: Vaccine[];
+    child_vitamins: ChildVitamin[];
+    available_vitamins: Vitamin[];
 };
 
 const getDoseBadgeClass = (status: string) => {
@@ -77,10 +77,10 @@ const getTodayDate = () => {
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
 
-export default function Vaccines({ child, child_vaccines, available_vaccines }: ChildVaccinesProps) {
-    const [selectedVaccineId, setSelectedVaccineId] = useState<number | null>(null);
-    const [recordingDoseFor, setRecordingDoseFor] = useState<ChildVaccine | null>(null);
-    const [editingDose, setEditingDose] = useState<{ cv: ChildVaccine; dose: Dose } | null>(null);
+export default function Vitamins({ child, child_vitamins, available_vitamins }: ChildVitaminsProps) {
+    const [selectedVitaminId, setSelectedVitaminId] = useState<number | null>(null);
+    const [recordingDoseFor, setRecordingDoseFor] = useState<ChildVitamin | null>(null);
+    const [editingDose, setEditingDose] = useState<{ cv: ChildVitamin; dose: Dose } | null>(null);
     const [administeredChoice, setAdministeredChoice] = useState<'yes' | 'no' | null>(null);
     const errors = usePage<{ errors: Record<string, string> }>().props.errors;
 
@@ -91,16 +91,16 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         remarks: '',
     });
 
-    const handleAddVaccine = (e: React.FormEvent) => {
+    const handleAddVitamin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedVaccineId) return;
+        if (!selectedVitaminId) return;
 
-        router.post(route('children.vaccines.store', { child: child.slug }), {
-            vaccine_id: selectedVaccineId,
+        router.post(route('children.vitamins.store', { child: child.slug }), {
+            vitamin_id: selectedVitaminId,
         });
     };
 
-    const openRecordDose = (cv: ChildVaccine) => {
+    const openRecordDose = (cv: ChildVitamin) => {
         const pendingDose = cv.doses.find((dose) => !dose.date_given);
 
         if (pendingDose) {
@@ -115,7 +115,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         }
     };
 
-    const openEditDose = (cv: ChildVaccine, dose: Dose) => {
+    const openEditDose = (cv: ChildVitamin, dose: Dose) => {
         setEditingDose({ cv, dose });
         setRecordingDoseFor(null);
         setAdministeredChoice('yes');
@@ -149,7 +149,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
         if (editingDose) {
             router.patch(
-                route('children.vaccines.doses.update', { child: child.id, childVaccine: editingDose.cv.id, dose: editingDose.dose.id }),
+                route('children.vitamins.doses.update', { child: child.id, childVitamin: editingDose.cv.id, dose: editingDose.dose.id }),
                 payload,
                 {
                     preserveScroll: true,
@@ -158,7 +158,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             );
         } else if (recordingDoseFor) {
             router.post(
-                route('children.vaccines.doses.store', { child: child.id, childVaccine: recordingDoseFor.id }),
+                route('children.vitamins.doses.store', { child: child.id, childVitamin: recordingDoseFor.id }),
                 {
                     ...payload,
                     dose_number: Number(doseForm.data.dose_number),
@@ -178,10 +178,10 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
         doseForm.reset();
     };
 
-    const handleDeleteVaccine = (cv: ChildVaccine) => {
+    const handleDeleteVitamin = (cv: ChildVitamin) => {
         MySwal.fire({
             ...swalTheme(),
-            title: `Remove ${cv.vaccine.name}?`,
+            title: `Remove ${cv.vitamin.name}?`,
             text: 'All dose records will be deleted. This action cannot be undone.',
             icon: 'warning',
             showCancelButton: true,
@@ -190,12 +190,12 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             confirmButtonText: 'Yes, remove it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('children.vaccines.destroy', { child: child.id, childVaccine: cv.id }));
+                router.delete(route('children.vitamins.destroy', { child: child.id, childVitamin: cv.id }));
             }
         });
     };
 
-    const handleDeleteDose = (cv: ChildVaccine, dose: Dose) => {
+    const handleDeleteDose = (cv: ChildVitamin, dose: Dose) => {
         MySwal.fire({
             ...swalTheme(),
             title: 'Delete Dose Record?',
@@ -207,7 +207,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                router.delete(route('children.vaccines.doses.destroy', { child: child.id, childVaccine: cv.id, dose: dose.id }));
+                router.delete(route('children.vitamins.doses.destroy', { child: child.id, childVitamin: cv.id, dose: dose.id }));
             }
         });
     };
@@ -217,10 +217,10 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
             breadcrumbs={[
                 ...breadcrumbs,
                 { title: child.fullname, href: route('children.show', { child: child.slug }) },
-                { title: 'Vaccines', href: route('children.vaccines.index', { child: child.slug }) },
+                { title: 'Vitamins', href: route('children.vitamins.index', { child: child.slug }) },
             ]}
         >
-            <Head title={`Vaccines - ${child.fullname}`} />
+            <Head title={`Vitamins - ${child.fullname}`} />
 
             <style>{`
                 @keyframes fadeInUp {
@@ -239,16 +239,16 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     opacity: 0;
                 }
 
-                .vaccine-card {
+                .vitamin-card {
                     animation: fadeInUp 0.5s ease-out forwards;
                     opacity: 0;
                 }
 
-                .vaccine-card:nth-child(1) { animation-delay: 0.1s; }
-                .vaccine-card:nth-child(2) { animation-delay: 0.2s; }
-                .vaccine-card:nth-child(3) { animation-delay: 0.3s; }
-                .vaccine-card:nth-child(4) { animation-delay: 0.4s; }
-                .vaccine-card:nth-child(5) { animation-delay: 0.5s; }
+                .vitamin-card:nth-child(1) { animation-delay: 0.1s; }
+                .vitamin-card:nth-child(2) { animation-delay: 0.2s; }
+                .vitamin-card:nth-child(3) { animation-delay: 0.3s; }
+                .vitamin-card:nth-child(4) { animation-delay: 0.4s; }
+                .vitamin-card:nth-child(5) { animation-delay: 0.5s; }
 
                 .action-btn {
                     transition: all 0.2s ease;
@@ -266,8 +266,8 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     {/* Header Section */}
                     <div className="fade-in-up mb-6 text-center">
                         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
-                            <Syringe className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Vaccine Tracker</span>
+                            <Pill className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Vitamin Tracker</span>
                         </div>
 
                         <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
@@ -275,7 +275,9 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                 {child.fullname}
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Track and manage vaccination records for {child.fullname}</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">
+                            Track and manage supplementation records for {child.fullname}
+                        </p>
                     </div>
 
                     {/* Action Buttons */}
@@ -295,26 +297,26 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                         </Link>
                     </div>
 
-                    {/* Add Vaccine Section */}
-                    {available_vaccines.length > 0 && (
+                    {/* Add Vitamin Section */}
+                    {available_vitamins.length > 0 && (
                         <div
                             className="fade-in-up mb-6 rounded-xl border-0 bg-white p-6 shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                             style={{ animationDelay: '0.3s' }}
                         >
                             <div className="mb-4 flex items-center gap-2">
                                 <Plus className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Add Vaccine to Child</h2>
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Add Vitamin to Child</h2>
                             </div>
-                            <form onSubmit={handleAddVaccine} className="flex gap-3">
+                            <form onSubmit={handleAddVitamin} className="flex gap-3">
                                 <Select
-                                    value={selectedVaccineId ? String(selectedVaccineId) : ''}
-                                    onValueChange={(val) => setSelectedVaccineId(Number(val))}
+                                    value={selectedVitaminId ? String(selectedVitaminId) : ''}
+                                    onValueChange={(val) => setSelectedVitaminId(Number(val))}
                                 >
                                     <SelectTrigger className="flex-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
-                                        <SelectValue placeholder="Select a vaccine..." />
+                                        <SelectValue placeholder="Select a vitamin..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {available_vaccines.map((v) => (
+                                        {available_vitamins.map((v) => (
                                             <SelectItem key={v.id} value={String(v.id)}>
                                                 {v.name}
                                             </SelectItem>
@@ -323,33 +325,33 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                 </Select>
                                 <Button
                                     type="submit"
-                                    disabled={!selectedVaccineId}
+                                    disabled={!selectedVitaminId}
                                     className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:from-teal-600 hover:to-cyan-600 disabled:opacity-50"
                                 >
                                     <Plus className="mr-2 h-4 w-4" />
-                                    Add Vaccine
+                                    Add Vitamin
                                 </Button>
                             </form>
                         </div>
                     )}
 
-                    {/* Vaccine Cards */}
-                    {child_vaccines.length > 0 ? (
+                    {/* Vitamin Cards */}
+                    {child_vitamins.length > 0 ? (
                         <div className="space-y-6">
-                            {child_vaccines.map((cv, idx) => (
+                            {child_vitamins.map((cv, idx) => (
                                 <div
                                     key={cv.id}
-                                    className="vaccine-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
+                                    className="vitamin-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                                     style={{ animationDelay: `${0.4 + idx * 0.1}s` }}
                                 >
                                     <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-800 dark:to-cyan-800">
-                                                    <Syringe className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                                                    <Pill className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                                 </div>
                                                 <div>
-                                                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">{cv.vaccine.name}</h2>
+                                                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">{cv.vitamin.name}</h2>
                                                     <div className="mt-1 flex items-center gap-2">
                                                         <Badge className={getProgressBadgeClass(cv.progress.status)}>{cv.progress.status}</Badge>
                                                         <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -367,7 +369,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                                     <Plus className="mr-1.5 h-3.5 w-3.5" />
                                                     Record Dose
                                                 </Button>
-                                                <Button onClick={() => handleDeleteVaccine(cv)} size="sm" variant="destructive">
+                                                <Button onClick={() => handleDeleteVitamin(cv)} size="sm" variant="destructive">
                                                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                                                     Remove
                                                 </Button>
@@ -443,9 +445,9 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                         </div>
                     ) : (
                         <div className="fade-in-up rounded-xl bg-gray-100 p-6 text-center dark:bg-gray-800" style={{ animationDelay: '0.4s' }}>
-                            <Syringe className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" />
-                            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No vaccines assigned</p>
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a vaccine using the form above to get started.</p>
+                            <Pill className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" />
+                            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No vitamins assigned</p>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a vitamin using the form above to get started.</p>
                         </div>
                     )}
                 </div>
@@ -538,20 +540,8 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                             {/* Scheduled Date - when scheduling for later */}
                             {administeredChoice === 'no' && (
                                 <div>
-                                    <Label className="text-gray-700 dark:text-gray-300">
-                                        {editingDose
-                                            ? editingDose.dose.date_given
-                                                ? 'Next Due Date (optional)'
-                                                : 'Scheduled Date (optional)'
-                                            : 'Scheduled Date'}
-                                    </Label>
-                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                        {editingDose
-                                            ? editingDose.dose.date_given
-                                                ? 'When should the next dose be scheduled?'
-                                                : 'When should this dose be given?'
-                                            : 'When should this dose be given?'}
-                                    </p>
+                                    <Label className="text-gray-700 dark:text-gray-300">Scheduled Date</Label>
+                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">When should this dose be given?</p>
                                     <Input
                                         type="date"
                                         value={doseForm.data.next_due_date}

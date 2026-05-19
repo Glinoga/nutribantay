@@ -12,11 +12,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArchiveRestore, Loader2, Megaphone, Trash2 } from 'lucide-react';
-import { route } from '@/lib/routes';
 import { useState } from 'react';
 
 type Category = {
@@ -56,7 +56,7 @@ export default function Archived({ announcements }: Props) {
     const handleRestore = async (id: number) => {
         setLoading(id);
         try {
-            await router.post(route('announcements.restore', { id }),);
+            await router.post(route('announcements.restore', { id }));
             smartToast.success('Announcement restored successfully!');
         } catch {
             smartToast.error('Failed to restore announcement.');
@@ -69,7 +69,7 @@ export default function Archived({ announcements }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('announcements.forceDelete', { id }),);
+            await router.delete(route('announcements.forceDelete', { id }));
             smartToast.success('Announcement permanently deleted.');
         } catch {
             smartToast.error('Failed to delete announcement.');
@@ -88,12 +88,12 @@ export default function Archived({ announcements }: Props) {
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <div className="mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-100/50 dark:border-amber-800/50 bg-white/90 dark:bg-gray-800/90 px-5 py-2 shadow-lg backdrop-blur-sm">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-amber-800/50 dark:bg-gray-800/90">
                             <ArchiveRestore className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                             <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">Archived</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 dark:text-gray-50 md:text-4xl">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
                             <span className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 bg-clip-text text-transparent">
                                 Archived Announcements
                             </span>
@@ -113,7 +113,7 @@ export default function Archived({ announcements }: Props) {
                         </Button>
                     </div>
 
-                    <div className="overflow-x-auto rounded-xl border border-teal-100/50 dark:border-teal-800/50 bg-white dark:bg-gray-800 shadow-md">
+                    <div className="overflow-x-auto rounded-xl border border-teal-100/50 bg-white shadow-md dark:border-teal-800/50 dark:bg-gray-800">
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">
@@ -153,8 +153,12 @@ export default function Archived({ announcements }: Props) {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="text-gray-600 dark:text-gray-300">{announcement.author ?? '-'}</TableCell>
-                                            <TableCell className="text-gray-600 dark:text-gray-300">{new Date(announcement.date).toLocaleDateString()}</TableCell>
-                                            <TableCell className="text-gray-600 dark:text-gray-300">{new Date(announcement.deleted_at).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-gray-600 dark:text-gray-300">
+                                                {new Date(announcement.date).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className="text-gray-600 dark:text-gray-300">
+                                                {new Date(announcement.deleted_at).toLocaleDateString()}
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex gap-1">
                                                     <Button
@@ -209,9 +213,7 @@ export default function Archived({ announcements }: Props) {
                 <AlertDialogContent className="dark:bg-gray-800 dark:text-gray-100">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Restore Announcement</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to restore this announcement? It will be visible again.
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>Are you sure you want to restore this announcement? It will be visible again.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -235,10 +237,7 @@ export default function Archived({ announcements }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => deleteId && handleForceDelete(deleteId)}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
+                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>

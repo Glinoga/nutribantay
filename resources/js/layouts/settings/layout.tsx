@@ -1,8 +1,8 @@
 import Heading from '@/components/heading';
 import { Separator } from '@/components/ui/separator';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
 import { route } from '@/lib/routes';
+import { cn } from '@/lib/utils';
 import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
 import { type NavItem } from '@/types';

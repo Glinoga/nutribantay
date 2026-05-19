@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Activity, User, Globe, Monitor, FileText } from 'lucide-react';
+import { Activity, ArrowLeft, FileText, Globe, Monitor, User } from 'lucide-react';
 
 type AuditLog = {
     id: number;
@@ -50,8 +50,7 @@ export default function Show({ log }: Props) {
 
     const oldValues = log.old_values;
     const newValues = log.new_values;
-    const hasChanges =
-        oldValues && newValues && Object.keys(oldValues).length > 0 && Object.keys(newValues).length > 0;
+    const hasChanges = oldValues && newValues && Object.keys(oldValues).length > 0 && Object.keys(newValues).length > 0;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -59,16 +58,12 @@ export default function Show({ log }: Props) {
 
             <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
-                <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="relative mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 text-center">
                         <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
                             <Activity className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                            <span
-                                className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
-                                    log.action,
-                                )}`}
-                            >
+                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(log.action)}`}>
                                 {log.action.replace(/_/g, ' ')}
                             </span>
                         </div>
@@ -80,7 +75,9 @@ export default function Show({ log }: Props) {
                             <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 Audit Log Details
                             </h1>
-                            <p className="mt-1 text-gray-600 dark:text-gray-300">Log #{log.id} — {new Date(log.created_at).toLocaleString()}</p>
+                            <p className="mt-1 text-gray-600 dark:text-gray-300">
+                                Log #{log.id} — {new Date(log.created_at).toLocaleString()}
+                            </p>
                         </div>
                         <Link
                             href={route('audit-logs.index')}
@@ -204,9 +201,7 @@ export default function Show({ log }: Props) {
                                                     <TableCell className="font-medium">{key}</TableCell>
                                                     <TableCell>
                                                         <span className="inline-block rounded bg-red-100 px-2 py-1 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                                                            {oldValues && oldValues[key] !== undefined
-                                                                ? String(oldValues[key])
-                                                                : '-'}
+                                                            {oldValues && oldValues[key] !== undefined ? String(oldValues[key]) : '-'}
                                                         </span>
                                                     </TableCell>
                                                     <TableCell>

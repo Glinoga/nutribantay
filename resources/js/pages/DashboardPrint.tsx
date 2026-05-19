@@ -1,7 +1,7 @@
-import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
@@ -289,9 +289,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
-                                <TableCaption className="text-cyan-700">
-                                    List of children registered for the selected period.
-                                </TableCaption>
+                                <TableCaption className="text-cyan-700">List of children registered for the selected period.</TableCaption>
                                 <TableHeader>
                                     <TableRow className="bg-cyan-50">
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Name</TableHead>

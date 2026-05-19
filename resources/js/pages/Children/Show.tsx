@@ -1,12 +1,13 @@
-import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
@@ -18,6 +19,7 @@ import {
     Edit2,
     Lightbulb,
     OctagonAlert,
+    Pill,
     Plus,
     Printer,
     Syringe,
@@ -27,7 +29,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
-import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
@@ -347,7 +348,9 @@ export default function Show({ child }: { child: Child }) {
                                 {child.fullname}
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">View and manage child health records and vaccination status</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">
+                            View and manage child health records and vaccination status
+                        </p>
                     </div>
 
                     {/* Action Buttons */}
@@ -381,6 +384,13 @@ export default function Show({ child }: { child: Child }) {
                             <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
                                 <Syringe className="h-4 w-4" />
                                 Vaccine Tracker
+                            </button>
+                        </Link>
+
+                        <Link href={route('children.vitamins.index', { child: child.slug })}>
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-orange-600 hover:to-amber-600 hover:shadow-lg">
+                                <Pill className="h-4 w-4" />
+                                Vitamin Tracker
                             </button>
                         </Link>
 
@@ -539,19 +549,35 @@ export default function Show({ child }: { child: Child }) {
                                     <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <tr>
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Weight (kg)</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Height (cm)</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Weight (kg)
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Height (cm)
+                                            </th>
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">BMI</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Nutrition Status</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status WFA</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status LFA</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status WFL</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Nutrition Status
+                                            </th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Status WFA
+                                            </th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Status LFA
+                                            </th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Status WFL
+                                            </th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Vit A</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Deworming</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Deworming
+                                            </th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">MNP</th>
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Created By</th>
                                             {canManageHealthlogs && (
-                                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Actions</th>
+                                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                    Actions
+                                                </th>
                                             )}
                                         </tr>
                                     </thead>
@@ -709,9 +735,13 @@ export default function Show({ child }: { child: Child }) {
                                     <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <tr>
                                             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date Given</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Vaccine Name</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Vaccine Name
+                                            </th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Dose</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Next Due Date</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                                Next Due Date
+                                            </th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status</th>
                                         </tr>
                                     </thead>
@@ -727,7 +757,9 @@ export default function Show({ child }: { child: Child }) {
                                                         {log.date_given ? new Date(log.date_given).toLocaleDateString() : '-'}
                                                     </td>
                                                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{log.vaccine_name}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-200">{log.dose_number ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-200">
+                                                        {log.dose_number ?? '-'}
+                                                    </td>
                                                     <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
                                                         {log.next_due_date ? new Date(log.next_due_date).toLocaleDateString() : '-'}
                                                     </td>
@@ -807,11 +839,15 @@ export default function Show({ child }: { child: Child }) {
                                         <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-3 dark:bg-gray-700">
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Weight</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                                    {selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}
+                                                </p>
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Height</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.height ? `${selectedLog.height} cm` : 'N/A'}</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                                    {selectedLog.height ? `${selectedLog.height} cm` : 'N/A'}
+                                                </p>
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">BMI</p>
@@ -1057,7 +1093,10 @@ export default function Show({ child }: { child: Child }) {
                                 <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                                     Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
                                     health measurements, please{' '}
-                                    <Link href={route('children.healthlogs.create', { child: child.slug })} className="font-semibold text-teal-600 hover:underline dark:text-teal-400">
+                                    <Link
+                                        href={route('children.healthlogs.create', { child: child.slug })}
+                                        className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
+                                    >
                                         create a health log
                                     </Link>{' '}
                                     instead.
@@ -1163,35 +1202,35 @@ export default function Show({ child }: { child: Child }) {
 
                         {/* Weight & Height */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Weight (kg)</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Input
-                                            type="number"
-                                            step="0.1"
-                                            placeholder="Enter weight"
-                                            value={data.weight}
-                                            onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                            className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                        />
-                                    </div>
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Weight (kg)</h3>
                                 </div>
+                                <div className="p-6">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="Enter weight"
+                                        value={data.weight}
+                                        onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    />
+                                </div>
+                            </div>
 
-                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Height (cm)</h3>
-                                    </div>
-                                    <div className="p-6">
-                                        <Input
-                                            type="number"
-                                            step="0.1"
-                                            placeholder="Enter height"
-                                            value={data.height}
-                                            onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                            className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                        />
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Height (cm)</h3>
+                                </div>
+                                <div className="p-6">
+                                    <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="Enter height"
+                                        value={data.height}
+                                        onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -1202,14 +1241,14 @@ export default function Show({ child }: { child: Child }) {
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Contact Number</h3>
                             </div>
                             <div className="p-6">
-                                    <Input
-                                        type="text"
-                                        placeholder="e.g., 09171234567"
-                                        value={data.contact_number}
-                                        onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
-                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                        maxLength={11}
-                                    />
+                                <Input
+                                    type="text"
+                                    placeholder="e.g., 09171234567"
+                                    value={data.contact_number}
+                                    onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
+                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    maxLength={11}
+                                />
                             </div>
                         </div>
 

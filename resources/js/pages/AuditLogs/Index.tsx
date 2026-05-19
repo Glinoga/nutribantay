@@ -1,9 +1,9 @@
-import { route } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Activity, Download, FileText, Layers, Search, Users } from 'lucide-react';
@@ -191,7 +191,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Entries</p>
@@ -202,7 +202,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Unique Actions</p>
@@ -213,7 +213,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50">
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Models Tracked</p>
@@ -224,7 +224,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Users</p>
@@ -312,7 +312,11 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                         <Search className="mr-2 h-4 w-4" />
                                         Apply Filters
                                     </Button>
-                                    <Button onClick={handleReset} variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                                    <Button
+                                        onClick={handleReset}
+                                        variant="outline"
+                                        className="border hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                                    >
                                         Reset
                                     </Button>
                                 </div>
@@ -347,9 +351,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                         <TableBody>
                                             {logs.data.map((log) => (
                                                 <TableRow key={log.id}>
-                                                    <TableCell className="font-medium">
-                                                        {new Date(log.created_at).toLocaleString()}
-                                                    </TableCell>
+                                                    <TableCell className="font-medium">{new Date(log.created_at).toLocaleString()}</TableCell>
                                                     <TableCell>{log.user?.name || log.user_name || 'System'}</TableCell>
                                                     <TableCell>
                                                         <span
@@ -384,7 +386,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                     <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-50">No audit logs found</h3>
                                     <p className="max-w-md text-center text-gray-600 dark:text-gray-300">
                                         {searchTerm || selectedAction || selectedModel || startDate || endDate
-                                            ? 'Try adjusting your filters to find what you\'re looking for.'
+                                            ? "Try adjusting your filters to find what you're looking for."
                                             : 'There are no audit log entries recorded yet.'}
                                     </p>
                                 </div>

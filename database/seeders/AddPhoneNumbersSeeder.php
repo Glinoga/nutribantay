@@ -3,14 +3,16 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class AddPhoneNumbersSeeder extends Seeder
 {
     public function run(): void
     {
-        if (!class_exists(\Faker\Factory::class)) {
+        if (! class_exists(Factory::class)) {
             $this->command->warn('Skipping AddPhoneNumbersSeeder: fakerphp/faker not installed.');
+
             return;
         }
 
@@ -18,7 +20,7 @@ class AddPhoneNumbersSeeder extends Seeder
             ->orWhere('contact_number', '')
             ->get();
 
-        $faker = \Faker\Factory::create('en_PH');
+        $faker = Factory::create('en_PH');
 
         $count = 0;
         foreach ($children as $child) {
