@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 import { initializeTheme } from './hooks/use-appearance';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -28,12 +29,18 @@ createInertiaApp({
             return resolvePageComponent(matchingPath, pages);
         }
 
+        // Return the 404 error page as fallback
+        const errorPath = `./pages/errors/404.tsx`;
+        if (pages[errorPath]) {
+            return resolvePageComponent(errorPath, pages);
+        }
+
         throw new Error(`Page not found: ${exactPath}`);
     },
     setup({ el, App, props }) {
         const root = createRoot(el);
         root.render(
-            <>
+            <ErrorBoundary>
                 <App {...props} />
                 <Toaster
                     position="top-right"
@@ -100,7 +107,7 @@ createInertiaApp({
                         },
                     }}
                 />
-            </>,
+            </ErrorBoundary>,
         );
     },
     progress: {
