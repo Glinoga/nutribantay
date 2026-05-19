@@ -22,11 +22,6 @@ type HealthLog = {
     status_wfa: string | null;
     status_lfa: string | null;
     status_wfl_wfh: string | null;
-    vaccine_name: string | null;
-    dose_number: number | null;
-    date_given: string | null;
-    next_due_date: string | null;
-    vaccine_status: string | null;
     created_at: string | null;
 };
 
@@ -284,11 +279,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Vit A</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Deworm</TableHead>
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">MNP</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Vaccine</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Dose</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Date Given</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Next Due</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900">Status</TableHead>
+
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -306,23 +297,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                         <TableCell className="px-4 py-2">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.deworming ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="px-4 py-2">{log.micronutrient_powder ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.vaccine_name ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.dose_number ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.date_given ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">{log.next_due_date ?? '-'}</TableCell>
-                                        <TableCell className="px-4 py-2">
-                                            <span
-                                                className={`rounded px-2 py-1 text-xs font-medium ${
-                                                    log.vaccine_status === 'overdue'
-                                                        ? 'bg-red-100 text-red-800'
-                                                        : log.vaccine_status === 'upcoming'
-                                                          ? 'bg-yellow-100 text-yellow-800'
-                                                          : 'bg-green-100 text-green-800'
-                                                }`}
-                                            >
-                                                {log.vaccine_status ?? '-'}
-                                            </span>
-                                        </TableCell>
+
                                     </TableRow>
                                 ))}
                             </TableBody>

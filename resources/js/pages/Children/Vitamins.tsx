@@ -125,7 +125,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
         doseForm.setData({
             dose_number: String(dose.dose_number),
             date_given: dose.date_given ?? '',
-            next_due_date: dose.next_due_date ?? '',
+            next_due_date: dose.date_given ? (dose.next_due_date ?? '') : '',
             remarks: dose.remarks ?? '',
         });
     };

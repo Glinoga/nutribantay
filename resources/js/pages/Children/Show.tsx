@@ -54,11 +54,6 @@ type HealthLog = {
     rutf: string | null;
     rusf: string | null;
     complementary_food: string | null;
-    vaccine_name: string | null;
-    dose_number: number | null;
-    date_given: string | null;
-    next_due_date: string | null;
-    vaccine_status: string | null;
     created_at: string;
     user?: { name: string | null };
 };
@@ -713,77 +708,6 @@ export default function Show({ child }: { child: Child }) {
                         </div>
                     )}
 
-                    {/* Vaccine Records Section (Legacy) */}
-                    {healthlogs.filter((log) => log.vaccine_name).length > 0 && (
-                        <div className="fade-in-up mb-8" style={{ animationDelay: '0.6s' }}>
-                            <div className="mb-4 flex items-center gap-2">
-                                <Syringe className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Historical Vaccine Records</h2>
-                            </div>
-                            <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-                                These records are from the old health log system.{' '}
-                                <Link
-                                    href={route('children.vaccines.index', { child: child.slug })}
-                                    className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline dark:text-teal-400 dark:hover:text-teal-300"
-                                >
-                                    Use the Vaccine Tracker
-                                </Link>{' '}
-                                for current vaccine management.
-                            </p>
-                            <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md dark:bg-gray-800">
-                                <table className="w-full text-sm">
-                                    <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
-                                        <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date Given</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                                Vaccine Name
-                                            </th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Dose</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                                Next Due Date
-                                            </th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {healthlogs
-                                            .filter((log) => log.vaccine_name)
-                                            .map((log, idx) => (
-                                                <tr
-                                                    key={log.id}
-                                                    className={`border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
-                                                >
-                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
-                                                        {log.date_given ? new Date(log.date_given).toLocaleDateString() : '-'}
-                                                    </td>
-                                                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{log.vaccine_name}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-200">
-                                                        {log.dose_number ?? '-'}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
-                                                        {log.next_due_date ? new Date(log.next_due_date).toLocaleDateString() : '-'}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <span
-                                                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                                                (log.vaccine_status || 'Pending') === 'Completed'
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : (log.vaccine_status || 'Pending') === 'Overdue'
-                                                                      ? 'bg-red-100 text-red-800'
-                                                                      : 'bg-yellow-100 text-yellow-800'
-                                                            }`}
-                                                        >
-                                                            {log.vaccine_status || 'Pending'}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
-
                     {/* AI Recommender Section */}
                     {canViewAiRecommender && (
                         <div
@@ -913,54 +837,6 @@ export default function Show({ child }: { child: Child }) {
                                                     )}
                                                 </div>
                                             ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Vaccine */}
-                                    <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Vaccination</h3>
-                                        <div className="rounded-md bg-gray-50 p-4 dark:bg-gray-700">
-                                            {selectedLog.vaccine_name ? (
-                                                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                                                    {[
-                                                        { label: 'Vaccine Name', value: selectedLog.vaccine_name },
-                                                        { label: 'Dose Number', value: selectedLog.dose_number },
-                                                        {
-                                                            label: 'Date Given',
-                                                            value: selectedLog.date_given
-                                                                ? new Date(selectedLog.date_given).toLocaleDateString()
-                                                                : null,
-                                                        },
-                                                        {
-                                                            label: 'Next Due Date',
-                                                            value: selectedLog.next_due_date
-                                                                ? new Date(selectedLog.next_due_date).toLocaleDateString()
-                                                                : null,
-                                                        },
-                                                    ].map((item, idx) => (
-                                                        <div key={idx}>
-                                                            <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
-                                                            <p className="font-medium text-gray-900 dark:text-gray-100">{item.value ?? '-'}</p>
-                                                        </div>
-                                                    ))}
-                                                    <div>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
-                                                        <span
-                                                            className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                                                (selectedLog.vaccine_status || 'Pending') === 'Completed'
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : (selectedLog.vaccine_status || 'Pending') === 'Overdue'
-                                                                      ? 'bg-red-100 text-red-800'
-                                                                      : 'bg-yellow-100 text-yellow-800'
-                                                            }`}
-                                                        >
-                                                            {selectedLog.vaccine_status || 'Pending'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <p className="text-gray-500 dark:text-gray-400">No vaccine information recorded.</p>
-                                            )}
                                         </div>
                                     </div>
 

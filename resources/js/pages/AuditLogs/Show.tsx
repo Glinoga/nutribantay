@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Activity, ArrowLeft, FileText, Globe, Monitor, User } from 'lucide-react';
+import { Activity, ArrowLeft, FileText, Monitor, User } from 'lucide-react';
 
 type AuditLog = {
     id: number;
@@ -156,14 +156,6 @@ export default function Show({ log }: Props) {
                                     <div className="sm:col-span-2">
                                         <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
                                         <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.description || '-'}</dd>
-                                    </div>
-
-                                    <div>
-                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</dt>
-                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900 dark:text-gray-50">
-                                            <Globe className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                                            {log.ip_address || '-'}
-                                        </dd>
                                     </div>
 
                                     <div className="sm:col-span-2">

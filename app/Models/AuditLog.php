@@ -17,7 +17,6 @@ class AuditLog extends Model
         'description',
         'old_values',
         'new_values',
-        'ip_address',
         'user_agent',
         'barangay',
     ];
@@ -39,7 +38,6 @@ class AuditLog extends Model
         $logData = array_merge([
             'user_id' => $user?->id,
             'user_name' => $user?->name,
-            'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'barangay' => $user?->barangay ?? null,
         ], $data);
