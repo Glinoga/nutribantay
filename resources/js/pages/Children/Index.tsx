@@ -715,7 +715,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                                     {child.fullname}
                                                                 </p>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</p>
-                                                                {child.vaccine_alert && (
+                                                                {(child.vaccine_alert || child.vitamin_alert) && (
                                                                     <div className="mt-0.5 flex items-center gap-1">
                                                                         {(child.vaccine_alert === 'overdue' || child.vaccine_alert === 'mixed') && (
                                                                             <span className="inline-flex items-center gap-1 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
