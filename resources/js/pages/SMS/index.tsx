@@ -187,15 +187,15 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Send SMS" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 pt-8 text-center">
-                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                            <MessageSquare className="h-6 w-6 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">SMS Management</span>
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <MessageSquare className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">SMS Management</span>
                         </div>
                     </div>
 
@@ -210,7 +210,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                         SMS Messenger
                                     </h1>
                                     <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
@@ -224,47 +224,47 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Users</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{users.length}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{users.length}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Users className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Selected</p>
-                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{getRecipientCount()}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Selected</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{getRecipientCount()}</p>
                                 </div>
-                                <div className="rounded-full bg-cyan-50 p-2.5">
-                                    <CheckCircle2 className="h-5 w-5 text-cyan-500" />
+                                <div className="rounded-full bg-cyan-50 p-2.5 dark:bg-cyan-900/30">
+                                    <CheckCircle2 className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">SMS Credits</p>
-                                    <p className="mt-1 text-2xl font-bold text-green-600">{credits}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">SMS Credits</p>
+                                    <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">{credits}</p>
                                 </div>
-                                <div className="rounded-full bg-green-50 p-2.5">
-                                    <Zap className="h-5 w-5 text-green-500" />
+                                <div className="rounded-full bg-green-50 p-2.5 dark:bg-green-900/30">
+                                    <Zap className="h-5 w-5 text-green-500 dark:text-green-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Send Mode</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 capitalize">{recipientType}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Send Mode</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400 capitalize">{recipientType}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <MessageSquare className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <MessageSquare className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
@@ -275,14 +275,14 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                         {/* Recipients Panel */}
                         <div className="space-y-4 lg:col-span-1">
                             <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
+                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <CardTitle className="flex items-center gap-2">
-                                                <Users className="h-5 w-5 text-teal-600" />
+                                                <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                                 Recipients
                                             </CardTitle>
-                                            <CardDescription>Select who receives your message</CardDescription>
+                                            <CardDescription className="dark:text-gray-400">Select who receives your message</CardDescription>
                                         </div>
                                         <div className="rounded-full bg-teal-600 px-3 py-1 text-sm font-semibold text-white">{getRecipientCount()}</div>
                                     </div>
@@ -290,9 +290,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                 <CardContent className="space-y-4 p-4">
                                     {/* Recipient Type Selector */}
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Send Mode</Label>
+                                        <Label className="text-sm font-medium dark:text-gray-300">Send Mode</Label>
                                         <Select value={recipientType} onValueChange={handleRecipientTypeChange}>
-                                            <SelectTrigger className="border transition-colors hover:border-teal-500">
+                                            <SelectTrigger className="border transition-colors hover:border-teal-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -336,18 +336,18 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                         <>
                                             {/* Search Bar */}
                                             <div className="relative">
-                                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                                 <input
                                                     type="text"
                                                     placeholder="Search children/guardian..."
                                                     value={searchQuery}
                                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                                    className="w-full rounded-md border py-2.5 pr-10 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                                    className="w-full rounded-md border py-2.5 pr-10 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                                 />
                                                 {searchQuery && (
                                                     <button
                                                         onClick={() => setSearchQuery('')}
-                                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                                                     >
                                                         <X className="h-4 w-4" />
                                                     </button>
@@ -357,10 +357,10 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                             {/* Quick Actions */}
                                             {recipientType === 'multiple' && filteredUsers.length > 0 && (
                                                 <div className="flex gap-2">
-                                                    <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs">
+                                                    <Button type="button" size="sm" variant="outline" onClick={selectAllFiltered} className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                                                         Select All
                                                     </Button>
-                                                    <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs">
+                                                    <Button type="button" size="sm" variant="outline" onClick={deselectAll} className="flex-1 text-xs dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                                                         Clear All
                                                     </Button>
                                                 </div>
@@ -388,12 +388,12 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                                 <div
                                                                     className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${
                                                                         selectedUsers.includes(user.id)
-                                                                            ? 'scale-110 border-white bg-white'
+                                                                            ? 'scale-110 border-white bg-white dark:border-gray-200 dark:bg-gray-200'
                                                                             : 'border-gray-300 group-hover:border-teal-500 dark:border-gray-600'
                                                                     }`}
                                                                 >
                                                                     {selectedUsers.includes(user.id) && (
-                                                                        <CheckCircle2 className="h-4 w-4 text-teal-600" />
+                                                                        <CheckCircle2 className="h-4 w-4 text-teal-600 dark:text-teal-500" />
                                                                     )}
                                                                 </div>
 
@@ -401,7 +401,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                                 <div
                                                                     className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-lg font-semibold ${
                                                                         selectedUsers.includes(user.id)
-                                                                            ? 'bg-white text-teal-600'
+                                                                            ? 'bg-white text-teal-600 dark:bg-gray-800 dark:text-teal-400'
                                                                             : 'bg-gradient-to-br from-teal-400 to-cyan-500 text-white'
                                                                     }`}
                                                                 >
@@ -422,13 +422,13 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                     ))
                                                 ) : (
                                                     <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl p-12">
-                                                        <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">
-                                                            <Users className="h-16 w-16 text-teal-600" />
+                                                        <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8 dark:from-teal-900/30 dark:to-cyan-900/30">
+                                                            <Users className="h-16 w-16 text-teal-600 dark:text-teal-400" />
                                                         </div>
-                                                        <h3 className="mb-2 text-xl font-bold text-gray-900">
+                                                        <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-50">
                                                             {searchQuery ? 'No matching guardians found' : 'No guardians available'}
                                                         </h3>
-                                                        <p className="max-w-md text-center text-gray-600">
+                                                        <p className="max-w-md text-center text-gray-600 dark:text-gray-300">
                                                             {searchQuery
                                                                 ? 'Try adjusting your search to find what you\'re looking for.'
                                                                 : 'There are no guardians with registered phone numbers yet.'}
@@ -446,22 +446,22 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                         <div className="space-y-4 lg:col-span-2">
                             {/* Message Composer */}
                             <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4">
+                                <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                                     <CardTitle className="flex items-center gap-2">
-                                        <Mail className="h-5 w-5 text-teal-600" />
+                                        <Mail className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                         Compose Message
                                     </CardTitle>
-                                    <CardDescription>Write your message below</CardDescription>
+                                    <CardDescription className="dark:text-gray-400">Write your message below</CardDescription>
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         {/* Message Textarea */}
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <Label className="flex items-center gap-2 text-sm font-medium">
+                                                <Label className="flex items-center gap-2 text-sm font-medium dark:text-gray-300">
                                                     Your Message
                                                     {isTyping && (
-                                                        <span className="flex items-center gap-1 text-xs text-teal-600">
+                                                        <span className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400">
                                                             <span className="animate-pulse">●</span>
                                                             typing...
                                                         </span>
@@ -470,10 +470,10 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                 <span
                                                     className={`text-sm font-medium transition-colors ${
                                                         characterCount > maxCharacters
-                                                            ? 'animate-pulse text-red-500'
+                                                            ? 'animate-pulse text-red-500 dark:text-red-400'
                                                             : characterCount > maxCharacters * 0.9
-                                                              ? 'text-orange-500'
-                                                              : 'text-gray-500'
+                                                              ? 'text-orange-500 dark:text-orange-400'
+                                                              : 'text-gray-500 dark:text-gray-400'
                                                     }`}
                                                 >
                                                     {characterCount} / {maxCharacters}
@@ -485,7 +485,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                 value={message}
                                                 onChange={handleMessageChange}
                                                 rows={8}
-                                                className="resize-none border text-base transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                                className="resize-none border text-base transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                             />
 
                                             <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -528,7 +528,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                                     setSearchQuery('');
                                                 }}
                                                 disabled={isSending}
-                                                className="border px-6 py-6 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                className="border px-6 py-6 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                             >
                                                 <X className="h-5 w-5" />
                                             </Button>
@@ -543,7 +543,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                     <CardContent className="p-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <AlertTriangle className="h-5 w-5 text-red-600" />
+                                                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
                                                 <div>
                                                     <p className="font-semibold text-red-900 dark:text-red-100">Last send failed</p>
                                                     <p className="text-sm text-red-700 dark:text-red-300">
@@ -566,7 +566,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                                         <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
                                             <div className="mb-1 flex items-center gap-2 text-teal-600 dark:text-teal-400">
                                                 <Users className="h-4 w-4" />
-                                                <span className="text-xs font-medium">Recipients</span>
+                                                <span className="text-xs font-medium dark:text-gray-400">Recipients</span>
                                             </div>
                                             <div className="text-2xl font-bold text-gray-900 dark:text-white">{getRecipientCount()}</div>
                                         </div>
@@ -609,7 +609,7 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2">
-                            <Send className="h-5 w-5 text-teal-600" />
+                            <Send className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                             Confirm SMS Send
                         </AlertDialogTitle>
                         <AlertDialogDescription>Please review the details before sending:</AlertDialogDescription>
@@ -620,9 +620,9 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                             <p className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Recipients</p>
                             <p className="text-sm text-gray-900 dark:text-white">
                                 {recipientType === 'all' ? (
-                                    <span className="font-semibold text-teal-600">{users.length} recipients (Broadcast)</span>
+                                    <span className="font-semibold text-teal-600 dark:text-teal-400">{users.length} recipients (Broadcast)</span>
                                 ) : (
-                                    <span className="font-semibold text-teal-600">{selectedUsers.length} recipient(s) selected</span>
+                                    <span className="font-semibold text-teal-600 dark:text-teal-400">{selectedUsers.length} recipient(s) selected</span>
                                 )}
                             </p>
                         </div>
@@ -635,17 +635,17 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
                         <div className="grid grid-cols-2 gap-3">
                             <div className="rounded-md bg-teal-50 p-3 dark:bg-teal-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">SMS Parts</p>
-                                <p className="text-xl font-bold text-teal-600">{Math.ceil(characterCount / 160) || 0}</p>
+                                <p className="text-xl font-bold text-teal-600 dark:text-teal-400">{Math.ceil(characterCount / 160) || 0}</p>
                             </div>
                             <div className="rounded-md bg-cyan-50 p-3 dark:bg-cyan-900/20">
                                 <p className="text-xs text-gray-600 dark:text-gray-400">Total SMS</p>
-                                <p className="text-xl font-bold text-cyan-600">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
+                                <p className="text-xl font-bold text-cyan-600 dark:text-cyan-400">{getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}</p>
                             </div>
                         </div>
 
                         {credits > 0 && getRecipientCount() * (Math.ceil(characterCount / 160) || 0) > credits && (
                             <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-900/20">
-                                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                 <p className="text-sm text-amber-800 dark:text-amber-200">
                                     Warning: You may not have enough credits. Required: {getRecipientCount() * (Math.ceil(characterCount / 160) || 0)}
                                     , Available: {credits}

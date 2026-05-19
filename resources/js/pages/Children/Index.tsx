@@ -30,10 +30,7 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-
-const MySwal = withReactContent(Swal);
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
 type Child = {
     id: number;
@@ -173,6 +170,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                     closeModal();
                     const importCount = importData.length;
                     MySwal.fire({
+                        ...swalTheme(),
                         title: 'Import Complete!',
                         html: `
                             <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
@@ -187,7 +185,6 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         icon: 'success',
                         confirmButtonText: 'OK',
                         confirmButtonColor: 'hsl(142 76% 36%)',
-                        background: 'hsl(142 100% 98%)',
                     }).then(() => {
                         window.location.reload();
                     });
@@ -209,10 +206,11 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
     const handleDelete = (child: Child) => {
         MySwal.fire({
+            ...swalTheme(),
             title: 'Delete Child Record?',
             html: `
-                <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
-                    <div style="font-size: 1.125rem; color: hsl(181 100% 2%); margin-bottom: 1rem; font-weight: 500;">
+                <div style="font-family: 'Montserrat', sans-serif; padding: 1rem 0;">
+                    <div style="font-size: 1.125rem; margin-bottom: 1rem; font-weight: 500;">
                         Are you sure you want to delete this child's record?
                     </div>
                     <strong>${child.fullname}</strong>
@@ -227,7 +225,6 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             cancelButtonColor: 'hsl(142 76% 36%)',
             confirmButtonText: 'Yes, Delete',
             cancelButtonText: 'Cancel',
-            background: 'hsl(178 100% 98%)',
         }).then((result) => {
             if (result.isConfirmed) {
                 router.delete(route('children.destroy', { child: child.slug }), {
@@ -388,69 +385,69 @@ router.get(route('children.index'), params, { replace: true });
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)]" />
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <div className="mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
-                            <Baby className="h-5 w-5 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Health Records</span>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Baby className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Health Records</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 Children Registry
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">Track and manage children&apos;s health, nutrition, and growth records</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Track and manage children&apos;s health, nutrition, and growth records</p>
                     </div>
 
                     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Children</p>
-                                    <p className="text-2xl font-bold text-teal-600">{stats.total}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Children</p>
+                                    <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">{stats.total}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Users className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-blue-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-blue-200 hover:shadow-lg dark:border-blue-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Male</p>
-                                    <p className="text-2xl font-bold text-blue-600">{stats.male}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Male</p>
+                                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.male}</p>
                                 </div>
-                                <div className="rounded-full bg-blue-50 p-2.5">
-                                    <User className="h-5 w-5 text-blue-500" />
+                                <div className="rounded-full bg-blue-50 p-2.5 dark:bg-blue-900/30">
+                                    <User className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-pink-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-pink-200 hover:shadow-lg dark:border-pink-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Female</p>
-                                    <p className="text-2xl font-bold text-pink-600">{stats.female}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Female</p>
+                                    <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">{stats.female}</p>
                                 </div>
-                                <div className="rounded-full bg-pink-50 p-2.5">
-                                    <User className="h-5 w-5 text-pink-500" />
+                                <div className="rounded-full bg-pink-50 p-2.5 dark:bg-pink-900/30">
+                                    <User className="h-5 w-5 text-pink-500 dark:text-pink-400" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg">
+                        <div className="stat-card cursor-pointer rounded-xl border border-purple-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-purple-200 hover:shadow-lg dark:border-purple-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Avg BMI</p>
-                                    <p className="text-2xl font-bold text-purple-600">{stats.avgBMI}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg BMI</p>
+                                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.avgBMI}</p>
                                 </div>
-                                <div className="rounded-full bg-purple-50 p-2.5">
-                                    <Activity className="h-5 w-5 text-purple-500" />
+                                <div className="rounded-full bg-purple-50 p-2.5 dark:bg-purple-900/30">
+                                    <Activity className="h-5 w-5 text-purple-500 dark:text-purple-400" />
                                 </div>
                             </div>
                         </div>
@@ -458,14 +455,14 @@ router.get(route('children.index'), params, { replace: true });
 
                     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="relative max-w-md flex-1">
-                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Search by name or ID..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearch}
-                                className="w-full rounded-md border border-gray-200 bg-white dark:bg-gray-800/80 dark:text-gray-100 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400 py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                             />
                             {searchQuery && (
                                 <button
@@ -473,7 +470,7 @@ router.get(route('children.index'), params, { replace: true });
                                         setSearchQuery('');
                                         router.get(route('children.index'), { search: '', sex: '', vaccine_status: '' }, { replace: true });
                                     }}
-                                    className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                                    className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>
@@ -484,7 +481,7 @@ router.get(route('children.index'), params, { replace: true });
                             {canExportChildren && (
                                 <button
                                     onClick={() => setShowExportDialog(true)}
-                                    className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                    className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                 >
                                     <Download className="mr-1.5 inline h-4 w-4" />
                                     Export / Print
@@ -494,9 +491,9 @@ router.get(route('children.index'), params, { replace: true });
 {canManageChildren && (
                                  <button
                                       onClick={openImportModal}
-                                      className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                      className="cursor-pointer rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                  >
-                                     <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
+                                      <FileSpreadsheet className="mr-1.5 inline h-4 w-4" />
                                      Upload Excel
                                  </button>
                              )}
@@ -531,28 +528,28 @@ router.get(route('children.index'), params, { replace: true });
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                 !activeSex && !activeVaccine
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
-                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
-                            All ({stats.total})
-                        </button>
-                        <button
-                            onClick={() => handleSexFilter('Male')}
-                            className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                activeSex === 'Male'
-                                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
-                        >
-                            Male ({stats.male})
-                        </button>
-                        <button
-                            onClick={() => handleSexFilter('Female')}
-                            className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                activeSex === 'Female'
-                                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
-                            }`}
+                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                             }`}
+                         >
+                             All ({stats.total})
+                         </button>
+                         <button
+                             onClick={() => handleSexFilter('Male')}
+                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                 activeSex === 'Male'
+                                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
+                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                             }`}
+                         >
+                             Male ({stats.male})
+                         </button>
+                         <button
+                             onClick={() => handleSexFilter('Female')}
+                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                 activeSex === 'Female'
+                                     ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
+                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                             }`}
                         >
                             Female ({stats.female})
                         </button>
@@ -565,7 +562,7 @@ router.get(route('children.index'), params, { replace: true });
                                 className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                     activeVaccine === 'overdue'
                                         ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md'
-                                        : 'border border-red-200 bg-white text-red-700 hover:bg-red-50'
+                                        : 'border border-red-200 bg-white text-red-700 hover:bg-red-50 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30'
                                 }`}
                                 aria-pressed={activeVaccine === 'overdue'}
                             >
@@ -579,7 +576,7 @@ router.get(route('children.index'), params, { replace: true });
                                 className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                     activeVaccine === 'upcoming'
                                         ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-md'
-                                        : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+                                        : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30'
                                 }`}
                                 aria-pressed={activeVaccine === 'upcoming'}
                             >
@@ -594,7 +591,7 @@ router.get(route('children.index'), params, { replace: true });
                                 className={`filter-pill flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                     activeVaccine === 'mixed'
                                         ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md'
-                                        : 'border border-orange-200 bg-white text-orange-700 hover:bg-orange-50'
+                                        : 'border border-orange-200 bg-white text-orange-700 hover:bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400 dark:hover:bg-orange-900/30'
                                 }`}
                                 aria-pressed={activeVaccine === 'mixed'}
                             >
@@ -605,16 +602,16 @@ router.get(route('children.index'), params, { replace: true });
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800">{flash.success}</div>
+                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-4 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">{flash.success}</div>
                     )}
 
                     {children.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <div className="mb-4 rounded-full bg-gray-100 p-4">
-                                <Baby className="h-12 w-12 text-gray-400" />
+                            <div className="mb-4 rounded-full bg-gray-100 p-4 dark:bg-gray-700">
+                                <Baby className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                             </div>
-                            <p className="text-lg font-medium text-gray-900">No children found</p>
-                            <p className="text-sm text-gray-500">Try adjusting your search or filters</p>
+                            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No children found</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -623,7 +620,7 @@ router.get(route('children.index'), params, { replace: true });
 
                                 return (
                                     <div key={child.id} className="child-card group block" style={{ animationDelay: `${index * 50}ms` }}>
-                                        <Card className="h-full overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-xl">
+                                        <Card className="h-full overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-xl dark:bg-gray-800">
                                             <CardContent className="p-0">
                                                 <div className="p-4">
                                                     <div className="mb-3 flex items-start justify-between">
@@ -631,25 +628,25 @@ router.get(route('children.index'), params, { replace: true });
                                                             <div
                                                                 className={`flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold shadow-sm ${
                                                                     child.sex === 'Male'
-                                                                        ? 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700'
-                                                                        : 'bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700'
+                                                                        ? 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 dark:from-blue-800 dark:to-blue-700 dark:text-blue-200'
+                                                                        : 'bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 dark:from-pink-800 dark:to-pink-700 dark:text-pink-200'
                                                                 }`}
                                                             >
                                                                 {child.fullname.charAt(0).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <p className="truncate text-sm font-bold text-gray-900">{child.fullname}</p>
-                                                                <p className="text-xs text-gray-500">ID: {child.id}</p>
+                                                                <p className="truncate text-sm font-bold text-gray-900 dark:text-gray-100">{child.fullname}</p>
+                                                                <p className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</p>
                                                                 {child.vaccine_alert && (
                                                                     <div className="mt-0.5 flex items-center gap-1">
                                                                         {(child.vaccine_alert === 'overdue' || child.vaccine_alert === 'mixed') && (
-                                                                            <span className="inline-flex items-center gap-1 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
                                                                                 <AlertTriangle className="h-3 w-3" />
                                                                                 Vaccine Overdue
                                                                             </span>
                                                                         )}
                                                                         {(child.vaccine_alert === 'upcoming' || child.vaccine_alert === 'mixed') && (
-                                                                            <span className="inline-flex items-center gap-1 rounded bg-yellow-100 px-1.5 py-0.5 text-[10px] font-medium text-yellow-700">
+                                                                            <span className="inline-flex items-center gap-1 rounded bg-yellow-100 px-1.5 py-0.5 text-[10px] font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
                                                                                 <Calendar className="h-3 w-3" />
                                                                                 Vaccine Due Soon
                                                                             </span>
@@ -661,43 +658,43 @@ router.get(route('children.index'), params, { replace: true });
                                                     </div>
 
                                                     <div className="mb-3 grid grid-cols-3 gap-2">
-                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
-                                                            <Scale className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
-                                                            <p className="text-xs font-semibold text-gray-900">{child.weight ?? '-'}</p>
-                                                            <p className="text-[10px] text-gray-500">kg</p>
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
+                                                            <Scale className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">{child.weight ?? '-'}</p>
+                                                            <p className="text-[10px] text-gray-500 dark:text-gray-400">kg</p>
                                                         </div>
-                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
-                                                            <Ruler className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
-                                                            <p className="text-xs font-semibold text-gray-900">{child.height ?? '-'}</p>
-                                                            <p className="text-[10px] text-gray-500">cm</p>
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
+                                                            <Ruler className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">{child.height ?? '-'}</p>
+                                                            <p className="text-[10px] text-gray-500 dark:text-gray-400">cm</p>
                                                         </div>
-                                                        <div className="rounded-md bg-gray-50 p-2 text-center">
-                                                            <Activity className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400" />
-                                                            <p className="text-xs font-semibold text-gray-900">{bmi ?? '-'}</p>
-                                                            <p className="text-[10px] text-gray-500">BMI</p>
+                                                        <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
+                                                            <Activity className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">{bmi ?? '-'}</p>
+                                                            <p className="text-[10px] text-gray-500 dark:text-gray-400">BMI</p>
                                                         </div>
                                                     </div>
 
                                                     <div className="space-y-2 text-xs">
-                                                        <div className="flex items-center gap-2 text-gray-600">
-                                                            <Calendar className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+                                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                                            <Calendar className="h-3.5 w-3.5 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                                                             <span className="truncate">
                                                                 {calculateAgeFromBirthdate(child.birthdate) ?? child.age ?? '-'} months old
                                                             </span>
                                                         </div>
                                                         {child.contact_number && (
-                                                            <div className="flex items-center gap-2 text-gray-600">
-                                                                <Phone className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
+                                                            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                                                                <Phone className="h-3.5 w-3.5 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                                                                 <span className="truncate">{child.contact_number}</span>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
 
-                                                <div className="border-t border-gray-100">
+                                                <div className="border-t border-gray-100 dark:border-gray-700">
                                                     <Link
                                                         href={route('children.show', { child: child.slug })}
-                                                        className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
+                                                        className="flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-900/20"
                                                     >
                                                         <Activity className="h-3.5 w-3.5" />
                                                         View Profile
@@ -705,17 +702,17 @@ router.get(route('children.index'), params, { replace: true });
                                                 </div>
 
                                                 {canManageChildren && (
-                                                    <div className="flex border-t border-gray-100">
+                                                    <div className="flex border-t border-gray-100 dark:border-gray-700">
                                                         <Link
                                                             href={route('children.edit', { child: child.slug })}
-                                                            className="flex flex-1 items-center justify-center gap-1 border-r border-gray-100 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50"
+                                                            className="flex flex-1 items-center justify-center gap-1 border-r border-gray-100 py-2.5 text-xs font-medium text-teal-600 transition-colors hover:bg-teal-50 dark:border-gray-700 dark:text-teal-400 dark:hover:bg-teal-900/20"
                                                         >
                                                             <Edit2 className="h-3.5 w-3.5" />
                                                             Edit
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(child)}
-                                                            className="flex flex-1 items-center justify-center gap-1 py-2.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50"
+                                                            className="flex flex-1 items-center justify-center gap-1 py-2.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />
                                                             Delete
@@ -737,7 +734,7 @@ router.get(route('children.index'), params, { replace: true });
                     <button
                         onClick={() => handlePageClick(pagination.current_page - 1)}
                         disabled={pagination.current_page === 1}
-                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
                         <ChevronLeft className="h-4 w-4" />
                         Prev
@@ -750,13 +747,13 @@ router.get(route('children.index'), params, { replace: true });
                                     key={idx}
                                     onClick={() => handlePageClick(page)}
                                     className={`page-btn rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                                        page === pagination.current_page ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        page === pagination.current_page ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                     }`}
                                 >
                                     {page}
                                 </button>
                             ) : (
-                                <span key={idx} className="px-2 py-1.5 text-sm text-gray-400">
+                                <span key={idx} className="px-2 py-1.5 text-sm text-gray-400 dark:text-gray-500">
                                     ...
                                 </span>
                             ),
@@ -766,7 +763,7 @@ router.get(route('children.index'), params, { replace: true });
                     <button
                         onClick={() => handlePageClick(pagination.current_page + 1)}
                         disabled={pagination.current_page === pagination.last_page}
-                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                        className="page-btn flex items-center gap-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
                         Next
                         <ChevronRight className="h-4 w-4" />
@@ -776,22 +773,22 @@ router.get(route('children.index'), params, { replace: true });
 
             {showExportDialog && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-                        <div className="flex items-center justify-between border-b p-4">
+                    <div className="w-full max-w-md rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+                        <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900">Export / Print</h2>
-                                <p className="text-sm text-cyan-700">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Export / Print</h2>
+                                <p className="text-sm text-cyan-700 dark:text-cyan-400">
                                     {searchQuery || activeSex || activeVaccine
                                         ? `Filters: ${[searchQuery, activeSex, activeVaccine].filter(Boolean).join(', ')}`
                                         : 'All children'}
                                 </p>
                             </div>
-                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100">
+                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
                         <div className="p-4">
-                            <p className="mb-4 text-sm text-gray-600">Choose an option:</p>
+                            <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">Choose an option:</p>
                             <div className="flex gap-2">
                                 <Button
                                     onClick={() => {
@@ -821,22 +818,22 @@ router.get(route('children.index'), params, { replace: true });
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl">
-                        <div className="flex items-center justify-between border-b p-4">
+                    <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl dark:bg-gray-800">
+                        <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900">Import Children from Excel</h2>
-                                <p className="text-sm text-gray-500">Upload an Excel file (.xlsx or .xls) with child records</p>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Import Children from Excel</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Upload an Excel file (.xlsx or .xls) with child records</p>
                             </div>
-                            <button onClick={closeModal} className="rounded-full p-1 hover:bg-gray-100">
+                            <button onClick={closeModal} className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
 
                         <div className="p-4">
                             {!selectedFile ? (
-                                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-12">
-                                    <Upload className="mb-4 h-10 w-10 text-gray-400" />
-                                    <p className="mb-4 text-gray-600">Click to select an Excel file</p>
+                                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 p-12 dark:border-gray-600">
+                                    <Upload className="mb-4 h-10 w-10 text-gray-400 dark:text-gray-500" />
+                                    <p className="mb-4 text-gray-600 dark:text-gray-300">Click to select an Excel file</p>
                                     <label className="cursor-pointer rounded-md bg-teal-500 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-teal-600">
                                         Select File
                                         <input type="file" accept=".xlsx, .xls" className="hidden" onChange={handleFileSelect} />
@@ -844,41 +841,41 @@ router.get(route('children.index'), params, { replace: true });
                                 </div>
                             ) : (
                                 <div>
-                                    <div className="mb-4 flex items-center justify-between rounded-md bg-gray-50 p-3">
+                                    <div className="mb-4 flex items-center justify-between rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                         <div className="flex items-center gap-3">
-                                            <FileSpreadsheet className="h-6 w-6 text-green-600" />
+                                            <FileSpreadsheet className="h-6 w-6 text-green-600 dark:text-green-400" />
                                             <div>
-                                                <p className="text-sm font-medium">{selectedFile.name}</p>
-                                                <p className="text-xs text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                                                <p className="text-sm font-medium dark:text-gray-200">{selectedFile.name}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{(selectedFile.size / 1024).toFixed(1)} KB</p>
                                             </div>
                                         </div>
-                                        <button onClick={() => setSelectedFile(null)} className="rounded p-1.5 hover:bg-gray-200">
+                                        <button onClick={() => setSelectedFile(null)} className="rounded p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600">
                                             <X className="h-4 w-4" />
                                         </button>
                                     </div>
 
                                     {previewData.length > 0 && (
                                         <div className="mb-4">
-                                            <p className="mb-2 text-sm font-medium text-gray-700">Preview ({importData.length} total rows):</p>
-                                            <div className="max-h-48 overflow-auto rounded-md border border-gray-200">
+                                            <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Preview ({importData.length} total rows):</p>
+                                            <div className="max-h-48 overflow-auto rounded-md border border-gray-200 dark:border-gray-600">
                                                 <table className="min-w-full text-xs">
-                                                    <thead className="sticky top-0 bg-gray-50">
+                                                    <thead className="sticky top-0 bg-gray-50 dark:bg-gray-700">
                                                         <tr>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium">Name</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium">Gender</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium">Weight</th>
-                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium">Height</th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Name</th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Gender</th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Weight</th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">Height</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {previewData.map((row, i) => (
-                                                            <tr key={i} className="hover:bg-gray-50">
-                                                                <td className="border border-gray-200 px-3 py-2">
+                                                            <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
                                                                     {row.first_name} {row.last_name}
                                                                 </td>
-                                                                <td className="border border-gray-200 px-3 py-2">{row.sex || '-'}</td>
-                                                                <td className="border border-gray-200 px-3 py-2">{row.weight || '-'}</td>
-                                                                <td className="border border-gray-200 px-3 py-2">{row.height || '-'}</td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.sex || '-'}</td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.weight || '-'}</td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">{row.height || '-'}</td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
@@ -890,7 +887,7 @@ router.get(route('children.index'), params, { replace: true });
                                     <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() => setSelectedFile(null)}
-                                            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50"
+                                            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                         >
                                             Different File
                                         </button>

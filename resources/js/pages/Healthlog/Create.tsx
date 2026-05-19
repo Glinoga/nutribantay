@@ -161,30 +161,30 @@ export default function Create({
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)]" />
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="fade-in-up mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
-                            <Heart className="h-5 w-5 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Health Log</span>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Heart className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Health Log</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 Add Health Log
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">Record new health measurements for {child.fullname}</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Record new health measurements for {child.fullname}</p>
                     </div>
 
                     {/* Success Message */}
                     {showSuccess && (
-                        <div className="fade-in-up mb-6 rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800">
+                        <div className="fade-in-up mb-6 rounded-xl border-2 border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300">
                             <div className="flex items-center gap-2">
-                                <Check className="h-5 w-5 text-green-600" />
+                                <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
                                 <span className="font-medium">Health log added successfully! Redirecting...</span>
                             </div>
                         </div>
@@ -192,42 +192,42 @@ export default function Create({
 
                     <form onSubmit={submit} className="fade-in-up space-y-6" style={{ animationDelay: '0.2s' }}>
                         {/* Child Info Card */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h2 className="text-lg font-bold text-gray-900">Child Information</h2>
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">Child Information</h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3 lg:grid-cols-5">
-                                <div className="rounded-md bg-gray-50 p-3">
-                                    <p className="text-xs font-medium text-gray-500">Full Name</p>
-                                    <p className="mt-1 font-semibold text-gray-900">{child.fullname}</p>
+                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Full Name</p>
+                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{child.fullname}</p>
                                 </div>
-                                <div className="rounded-md bg-gray-50 p-3">
-                                    <p className="text-xs font-medium text-gray-500">Sex</p>
-                                    <p className="mt-1 font-semibold text-gray-900">{child.sex}</p>
+                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Sex</p>
+                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{child.sex}</p>
                                 </div>
-                                <div className="rounded-md bg-gray-50 p-3">
-                                    <p className="text-xs font-medium text-gray-500">Birthdate</p>
-                                    <p className="mt-1 font-semibold text-gray-900">
+                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Birthdate</p>
+                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                                         {child.birthdate ? new Date(child.birthdate).toLocaleDateString() : 'N/A'}
                                     </p>
                                 </div>
-                                <div className="rounded-md bg-gray-50 p-3">
-                                    <p className="text-xs font-medium text-gray-500">Current Weight (kg)</p>
-                                    <p className="mt-1 font-semibold text-gray-900">{child.weight ?? 'N/A'}</p>
+                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Current Weight (kg)</p>
+                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{child.weight ?? 'N/A'}</p>
                                 </div>
-                                <div className="rounded-md bg-gray-50 p-3">
-                                    <p className="text-xs font-medium text-gray-500">Current Height (cm)</p>
-                                    <p className="mt-1 font-semibold text-gray-900">{child.height ?? 'N/A'}</p>
+                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Current Height (cm)</p>
+                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{child.height ?? 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Record Selector */}
                         {records.length > 1 && (
-                            <div className="mb-4 rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                            <div className="mb-4 rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-bold text-gray-900">Select Previous Record</h3>
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Select Previous Record</h3>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -299,18 +299,18 @@ export default function Create({
                         {/* Previous Record */}
                         {selectedRecord && (
                             <div
-                                className="form-section fade-in-up rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg"
+                                className="form-section fade-in-up rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                                 style={{ animationDelay: '0.15s' }}
                             >
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h2 className="text-lg font-bold text-gray-900">Previous Record</h2>
-                                    <p className="mt-1 text-xs text-gray-500">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">Previous Record</h2>
+                                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                         Record from: {selectedRecord.created_at ? new Date(selectedRecord.created_at).toLocaleDateString() : 'N/A'}
                                         {records.length > 1 && (
                                             <button
                                                 type="button"
                                                 onClick={() => setShowRecordSelector(true)}
-                                                className="ml-2 cursor-pointer text-xs text-teal-600 hover:underline"
+                                                className="ml-2 cursor-pointer text-xs text-teal-600 hover:underline dark:text-teal-400"
                                             >
                                                 (Switch Record)
                                             </button>
@@ -320,19 +320,19 @@ export default function Create({
                                 <div className="space-y-4 p-6">
                                     {/* Measurements */}
                                     <div>
-                                        <h3 className="mb-2 text-sm font-semibold text-gray-700">Measurements</h3>
+                                        <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Measurements</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="text-xs font-medium text-gray-500">Weight (kg)</p>
-                                                <p className="mt-1 font-semibold text-gray-900">{selectedRecord.weight ?? 'N/A'}</p>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Weight (kg)</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.weight ?? 'N/A'}</p>
                                             </div>
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="text-xs font-medium text-gray-500">Height (cm)</p>
-                                                <p className="mt-1 font-semibold text-gray-900">{selectedRecord.height ?? 'N/A'}</p>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Height (cm)</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.height ?? 'N/A'}</p>
                                             </div>
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="text-xs font-medium text-gray-500">BMI</p>
-                                                <p className="mt-1 font-semibold text-gray-900">{selectedRecord.bmi ?? 'N/A'}</p>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">BMI</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.bmi ?? 'N/A'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -340,48 +340,48 @@ export default function Create({
                                     {/* Nutrition Status */}
                                     {selectedRecord.nutrition_status && (
                                         <div>
-                                            <h3 className="mb-2 text-sm font-semibold text-gray-700">Nutrition Status</h3>
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="font-semibold text-gray-900">{selectedRecord.nutrition_status}</p>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Nutrition Status</h3>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.nutrition_status}</p>
                                             </div>
                                         </div>
                                     )}
 
                                     {/* Supplementary Programs */}
                                     <div>
-                                        <h3 className="mb-2 text-sm font-semibold text-gray-700">Supplementary Programs</h3>
+                                        <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Supplementary Programs</h3>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             {selectedRecord.micronutrient_powder && (
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">MNP</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.micronutrient_powder}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">MNP</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.micronutrient_powder}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.rutf && (
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">RUTF</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.rutf}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">RUTF</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.rutf}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.rusf && (
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">RUSF</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.rusf}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">RUSF</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.rusf}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.complementary_food && (
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Complementary Food</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.complementary_food}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Complementary Food</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.complementary_food}</p>
                                                 </div>
                                             )}
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="text-xs font-medium text-gray-500">Vitamin A</p>
-                                                <p className="mt-1 font-semibold text-gray-900">{selectedRecord.vitamin_a ? 'Yes' : 'No'}</p>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vitamin A</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.vitamin_a ? 'Yes' : 'No'}</p>
                                             </div>
-                                            <div className="rounded-md bg-gray-50 p-3">
-                                                <p className="text-xs font-medium text-gray-500">Deworming</p>
-                                                <p className="mt-1 font-semibold text-gray-900">{selectedRecord.deworming ? 'Yes' : 'No'}</p>
+                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Deworming</p>
+                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.deworming ? 'Yes' : 'No'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -389,39 +389,39 @@ export default function Create({
                                     {/* Vaccination */}
                                     {selectedRecord.vaccine_name && (
                                         <div>
-                                            <h3 className="mb-2 text-sm font-semibold text-gray-700">Vaccination</h3>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Vaccination</h3>
                                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Vaccine Name</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.vaccine_name}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vaccine Name</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.vaccine_name}</p>
                                                 </div>
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Dose Number</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">{selectedRecord.dose_number ?? 'N/A'}</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Dose Number</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.dose_number ?? 'N/A'}</p>
                                                 </div>
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Date Given</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date Given</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                                                         {selectedRecord.date_given ? new Date(selectedRecord.date_given).toLocaleDateString() : 'N/A'}
                                                     </p>
                                                 </div>
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Next Due Date</p>
-                                                    <p className="mt-1 font-semibold text-gray-900">
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Next Due Date</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                                                         {selectedRecord.next_due_date
                                                             ? new Date(selectedRecord.next_due_date).toLocaleDateString()
                                                             : 'N/A'}
                                                     </p>
                                                 </div>
-                                                <div className="rounded-md bg-gray-50 p-3">
-                                                    <p className="text-xs font-medium text-gray-500">Status</p>
+                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Status</p>
                                                     <span
                                                         className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                                             selectedRecord.vaccine_status === 'Completed'
-                                                                ? 'bg-green-100 text-green-800'
+                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                                                                 : selectedRecord.vaccine_status === 'Overdue'
-                                                                  ? 'bg-red-100 text-red-800'
-                                                                  : 'bg-yellow-100 text-yellow-800'
+                                                                  ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                                                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                                                         }`}
                                                     >
                                                         {selectedRecord.vaccine_status || 'Pending'}
@@ -435,16 +435,16 @@ export default function Create({
                         )}
 
                         {/* Measurements Section */}
-                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
                                 <div className="flex items-center gap-2">
-                                    <Calculator className="h-5 w-5 text-teal-600" />
-                                    <h2 className="text-lg font-bold text-gray-900">Measurements</h2>
+                                    <Calculator className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">Measurements</h2>
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-3">
                                 <div>
-                                    <Label htmlFor="weight" className="text-gray-700">
+                                    <Label htmlFor="weight" className="text-gray-700 dark:text-gray-200">
                                         Weight (kg)
                                     </Label>
                                     <Input
@@ -453,14 +453,14 @@ export default function Create({
                                         step="0.01"
                                         value={data.weight}
                                         onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter weight"
                                     />
-                                    {errors.weight && <p className="mt-1 text-sm text-red-600">{errors.weight}</p>}
+                                    {errors.weight && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.weight}</p>}
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="height" className="text-gray-700">
+                                    <Label htmlFor="height" className="text-gray-700 dark:text-gray-200">
                                         Height (cm)
                                     </Label>
                                     <Input
@@ -469,14 +469,14 @@ export default function Create({
                                         step="0.01"
                                         value={data.height}
                                         onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter height"
                                     />
-                                    {errors.height && <p className="mt-1 text-sm text-red-600">{errors.height}</p>}
+                                    {errors.height && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.height}</p>}
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="bmi" className="text-gray-700">
+                                    <Label htmlFor="bmi" className="text-gray-700 dark:text-gray-200">
                                         BMI (auto-calculated)
                                     </Label>
                                     <Input
@@ -484,20 +484,20 @@ export default function Create({
                                         type="text"
                                         value={data.bmi}
                                         readOnly
-                                        className="mt-1 cursor-not-allowed bg-gray-100 font-semibold text-gray-900"
+                                        className="mt-1 cursor-not-allowed bg-gray-100 font-semibold text-gray-900 dark:bg-gray-600 dark:text-gray-100"
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">Calculated automatically from weight and height</p>
+                                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Calculated automatically from weight and height</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Nutrition Status */}
-                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h2 className="text-lg font-bold text-gray-900">Nutrition Status</h2>
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">Nutrition Status</h2>
                             </div>
                             <div className="p-6">
-                                <Label htmlFor="nutrition_status" className="text-gray-700">
+                                <Label htmlFor="nutrition_status" className="text-gray-700 dark:text-gray-200">
                                     Nutrition Status
                                 </Label>
                                 <Input
@@ -505,20 +505,20 @@ export default function Create({
                                     type="text"
                                     value={data.nutrition_status}
                                     readOnly
-                                    className="mt-1 w-full cursor-not-allowed bg-gray-100 font-semibold text-gray-900"
+                                    className="mt-1 w-full cursor-not-allowed bg-gray-100 font-semibold text-gray-900 dark:bg-gray-600 dark:text-gray-100"
                                 />
-                                <p className="mt-1 text-xs text-gray-500">Calculated automatically after saving based on WHO growth standards</p>
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Calculated automatically after saving based on WHO growth standards</p>
                             </div>
                         </div>
 
                         {/* Supplementary Programs */}
-                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h2 className="text-lg font-bold text-gray-900">Supplementary Programs</h2>
+                        <div className="form-section rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">Supplementary Programs</h2>
                             </div>
                             <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="micronutrient_powder" className="text-gray-700">
+                                    <Label htmlFor="micronutrient_powder" className="text-gray-700 dark:text-gray-200">
                                         Micronutrient Powder (MNP)
                                     </Label>
                                     <Input
@@ -526,13 +526,13 @@ export default function Create({
                                         type="text"
                                         value={data.micronutrient_powder}
                                         onChange={(e) => setData('micronutrient_powder', e.target.value)}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="complementary_food" className="text-gray-700">
+                                    <Label htmlFor="complementary_food" className="text-gray-700 dark:text-gray-200">
                                         Complementary Food
                                     </Label>
                                     <Input
@@ -540,13 +540,13 @@ export default function Create({
                                         type="text"
                                         value={data.complementary_food}
                                         onChange={(e) => setData('complementary_food', e.target.value)}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rutf" className="text-gray-700">
+                                    <Label htmlFor="rutf" className="text-gray-700 dark:text-gray-200">
                                         RUTF (Severely Wasted)
                                     </Label>
                                     <Input
@@ -554,13 +554,13 @@ export default function Create({
                                         type="text"
                                         value={data.rutf}
                                         onChange={(e) => setData('rutf', e.target.value)}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rusf" className="text-gray-700">
+                                    <Label htmlFor="rusf" className="text-gray-700 dark:text-gray-200">
                                         RUSF (Moderately Wasted)
                                     </Label>
                                     <Input
@@ -568,33 +568,33 @@ export default function Create({
                                         type="text"
                                         value={data.rusf}
                                         onChange={(e) => setData('rusf', e.target.value)}
-                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />
                                 </div>
                             </div>
 
                             {/* Checkboxes */}
-                            <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4">
+                            <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
                                 <div className="flex gap-6">
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
                                         <Checkbox
                                             id="vitamin_a"
                                             checked={data.vitamin_a}
                                             onCheckedChange={(checked) => setData('vitamin_a', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
                                         />
-                                        <span className="text-sm font-medium text-gray-700">Vitamin A Supplementation</span>
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Vitamin A Supplementation</span>
                                     </label>
 
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white">
+                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
                                         <Checkbox
                                             id="deworming"
                                             checked={data.deworming}
                                             onCheckedChange={(checked) => setData('deworming', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
+                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
                                         />
-                                        <span className="text-sm font-medium text-gray-700">Deworming</span>
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Deworming</span>
                                     </label>
                                 </div>
                             </div>

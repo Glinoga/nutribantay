@@ -262,7 +262,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         switch (status) {
             case 'active':
                 return (
-                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400">
                         Active
                     </Badge>
                 );
@@ -317,15 +317,15 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 pt-8 text-center">
-                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                            <Users className="h-6 w-6 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">User Management</span>
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                                <Users className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                                <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">User Management</span>
                         </div>
                     </div>
 
@@ -357,44 +357,44 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Users</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{stats.total}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{stats.total}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Users className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
                         <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Roles</p>
-                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{stats.roles}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Roles</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{stats.roles}</p>
                                 </div>
-                                <div className="rounded-full bg-cyan-50 p-2.5">
-                                    <Shield className="h-5 w-5 text-cyan-500" />
+                                <div className="rounded-full bg-cyan-50 p-2.5 dark:bg-cyan-900/30">
+                                    <Shield className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                                 </div>
                             </div>
                         </div>
                         <div className="stat-card rounded-xl border border-yellow-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-yellow-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Pending Approvals</p>
-                                    <p className="mt-1 text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
+                                    <p className="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending}</p>
                                 </div>
-                                <div className="rounded-full bg-yellow-50 p-2.5">
-                                    <Clock className="h-5 w-5 text-yellow-500" />
+                                <div className="rounded-full bg-yellow-50 p-2.5 dark:bg-yellow-900/30">
+                                    <Clock className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
                                 </div>
                             </div>
                         </div>
                         <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Admin Codes</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{codes.length}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Admin Codes</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{codes.length}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Key className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Key className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
@@ -405,7 +405,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         <Button
                             onClick={toggleMaintenance}
                             variant={maintenance ? 'destructive' : 'default'}
-                            className={maintenance ? '' : 'bg-green-600 hover:bg-green-700 gap-2'}
+                            className={maintenance ? '' : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 gap-2 dark:bg-green-700 dark:hover:bg-green-600'}
                         >
                             <ShieldAlert className="h-4 w-4" />
                             {maintenance ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
@@ -416,14 +416,14 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                         <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
                             <CardTitle className="flex items-center gap-2">
-                                <Key className="h-5 w-5 text-teal-600" />
+                                <Key className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                 Admin Codes
                             </CardTitle>
                             <CardDescription>Generate and manage registration codes for admin users</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap items-center gap-3">
-                                <Label htmlFor="count" className="text-gray-700 whitespace-nowrap">
+                                <Label htmlFor="count" className="text-gray-700 whitespace-nowrap dark:text-gray-300">
                                     Number of Codes:
                                 </Label>
                                 <Input
@@ -432,7 +432,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     min="1"
                                     value={count}
                                     onChange={(e) => setCount(Number(e.target.value.replace(/\D/g, '')))}
-                                    className="w-20 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                    className="w-20 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                 />
                                 <Button
                                     onClick={generateAdminCodes}
@@ -448,7 +448,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         'Generate'
                                     )}
                                 </Button>
-                                <Button onClick={openCodeModal} variant="outline" className="border hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <Button onClick={openCodeModal} variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700">
                                     View All Codes
                                 </Button>
                             </div>
@@ -460,7 +460,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="flex items-center gap-2">
-                                    <Users className="h-5 w-5 text-teal-600" />
+                                    <Users className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                     User List
                                 </CardTitle>
                                 <div className="flex gap-2">
@@ -478,7 +478,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         <Plus className="mr-2 h-4 w-4" />
                                         Create User
                                     </Button>
-                                    <Button variant="outline" className="border hover:bg-gray-100 dark:hover:bg-gray-700" asChild>
+                                    <Button variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700" asChild>
                                         <Link href={route('users.archived')}>
                                             <Archive className="mr-2 h-4 w-4" />
                                             View Archived
@@ -493,13 +493,13 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <div className="border-b border-gray-100 px-6 py-4 dark:border-gray-700">
                                 <form onSubmit={handleSearch} className="flex items-center gap-2">
                                     <div className="relative flex-1">
-                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                         <Input
                                             type="text"
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
                                             placeholder="Search by ID, Name, Email, or Role"
-                                            className="w-full border py-2.5 pr-3 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                            className="w-full border py-2.5 pr-3 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                         />
                                     </div>
                                     <Button
@@ -534,12 +534,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             <TableCell>{user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}</TableCell>
                                             <TableCell>
                                                 {user.status === 'pending' && (
-                                                    <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800">
+                                                    <Badge variant="outline" className="border-yellow-300 bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                                                         Pending
                                                     </Badge>
                                                 )}
                                                 {user.status === 'approved' && (
-                                                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                                                    <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400">
                                                         Approved
                                                     </Badge>
                                                 )}
@@ -553,7 +553,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                             <Button
                                                                 size="sm"
                                                                 variant="default"
-                                                                className="bg-green-600 hover:bg-green-700"
+                                                                className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
                                                                 onClick={() => setApproveUserId(user.id)}
                                                             >
                                                                 Approve
@@ -566,7 +566,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                     <Button size="sm" variant="secondary" asChild>
                                                         <Link href={route('users.show', { user: user.id })}>View</Link>
                                                     </Button>
-                                                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700" asChild>
+                                                    <Button size="sm" variant="default" className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" asChild>
                                                         <Link href={route('users.edit', { user: user.id })}>Edit</Link>
                                                     </Button>
                                                     <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
@@ -594,7 +594,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => approveUserId && handleApprove(approveUserId)} className="bg-green-600 hover:bg-green-700">
+                        <AlertDialogAction onClick={() => approveUserId && handleApprove(approveUserId)} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
                             Approve
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -679,7 +679,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             value={codeSearch}
                             onChange={(e) => setCodeSearch(e.target.value)}
                             placeholder="Search codes..."
-                            className="w-64 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                            className="w-64 border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                         />
                         <Button
                             onClick={copyAllCodes}
@@ -784,7 +784,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 value={newUser.name}
                                 onChange={(e) => setNewUser({ ...newUser, name: e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, '') })}
                                 placeholder="Full name"
-                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -797,7 +797,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 value={newUser.email}
                                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                                 placeholder="Email address"
-                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                             />
                         </div>
 
@@ -810,12 +810,12 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     value={newUser.password}
                                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                                     placeholder="Password"
-                                    className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-                                    required
-                                />
-                                <Button type="button" variant="secondary" onClick={generatePassword}>
-                                    Generate
-                                </Button>
+                                className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                                required
+                            />
+                            <Button type="button" variant="secondary" onClick={generatePassword}>
+                                Generate
+                            </Button>
                             </div>
                         </div>
 
@@ -825,7 +825,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 id="role"
                                 value={newUser.role}
                                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                                className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                 required
                             >
                                 <option value="Healthworker">Healthworker</option>
@@ -836,20 +836,20 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         {createError && <div className="text-sm text-destructive">{createError}</div>}
 
                         {createSuccess && generatedCode && (
-                            <div className="rounded-md bg-green-50 p-3 text-sm">
-                                <p className="mb-2 font-medium text-green-800">User created successfully!</p>
+                            <div className="rounded-md bg-green-50 p-3 text-sm dark:bg-green-900/20">
+                                <p className="mb-2 font-medium text-green-800 dark:text-green-400">User created successfully!</p>
                                 <div className="flex items-center justify-between gap-2">
                                     <div>
-                                        <p className="text-xs text-green-600">Code - Password:</p>
-                                        <p className="font-mono text-lg font-bold text-green-900">
+                                        <p className="text-xs text-green-600 dark:text-green-400">Code - Password:</p>
+                                        <p className="font-mono text-lg font-bold text-green-900 dark:text-green-300">
                                             {generatedCode} - {generatedPassword}
                                         </p>
                                     </div>
-                                    <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={copyCredentials}>
+                                    <Button size="sm" className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600" onClick={copyCredentials}>
                                         {copiedLogin ? 'Copied!' : 'Copy'}
                                     </Button>
                                 </div>
-                                <p className="mt-1 text-xs text-green-600">Give these credentials to the healthworker</p>
+                                <p className="mt-1 text-xs text-green-600 dark:text-green-400">Give these credentials to the healthworker</p>
                             </div>
                         )}
                     </div>

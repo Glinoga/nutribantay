@@ -10,10 +10,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Plus, Syringe, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-
-const MySwal = withReactContent(Swal);
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
 type Vaccine = {
     id: number;
@@ -54,22 +51,22 @@ type ChildVaccinesProps = {
 const getDoseBadgeClass = (status: string) => {
     switch (status) {
         case 'Completed':
-            return 'bg-green-100 text-green-800';
+            return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
         case 'Overdue':
-            return 'bg-red-100 text-red-800';
+            return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
         default:
-            return 'bg-yellow-100 text-yellow-800';
+            return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
     }
 };
 
 const getProgressBadgeClass = (status: string) => {
     switch (status) {
         case 'Completed':
-            return 'bg-green-100 text-green-800';
+            return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
         case 'In Progress':
-            return 'bg-blue-100 text-blue-800';
+            return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
         default:
-            return 'bg-gray-100 text-gray-800';
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
 };
 
@@ -179,6 +176,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
     const handleDeleteVaccine = (cv: ChildVaccine) => {
         MySwal.fire({
+            ...swalTheme(),
             title: `Remove ${cv.vaccine.name}?`,
             text: 'All dose records will be deleted. This action cannot be undone.',
             icon: 'warning',
@@ -195,6 +193,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
     const handleDeleteDose = (cv: ChildVaccine, dose: Dose) => {
         MySwal.fire({
+            ...swalTheme(),
             title: 'Delete Dose Record?',
             text: 'This action cannot be undone.',
             icon: 'warning',
@@ -256,23 +255,23 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)]" />
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="fade-in-up mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
-                            <Syringe className="h-5 w-5 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Vaccine Tracker</span>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Syringe className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Vaccine Tracker</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 {child.fullname}
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">Track and manage vaccination records for {child.fullname}</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Track and manage vaccination records for {child.fullname}</p>
                     </div>
 
                     {/* Action Buttons */}
@@ -285,7 +284,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                         </Link>
 
                         <Link href={route('children.index')}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                                 <X className="h-4 w-4" />
                                 Back to List
                             </button>
@@ -295,21 +294,21 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                     {/* Add Vaccine Section */}
                     {available_vaccines.length > 0 && (
                         <div
-                            className="fade-in-up mb-6 rounded-xl border-0 bg-white p-6 shadow-md transition-all hover:shadow-lg"
+                            className="fade-in-up mb-6 rounded-xl border-0 bg-white p-6 shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                             style={{ animationDelay: '0.3s' }}
                         >
                             <div className="mb-4 flex items-center gap-2">
-                                <Plus className="h-5 w-5 text-teal-600" />
-                                <h2 className="text-xl font-bold text-gray-900">Add Vaccine to Child</h2>
+                                <Plus className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Add Vaccine to Child</h2>
                             </div>
                             <form onSubmit={handleAddVaccine} className="flex gap-3">
                                 <Select
                                     value={selectedVaccineId ? String(selectedVaccineId) : ''}
                                     onValueChange={(val) => setSelectedVaccineId(Number(val))}
                                 >
-                                    <SelectTrigger className="flex-1">
-                                        <SelectValue placeholder="Select a vaccine..." />
-                                    </SelectTrigger>
+                                <SelectTrigger className="flex-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                    <SelectValue placeholder="Select a vaccine..." />
+                                </SelectTrigger>
                                     <SelectContent>
                                         {available_vaccines.map((v) => (
                                             <SelectItem key={v.id} value={String(v.id)}>
@@ -336,20 +335,20 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                             {child_vaccines.map((cv, idx) => (
                                 <div
                                     key={cv.id}
-                                    className="vaccine-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg"
+                                    className="vaccine-card rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                                     style={{ animationDelay: `${0.4 + idx * 0.1}s` }}
                                 >
-                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
+                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-cyan-100">
-                                                    <Syringe className="h-5 w-5 text-teal-600" />
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 dark:from-teal-800 dark:to-cyan-800">
+                                                    <Syringe className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                                 </div>
                                                 <div>
-                                                    <h2 className="text-lg font-bold text-gray-900">{cv.vaccine.name}</h2>
+                                                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-50">{cv.vaccine.name}</h2>
                                                     <div className="mt-1 flex items-center gap-2">
                                                         <Badge className={getProgressBadgeClass(cv.progress.status)}>{cv.progress.status}</Badge>
-                                                        <span className="text-sm text-gray-500">
+                                                        <span className="text-sm text-gray-500 dark:text-gray-400">
                                                             ({cv.progress.completed}/{cv.progress.total} doses)
                                                         </span>
                                                     </div>
@@ -376,34 +375,34 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                     {cv.doses.length > 0 ? (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-sm">
-                                                <thead className="bg-gradient-to-r from-teal-50 to-cyan-50">
+                                                <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
                                                     <tr>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Dose #</th>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Date Given</th>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Next Due Date</th>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Status</th>
-                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Administered By</th>
-                                                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Actions</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Dose #</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date Given</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Next Due Date</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Administered By</th>
+                                                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {cv.doses.map((dose, doseIdx) => (
                                                         <tr
                                                             key={dose.id}
-                                                            className={`border-t transition-colors hover:bg-teal-50/50 ${doseIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                            className={`border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${doseIdx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
                                                         >
-                                                            <td className="px-4 py-3 font-medium text-gray-900">{dose.dose_number}</td>
-                                                            <td className="px-4 py-3 text-gray-900">{dose.date_given ?? '-'}</td>
-                                                            <td className="px-4 py-3 text-gray-900">{dose.next_due_date ?? '-'}</td>
+                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{dose.dose_number}</td>
+                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{dose.date_given ?? '-'}</td>
+                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{dose.next_due_date ?? '-'}</td>
                                                             <td className="px-4 py-3">
                                                                 <Badge className={getDoseBadgeClass(dose.dose_status)}>{dose.dose_status}</Badge>
                                                             </td>
-                                                            <td className="px-4 py-3 text-gray-900">{dose.administered_by ?? '-'}</td>
+                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{dose.administered_by ?? '-'}</td>
                                                             <td className="px-4 py-3">
                                                                  <div className="flex items-center justify-center">
                                                                      <button
                                                                          onClick={() => handleDeleteDose(cv, dose)}
-                                                                         className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                                         className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
                                                                      >
                                                                          <Trash2 className="h-4 w-4" />
                                                                      </button>
@@ -415,16 +414,16 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                                             </table>
                                         </div>
                                     ) : (
-                                        <div className="px-6 py-4 text-center text-gray-500">No doses recorded yet.</div>
+                                        <div className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No doses recorded yet.</div>
                                     )}
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="fade-in-up rounded-xl bg-gray-100 p-6 text-center" style={{ animationDelay: '0.4s' }}>
-                            <Syringe className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                            <p className="text-lg font-medium text-gray-900">No vaccines assigned</p>
-                            <p className="mt-1 text-sm text-gray-500">Add a vaccine using the form above to get started.</p>
+                        <div className="fade-in-up rounded-xl bg-gray-100 p-6 text-center dark:bg-gray-800" style={{ animationDelay: '0.4s' }}>
+                            <Syringe className="mx-auto mb-4 h-12 w-12 text-gray-400 dark:text-gray-500" />
+                            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No vaccines assigned</p>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a vaccine using the form above to get started.</p>
                         </div>
                     )}
                 </div>
@@ -442,19 +441,19 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                         <form onSubmit={submitDose} className="space-y-4">
                             {Object.keys(errors).length > 0 && (
-                                <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">{Object.values(errors)[0]}</div>
+                                <div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">{Object.values(errors)[0]}</div>
                             )}
 
                             {/* Dose Number - only show when creating new dose */}
                             {!editingDose && (
                                 <div>
-                                    <Label className="text-gray-700">Dose Number</Label>
+                                    <Label className="text-gray-700 dark:text-gray-300">Dose Number</Label>
                                     <Input
                                         type="number"
                                         min="1"
                                         value={doseForm.data.dose_number}
                                         onChange={(e) => doseForm.setData('dose_number', e.target.value)}
-                                        className="bg-gray-50"
+                                        className="bg-gray-50 dark:bg-gray-700 dark:text-gray-100"
                                         readOnly
                                     />
                                 </div>
@@ -462,15 +461,15 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                             {/* Info banner when editing a pending/scheduled dose */}
                             {editingDose && !editingDose.dose.date_given && (
-                                <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
+                                <div className="rounded-md bg-green-50 p-3 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-400">
                                     This dose was scheduled. Set the date it was given to complete it.
                                 </div>
                             )}
 
                             {/* Yes/No radio buttons - when creating new dose OR editing pending dose */}
                             {(!editingDose || (editingDose && !editingDose.dose.date_given)) && (
-                                <div className="rounded-md bg-blue-50 p-4">
-                                    <Label className="font-medium text-blue-900">Has this dose been given?</Label>
+                                <div className="rounded-md bg-blue-50 p-4 dark:bg-blue-900/20">
+                                    <Label className="font-medium text-blue-900 dark:text-blue-400">Has this dose been given?</Label>
                                     <div className="mt-3 flex gap-4">
                                         <label className="flex cursor-pointer items-center gap-2">
                                             <input
@@ -501,7 +500,7 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                             {/* Date Given field - shown for editing or new "yes" dose */}
                             {(editingDose || administeredChoice === 'yes') && (
                                 <div>
-                                    <Label className="text-gray-700">Date Given</Label>
+                                    <Label className="text-gray-700 dark:text-gray-300">Date Given</Label>
                                     <Input
                                          type="date"
                                          value={doseForm.data.date_given}
@@ -515,14 +514,14 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
                             {/* Scheduled Date - when scheduling for later */}
                              {administeredChoice === 'no' && (
                                  <div>
-                                     <Label className="text-gray-700">
+                                     <Label className="text-gray-700 dark:text-gray-300">
                                          {editingDose
                                              ? editingDose.dose.date_given
                                                  ? 'Next Due Date (optional)'
                                                  : 'Scheduled Date (optional)'
                                              : 'Scheduled Date'}
                                      </Label>
-                                     <p className="mb-2 text-sm text-gray-500">
+                                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                                          {editingDose
                                              ? editingDose.dose.date_given
                                                  ? 'When should the next dose be scheduled?'
@@ -540,11 +539,11 @@ export default function Vaccines({ child, child_vaccines, available_vaccines }: 
 
                             {/* Remarks */}
                             <div>
-                                <Label className="text-gray-700">Remarks (optional)</Label>
+                                <Label className="text-gray-700 dark:text-gray-300">Remarks (optional)</Label>
                                 <textarea
                                     value={doseForm.data.remarks}
                                     onChange={(e) => doseForm.setData('remarks', e.target.value)}
-                                    className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                     rows={2}
                                     placeholder="Any notes or observations..."
                                 />

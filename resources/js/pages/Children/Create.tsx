@@ -1,21 +1,18 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber, formatPhoneNumber } from '@/lib/phoneUtils';
-import { SharedData } from '@/types';
 import { smartToast } from '@/utils/smartToast';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { route } from '@/lib/routes';
-import { Baby, Calendar, CheckCircle2, MapPin, OctagonAlert, Phone, Ruler, Sparkles, User, Weight } from 'lucide-react';
+import { Baby, Calendar, CheckCircle2, OctagonAlert, Phone, Ruler, Sparkles, User, Weight } from 'lucide-react';
 import React, { useState } from 'react';
 
 export default function ChildrenCreate() {
-    const { auth } = usePage<SharedData>().props;
     const [showModal, setShowModal] = useState(true);
-    const [focusedField, setFocusedField] = useState<string | null>(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         first_name: '',
@@ -61,14 +58,13 @@ export default function ChildrenCreate() {
         router.visit(route('children.index'));
     };
 
-    // Calculate BMI if weight and height are provided
     const bmi = data.weight && data.height ? (Number(data.weight) / Math.pow(Number(data.height) / 100, 2)).toFixed(1) : null;
 
     const getBMIStatus = (bmi: number) => {
-        if (bmi < 18.5) return { text: 'Underweight', color: 'text-orange-600' };
-        if (bmi < 25) return { text: 'Normal', color: 'text-green-600' };
-        if (bmi < 30) return { text: 'Overweight', color: 'text-yellow-600' };
-        return { text: 'Obese', color: 'text-red-600' };
+        if (bmi < 18.5) return { text: 'Underweight', color: 'text-orange-600 dark:text-orange-400' };
+        if (bmi < 25) return { text: 'Normal', color: 'text-green-600 dark:text-green-400' };
+        if (bmi < 30) return { text: 'Overweight', color: 'text-yellow-600 dark:text-yellow-400' };
+        return { text: 'Obese', color: 'text-red-600 dark:text-red-400' };
     };
 
     return (
@@ -76,375 +72,253 @@ export default function ChildrenCreate() {
             <Head title="Add Child" />
 
             <style>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.8;
-          }
-        }
+                .fade-in-up {
+                    animation: fadeInUp 0.4s ease-out forwards;
+                    opacity: 0;
+                }
+            `}</style>
 
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
-
-        .form-field {
-          animation: slideUp 0.5s ease-out;
-        }
-
-        .form-field:hover {
-          transform: translateY(-2px);
-          transition: transform 0.3s ease;
-        }
-
-        .input-focus {
-          box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
-          border-color: #22c55e !important;
-        }
-
-        .success-checkmark {
-          animation: bounce 1s ease-in-out;
-        }
-
-        /* Custom scrollbar */
-        .modal-content::-webkit-scrollbar {
-          width: 5px;
-        }
-
-        .modal-content::-webkit-scrollbar-track {
-          background: linear-gradient(to bottom, rgba(191, 219, 254, 0.3), rgba(233, 213, 255, 0.3));
-          border-radius: 10px;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, rgb(34, 197, 94), rgb(16, 185, 129));
-          border-radius: 10px;
-          border: 2px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .modal-content::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, rgb(22, 163, 74), rgb(5, 150, 105));
-        }
-      `}</style>
-
-            <Dialog
-                open={showModal}
-                onOpenChange={(isOpen) => {
-                    if (!isOpen) handleClose();
-                    setShowModal(isOpen);
-                }}
-            >
-                <DialogContent className="modal-content max-w-12xl max-h-[90vh] overflow-y-auto rounded-md border-0 bg-gradient-to-br from-green-50 via-white to-emerald-50 shadow-2xl">
-                    {/* Modern Header with Gradient */}
-                    <div className="relative -m-6 mb-6 overflow-hidden rounded-t-md bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 p-8">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%),radial-gradient(circle_at_70%_60%,rgba(255,255,255,0.1),transparent_50%)]" />
-
-                        <div className="relative z-10 text-center">
-                            <div className="mb-4 inline-flex items-center gap-3 rounded-full bg-white/20 px-6 py-3 shadow-lg backdrop-blur-sm">
-                                <Baby className="h-6 w-6 text-white" />
-                                <span className="text-sm font-semibold text-white">Child Registration</span>
-                            </div>
-
-                            <h1 className="mb-2 text-4xl font-bold text-white md:text-5xl">Register New Child</h1>
-                            <p className="text-emerald-100">Add a new child to the nutrition tracking system</p>
+                <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="fade-in-up mb-6 text-center">
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Baby className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Child Registration</span>
                         </div>
+
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
+                                Register New Child
+                            </span>
+                        </h1>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Add a new child to the nutrition tracking system</p>
                     </div>
 
-                    {/* Validation Errors */}
-                    {Object.keys(errors).length > 0 && (
-                        <div className="mb-6 rounded-2xl border-2 border-red-200 bg-gradient-to-br from-red-50 to-red-100 p-6 shadow-lg">
-                            <div className="flex items-start gap-3">
-                                <div className="rounded-full bg-red-200 p-2">
-                                    <OctagonAlert className="h-6 w-6 text-red-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="mb-2 font-bold text-red-800">Please fix the following errors:</h4>
-                                    <ul className="list-inside list-disc space-y-1">
-                                        {Object.entries(errors).map(([field, message]) => (
-                                            <li key={field} className="text-sm text-red-700">
-                                                {message}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Name Fields */}
-                        <div
-                            className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                            style={{ animationDelay: '0ms' }}
+                    <div className="fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        <Dialog
+                            open={showModal}
+                            onOpenChange={(isOpen) => {
+                                if (!isOpen) handleClose();
+                                setShowModal(isOpen);
+                            }}
                         >
-                            <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                <User className="h-5 w-5 text-green-600" />
-                                Child's Name
-                                <span className="text-red-500">*</span>
-                            </Label>
-                            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                                <div>
-                                    <Input
-                                        type="text"
-                                        placeholder="First name"
-                                        value={data.first_name}
-                                        onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                        onFocus={() => setFocusedField('first_name')}
-                                        onBlur={() => setFocusedField(null)}
-                                        className={`border-2 text-base font-medium transition-all ${
-                                            focusedField === 'first_name' ? 'input-focus' : 'border-gray-300'
-                                        }`}
-                                    />
-                                </div>
-                                <div>
-                                    <Input
-                                        type="text"
-                                        placeholder="Middle initial (optional)"
-                                        value={data.middle_initial}
-                                        onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
-                                        onFocus={() => setFocusedField('middle_initial')}
-                                        onBlur={() => setFocusedField(null)}
-                                        maxLength={5}
-                                        className={`border-2 text-base font-medium transition-all ${
-                                            focusedField === 'middle_initial' ? 'input-focus' : 'border-gray-300'
-                                        }`}
-                                    />
-                                </div>
-                                <div>
-                                    <Input
-                                        type="text"
-                                        placeholder="Last name"
-                                        value={data.last_name}
-                                        onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                        onFocus={() => setFocusedField('last_name')}
-                                        onBlur={() => setFocusedField(null)}
-                                        className={`border-2 text-base font-medium transition-all ${
-                                            focusedField === 'last_name' ? 'input-focus' : 'border-gray-300'
-                                        }`}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                            <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-2 border-teal-100 bg-white shadow-lg dark:border-teal-800 dark:bg-gray-800">
+                                <DialogHeader>
+                                    <DialogTitle className="mb-6 w-full text-center text-3xl font-extrabold text-teal-600 dark:text-teal-400">
+                                        Register New Child
+                                    </DialogTitle>
+                                </DialogHeader>
 
-                        {/* Sex & Birthdate Grid */}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div
-                                className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                                style={{ animationDelay: '50ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                    <User className="h-5 w-5 text-green-600" />
-                                    Sex
-                                    <span className="text-red-500">*</span>
-                                </Label>
-                                <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                    <SelectTrigger className="border-2 border-gray-300 text-base font-medium transition-all hover:border-green-400">
-                                        <SelectValue placeholder="Select sex" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Male" className="cursor-pointer font-medium">
-                                            Male
-                                        </SelectItem>
-                                        <SelectItem value="Female" className="cursor-pointer font-medium">
-                                            Female
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div
-                                className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                                style={{ animationDelay: '100ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                    <Calendar className="h-5 w-5 text-green-600" />
-                                    Birthdate
-                                </Label>
-                                <Input
-                                    type="date"
-                                    value={data.birthdate}
-                                    onChange={(e) => setData('birthdate', e.target.value)}
-                                    onFocus={() => setFocusedField('birthdate')}
-                                    onBlur={() => setFocusedField(null)}
-                                    className={`border-2 text-base font-medium transition-all ${
-                                        focusedField === 'birthdate' ? 'input-focus' : 'border-gray-300'
-                                    }`}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Weight & Height Grid */}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div
-                                className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                                style={{ animationDelay: '150ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                    <Weight className="h-5 w-5 text-green-600" />
-                                    Weight (kg)
-                                </Label>
-                                <Input
-                                    type="number"
-                                    step="0.1"
-                                    placeholder="Enter weight"
-                                    value={data.weight}
-                                    onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                    onFocus={() => setFocusedField('weight')}
-                                    onBlur={() => setFocusedField(null)}
-                                    min="0"
-                                    max="200"
-                                    className={`border-2 text-base font-medium transition-all ${
-                                        focusedField === 'weight' ? 'input-focus' : 'border-gray-300'
-                                    }`}
-                                />
-                                <p className="mt-2 text-xs text-gray-500">Maximum: 200 kg</p>
-                            </div>
-
-                            <div
-                                className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                                style={{ animationDelay: '200ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                    <Ruler className="h-5 w-5 text-green-600" />
-                                    Height (cm)
-                                </Label>
-                                <Input
-                                    type="number"
-                                    step="0.1"
-                                    placeholder="Enter height"
-                                    value={data.height}
-                                    onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                    onFocus={() => setFocusedField('height')}
-                                    onBlur={() => setFocusedField(null)}
-                                    min="0"
-                                    max="250"
-                                    className={`border-2 text-base font-medium transition-all ${
-                                        focusedField === 'height' ? 'input-focus' : 'border-gray-300'
-                                    }`}
-                                />
-                                <p className="mt-2 text-xs text-gray-500">Maximum: 250 cm</p>
-                            </div>
-                        </div>
-
-                        {/* BMI Calculator Display */}
-                        {bmi && (
-                            <div className="form-field rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 p-6 shadow-md">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-600">Body Mass Index (BMI)</p>
-                                        <p className="text-3xl font-bold text-blue-600">{bmi}</p>
+                                {Object.keys(errors).length > 0 && (
+                                    <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+                                        <div className="list-inside list-none">
+                                            <OctagonAlert className="mr-2 inline-block" size={24} />
+                                            {Object.entries(errors).map(([field, msg]) => (
+                                                <li key={field} className="text-md inline-block">
+                                                    {msg}
+                                                </li>
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-semibold text-gray-600">Status</p>
-                                        <p className={`text-xl font-bold ${getBMIStatus(Number(bmi)).color}`}>{getBMIStatus(Number(bmi)).text}</p>
+                                )}
+
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                        <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                            <User className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                            Child's Name
+                                            <span className="text-red-500">*</span>
+                                        </Label>
+                                        <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+                                            <Input
+                                                type="text"
+                                                placeholder="First name"
+                                                value={data.first_name}
+                                                onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="M.I. (optional)"
+                                                maxLength={5}
+                                                value={data.middle_initial}
+                                                onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="Last name"
+                                                value={data.last_name}
+                                                onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        )}
 
-                        {/* Contact Number Grid */}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div
-                                className="form-field group rounded-2xl border-2 border-green-200 bg-white p-6 shadow-md transition-all hover:shadow-lg"
-                                style={{ animationDelay: '250ms' }}
-                            >
-                                <Label className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
-                                    <Phone className="h-5 w-5 text-green-600" />
-                                    Guardian Contact Number
-                                </Label>
-                                <Input
-                                    type="tel"
-                                    placeholder="+63 XXX XXX XXXX"
-                                    value={displayPhoneNumber(data.contact_number)}
-                                    onChange={handlePhoneNumberChange}
-                                    onFocus={() => setFocusedField('contact_number')}
-                                    onBlur={() => setFocusedField(null)}
-                                    className={`border-2 text-base font-medium transition-all ${
-                                        focusedField === 'contact_number' ? 'input-focus' : 'border-gray-300'
-                                    }`}
-                                />
-                                <p className="mt-2 text-xs text-gray-500">Format: +63 XXX XXX XXXX</p>
-                            </div>
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                <User className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                                Sex
+                                                <span className="text-red-500">*</span>
+                                            </Label>
+                                            <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
+                                                <SelectTrigger className="w-full rounded-md border-teal-200 bg-white text-sm font-bold transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100">
+                                                    <SelectValue placeholder="Select sex" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Male" className="font-bold">
+                                                        Male
+                                                    </SelectItem>
+                                                    <SelectItem value="Female" className="font-bold">
+                                                        Female
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
 
-                        </div>
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                                Birthdate
+                                            </Label>
+                                            <Input
+                                                type="date"
+                                                value={data.birthdate}
+                                                onChange={(e) => setData('birthdate', e.target.value)}
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                        </div>
+                                    </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex flex-col gap-4 border-t-2 border-gray-200 pt-8 sm:flex-row sm:justify-center">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="group relative overflow-hidden rounded-full bg-gradient-to-r from-green-600 to-emerald-600 px-12 py-6 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100"
-                            >
-                                <span className="relative z-10 flex items-center gap-2">
-                                    {processing ? (
-                                        <>
-                                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <CheckCircle2 className="h-5 w-5 transition-transform group-hover:rotate-12" />
-                                            Register Child
-                                        </>
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                <Weight className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                                Weight (kg)
+                                            </Label>
+                                            <Input
+                                                type="number"
+                                                step="0.1"
+                                                placeholder="Enter weight"
+                                                value={data.weight}
+                                                onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                                min="0"
+                                                max="200"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum: 200 kg</p>
+                                        </div>
+
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                <Ruler className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                                Height (cm)
+                                            </Label>
+                                            <Input
+                                                type="number"
+                                                step="0.1"
+                                                placeholder="Enter height"
+                                                value={data.height}
+                                                onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                                min="0"
+                                                max="250"
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum: 250 cm</p>
+                                        </div>
+                                    </div>
+
+                                    {bmi && (
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Body Mass Index (BMI)</p>
+                                                    <p className="text-3xl font-bold text-teal-600 dark:text-teal-400">{bmi}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Status</p>
+                                                    <p className={`text-xl font-bold ${getBMIStatus(Number(bmi)).color}`}>{getBMIStatus(Number(bmi)).text}</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
-                                </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 transition-opacity group-hover:opacity-100" />
-                            </Button>
 
-                            <Button
-                                type="button"
-                                onClick={handleClose}
-                                className="rounded-full border-2 border-gray-300 bg-white px-12 py-6 text-lg font-bold text-gray-700 shadow-md transition-all hover:scale-105 hover:border-gray-400 hover:bg-gray-50 hover:shadow-lg"
-                            >
-                                Cancel
-                            </Button>
-                        </div>
+                                    <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                        <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                            <Phone className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                            Guardian Contact Number
+                                        </Label>
+                                        <Input
+                                            type="tel"
+                                            placeholder="+63 XXX XXX XXXX"
+                                            value={displayPhoneNumber(data.contact_number)}
+                                            onChange={handlePhoneNumberChange}
+                                            className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                        />
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Format: +63 XXX XXX XXXX</p>
+                                    </div>
 
-                        {/* Info Footer */}
-                        <div className="rounded-2xl border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-6">
-                            <div className="flex items-start gap-3">
-                                <Sparkles className="h-6 w-6 flex-shrink-0 text-green-600" />
-                                <div>
-                                    <p className="font-semibold text-green-800">Quick Tips:</p>
-                                    <ul className="mt-2 space-y-1 text-sm text-green-700">
-                                        <li>
-                                            • All fields marked with <span className="text-red-500">*</span> are required
-                                        </li>
-                                        <li>• Contact number helps us reach guardians for important updates</li>
-                                        <li>• Weight and height are used to calculate BMI automatically</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </DialogContent>
-            </Dialog>
+                                    <div className="mt-6 flex flex-col justify-center gap-4 border-t border-gray-100 pt-6 sm:flex-row sm:gap-6 dark:border-gray-700">
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-10 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                        >
+                                            {processing ? (
+                                                <>
+                                                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                                                    Register Child
+                                                </>
+                                            )}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            onClick={handleClose}
+                                            variant="outline"
+                                            className="rounded-md px-10 py-5 text-lg font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg dark:text-gray-200 dark:hover:bg-gray-700"
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+
+                                    <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                        <div className="flex items-start gap-3">
+                                            <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-teal-600 dark:text-teal-400" />
+                                            <div>
+                                                <p className="font-semibold text-teal-800 dark:text-teal-400">Quick Tips:</p>
+                                                <ul className="mt-1 space-y-1 text-sm text-teal-700 dark:text-teal-300">
+                                                    <li>• All fields marked with <span className="text-red-500">*</span> are required</li>
+                                                    <li>• Contact number helps us reach guardians for important updates</li>
+                                                    <li>• Weight and height are used to calculate BMI automatically</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </div>
+            </div>
         </AppLayout>
     );
 }

@@ -29,17 +29,17 @@ type Props = {
 
 const getActionColor = (action: string) => {
     const colors: Record<string, string> = {
-        created: 'bg-green-100 text-green-800',
-        updated: 'bg-teal-100 text-teal-800',
-        deleted: 'bg-red-100 text-red-800',
-        archived: 'bg-orange-100 text-orange-800',
-        restored: 'bg-cyan-100 text-cyan-800',
-        permanently_deleted: 'bg-red-200 text-red-900',
-        maintenance_enabled: 'bg-yellow-100 text-yellow-800',
-        maintenance_disabled: 'bg-green-100 text-green-800',
-        backup_created: 'bg-teal-100 text-teal-800',
+        created: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        updated: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
+        deleted: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+        archived: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+        restored: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
+        permanently_deleted: 'bg-red-200 text-red-900 dark:bg-red-900/30 dark:text-red-400',
+        maintenance_enabled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+        maintenance_disabled: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        backup_created: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
     };
-    return colors[action] || 'bg-gray-100 text-gray-800';
+    return colors[action] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
 };
 
 export default function Show({ log }: Props) {
@@ -57,14 +57,13 @@ export default function Show({ log }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Audit Log #${log.id}`} />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
-
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
                 <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
                     {/* Pill Badge */}
                     <div className="mb-6 text-center">
-                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                            <Activity className="h-6 w-6 text-teal-600" />
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Activity className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                             <span
                                 className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
                                     log.action,
@@ -78,10 +77,10 @@ export default function Show({ log }: Props) {
                     {/* Header */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
-                            <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent">
+                            <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 Audit Log Details
                             </h1>
-                            <p className="mt-1 text-gray-600">Log #{log.id} — {new Date(log.created_at).toLocaleString()}</p>
+                            <p className="mt-1 text-gray-600 dark:text-gray-300">Log #{log.id} — {new Date(log.created_at).toLocaleString()}</p>
                         </div>
                         <Link
                             href={route('audit-logs.index')}
@@ -97,21 +96,21 @@ export default function Show({ log }: Props) {
                         <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                             <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                                 <CardTitle className="flex items-center gap-2 text-lg">
-                                    <FileText className="h-5 w-5 text-teal-600" />
+                                    <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                     Event Information
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
                                 <dl className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">Timestamp</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Timestamp</dt>
+                                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">
                                             {log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}
                                         </dd>
                                     </div>
 
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">Action</dt>
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Action</dt>
                                         <dd className="mt-1">
                                             <span
                                                 className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
@@ -124,13 +123,13 @@ export default function Show({ log }: Props) {
                                     </div>
 
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">User</dt>
-                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900">
-                                            <User className="h-4 w-4 text-gray-400" />
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">User</dt>
+                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900 dark:text-gray-50">
+                                            <User className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                             {log.user ? (
                                                 <>
                                                     {log.user.name}
-                                                    <span className="text-gray-500">({log.user.email})</span>
+                                                    <span className="text-gray-500 dark:text-gray-400">({log.user.email})</span>
                                                 </>
                                             ) : (
                                                 log.user_name || 'System'
@@ -141,39 +140,39 @@ export default function Show({ log }: Props) {
                                     {log.model_type && (
                                         <>
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Model Type</dt>
-                                                <dd className="mt-1 text-sm text-gray-900">{log.model_type}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model Type</dt>
+                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_type}</dd>
                                             </div>
 
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Model ID</dt>
-                                                <dd className="mt-1 text-sm text-gray-900">{log.model_id ?? '-'}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model ID</dt>
+                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_id ?? '-'}</dd>
                                             </div>
 
                                             <div className="sm:col-span-2">
-                                                <dt className="text-sm font-medium text-gray-500">Model Name</dt>
-                                                <dd className="mt-1 text-sm text-gray-900">{log.model_name || '-'}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model Name</dt>
+                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_name || '-'}</dd>
                                             </div>
                                         </>
                                     )}
 
                                     <div className="sm:col-span-2">
-                                        <dt className="text-sm font-medium text-gray-500">Description</dt>
-                                        <dd className="mt-1 text-sm text-gray-900">{log.description || '-'}</dd>
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+                                        <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.description || '-'}</dd>
                                     </div>
 
                                     <div>
-                                        <dt className="text-sm font-medium text-gray-500">IP Address</dt>
-                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900">
-                                            <Globe className="h-4 w-4 text-gray-400" />
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">IP Address</dt>
+                                        <dd className="mt-1 flex items-center gap-2 text-sm text-gray-900 dark:text-gray-50">
+                                            <Globe className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                             {log.ip_address || '-'}
                                         </dd>
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <dt className="text-sm font-medium text-gray-500">User Agent</dt>
-                                        <dd className="mt-1 flex items-start gap-2 text-sm text-gray-900">
-                                            <Monitor className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400" />
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">User Agent</dt>
+                                        <dd className="mt-1 flex items-start gap-2 text-sm text-gray-900 dark:text-gray-50">
+                                            <Monitor className="mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                                             <span className="break-all">{log.user_agent || '-'}</span>
                                         </dd>
                                     </div>
@@ -186,7 +185,7 @@ export default function Show({ log }: Props) {
                             <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                                 <CardHeader className="border-b border-gray-100 dark:border-gray-700">
                                     <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Activity className="h-5 w-5 text-teal-600" />
+                                        <Activity className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                         Changes
                                     </CardTitle>
                                 </CardHeader>
@@ -204,14 +203,14 @@ export default function Show({ log }: Props) {
                                                 <TableRow key={key}>
                                                     <TableCell className="font-medium">{key}</TableCell>
                                                     <TableCell>
-                                                        <span className="inline-block rounded bg-red-100 px-2 py-1 text-sm text-red-800">
+                                                        <span className="inline-block rounded bg-red-100 px-2 py-1 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-400">
                                                             {oldValues && oldValues[key] !== undefined
                                                                 ? String(oldValues[key])
                                                                 : '-'}
                                                         </span>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <span className="inline-block rounded bg-green-100 px-2 py-1 text-sm text-green-800">
+                                                        <span className="inline-block rounded bg-green-100 px-2 py-1 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-400">
                                                             {newValues[key] !== undefined ? String(newValues[key]) : '-'}
                                                         </span>
                                                     </TableCell>

@@ -213,11 +213,11 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                                     className="flex cursor-pointer items-center gap-1 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
                                                 >
                                                     {sharedId === announcement.id ? (
-                                                        <Check className="h-4 w-4 text-green-500" />
+                                                        <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
                                                     ) : (
                                                         <Share2 className="h-4 w-4" />
                                                     )}
-                                                    <span className={sharedId === announcement.id ? 'text-green-500' : ''}>
+                                                    <span className={sharedId === announcement.id ? 'text-green-500 dark:text-green-400' : ''}>
                                                         {sharedId === announcement.id ? 'Copied!' : 'Share'}
                                                     </span>
                                                 </button>
@@ -244,9 +244,9 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
             </section>
 
             {/* Call to Action Section */}
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16">
-                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
-                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 dark:to-gray-900 py-16">
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20 dark:bg-teal-400 dark:opacity-30" />
+                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20 dark:bg-cyan-400 dark:opacity-30" />
                 <div className="relative container mx-auto px-6 text-center lg:px-8">
                     <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Making a Difference in Our Community</h2>
                     <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">

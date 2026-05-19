@@ -152,13 +152,13 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
 
-            <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-100 p-6 font-sans">
+            <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-100 p-6 font-sans dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="mx-auto max-w-7xl">
                     {/* Header Section */}
                     <div className="mb-8">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-3xl font-bold text-cyan-900">Dashboard</h1>
+                                <h1 className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">Dashboard</h1>
                             </div>
                             <Dialog open={showPrintModal} onOpenChange={setShowPrintModal}>
                                 <DialogTrigger asChild>
@@ -171,7 +171,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                     <DialogHeader>
                                         <DialogTitle>Export / Print Report</DialogTitle>
                                     </DialogHeader>
-                                    <p className="mb-4 text-cyan-700">Select time period for export:</p>
+                                    <p className="mb-4 text-cyan-700 dark:text-cyan-300">Select time period for export:</p>
 
                                     <RadioGroup value={printPeriod} onValueChange={setPrintPeriod} className="mb-6 space-y-3">
                                         <div className="flex items-center space-x-2">
@@ -279,18 +279,18 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                     {/* Vaccine Follow-ups Alert */}
                     {vaccine_followups.overdue_count > 0 || vaccine_followups.due_this_month_count > 0 ? (
                         <div className="mb-8">
-                            <Alert className="border-amber-200 bg-amber-50" role="alert" aria-live="assertive">
-                                <AlertTriangle className="h-5 w-5 text-amber-600" />
-                                <AlertTitle className="text-amber-900">Vaccine Follow-ups Needed</AlertTitle>
-                                <AlertDescription className="text-amber-700">
+                            <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/20" role="alert" aria-live="assertive">
+                                <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                                <AlertTitle className="text-amber-900 dark:text-amber-100">Vaccine Follow-ups Needed</AlertTitle>
+                                <AlertDescription className="text-amber-700 dark:text-amber-300">
                                     <div className="mt-2 flex flex-wrap items-center gap-2">
                                         {vaccine_followups.overdue_count > 0 && (
-                                            <Badge className="cursor-pointer bg-red-100 text-red-800 transition-all duration-200 hover:bg-red-200">
+                                            <Badge className="cursor-pointer bg-red-100 text-red-800 transition-all duration-200 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50">
                                                 {vaccine_followups.overdue_count} overdue
                                             </Badge>
                                         )}
                                         {vaccine_followups.due_this_month_count > 0 && (
-                                            <Badge className="cursor-pointer bg-amber-100 text-amber-800 transition-all duration-200 hover:bg-amber-200">
+                                            <Badge className="cursor-pointer bg-amber-100 text-amber-800 transition-all duration-200 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50">
                                                 {vaccine_followups.due_this_month_count} due this month
                                             </Badge>
                                         )}
@@ -319,46 +319,46 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                                     {vaccine_followups.follow_ups.length > 0 && (
                                         <div
-                                            className="mt-4 max-h-64 overflow-y-auto rounded-md border border-amber-200"
+                                            className="mt-4 max-h-64 overflow-y-auto rounded-md border border-amber-200 dark:border-amber-800"
                                             role="region"
                                             aria-label="Vaccine follow-ups table"
                                         >
                                             <div className="overflow-x-auto">
                                                 <table className="w-full text-sm">
-                                                    <thead className="sticky top-0 bg-amber-100/50">
+                                                    <thead className="sticky top-0 bg-amber-100/50 dark:bg-amber-900/30">
                                                         <tr>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Child</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Vaccine</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Dose</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Due Date</th>
-                                                            <th className="px-4 py-2 text-left font-medium text-amber-800">Status</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Child</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Vaccine</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Dose</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Due Date</th>
+                                                            <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-300">Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {vaccine_followups.follow_ups.slice(0, 10).map((fu, idx) => (
                                                             <tr
                                                                 key={idx}
-                                                                className="border-t border-amber-100 transition-colors hover:bg-amber-50/50"
+                                                                className="border-t border-amber-100 transition-colors hover:bg-amber-50/50 dark:border-amber-800 dark:hover:bg-amber-900/20"
                                                             >
                                                                 <td className="px-4 py-2">
                                                                     <Link
                                                                         href={route('children.show', { child: fu.child_id })}
-                                                                        className="cursor-pointer rounded text-cyan-600 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
+                                                                        className="cursor-pointer rounded text-cyan-600 hover:underline focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 dark:text-cyan-400"
                                                                     >
                                                                         {fu.child_name}
                                                                     </Link>
                                                                 </td>
-                                                                <td className="px-4 py-2 text-cyan-700">{fu.vaccine_name}</td>
-                                                                <td className="px-4 py-2 text-cyan-700">{fu.dose_number}</td>
-                                                                <td className="px-4 py-2 text-cyan-700">{fu.next_due_date}</td>
+                                                                <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{fu.vaccine_name}</td>
+                                                                <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{fu.dose_number}</td>
+                                                                <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{fu.next_due_date}</td>
                                                                 <td className="px-4 py-2">
                                                                     {fu.status === 'Mixed' ? (
                                                                         <div className="flex items-center gap-1">
-                                                                            <Badge className="cursor-pointer bg-red-100 text-red-800">
+                                                                            <Badge className="cursor-pointer bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
                                                                                 <AlertTriangle className="mr-1 h-3 w-3" />
                                                                                 Overdue
                                                                             </Badge>
-                                                                            <Badge className="cursor-pointer bg-yellow-100 text-yellow-800">
+                                                                            <Badge className="cursor-pointer bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
                                                                                 <Calendar className="mr-1 h-3 w-3" />
                                                                                 Upcoming
                                                                             </Badge>
@@ -367,8 +367,8 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                                                         <Badge
                                                                             className={
                                                                                 fu.status === 'Overdue'
-                                                                                    ? 'cursor-pointer bg-red-100 text-red-800'
-                                                                                    : 'cursor-pointer bg-yellow-100 text-yellow-800'
+                                                                                    ? 'cursor-pointer bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                                                                    : 'cursor-pointer bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                                                                             }
                                                                         >
                                                                             {fu.status}
@@ -381,7 +381,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                                 </table>
                                             </div>
                                             {vaccine_followups.follow_ups.length > 10 && (
-                                                <div className="border-t border-amber-200 px-4 py-2 text-center text-sm text-amber-600">
+                                                <div className="border-t border-amber-200 px-4 py-2 text-center text-sm text-amber-600 dark:border-amber-800 dark:text-amber-400">
                                                     ...and {vaccine_followups.follow_ups.length - 10} more
                                                 </div>
                                             )}
@@ -394,18 +394,18 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                     {/* Age Breakdown */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Age Breakdown</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Age Breakdown</h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>0-5 months</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['0to5']}</CardTitle>
+                                    <CardTitle className="text-3xl text-cyan-600 dark:text-cyan-400">{stats.age_breakdown['0to5']}</CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>6-11 months</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-500">{stats.age_breakdown['6to11']}</CardTitle>
+                                    <CardTitle className="text-3xl text-cyan-500 dark:text-cyan-400">{stats.age_breakdown['6to11']}</CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
@@ -414,10 +414,10 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                     <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['12to35']}</CardTitle>
                                 </CardHeader>
                             </Card>
-                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
+                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-orange-800 dark:bg-orange-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-orange-600">36+ months</CardDescription>
-                                    <CardTitle className="text-3xl text-orange-600">{stats.age_breakdown['36plus']}</CardTitle>
+                                    <CardDescription className="text-orange-600 dark:text-orange-400">36+ months</CardDescription>
+                                    <CardTitle className="text-3xl text-orange-600 dark:text-orange-400">{stats.age_breakdown['36plus']}</CardTitle>
                                 </CardHeader>
                             </Card>
                         </div>
@@ -425,30 +425,30 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                     {/* Nutrition Status */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Nutrition Status (This Year)</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Nutrition Status (This Year)</h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <Card className="min-h-[44px] cursor-pointer border-green-200 bg-green-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2">
+                            <Card className="min-h-[44px] cursor-pointer border-green-200 bg-green-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:border-green-800 dark:bg-green-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-green-600">Normal</CardDescription>
-                                    <CardTitle className="text-3xl text-green-600">{stats.nutrition_status.normal}</CardTitle>
+                                    <CardDescription className="text-green-600 dark:text-green-400">Normal</CardDescription>
+                                    <CardTitle className="text-3xl text-green-600 dark:text-green-400">{stats.nutrition_status.normal}</CardTitle>
                                 </CardHeader>
                             </Card>
-                            <Card className="min-h-[44px] cursor-pointer border-yellow-200 bg-yellow-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2">
+                            <Card className="min-h-[44px] cursor-pointer border-yellow-200 bg-yellow-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2 dark:border-yellow-800 dark:bg-yellow-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-yellow-600">Underweight</CardDescription>
-                                    <CardTitle className="text-3xl text-yellow-600">{stats.nutrition_status.underweight}</CardTitle>
+                                    <CardDescription className="text-yellow-600 dark:text-yellow-400">Underweight</CardDescription>
+                                    <CardTitle className="text-3xl text-yellow-600 dark:text-yellow-400">{stats.nutrition_status.underweight}</CardTitle>
                                 </CardHeader>
                             </Card>
-                            <Card className="min-h-[44px] cursor-pointer border-red-200 bg-red-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                            <Card className="min-h-[44px] cursor-pointer border-red-200 bg-red-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 dark:border-red-800 dark:bg-red-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-red-600">Overweight</CardDescription>
-                                    <CardTitle className="text-3xl text-red-600">{stats.nutrition_status.overweight}</CardTitle>
+                                    <CardDescription className="text-red-600 dark:text-red-400">Overweight</CardDescription>
+                                    <CardTitle className="text-3xl text-red-600 dark:text-red-400">{stats.nutrition_status.overweight}</CardTitle>
                                 </CardHeader>
                             </Card>
-                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2">
+                            <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-orange-800 dark:bg-orange-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-orange-600">Stunted</CardDescription>
-                                    <CardTitle className="text-3xl text-orange-600">{stats.nutrition_status.stunted}</CardTitle>
+                                    <CardDescription className="text-orange-600 dark:text-orange-400">Stunted</CardDescription>
+                                    <CardTitle className="text-3xl text-orange-600 dark:text-orange-400">{stats.nutrition_status.stunted}</CardTitle>
                                 </CardHeader>
                             </Card>
                         </div>
@@ -456,32 +456,32 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                     {/* Coverage Stats */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Coverage</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Coverage</h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>Vitamin A Given</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900">{stats.vitamin_a.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700">({stats.vitamin_a.percentage}%)</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
+                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">({stats.vitamin_a.percentage}%)</CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>Deworming Given</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900">{stats.deworming.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700">({stats.deworming.percentage}%)</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
+                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">({stats.deworming.percentage}%)</CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>Total Measured</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900">{stats.vitamin_a.total}</CardTitle>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.total}</CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>Health Logs This Year</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900">{stats.yearly.healthlogs}</CardTitle>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.yearly.healthlogs}</CardTitle>
                                 </CardHeader>
                             </Card>
                         </div>
@@ -489,7 +489,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                     {/* Trend Charts */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900">Trends</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Trends</h2>
 
                         <div className="mb-4 flex gap-2">
                             <Button
@@ -519,7 +519,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2" role="region" aria-label="Health trends charts">
                             <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardTitle className="text-lg text-cyan-900">Health Logs Over Time</CardTitle>
+                                    <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <Line
@@ -537,7 +537,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
 
                             <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardTitle className="text-lg text-cyan-900">Monthly Comparison</CardTitle>
+                                    <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <Bar
@@ -557,7 +557,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2" role="region" aria-label="Nutrition status distribution chart">
                             <Card className="min-h-[44px] transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardTitle className="text-lg text-cyan-900">Nutrition Status Distribution</CardTitle>
+                                    <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Nutrition Status Distribution</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     {trends.status_distribution.normal +
@@ -576,7 +576,7 @@ export default function Dashboard({ stats, trends, vaccine_followups }: Dashboar
                                             aria-label="Doughnut chart showing nutrition status distribution"
                                         />
                                     ) : (
-                                        <p className="py-8 text-center text-cyan-700">No nutrition status data available.</p>
+                                        <p className="py-8 text-center text-cyan-700 dark:text-cyan-300">No nutrition status data available.</p>
                                     )}
                                 </CardContent>
                             </Card>

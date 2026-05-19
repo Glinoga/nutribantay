@@ -176,15 +176,15 @@ export default function DatabaseMaintenance({ backups }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Database Maintenance" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 pt-8 text-center">
-                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                            <Database className="h-6 w-6 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Database Management</span>
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Database className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Database Management</span>
                         </div>
                     </div>
 
@@ -199,7 +199,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
                                         Database Maintenance
                                     </h1>
                                     <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
@@ -213,51 +213,51 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:border-teal-800/50 dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Backups</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{backups.length}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Backups</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{backups.length}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <HardDrive className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <HardDrive className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:border-cyan-800/50 dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Size</p>
-                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{formatTotalSize(totalBackupsSize)}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Size</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{formatTotalSize(totalBackupsSize)}</p>
                                 </div>
-                                <div className="rounded-full bg-cyan-50 p-2.5">
-                                    <FileText className="h-5 w-5 text-cyan-500" />
+                                <div className="rounded-full bg-cyan-50 p-2.5 dark:bg-cyan-900/30">
+                                    <FileText className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:border-green-800/50 dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Latest Backup</p>
-                                    <p className="mt-1 text-2xl font-bold text-green-600">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Latest Backup</p>
+                                    <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">
                                         {backups.length > 0
                                             ? new Date(backups[0].timestamp * 1000).toLocaleDateString()
                                             : 'None'}
                                     </p>
                                 </div>
-                                <div className="rounded-full bg-green-50 p-2.5">
-                                    <Calendar className="h-5 w-5 text-green-500" />
+                                <div className="rounded-full bg-green-50 p-2.5 dark:bg-green-900/20">
+                                    <Calendar className="h-5 w-5 text-green-500 dark:text-green-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:border-teal-800/50 dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Storage Engine</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">SQLite</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Storage Engine</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">SQLite</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Database className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Database className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
@@ -265,9 +265,9 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Create Backup Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:from-teal-900/20 dark:to-cyan-900/20">
                             <CardTitle className="flex items-center gap-2">
-                                <UploadCloud className="h-5 w-5 text-teal-600" />
+                                <UploadCloud className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                 Create Database Backup
                             </CardTitle>
                             <CardDescription>
@@ -297,10 +297,10 @@ export default function DatabaseMaintenance({ backups }: Props) {
 
                     {/* Backup List Section */}
                     <Card className="mb-8 border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
-                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 dark:from-teal-900/20 dark:to-cyan-900/20">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="flex items-center gap-2">
-                                    <HardDrive className="h-5 w-5 text-teal-600" />
+                                    <HardDrive className="h-5 w-5 text-teal-600 dark:text-teal-400" />
                                     Available Backups
                                 </CardTitle>
                                 <Button onClick={refreshBackupList} variant="outline" size="sm" className="gap-1">
@@ -313,11 +313,11 @@ export default function DatabaseMaintenance({ backups }: Props) {
                         <CardContent>
                             {backups.length === 0 ? (
                                 <div className="flex min-h-[300px] flex-col items-center justify-center p-12">
-                                    <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">
-                                        <HardDrive className="h-16 w-16 text-teal-600" />
+                                    <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8 dark:from-teal-900/30 dark:to-cyan-900/30">
+                                        <HardDrive className="h-16 w-16 text-teal-600 dark:text-teal-400" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-bold text-gray-900">No backups available</h3>
-                                    <p className="max-w-md text-center text-gray-600">
+                                    <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-50">No backups available</h3>
+                                    <p className="max-w-md text-center text-gray-600 dark:text-gray-300">
                                         Create your first backup above to start protecting your data.
                                     </p>
                                 </div>
@@ -343,7 +343,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                                             onClick={() => openRestoreDialog(backup)}
                                                             size="sm"
                                                             variant="outline"
-                                                            className="gap-1 border-yellow-200 text-yellow-700 hover:bg-yellow-50"
+                                                            className="gap-1 border-yellow-200 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-800 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
                                                         >
                                                             <UploadCloud className="h-3 w-3" />
                                                             Restore
@@ -373,13 +373,13 @@ export default function DatabaseMaintenance({ backups }: Props) {
             <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+                        <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
                             <AlertTriangle className="h-5 w-5" />
                             CRITICAL WARNING
                         </AlertDialogTitle>
                         <AlertDialogDescription asChild>
                             <div className="space-y-3">
-                                <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
+                                <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4 text-sm text-red-800 dark:text-red-400">
                                     <p className="mb-2 font-semibold">This action is IRREVERSIBLE and will:</p>
                                     <ul className="ml-4 list-disc space-y-1">
                                         <li>Completely replace your current database</li>
@@ -389,15 +389,15 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                         </li>
                                     </ul>
                                 </div>
-                                <p className="text-sm text-gray-700">
-                                    To confirm, type <span className="font-mono font-semibold text-red-600">RESTORE DATABASE</span> below:
+                                <p className="text-sm text-gray-700 dark:text-gray-200">
+                                    To confirm, type <span className="font-mono font-semibold text-red-600 dark:text-red-400">RESTORE DATABASE</span> below:
                                 </p>
                                 <Input
                                     type="text"
                                     value={confirmationText}
                                     onChange={(e) => setConfirmationText(e.target.value)}
                                     placeholder="RESTORE DATABASE"
-                                    className="font-mono focus:border-red-500"
+                                    className="font-mono focus:border-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                     disabled={restoring}
                                 />
                             </div>
@@ -410,7 +410,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                         <AlertDialogAction
                             onClick={handleRestore}
                             disabled={confirmationText !== 'RESTORE DATABASE' || restoring}
-                            className="gap-2 bg-red-600 hover:bg-red-700"
+                            className="gap-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
                         >
                             {restoring ? (
                                 <>
@@ -432,7 +432,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+                        <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
                             <Trash2 className="h-5 w-5" />
                             Delete Backup
                         </AlertDialogTitle>
@@ -443,7 +443,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="gap-2 bg-red-600 hover:bg-red-700">
+                        <AlertDialogAction onClick={handleDelete} className="gap-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800">
                             <Trash2 className="h-4 w-4" />
                             Delete Backup
                         </AlertDialogAction>

@@ -27,12 +27,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
-
-const MySwal = withReactContent(Swal);
 
 type Note = {
     id: number;
@@ -167,6 +164,7 @@ export default function Show({ child }: { child: Child }) {
 
     const deleteNote = (noteId: number) => {
         MySwal.fire({
+            ...swalTheme(),
             title: 'Delete Note?',
             text: 'This action cannot be undone.',
             icon: 'warning',
@@ -183,6 +181,7 @@ export default function Show({ child }: { child: Child }) {
 
     const deleteHealthLog = (logId: number) => {
         MySwal.fire({
+            ...swalTheme(),
             title: 'Delete Health Log?',
             text: 'This action cannot be undone.',
             icon: 'warning',
@@ -332,23 +331,23 @@ export default function Show({ child }: { child: Child }) {
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)]" />
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {/* Header Section */}
                     <div className="fade-in-up mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
-                            <ClipboardList className="h-5 w-5 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Child Profile</span>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <ClipboardList className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Child Profile</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
-                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl dark:text-gray-50">
+                            <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                 {child.fullname}
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">View and manage child health records and vaccination status</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">View and manage child health records and vaccination status</p>
                     </div>
 
                     {/* Action Buttons */}
@@ -386,7 +385,7 @@ export default function Show({ child }: { child: Child }) {
                         </Link>
 
                         <Link href={route('children.index')}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50">
+                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                                 <X className="h-4 w-4" />
                                 Back to List
                             </button>
@@ -395,9 +394,9 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Child Details Card */}
                     <div className="fade-in-up mb-8" style={{ animationDelay: '0.3s' }}>
-                        <div className="overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h2 className="text-xl font-bold text-gray-900">Child Information</h2>
+                        <div className="overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Child Information</h2>
                             </div>
                             <div className="p-6">
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -412,24 +411,24 @@ export default function Show({ child }: { child: Child }) {
                                         { label: 'Created by', value: child.creator?.name ?? 'N/A' },
                                         { label: 'Updated by', value: child.updater?.name ?? 'N/A' },
                                     ].map((item, idx) => (
-                                        <div key={idx} className="rounded-md bg-gray-50 p-3">
-                                            <p className="text-xs font-medium text-gray-500">{item.label}</p>
-                                            <p className="mt-1 text-sm font-semibold text-gray-900">{item.value}</p>
+                                        <div key={idx} className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
+                                            <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">{item.value}</p>
                                         </div>
                                     ))}
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                    <div className="rounded-md bg-gray-50 p-3">
-                                        <p className="text-xs font-medium text-gray-500">Created at</p>
-                                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                                    <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Created at</p>
+                                        <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                                             {child.created_at
                                                 ? `by ${child.creator?.name ?? 'Unknown'} on ${new Date(child.created_at).toLocaleString()}`
                                                 : 'N/A'}
                                         </p>
                                     </div>
-                                    <div className="rounded-md bg-gray-50 p-3">
-                                        <p className="text-xs font-medium text-gray-500">Last updated at</p>
-                                        <p className="mt-1 text-sm font-semibold text-gray-900">
+                                    <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Last updated at</p>
+                                        <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                                             {child.updated_at
                                                 ? `by ${child.updater?.name ?? 'Unknown'} on ${new Date(child.updated_at).toLocaleString()}`
                                                 : 'N/A'}
@@ -445,7 +444,7 @@ export default function Show({ child }: { child: Child }) {
                         <div className="fade-in-up mb-8" style={{ animationDelay: '0.4s' }}>
                             <div className="mb-4 flex items-center gap-2">
                                 <TrendingUp className="h-6 w-6 text-teal-600" />
-                                <h2 className="text-2xl font-bold text-gray-900">Growth Trends</h2>
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Growth Trends</h2>
                             </div>
 
                             <div className="mb-4 flex gap-2">
@@ -454,7 +453,7 @@ export default function Show({ child }: { child: Child }) {
                                     className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                                         trendRange === '6months'
                                             ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
-                                            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                     }`}
                                 >
                                     Last 6 Months
@@ -464,7 +463,7 @@ export default function Show({ child }: { child: Child }) {
                                     className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
                                         trendRange === '1year'
                                             ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
-                                            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                     }`}
                                 >
                                     Last Year
@@ -473,10 +472,10 @@ export default function Show({ child }: { child: Child }) {
 
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                                 <div
-                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg"
+                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                                     style={{ animationDelay: '0.5s' }}
                                 >
-                                    <h3 className="mb-2 font-semibold text-gray-900">Weight, Height & BMI Over Time</h3>
+                                    <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Weight, Height & BMI Over Time</h3>
                                     <Line
                                         data={lineChartData}
                                         options={{
@@ -496,10 +495,10 @@ export default function Show({ child }: { child: Child }) {
                                 </div>
 
                                 <div
-                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg"
+                                    className="fade-in-up rounded-xl border-0 bg-white p-4 shadow-md transition-all hover:shadow-lg dark:bg-gray-800"
                                     style={{ animationDelay: '0.6s' }}
                                 >
-                                    <h3 className="mb-2 font-semibold text-gray-900">Nutrition Status Distribution</h3>
+                                    <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Nutrition Status Distribution</h3>
                                     {nutritionCounts.normal + nutritionCounts.underweight + nutritionCounts.overweight + nutritionCounts.stunted >
                                     0 ? (
                                         <Doughnut
@@ -514,7 +513,7 @@ export default function Show({ child }: { child: Child }) {
                                             }}
                                         />
                                     ) : (
-                                        <p className="text-gray-500">No nutrition status data available.</p>
+                                        <p className="text-gray-500 dark:text-gray-400">No nutrition status data available.</p>
                                     )}
                                 </div>
                             </div>
@@ -522,8 +521,8 @@ export default function Show({ child }: { child: Child }) {
                     )}
 
                     {healthlogs.length === 0 && (
-                        <div className="fade-in-up mt-8 rounded-xl bg-gray-100 p-6 text-center" style={{ animationDelay: '0.4s' }}>
-                            <p className="text-gray-500">No health logs yet. Add a health log to see growth trends.</p>
+                        <div className="fade-in-up mt-8 rounded-xl bg-gray-100 p-6 text-center dark:bg-gray-800" style={{ animationDelay: '0.4s' }}>
+                            <p className="text-gray-500 dark:text-gray-400">No health logs yet. Add a health log to see growth trends.</p>
                         </div>
                     )}
 
@@ -531,28 +530,28 @@ export default function Show({ child }: { child: Child }) {
                     {healthlogs.length > 0 && (
                         <div className="fade-in-up mb-8" style={{ animationDelay: '0.5s' }}>
                             <div className="mb-4 flex items-center gap-2">
-                                <ClipboardList className="h-6 w-6 text-teal-600" />
-                                <h2 className="text-2xl font-bold text-gray-900">Health Log Records</h2>
+                                <ClipboardList className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Health Log Records</h2>
                             </div>
 
-                            <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md">
+                            <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md dark:bg-gray-800">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-gradient-to-r from-teal-50 to-cyan-50">
+                                    <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Date</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Weight (kg)</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Height (cm)</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">BMI</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Nutrition Status</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Status WFA</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Status LFA</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Status WFL</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Vit A</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Deworming</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">MNP</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Created By</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Weight (kg)</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Height (cm)</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">BMI</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Nutrition Status</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status WFA</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status LFA</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status WFL</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Vit A</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Deworming</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">MNP</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Created By</th>
                                             {canManageHealthlogs && (
-                                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Actions</th>
+                                                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                                             )}
                                         </tr>
                                     </thead>
@@ -566,19 +565,19 @@ export default function Show({ child }: { child: Child }) {
                                             return paginatedLogs.map((log, idx) => (
                                                 <tr
                                                     key={log.id}
-                                                    className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                    className={`border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
                                                 >
                                                     <td className="px-4 py-3">
                                                         <button
                                                             onClick={() => setSelectedLog(log)}
-                                                            className="cursor-pointer text-left font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
+                                                            className="cursor-pointer text-left font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline dark:text-teal-400 dark:hover:text-teal-300"
                                                         >
                                                             {log.created_at ? new Date(log.created_at).toLocaleDateString() : 'N/A'}
                                                         </button>
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-900">{log.weight ?? '-'}</td>
-                                                    <td className="px-4 py-3 text-gray-900">{log.height ?? '-'}</td>
-                                                    <td className="px-4 py-3 text-gray-900">{log.bmi ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.weight ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.height ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.bmi ?? '-'}</td>
                                                     <td className="px-4 py-3">
                                                         <span
                                                             className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(log.nutrition_status)}`}
@@ -628,19 +627,19 @@ export default function Show({ child }: { child: Child }) {
                                                             <X className="mx-auto h-4 w-4 text-red-600" />
                                                         )}
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-900">{log.user?.name ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.user?.name ?? '-'}</td>
                                                     {canManageHealthlogs && (
                                                         <td className="px-4 py-3 text-center">
                                                             <div className="flex items-center justify-center gap-2">
                                                                 <button
                                                                     onClick={() => setSelectedLog(log)}
-                                                                    className="cursor-pointer rounded-md p-1.5 text-teal-600 transition-colors hover:bg-teal-50"
+                                                                    className="cursor-pointer rounded-md p-1.5 text-teal-600 transition-colors hover:bg-teal-50 dark:text-teal-400 dark:hover:bg-teal-900/30"
                                                                 >
                                                                     <Edit2 className="h-4 w-4" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => deleteHealthLog(log.id)}
-                                                                    className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50"
+                                                                    className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </button>
@@ -661,22 +660,22 @@ export default function Show({ child }: { child: Child }) {
                                     const totalPages = Math.ceil(sortedLogs.length / logsPerPage);
 
                                     return totalPages > 1 ? (
-                                        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
-                                            <span className="text-sm text-gray-500">
+                                        <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 dark:border-gray-700">
+                                            <span className="text-sm text-gray-500 dark:text-gray-400">
                                                 Page {logPage} of {totalPages} ({sortedLogs.length} total)
                                             </span>
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => setLogPage((p) => Math.max(1, p - 1))}
                                                     disabled={logPage === 1}
-                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                                 >
                                                     Previous
                                                 </button>
                                                 <button
                                                     onClick={() => setLogPage((p) => Math.min(totalPages, p + 1))}
                                                     disabled={logPage === totalPages}
-                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                                                    className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                                 >
                                                     Next
                                                 </button>
@@ -692,28 +691,28 @@ export default function Show({ child }: { child: Child }) {
                     {healthlogs.filter((log) => log.vaccine_name).length > 0 && (
                         <div className="fade-in-up mb-8" style={{ animationDelay: '0.6s' }}>
                             <div className="mb-4 flex items-center gap-2">
-                                <Syringe className="h-6 w-6 text-teal-600" />
-                                <h2 className="text-2xl font-bold text-gray-900">Historical Vaccine Records</h2>
+                                <Syringe className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Historical Vaccine Records</h2>
                             </div>
-                            <p className="mb-4 text-sm text-gray-600">
+                            <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
                                 These records are from the old health log system.{' '}
                                 <Link
                                     href={route('children.vaccines.index', { child: child.slug })}
-                                    className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline"
+                                    className="font-medium text-teal-600 transition-colors hover:text-teal-700 hover:underline dark:text-teal-400 dark:hover:text-teal-300"
                                 >
                                     Use the Vaccine Tracker
                                 </Link>{' '}
                                 for current vaccine management.
                             </p>
-                            <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md">
+                            <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md dark:bg-gray-800">
                                 <table className="w-full text-sm">
-                                    <thead className="bg-gradient-to-r from-teal-50 to-cyan-50">
+                                    <thead className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20">
                                         <tr>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Date Given</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Vaccine Name</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Dose</th>
-                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Next Due Date</th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Status</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Date Given</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Vaccine Name</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Dose</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">Next Due Date</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -722,14 +721,14 @@ export default function Show({ child }: { child: Child }) {
                                             .map((log, idx) => (
                                                 <tr
                                                     key={log.id}
-                                                    className={`border-t transition-colors hover:bg-teal-50/50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                                                    className={`border-t transition-colors hover:bg-teal-50/50 dark:border-gray-700 dark:hover:bg-teal-900/20 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50/50 dark:bg-gray-700/50'}`}
                                                 >
-                                                    <td className="px-4 py-3 text-gray-900">
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
                                                         {log.date_given ? new Date(log.date_given).toLocaleDateString() : '-'}
                                                     </td>
-                                                    <td className="px-4 py-3 font-medium text-gray-900">{log.vaccine_name}</td>
-                                                    <td className="px-4 py-3 text-center text-gray-900">{log.dose_number ?? '-'}</td>
-                                                    <td className="px-4 py-3 text-gray-900">
+                                                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{log.vaccine_name}</td>
+                                                    <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-200">{log.dose_number ?? '-'}</td>
+                                                    <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
                                                         {log.next_due_date ? new Date(log.next_due_date).toLocaleDateString() : '-'}
                                                     </td>
                                                     <td className="px-4 py-3 text-center">
@@ -756,14 +755,14 @@ export default function Show({ child }: { child: Child }) {
                     {/* AI Recommender Section */}
                     {canViewAiRecommender && (
                         <div
-                            className="fade-in-up mb-8 rounded-xl border-0 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-md"
+                            className="fade-in-up mb-8 rounded-xl border-0 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-md dark:from-teal-900/20 dark:to-cyan-900/20"
                             style={{ animationDelay: '0.7s' }}
                         >
                             <div className="mb-4 flex items-center gap-2">
-                                <Lightbulb className="h-6 w-6 text-teal-600" />
-                                <h2 className="text-2xl font-bold text-gray-900">AI Nutrition Recommendation</h2>
+                                <Lightbulb className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">AI Nutrition Recommendation</h2>
                             </div>
-                            <p className="mb-4 text-sm text-gray-600">
+                            <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
                                 Generate personalized nutrition recommendations based on the child's latest health log.
                             </p>
 
@@ -776,9 +775,9 @@ export default function Show({ child }: { child: Child }) {
                             </button>
 
                             {recommendation && (
-                                <div className="mt-4 rounded-md bg-white p-4 shadow-inner">
-                                    <h3 className="mb-2 font-semibold text-gray-900">Recommendation:</h3>
-                                    <p className="text-sm whitespace-pre-line text-gray-700">{recommendation}</p>
+                                <div className="mt-4 rounded-md bg-white p-4 shadow-inner dark:bg-gray-800">
+                                    <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Recommendation:</h3>
+                                    <p className="text-sm whitespace-pre-line text-gray-700 dark:text-gray-300">{recommendation}</p>
                                 </div>
                             )}
                         </div>
@@ -788,14 +787,14 @@ export default function Show({ child }: { child: Child }) {
                     {selectedLog && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedLog(null)}>
                             <div
-                                className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+                                className="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-gray-800"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="mb-4 flex items-center justify-between">
-                                    <h2 className="text-xl font-bold text-gray-900">Health Log Details</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Health Log Details</h2>
                                     <button
                                         onClick={() => setSelectedLog(null)}
-                                        className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                                        className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                                     >
                                         <X className="h-5 w-5" />
                                     </button>
@@ -804,27 +803,27 @@ export default function Show({ child }: { child: Child }) {
                                 <div className="space-y-4">
                                     {/* Measurements */}
                                     <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700">Measurements</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-3">
+                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Measurements</h3>
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-3 dark:bg-gray-700">
                                             <div>
-                                                <p className="text-sm text-gray-500">Weight</p>
-                                                <p className="font-medium text-gray-900">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">Weight</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.weight ? `${selectedLog.weight} kg` : 'N/A'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">Height</p>
-                                                <p className="font-medium text-gray-900">{selectedLog.height ? `${selectedLog.height} cm` : 'N/A'}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">Height</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.height ? `${selectedLog.height} cm` : 'N/A'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">BMI</p>
-                                                <p className="font-medium text-gray-900">{selectedLog.bmi ?? 'N/A'}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">BMI</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.bmi ?? 'N/A'}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Nutrition Status */}
                                     <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700">Nutrition Status</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-4">
+                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Nutrition Status</h3>
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-4 dark:bg-gray-700">
                                             {[
                                                 {
                                                     label: 'Overall',
@@ -840,7 +839,7 @@ export default function Show({ child }: { child: Child }) {
                                                 },
                                             ].map((item, idx) => (
                                                 <div key={idx}>
-                                                    <p className="text-sm text-gray-500">{item.label}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
                                                     <span
                                                         className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${item.class}`}
                                                     >
@@ -853,8 +852,8 @@ export default function Show({ child }: { child: Child }) {
 
                                     {/* Supplements */}
                                     <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700">Supplements & Programs</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4">
+                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Supplements & Programs</h3>
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
                                             {[
                                                 { label: 'Vitamin A', value: selectedLog.vitamin_a },
                                                 { label: 'Deworming', value: selectedLog.deworming },
@@ -864,7 +863,7 @@ export default function Show({ child }: { child: Child }) {
                                                 { label: 'RUSF (Moderately Wasted)', value: selectedLog.rusf },
                                             ].map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-2">
-                                                    <span className="font-medium text-gray-700">{item.label}:</span>
+                                                    <span className="font-medium text-gray-700 dark:text-gray-300">{item.label}:</span>
                                                     {typeof item.value === 'boolean' ? (
                                                         item.value ? (
                                                             <Check className="h-4 w-4 text-green-600" />
@@ -872,7 +871,7 @@ export default function Show({ child }: { child: Child }) {
                                                             <X className="h-4 w-4 text-red-600" />
                                                         )
                                                     ) : (
-                                                        <span className="text-gray-900">
+                                                        <span className="text-gray-900 dark:text-gray-200">
                                                             {item.value || <X className="inline h-4 w-4 text-red-600" />}
                                                         </span>
                                                     )}
@@ -883,8 +882,8 @@ export default function Show({ child }: { child: Child }) {
 
                                     {/* Vaccine */}
                                     <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700">Vaccination</h3>
-                                        <div className="rounded-md bg-gray-50 p-4">
+                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Vaccination</h3>
+                                        <div className="rounded-md bg-gray-50 p-4 dark:bg-gray-700">
                                             {selectedLog.vaccine_name ? (
                                                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                                                     {[
@@ -904,12 +903,12 @@ export default function Show({ child }: { child: Child }) {
                                                         },
                                                     ].map((item, idx) => (
                                                         <div key={idx}>
-                                                            <p className="text-sm text-gray-500">{item.label}</p>
-                                                            <p className="font-medium text-gray-900">{item.value ?? '-'}</p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>
+                                                            <p className="font-medium text-gray-900 dark:text-gray-100">{item.value ?? '-'}</p>
                                                         </div>
                                                     ))}
                                                     <div>
-                                                        <p className="text-sm text-gray-500">Status</p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                                                         <span
                                                             className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                                                 (selectedLog.vaccine_status || 'Pending') === 'Completed'
@@ -924,22 +923,22 @@ export default function Show({ child }: { child: Child }) {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <p className="text-gray-500">No vaccine information recorded.</p>
+                                                <p className="text-gray-500 dark:text-gray-400">No vaccine information recorded.</p>
                                             )}
                                         </div>
                                     </div>
 
                                     {/* Metadata */}
                                     <div>
-                                        <h3 className="mb-2 font-semibold text-gray-700">Record Info</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4">
+                                        <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Record Info</h3>
+                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
                                             <div>
-                                                <p className="text-sm text-gray-500">Created By</p>
-                                                <p className="font-medium text-gray-900">{selectedLog.user?.name ?? '-'}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">Created By</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.user?.name ?? '-'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">Date Logged</p>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">Date Logged</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">
                                                     {selectedLog.created_at ? new Date(selectedLog.created_at).toLocaleString() : '-'}
                                                 </p>
                                             </div>
@@ -958,7 +957,7 @@ export default function Show({ child }: { child: Child }) {
                                     )}
                                     <button
                                         onClick={() => setSelectedLog(null)}
-                                        className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50"
+                                        className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                     >
                                         Close
                                     </button>
@@ -977,15 +976,15 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 h-full w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 ${
+                        className={`fixed top-0 right-0 z-40 h-full w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >
                         <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-gray-900">Notes</h2>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50">Notes</h2>
                             <button
                                 onClick={() => setNotesOpen(false)}
-                                className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                                className="cursor-pointer rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -995,7 +994,7 @@ export default function Show({ child }: { child: Child }) {
                             <textarea
                                 value={newNote}
                                 onChange={(e) => setNewNote(e.target.value)}
-                                className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                 rows={3}
                                 placeholder="Add a new note..."
                             />
@@ -1007,15 +1006,15 @@ export default function Show({ child }: { child: Child }) {
 
                         {child.notes?.length ? (
                             child.notes.map((note) => (
-                                <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3">
-                                    <p className="text-sm text-gray-700">{note.note}</p>
-                                    <small className="mt-1 block text-gray-500">
+                                <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                    <p className="text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
+                                    <small className="mt-1 block text-gray-500 dark:text-gray-400">
                                         {note.created_at
                                             ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
                                             : 'N/A'}
                                     </small>
                                     <button
-                                        className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800"
+                                        className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                                         onClick={() => deleteNote(note.id)}
                                     >
                                         <Trash2 className="h-3.5 w-3.5" />
@@ -1024,7 +1023,7 @@ export default function Show({ child }: { child: Child }) {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-500">No notes yet.</p>
+                            <p className="text-gray-500 dark:text-gray-400">No notes yet.</p>
                         )}
                     </div>
                 </div>
@@ -1038,11 +1037,11 @@ export default function Show({ child }: { child: Child }) {
                     setShowEditModal(isOpen);
                 }}
             >
-                <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-0 bg-white shadow-2xl">
-                    <DialogHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                        <DialogTitle className="text-center text-2xl font-bold text-gray-900">Edit Child Record</DialogTitle>
-                        <DialogDescription className="mt-2 text-center text-sm text-gray-600">
-                            <span className="inline-flex items-center gap-2 rounded-md bg-amber-50 px-3 py-1.5 text-amber-800">
+                <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-xl border-0 bg-white shadow-2xl dark:bg-gray-800">
+                    <DialogHeader className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                        <DialogTitle className="text-center text-2xl font-bold text-gray-900 dark:text-gray-50">Edit Child Record</DialogTitle>
+                        <DialogDescription className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
+                            <span className="inline-flex items-center gap-2 rounded-md bg-amber-50 px-3 py-1.5 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                                 <AlertTriangle className="h-4 w-4" />
                                 Only edit if you entered wrong data. Otherwise, create a health log.
                             </span>
@@ -1050,15 +1049,15 @@ export default function Show({ child }: { child: Child }) {
                     </DialogHeader>
 
                     {/* Confirmation Alert */}
-                    <div className="mx-6 mt-4 rounded-md border border-amber-200 bg-amber-50 p-4">
+                    <div className="mx-6 mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
                         <div className="flex items-start gap-3">
-                            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+                            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                             <div>
-                                <h4 className="font-semibold text-amber-800">Confirmation Required</h4>
-                                <p className="mt-1 text-sm text-amber-700">
+                                <h4 className="font-semibold text-amber-800 dark:text-amber-400">Confirmation Required</h4>
+                                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                                     Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
                                     health measurements, please{' '}
-                                    <Link href={route('children.healthlogs.create', { child: child.slug })} className="font-semibold text-teal-600 hover:underline">
+                                    <Link href={route('children.healthlogs.create', { child: child.slug })} className="font-semibold text-teal-600 hover:underline dark:text-teal-400">
                                         create a health log
                                     </Link>{' '}
                                     instead.
@@ -1068,7 +1067,7 @@ export default function Show({ child }: { child: Child }) {
                     </div>
 
                     {Object.keys(errors).length > 0 && (
-                        <div className="mx-6 mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-700">
+                        <div className="mx-6 mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
                             <div className="flex items-center gap-2">
                                 <OctagonAlert className="h-5 w-5 flex-shrink-0" />
                                 <div>
@@ -1084,41 +1083,41 @@ export default function Show({ child }: { child: Child }) {
 
                     <form onSubmit={handleEditSubmit} className="space-y-4 px-6 pb-6">
                         {/* Name Fields */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h3 className="text-lg font-bold text-gray-900">Name</h3>
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Name</h3>
                             </div>
                             <div className="p-6">
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                     <div>
-                                        <Label className="block text-sm font-medium text-gray-700">First Name</Label>
+                                        <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</Label>
                                         <Input
                                             type="text"
                                             placeholder="First name"
                                             value={data.first_name}
                                             onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                         />
                                     </div>
                                     <div>
-                                        <Label className="block text-sm font-medium text-gray-700">M.I. (Optional)</Label>
+                                        <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">M.I. (Optional)</Label>
                                         <Input
                                             type="text"
                                             placeholder="M.I. (optional)"
                                             maxLength={5}
                                             value={data.middle_initial}
                                             onChange={(e) => setData('middle_initial', e.target.value.replace(/[^a-zA-ZñÑ.]/g, ''))}
-                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                         />
                                     </div>
                                     <div>
-                                        <Label className="block text-sm font-medium text-gray-700">Last Name</Label>
+                                        <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</Label>
                                         <Input
                                             type="text"
                                             placeholder="Last name"
                                             value={data.last_name}
                                             onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                            className="mt-1 rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                         />
                                     </div>
                                 </div>
@@ -1126,13 +1125,13 @@ export default function Show({ child }: { child: Child }) {
                         </div>
 
                         {/* Sex */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h3 className="text-lg font-bold text-gray-900">Sex</h3>
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Sex</h3>
                             </div>
                             <div className="p-6">
                                 <Select value={data.sex} onValueChange={(value) => setData('sex', value)}>
-                                    <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none">
+                                    <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                                         <SelectValue placeholder="Select sex" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -1148,59 +1147,59 @@ export default function Show({ child }: { child: Child }) {
                         </div>
 
                         {/* Birthdate */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h3 className="text-lg font-bold text-gray-900">Birthdate</h3>
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Birthdate</h3>
                             </div>
                             <div className="p-6">
                                 <Input
                                     type="date"
                                     value={data.birthdate}
                                     onChange={(e) => setData('birthdate', e.target.value)}
-                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                 />
                             </div>
                         </div>
 
                         {/* Weight & Height */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Weight (kg)</h3>
+                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Weight (kg)</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        <Input
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="Enter weight"
+                                            value={data.weight}
+                                            onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                            className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="p-6">
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="Enter weight"
-                                        value={data.weight}
-                                        onChange={(e) => setData('weight', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    />
-                                </div>
-                            </div>
 
-                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Height (cm)</h3>
-                                </div>
-                                <div className="p-6">
-                                    <Input
-                                        type="number"
-                                        step="0.1"
-                                        placeholder="Enter height"
-                                        value={data.height}
-                                        onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
-                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                                    />
+                                <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                    <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Height (cm)</h3>
+                                    </div>
+                                    <div className="p-6">
+                                        <Input
+                                            type="number"
+                                            step="0.1"
+                                            placeholder="Enter height"
+                                            value={data.height}
+                                            onChange={(e) => setData('height', e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1'))}
+                                            className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                        />
                                 </div>
                             </div>
                         </div>
 
                         {/* Contact Number */}
-                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg">
-                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4">
-                                <h3 className="text-lg font-bold text-gray-900">Contact Number</h3>
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Contact Number</h3>
                             </div>
                             <div className="p-6">
                                     <Input
@@ -1208,14 +1207,14 @@ export default function Show({ child }: { child: Child }) {
                                         placeholder="e.g., 09171234567"
                                         value={data.contact_number}
                                         onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
-                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                         maxLength={11}
                                     />
                             </div>
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex items-center justify-center gap-4 border-t border-gray-100 pt-6">
+                        <div className="flex items-center justify-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-700">
                             <Button
                                 type="submit"
                                 disabled={processing}
@@ -1227,7 +1226,7 @@ export default function Show({ child }: { child: Child }) {
                                 type="button"
                                 onClick={handleEditClose}
                                 variant="outline"
-                                className="rounded-md px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg"
+                                className="rounded-md px-8 py-2.5 text-sm font-medium text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg dark:text-gray-200 dark:hover:bg-gray-700"
                             >
                                 Cancel
                             </Button>
@@ -1238,14 +1237,14 @@ export default function Show({ child }: { child: Child }) {
 
             {showExportDialog && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowExportDialog(false)}>
-                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-gray-800" onClick={(e) => e.stopPropagation()}>
                         <div className="mb-4 flex items-center justify-between">
-                            <h2 className="text-lg font-semibold text-gray-900">Export / Print</h2>
-                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100">
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Export / Print</h2>
+                            <button onClick={() => setShowExportDialog(false)} className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
-                        <p className="mb-4 text-sm text-cyan-700">
+                        <p className="mb-4 text-sm text-cyan-700 dark:text-cyan-400">
                             Export or print <strong>{child.fullname}</strong>'s profile
                         </p>
                         <div className="flex gap-2">

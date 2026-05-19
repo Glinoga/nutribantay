@@ -56,17 +56,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const getActionColor = (action: string) => {
     const colors: Record<string, string> = {
-        created: 'bg-green-100 text-green-800',
-        updated: 'bg-teal-100 text-teal-800',
-        deleted: 'bg-red-100 text-red-800',
-        archived: 'bg-orange-100 text-orange-800',
-        restored: 'bg-cyan-100 text-cyan-800',
-        permanently_deleted: 'bg-red-200 text-red-900',
-        maintenance_enabled: 'bg-yellow-100 text-yellow-800',
-        maintenance_disabled: 'bg-green-100 text-green-800',
-        backup_created: 'bg-teal-100 text-teal-800',
+        created: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        updated: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
+        deleted: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+        archived: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+        restored: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
+        permanently_deleted: 'bg-red-200 text-red-900 dark:bg-red-900/30 dark:text-red-400',
+        maintenance_enabled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+        maintenance_disabled: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        backup_created: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
     };
-    return colors[action] || 'bg-gray-100 text-gray-800';
+    return colors[action] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
 };
 
 export default function Index({ logs, filters, actions, modelTypes }: Props) {
@@ -154,15 +154,15 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Audit Logs" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
                     <div className="mb-6 pt-8 text-center">
-                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm">
-                            <Activity className="h-6 w-6 text-teal-600" />
-                            <span className="text-sm font-semibold text-teal-700">Audit Trail</span>
+                        <div className="mb-4 inline-flex items-center gap-3 rounded-full border border-teal-100/50 bg-white/90 px-6 py-3 shadow-lg backdrop-blur-sm dark:border-teal-800/50 dark:bg-gray-800/90">
+                            <Activity className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                            <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">Audit Trail</span>
                         </div>
                     </div>
 
@@ -177,7 +177,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
+                                    <h1 className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent sm:text-4xl dark:from-teal-300 dark:via-cyan-300 dark:to-teal-300">
                                         Audit Logs
                                     </h1>
                                     <p className="mt-1 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300">
@@ -191,47 +191,47 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
 
                     {/* Stats Row */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Total Entries</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{stats.totalEntries}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Entries</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{stats.totalEntries}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <FileText className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <FileText className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-cyan-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-cyan-200 hover:shadow-lg dark:border-cyan-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Unique Actions</p>
-                                    <p className="mt-1 text-2xl font-bold text-cyan-600">{stats.uniqueActions}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Unique Actions</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{stats.uniqueActions}</p>
                                 </div>
-                                <div className="rounded-full bg-cyan-50 p-2.5">
-                                    <Activity className="h-5 w-5 text-cyan-500" />
+                                <div className="rounded-full bg-cyan-50 p-2.5 dark:bg-cyan-900/30">
+                                    <Activity className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-green-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-green-200 hover:shadow-lg dark:border-green-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Models Tracked</p>
-                                    <p className="mt-1 text-2xl font-bold text-green-600">{stats.modelsTracked}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Models Tracked</p>
+                                    <p className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">{stats.modelsTracked}</p>
                                 </div>
-                                <div className="rounded-full bg-green-50 p-2.5">
-                                    <Layers className="h-5 w-5 text-green-500" />
+                                <div className="rounded-full bg-green-50 p-2.5 dark:bg-green-900/30">
+                                    <Layers className="h-5 w-5 text-green-500 dark:text-green-400" />
                                 </div>
                             </div>
                         </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg">
+                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white dark:bg-gray-800/80 p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-xs font-medium text-gray-500">Active Users</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600">{stats.activeUsers}</p>
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Active Users</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{stats.activeUsers}</p>
                                 </div>
-                                <div className="rounded-full bg-teal-50 p-2.5">
-                                    <Users className="h-5 w-5 text-teal-500" />
+                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
+                                    <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
@@ -242,24 +242,24 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                         <CardContent className="p-4">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Search</label>
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
                                     <div className="relative">
-                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                                         <input
                                             type="text"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             placeholder="Search..."
-                                            className="w-full rounded-md border py-2.5 pr-3 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                            className="w-full rounded-md border py-2.5 pr-3 pl-10 transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                         />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Action</label>
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Action</label>
                                     <select
                                         value={selectedAction}
                                         onChange={(e) => setSelectedAction(e.target.value)}
-                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="">All Actions</option>
                                         {actions.map((action) => (
@@ -270,11 +270,11 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Type</label>
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
                                     <select
                                         value={selectedModel}
                                         onChange={(e) => setSelectedModel(e.target.value)}
-                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="">All Types</option>
                                         {modelTypes.map((type) => (
@@ -285,21 +285,21 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">Start Date</label>
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
                                     <input
                                         type="date"
                                         value={startDate}
                                         onChange={(e) => setStartDate(e.target.value)}
-                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-1 block text-sm font-medium text-gray-700">End Date</label>
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
                                     <input
                                         type="date"
                                         value={endDate}
                                         onChange={(e) => setEndDate(e.target.value)}
-                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                                        className="w-full rounded-md border px-3 py-2.5 text-sm transition-all outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     />
                                 </div>
                             </div>
@@ -312,14 +312,14 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                         <Search className="mr-2 h-4 w-4" />
                                         Apply Filters
                                     </Button>
-                                    <Button onClick={handleReset} variant="outline" className="border hover:bg-gray-100 dark:hover:bg-gray-700">
+                                    <Button onClick={handleReset} variant="outline" className="border hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                                         Reset
                                     </Button>
                                 </div>
                                 <Button
                                     onClick={handleExport}
                                     variant="outline"
-                                    className="border hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    className="border hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                 >
                                     <Download className="mr-2 h-4 w-4" />
                                     Export CSV
@@ -365,7 +365,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                                     <TableCell className="text-right">
                                                         <Link
                                                             href={route('audit-logs.show', { auditLog: log.id })}
-                                                            className="text-sm font-medium text-teal-600 hover:text-teal-800"
+                                                            className="text-sm font-medium text-teal-600 hover:text-teal-800 dark:text-teal-400 dark:hover:text-teal-300"
                                                         >
                                                             View Details
                                                         </Link>
@@ -378,11 +378,11 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                 </>
                             ) : (
                                 <div className="flex min-h-[400px] flex-col items-center justify-center p-12">
-                                    <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8">
-                                        <Activity className="h-16 w-16 text-teal-600" />
+                                    <div className="mb-6 rounded-full bg-gradient-to-br from-teal-100 to-cyan-100 p-8 dark:from-teal-900/30 dark:to-cyan-900/30">
+                                        <Activity className="h-16 w-16 text-teal-600 dark:text-teal-400" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-bold text-gray-900">No audit logs found</h3>
-                                    <p className="max-w-md text-center text-gray-600">
+                                    <h3 className="mb-2 text-xl font-bold text-gray-900 dark:text-gray-50">No audit logs found</h3>
+                                    <p className="max-w-md text-center text-gray-600 dark:text-gray-300">
                                         {searchTerm || selectedAction || selectedModel || startDate || endDate
                                             ? 'Try adjusting your filters to find what you\'re looking for.'
                                             : 'There are no audit log entries recorded yet.'}

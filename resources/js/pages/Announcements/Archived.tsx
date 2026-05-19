@@ -83,26 +83,26 @@ export default function Archived({ announcements }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Archived Announcements" />
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     <div className="mb-6 text-center">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-100/50 bg-white/90 px-5 py-2 shadow-lg backdrop-blur-sm">
-                            <ArchiveRestore className="h-5 w-5 text-amber-600" />
-                            <span className="text-sm font-semibold text-amber-700">Archived</span>
+                        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-100/50 dark:border-amber-800/50 bg-white/90 dark:bg-gray-800/90 px-5 py-2 shadow-lg backdrop-blur-sm">
+                            <ArchiveRestore className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">Archived</span>
                         </div>
 
-                        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">
+                        <h1 className="mb-3 text-3xl font-bold text-gray-900 dark:text-gray-50 md:text-4xl">
                             <span className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 bg-clip-text text-transparent">
                                 Archived Announcements
                             </span>
                         </h1>
-                        <p className="mx-auto max-w-xl text-gray-600">Manage and restore previously archived announcements</p>
+                        <p className="mx-auto max-w-xl text-gray-600 dark:text-gray-300">Manage and restore previously archived announcements</p>
                     </div>
 
                     <div className="mb-4 flex items-center justify-between">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
                             {announcements.length} {announcements.length === 1 ? 'announcement' : 'announcements'} archived
                         </p>
                         <Button variant="outline" size="sm" asChild>
@@ -113,17 +113,17 @@ export default function Archived({ announcements }: Props) {
                         </Button>
                     </div>
 
-                    <div className="overflow-x-auto rounded-xl border border-teal-100/50 bg-white shadow-md">
+                    <div className="overflow-x-auto rounded-xl border border-teal-100/50 dark:border-teal-800/50 bg-white dark:bg-gray-800 shadow-md">
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50">
-                                    <TableHead className="font-bold text-teal-800">ID</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Title</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Category</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Author</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Published</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Deleted Date</TableHead>
-                                    <TableHead className="font-bold text-teal-800">Actions</TableHead>
+                                <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">ID</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Title</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Category</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Author</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Published</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Deleted Date</TableHead>
+                                    <TableHead className="font-bold text-teal-800 dark:text-teal-200">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -131,16 +131,16 @@ export default function Archived({ announcements }: Props) {
                                     <TableRow>
                                         <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
                                             <div className="flex flex-col items-center gap-2">
-                                                <ArchiveRestore className="h-8 w-8 text-gray-300" />
-                                                <p className="font-medium text-gray-500">No archived announcements found.</p>
+                                                <ArchiveRestore className="h-8 w-8 text-gray-300 dark:text-gray-500" />
+                                                <p className="font-medium text-gray-500 dark:text-gray-400">No archived announcements found.</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     announcements.map((announcement) => (
-                                        <TableRow key={announcement.id} className="hover:bg-teal-50/30">
+                                        <TableRow key={announcement.id} className="hover:bg-teal-50/30 dark:hover:bg-teal-900/20">
                                             <TableCell className="font-medium">{announcement.id}</TableCell>
-                                            <TableCell className="font-medium text-gray-900">{announcement.title}</TableCell>
+                                            <TableCell className="font-medium text-gray-900 dark:text-gray-50">{announcement.title}</TableCell>
                                             <TableCell>
                                                 <Badge
                                                     className="font-semibold shadow-sm"
@@ -152,9 +152,9 @@ export default function Archived({ announcements }: Props) {
                                                     {announcement.category.name}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="text-gray-600">{announcement.author ?? '-'}</TableCell>
-                                            <TableCell className="text-gray-600">{new Date(announcement.date).toLocaleDateString()}</TableCell>
-                                            <TableCell className="text-gray-600">{new Date(announcement.deleted_at).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-gray-600 dark:text-gray-300">{announcement.author ?? '-'}</TableCell>
+                                            <TableCell className="text-gray-600 dark:text-gray-300">{new Date(announcement.date).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-gray-600 dark:text-gray-300">{new Date(announcement.deleted_at).toLocaleDateString()}</TableCell>
                                             <TableCell>
                                                 <div className="flex gap-1">
                                                     <Button
@@ -206,7 +206,7 @@ export default function Archived({ announcements }: Props) {
             </div>
 
             <AlertDialog open={!!restoreId} onOpenChange={() => setRestoreId(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className="dark:bg-gray-800 dark:text-gray-100">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Restore Announcement</AlertDialogTitle>
                         <AlertDialogDescription>
@@ -226,7 +226,7 @@ export default function Archived({ announcements }: Props) {
             </AlertDialog>
 
             <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className="dark:bg-gray-800 dark:text-gray-100">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Permanently</AlertDialogTitle>
                         <AlertDialogDescription>
