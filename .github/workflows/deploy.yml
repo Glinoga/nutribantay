@@ -53,10 +53,12 @@ jobs:
           script: |
             cd ${{ secrets.VPS_DEPLOY_PATH }}
             php artisan migrate --force
+            php artisan db:seed --class=VitaminSeeder --force
             php artisan dashboard:refresh
             php artisan config:cache
             php artisan view:cache
             php artisan queue:restart
             test -L public/storage || ln -s storage/app/public public/storage
-            sudo supervisorctl restart nutribantay-queue-default:*
-            sudo supervisorctl restart nutribantay-queue-dashboard:*
+            sudo supervisorctl reread
+            sudo supervisorctl update
+            sudo supervisorctl start all
