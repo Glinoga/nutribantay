@@ -122,42 +122,42 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                         </DialogTrigger>
                                         <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl p-6">
                                             <DialogHeader>
-                                                <DialogTitle className="text-xl font-bold text-teal-700">Terms & Conditions</DialogTitle>
+                                                <DialogTitle className="text-xl font-bold text-teal-700 dark:text-teal-400">Terms & Conditions</DialogTitle>
                                             </DialogHeader>
-                                            <div className="space-y-4 text-sm text-gray-700">
-                                                <h3 className="font-semibold text-gray-900">1. Acceptance of Terms</h3>
+                                            <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">1. Acceptance of Terms</h3>
                                                 <p>
                                                     By accessing and using NutriBantay, you agree to be bound by these Terms & Conditions. If you do
                                                     not agree with any part of these terms, you must not use the system.
                                                 </p>
 
-                                                <h3 className="font-semibold text-gray-900">2. System Use</h3>
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">2. System Use</h3>
                                                 <p>
                                                     NutriBantay is a barangay health tracking system intended for authorized health workers and
                                                     administrators. You are responsible for maintaining the confidentiality of your account
                                                     credentials.
                                                 </p>
 
-                                                <h3 className="font-semibold text-gray-900">3. Data Privacy</h3>
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">3. Data Privacy</h3>
                                                 <p>
                                                     All personal and health data stored in NutriBantay is treated as confidential and is protected
                                                     under applicable data privacy laws. Access to data is limited to authorized personnel only.
                                                 </p>
 
-                                                <h3 className="font-semibold text-gray-900">4. Acceptable Use</h3>
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">4. Acceptable Use</h3>
                                                 <p>
                                                     You agree to use NutriBantay solely for its intended purpose — monitoring and managing child
                                                     nutrition and health records. Any unauthorized access, data extraction, or misuse of the system is
                                                     strictly prohibited.
                                                 </p>
 
-                                                <h3 className="font-semibold text-gray-900">5. Limitation of Liability</h3>
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">5. Limitation of Liability</h3>
                                                 <p>
                                                     NutriBantay is provided &quot;as is&quot; without warranties of any kind. The barangay and its
                                                     developers shall not be held liable for any damages arising from the use of the system.
                                                 </p>
 
-                                                <h3 className="font-semibold text-gray-900">6. Changes to Terms</h3>
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">6. Changes to Terms</h3>
                                                 <p>
                                                     We reserve the right to update these terms at any time. Continued use of the system after changes
                                                     constitutes acceptance of the updated terms.
