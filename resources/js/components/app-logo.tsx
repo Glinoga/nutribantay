@@ -2,7 +2,7 @@ export default function AppLogo() {
     return (
         <>
             <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                <img src="/NutriBantay Logo.png" alt="NutriBantay" className="size-5 object-contain" />
+                <img src="/NutriBantay Logo.svg" alt="NutriBantay" className="size-5 object-contain" />
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
                 <span className="mb-0.5 truncate leading-tight font-semibold">Nutribantay</span>
