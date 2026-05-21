@@ -264,12 +264,16 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            const params: Record<string, string> = { search: searchQuery };
-            if (activeSex) params.sex = activeSex;
-            if (activeVaccine) params.vaccine_status = activeVaccine;
-            if (activeVitamin) params.vitamin_status = activeVitamin;
-            router.get(route('children.index'), params, { replace: true });
+            triggerSearch();
         }
+    };
+
+    const triggerSearch = () => {
+        const params: Record<string, string> = { search: searchQuery };
+        if (activeSex) params.sex = activeSex;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
+        router.get(route('children.index'), params, { replace: true });
     };
 
     const handleSort = (column: string) => {
@@ -505,15 +509,21 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyDown={handleSearch}
-                                className="w-full rounded-md border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                                className="w-full rounded-md border border-gray-200 bg-white py-2.5 pr-16 pl-10 text-sm shadow-sm transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                             />
+                            <button
+                                onClick={triggerSearch}
+                                className="absolute top-1/2 right-3 -translate-y-1/2 p-1.5 text-gray-400 hover:text-teal-600 dark:hover:text-teal-400"
+                            >
+                                <Search className="h-4 w-4" />
+                            </button>
                             {searchQuery && (
                                 <button
                                     onClick={() => {
                                         setSearchQuery('');
                                         router.get(route('children.index'), { search: '', sex: '', vaccine_status: '' }, { replace: true });
                                     }}
-                                    className="absolute top-1/2 right-3 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    className="absolute top-1/2 right-10 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>

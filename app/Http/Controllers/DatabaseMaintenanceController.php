@@ -7,14 +7,10 @@ use App\Models\AuditLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class DatabaseMaintenanceController extends Controller
 {
-    /**
-     * Show the database maintenance page
-     */
     public function index()
     {
         $backups = $this->getBackupsList();
@@ -24,28 +20,18 @@ class DatabaseMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Create a manual database backup.
-     *
-     * Uses a pure-PHP PDO-based dumper instead of spawning mysqldump as a subprocess.
-     * This avoids Windows Winsock error 10106 (WSAEPROVIDERFAILEDINIT) that occurs
-     * when the web server process tries to launch mysqldump via Symfony Process.
-     */
     public function backup()
     {
         try {
             \Log::info('=== Starting synchronous web-triggered backup (PHP-native dumper) ===');
 
-            // ── 1. Determine destination paths ───────────────────────────────
             $appName = 'NutriBantay';
             $timestamp = now()->format('Y-m-d-H-i-s');
             $sqlFile = storage_path("app/backup-temp/{$timestamp}-db.sql");
             $zipName = "{$timestamp}.zip";
-            // We want to store in storage/app/NutriBantay to keep it accessible
             $zipDestDir = storage_path("app/{$appName}");
             $zipDest = $zipDestDir.'/'.$zipName;
 
-            // Ensure destination directories exist
             if (! file_exists(dirname($sqlFile))) {
                 @mkdir(dirname($sqlFile), 0755, true);
             }
@@ -53,18 +39,15 @@ class DatabaseMaintenanceController extends Controller
                 @mkdir($zipDestDir, 0755, true);
             }
 
-            // ── 2. Dump via pure PHP/PDO (no subprocess, no Winsock) ─────────
             $connection = config('database.default', 'mysql');
             MysqlDumper::dump($sqlFile, $connection);
 
-            // ── 3. Zip the SQL file ───────────────────────────────────────────
             $zip = new \ZipArchive;
             if ($zip->open($zipDest, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
                 throw new \RuntimeException("Cannot create zip archive at: {$zipDest}");
             }
             $zip->addFile($sqlFile, "{$timestamp}-db.sql");
 
-            // AES-256 encrypt the zip contents at rest
             $encPassword = config('app.backup_encryption_password');
             if ($encPassword) {
                 $zip->setPassword($encPassword);
@@ -73,10 +56,8 @@ class DatabaseMaintenanceController extends Controller
 
             $zip->close();
 
-            // ── 4. Clean up the raw SQL temp file ───────────────────────────
             @unlink($sqlFile);
 
-            // ── 5. Verify the zip was written ────────────────────────────────
             if (! file_exists($zipDest) || filesize($zipDest) < 100) {
                 throw new \RuntimeException('Backup zip was not created or is suspiciously small.');
             }
@@ -84,7 +65,6 @@ class DatabaseMaintenanceController extends Controller
             $sizeFormatted = $this->formatBytes(filesize($zipDest));
             \Log::info("Backup created: {$zipName} ({$sizeFormatted})");
 
-            // ── 6. Audit log ─────────────────────────────────────────────────
             AuditLog::logAction([
                 'action' => 'backup_created',
                 'model_type' => 'System',
@@ -110,9 +90,6 @@ class DatabaseMaintenanceController extends Controller
         }
     }
 
-    /**
-     * Get list of available backups
-     */
     public function list()
     {
         $backups = $this->getBackupsList();
@@ -122,11 +99,6 @@ class DatabaseMaintenanceController extends Controller
         ]);
     }
 
-    /**
-     * Restore database from a MySQL backup zip (produced by the PHP-native dumper).
-     *
-     * The zip must contain a single .sql file with a valid MySQL dump.
-     */
     public function restore(Request $request)
     {
         $request->validate([
@@ -138,17 +110,17 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
-            $backupFileRel = basename($backupFileRel);
+            if (! str_starts_with($backupFileRel, 'NutriBantay/') && ! str_starts_with($backupFileRel, 'private/NutriBantay/')) {
+                return back()->with('error', 'Invalid backup file path.');
+            }
             $fullPath = storage_path('app/'.$backupFileRel);
 
-            // Verify backup file exists
             if (! file_exists($fullPath)) {
                 \Log::error("Backup file not found at: {$fullPath}");
 
-                return back()->with('error', '❌ Backup file not found.');
+                return back()->with('error', 'Backup file not found.');
             }
 
-            // ── 1. Extract zip ────────────────────────────────────────────────
             if (file_exists($extractPath)) {
                 $this->recursiveDelete($extractPath);
             }
@@ -159,7 +131,6 @@ class DatabaseMaintenanceController extends Controller
                 throw new \RuntimeException('Failed to extract backup archive.');
             }
 
-            // Decrypt the zip using the encryption password
             $encPassword = config('app.backup_encryption_password');
             if ($encPassword) {
                 $zip->setPassword($encPassword);
@@ -168,7 +139,6 @@ class DatabaseMaintenanceController extends Controller
             $zip->extractTo($extractPath);
             $zip->close();
 
-            // ── 2. Find the .sql file ─────────────────────────────────────────
             $sqlFile = $this->findSqlFile($extractPath);
 
             if (! $sqlFile) {
@@ -179,14 +149,12 @@ class DatabaseMaintenanceController extends Controller
 
             \Log::info("Found SQL dump at: {$sqlFile}");
 
-            // ── 3. Execute the SQL dump ───────────────────────────────────────
             $sql = file_get_contents($sqlFile);
 
             if (empty($sql)) {
                 throw new \RuntimeException('SQL dump file is empty or unreadable.');
             }
 
-            // Safety: reject old SQLite dumps
             if (
                 stripos($sql, 'PRAGMA foreign_keys') !== false ||
                 stripos($sql, 'AUTOINCREMENT') !== false
@@ -205,10 +173,8 @@ class DatabaseMaintenanceController extends Controller
 
             \Log::info('MySQL restore completed successfully.');
 
-            // ── 4. Clean up ───────────────────────────────────────────────────
             $this->recursiveDelete($extractPath);
 
-            // ── 5. Audit log ──────────────────────────────────────────────────
             AuditLog::logAction([
                 'action' => 'database_restored',
                 'model_type' => 'System',
@@ -223,7 +189,6 @@ class DatabaseMaintenanceController extends Controller
         } catch (\Exception $e) {
             \Log::error('Database restore failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
-            // Clean up temp files even on failure
             if (file_exists($extractPath)) {
                 $this->recursiveDelete($extractPath);
             }
@@ -232,9 +197,6 @@ class DatabaseMaintenanceController extends Controller
         }
     }
 
-    /**
-     * Recursively find SQLite database file in directory
-     */
     private function findSqliteFile($directory)
     {
         $iterator = new \RecursiveIteratorIterator(
@@ -245,9 +207,7 @@ class DatabaseMaintenanceController extends Controller
         foreach ($iterator as $file) {
             if ($file->isFile()) {
                 $ext = strtolower($file->getExtension());
-                // Look for .sqlite, .db, or no extension files
                 if ($ext === 'sqlite' || $ext === 'db' || $ext === '') {
-                    // Check if it looks like a SQLite database
                     if ($this->isSqliteFile($file->getPathname())) {
                         return $file->getPathname();
                     }
@@ -255,7 +215,6 @@ class DatabaseMaintenanceController extends Controller
             }
         }
 
-        // Fallback: look for any file that might be SQLite
         foreach ($iterator as $file) {
             if ($file->isFile() && $file->getSize() > 1000) {
                 if ($this->isSqliteFile($file->getPathname())) {
@@ -267,9 +226,6 @@ class DatabaseMaintenanceController extends Controller
         return null;
     }
 
-    /**
-     * Find a MySQL .sql dump file in the given directory (recursive).
-     */
     private function findSqlFile(string $directory): ?string
     {
         $iterator = new \RecursiveIteratorIterator(
@@ -286,16 +242,12 @@ class DatabaseMaintenanceController extends Controller
         return null;
     }
 
-    /**
-     * Check if file is a valid SQLite database
-     */
     private function isSqliteFile($path)
     {
         if (! file_exists($path)) {
             return false;
         }
 
-        // Check for SQLite magic header
         $handle = fopen($path, 'rb');
         if (! $handle) {
             return false;
@@ -304,13 +256,9 @@ class DatabaseMaintenanceController extends Controller
         $header = fread($handle, 16);
         fclose($handle);
 
-        // SQLite files start with "SQLite format 3\0" or "SQLite database"
         return strpos($header, 'SQLite') !== false || strpos($header, "\x53\x51\x4c\x69") !== false;
     }
 
-    /**
-     * List all files in directory recursively (for debugging)
-     */
     private function listAllFiles($directory)
     {
         $files = [];
@@ -326,9 +274,6 @@ class DatabaseMaintenanceController extends Controller
         return $files;
     }
 
-    /**
-     * Recursively delete directory and contents
-     */
     private function recursiveDelete($directory)
     {
         if (! file_exists($directory)) {
@@ -351,9 +296,6 @@ class DatabaseMaintenanceController extends Controller
         rmdir($directory);
     }
 
-    /**
-     * Delete a backup file
-     */
     public function delete(Request $request)
     {
         $request->validate([
@@ -362,18 +304,19 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
-            $backupFileRel = basename($backupFileRel);
+            if (! str_starts_with($backupFileRel, 'NutriBantay/') && ! str_starts_with($backupFileRel, 'private/NutriBantay/')) {
+                return back()->with('error', 'Invalid backup file path.');
+            }
             $fullPath = storage_path('app/'.$backupFileRel);
 
             if (! file_exists($fullPath)) {
-                return back()->with('error', '❌ Backup file not found.');
+                return back()->with('error', 'Backup file not found.');
             }
 
             $filename = basename($fullPath);
 
             @unlink($fullPath);
 
-            // Log the deletion
             AuditLog::logAction([
                 'action' => 'backup_deleted',
                 'model_type' => 'System',
@@ -392,16 +335,9 @@ class DatabaseMaintenanceController extends Controller
         }
     }
 
-    /**
-     * Helper: Get list of backup files
-     */
     private function getBackupsList()
     {
         $backups = [];
-
-        // We check two locations:
-        // 1. storage/app/NutriBantay (Primary for new backups)
-        // 2. storage/app/private/NutriBantay (Legacy location)
 
         $locations = [
             'storage' => storage_path('app/NutriBantay'),
@@ -431,7 +367,6 @@ class DatabaseMaintenanceController extends Controller
             }
         }
 
-        // Sort by timestamp descending (newest first)
         usort($backups, function ($a, $b) {
             return $b['timestamp'] - $a['timestamp'];
         });
@@ -439,9 +374,6 @@ class DatabaseMaintenanceController extends Controller
         return $backups;
     }
 
-    /**
-     * Helper: Format bytes to human readable
-     */
     private function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];

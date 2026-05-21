@@ -900,20 +900,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 'Create & Add Another'
                             )}
                         </Button>
-                        <Button
-                            onClick={() => handleCreateUser(true)}
-                            disabled={createLoading}
-                            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600"
-                        >
-                            {createLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Creating...
-                                </>
-                            ) : (
-                                'Create'
-                            )}
-                        </Button>
+
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
