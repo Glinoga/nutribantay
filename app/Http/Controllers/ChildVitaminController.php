@@ -7,7 +7,9 @@ use App\Models\Child;
 use App\Models\ChildVitamin;
 use App\Models\ChildVitaminDose;
 use App\Models\Vitamin;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChildVitaminController extends Controller
@@ -70,18 +72,17 @@ class ChildVitaminController extends Controller
             'vitamin_id' => 'required|exists:vitamins,id',
         ]);
 
-        $existing = ChildVitamin::where('child_id', $child->id)
-            ->where('vitamin_id', $request->vitamin_id)
-            ->first();
-
-        if ($existing) {
-            return back()->with('error', 'Vitamin is already assigned to this child.');
+        try {
+            ChildVitamin::create([
+                'child_id' => $child->id,
+                'vitamin_id' => $request->vitamin_id,
+            ]);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return back()->with('error', 'Vitamin is already assigned to this child.');
+            }
+            throw $e;
         }
-
-        ChildVitamin::create([
-            'child_id' => $child->id,
-            'vitamin_id' => $request->vitamin_id,
-        ]);
 
         RefreshDashboardForBarangay::dispatch($child->barangay)
             ->delay(now()->addSeconds(10));
@@ -130,9 +131,12 @@ class ChildVitaminController extends Controller
 
         $doseNumber = (int) $request->dose_number;
 
-        $duplicate = ChildVitaminDose::where('child_vitamin_id', $childVitamin->id)
-            ->where('dose_number', $doseNumber)
-            ->exists();
+        $duplicate = DB::transaction(function () use ($childVitamin, $doseNumber) {
+            return ChildVitaminDose::where('child_vitamin_id', $childVitamin->id)
+                ->where('dose_number', $doseNumber)
+                ->lockForUpdate()
+                ->first();
+        });
 
         if ($duplicate) {
             return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vitamin.']);

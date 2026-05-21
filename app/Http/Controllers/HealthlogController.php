@@ -133,7 +133,9 @@ class HealthlogController extends Controller
                         'child_id' => $child->id,
                         'vitamin_id' => $vitamin->id,
                     ]);
-                    $nextDoseNumber = ($childVitamin->doses()->max('dose_number') ?? 0) + 1;
+                    $nextDoseNumber = ($childVitamin->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
                     ChildVitaminDose::create([
                         'child_vitamin_id' => $childVitamin->id,
                         'dose_number' => $nextDoseNumber,
@@ -239,7 +241,9 @@ class HealthlogController extends Controller
                         'child_id' => $child->id,
                         'vitamin_id' => $vitamin->id,
                     ]);
-                    $nextDoseNumber = ($childVitamin->doses()->max('dose_number') ?? 0) + 1;
+                    $nextDoseNumber = ($childVitamin->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
                     ChildVitaminDose::create([
                         'child_vitamin_id' => $childVitamin->id,
                         'dose_number' => $nextDoseNumber,

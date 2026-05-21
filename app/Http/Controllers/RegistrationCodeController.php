@@ -126,8 +126,15 @@ class RegistrationCodeController extends Controller
             ], 404);
         }
 
-        // Don't allow deleting active codes (can only delete used/expired)
-        if (! $code->is_used && $code->expires_at && ! $code->expires_at->isPast()) {
+        // Can only delete expired codes (not used or active)
+        if ($code->is_used) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete used codes.',
+            ], 400);
+        }
+
+        if ($code->expires_at && ! $code->expires_at->isPast()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Cannot delete active codes.',

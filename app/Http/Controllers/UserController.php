@@ -6,6 +6,7 @@ use App\Models\RegistrationCode;
 use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -117,38 +118,42 @@ class UserController extends Controller
         $admin = auth()->user();
         $barangay = $admin->barangay;
 
-        // Generate registration code (8 random characters like before)
-        $code = strtoupper(Str::random(8));
-
-        // Create registration code
-        $registrationCode = RegistrationCode::create([
-            'code' => $code,
-            'barangay' => $barangay,
-            'is_used' => true, // Mark as used (assigned to this user)
-        ]);
-
-        // Check for duplicate email if provided
+        // Check for duplicate email before transaction
         $email = $request->input('email');
         if ($email && User::where('email', $email)->exists()) {
             return response()->json(['message' => 'Email already exists'], 422);
         }
 
-        // Create user with linked registration code
-        $newUser = User::create([
-            'name' => $request->name,
-            'email' => $email, // nullable
-            'password' => Hash::make($request->password),
-            'barangay' => $barangay,
-            'status' => 'approved',
-            'registration_code_id' => $registrationCode->id,
-        ]);
+        $result = DB::transaction(function () use ($request, $barangay, $email) {
+            $code = strtoupper(Str::random(8));
 
-        $newUser->assignRole($request->role);
+            $registrationCode = RegistrationCode::create([
+                'code' => $code,
+                'barangay' => $barangay,
+                'is_used' => true,
+            ]);
+
+            $newUser = User::create([
+                'name' => $request->name,
+                'email' => $email,
+                'password' => Hash::make($request->password),
+                'barangay' => $barangay,
+                'status' => 'approved',
+                'registration_code_id' => $registrationCode->id,
+            ]);
+
+            $newUser->assignRole($request->role);
+
+            return [
+                'code' => $code,
+                'password' => $request->password,
+            ];
+        });
 
         return response()->json([
             'message' => 'User created successfully',
-            'code' => $code,
-            'password' => $request->password,
+            'code' => $result['code'],
+            'password' => $result['password'],
         ]);
     }
 

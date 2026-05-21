@@ -7,7 +7,9 @@ use App\Models\Child;
 use App\Models\ChildVaccine;
 use App\Models\ChildVaccineDose;
 use App\Models\Vaccine;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChildVaccineController extends Controller
@@ -70,18 +72,17 @@ class ChildVaccineController extends Controller
             'vaccine_id' => 'required|exists:vaccines,id',
         ]);
 
-        $existing = ChildVaccine::where('child_id', $child->id)
-            ->where('vaccine_id', $request->vaccine_id)
-            ->first();
-
-        if ($existing) {
-            return back()->with('error', 'Vaccine is already assigned to this child.');
+        try {
+            ChildVaccine::create([
+                'child_id' => $child->id,
+                'vaccine_id' => $request->vaccine_id,
+            ]);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return back()->with('error', 'Vaccine is already assigned to this child.');
+            }
+            throw $e;
         }
-
-        ChildVaccine::create([
-            'child_id' => $child->id,
-            'vaccine_id' => $request->vaccine_id,
-        ]);
 
         RefreshDashboardForBarangay::dispatch($child->barangay)
             ->delay(now()->addSeconds(10));
@@ -130,9 +131,12 @@ class ChildVaccineController extends Controller
 
         $doseNumber = (int) $request->dose_number;
 
-        $duplicate = ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
-            ->where('dose_number', $doseNumber)
-            ->exists();
+        $duplicate = DB::transaction(function () use ($childVaccine, $doseNumber) {
+            return ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
+                ->where('dose_number', $doseNumber)
+                ->lockForUpdate()
+                ->first();
+        });
 
         if ($duplicate) {
             return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vaccine.']);
