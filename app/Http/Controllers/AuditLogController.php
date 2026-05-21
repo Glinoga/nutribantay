@@ -138,7 +138,7 @@ class AuditLogController extends Controller
         $callback = function () use ($query) {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Timestamp', 'User', 'Action', 'Type', 'Model Name', 'Description']);
+            fputcsv($handle, ['Timestamp', 'User', 'Action', 'Type', 'Description']);
 
             $query->chunk(500, function ($logs) use ($handle) {
                 foreach ($logs as $log) {
@@ -147,7 +147,6 @@ class AuditLogController extends Controller
                         $log->user_name ?? $log->user?->name ?? 'System',
                         $log->action,
                         $log->model_type ?? '-',
-                        $log->model_name ?? '-',
                         str_replace('"', '""', $log->description ?? '-'),
                     ]);
                 }

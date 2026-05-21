@@ -135,22 +135,10 @@ export default function Show({ log }: Props) {
                                     </div>
 
                                     {log.model_type && (
-                                        <>
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model Type</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_type}</dd>
-                                            </div>
-
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model ID</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_id ?? '-'}</dd>
-                                            </div>
-
-                                            <div className="sm:col-span-2">
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model Name</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_name || '-'}</dd>
-                                            </div>
-                                        </>
+                                        <div>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Model Type</dt>
+                                            <dd className="mt-1 text-sm text-gray-900 dark:text-gray-50">{log.model_type}</dd>
+                                        </div>
                                     )}
 
                                     <div className="sm:col-span-2">

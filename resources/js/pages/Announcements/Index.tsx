@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { MySwal, swalTheme } from '@/utils/sweetAlertConfig';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Activity,
@@ -165,22 +166,42 @@ export default function Index(props: IndexProps) {
     };
 
     const handleDelete = (announcement: Announcement) => {
-        if (!confirm(`Are you sure you want to delete "${announcement.title}"? This action cannot be undone.`)) {
-            return;
-        }
+        MySwal.fire({
+            ...swalTheme(),
+            title: 'Archive Announcement?',
+            html: `
+                <div style="font-family: 'Montserrat', sans-serif; padding: 1rem 0;">
+                    <div style="font-size: 1.125rem; margin-bottom: 1rem; font-weight: 500;">
+                        Are you sure you want to archive this announcement?
+                    </div>
+                    <strong>${announcement.title}</strong>
+                    <p style="color: hsl(0 84% 50%); font-size: 0.875rem; margin: 0; line-height: 1.5;">
+                        This will hide the announcement. You can restore it later from the archived section.
+                    </p>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'hsl(0 84% 60%)',
+            cancelButtonColor: 'hsl(142 76% 36%)',
+            confirmButtonText: 'Yes, Archive',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setDeletingId(announcement.id);
 
-        setDeletingId(announcement.id);
-
-        router.delete(route('announcements.destroy', { announcement: announcement.slug }), {
-            preserveScroll: true,
-            onSuccess: () => {
-                setDeletingId(null);
-                smartToast.success(`"${announcement.title}" has been deleted successfully!`);
-            },
-            onError: () => {
-                setDeletingId(null);
-                smartToast.error('Failed to delete announcement. Please try again.');
-            },
+                router.delete(route('announcements.destroy', { announcement: announcement.slug }), {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        setDeletingId(null);
+                        smartToast.success(`"${announcement.title}" has been archived successfully!`);
+                    },
+                    onError: () => {
+                        setDeletingId(null);
+                        smartToast.error('Failed to archive announcement. Please try again.');
+                    },
+                });
+            }
         });
     };
 
@@ -530,12 +551,12 @@ export default function Index(props: IndexProps) {
                                                     {deletingId === announcement.id ? (
                                                         <>
                                                             <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                                                            Deleting...
+                                                            Archiving...
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Trash2 className="mr-1.5 h-4 w-4" />
-                                                            Delete
+                                                            Archive
                                                         </>
                                                     )}
                                                 </Button>
@@ -638,7 +659,7 @@ export default function Index(props: IndexProps) {
                                                             ) : (
                                                                 <Trash2 className="h-4 w-4" />
                                                             )}
-                                                            <span className="sr-only">Delete</span>
+                                                            <span className="sr-only">Archive</span>
                                                         </Button>
                                                     </div>
                                                 </TableCell>

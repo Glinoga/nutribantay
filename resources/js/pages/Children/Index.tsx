@@ -214,15 +214,15 @@ export default function Index({ children, pagination, search = '', sex = '', fla
     const handleDelete = (child: Child) => {
         MySwal.fire({
             ...swalTheme(),
-            title: 'Delete Child Record?',
+            title: 'Archive Child Record?',
             html: `
                 <div style="font-family: 'Montserrat', sans-serif; padding: 1rem 0;">
                     <div style="font-size: 1.125rem; margin-bottom: 1rem; font-weight: 500;">
-                        Are you sure you want to delete this child's record?
+                        Are you sure you want to archive this child's record?
                     </div>
                     <strong>${child.fullname}</strong>
                     <p style="color: hsl(0 84% 50%); font-size: 0.875rem; margin: 0; line-height: 1.5;">
-                        This action cannot be undone. All health records and data for this child will be permanently removed.
+                        This will hide the record. You can restore it later from the archived section.
                     </p>
                 </div>
             `,
@@ -230,17 +230,17 @@ export default function Index({ children, pagination, search = '', sex = '', fla
             showCancelButton: true,
             confirmButtonColor: 'hsl(0 84% 60%)',
             cancelButtonColor: 'hsl(142 76% 36%)',
-            confirmButtonText: 'Yes, Delete',
+            confirmButtonText: 'Yes, Archive',
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
                 router.delete(route('children.destroy', { child: child.slug }), {
                     preserveScroll: true,
                     onSuccess: () => {
-                        smartToast.success(`${child.fullname}'s record deleted successfully!`);
+                        smartToast.success(`${child.fullname}'s record archived successfully!`);
                     },
                     onError: () => {
-                        smartToast.error('Failed to delete record. Please try again.');
+                        smartToast.error('Failed to archive record. Please try again.');
                     },
                 });
             }
@@ -819,7 +819,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                             className="flex flex-1 items-center justify-center gap-1 py-2.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />
-                                                            Delete
+                                                            Archive
                                                         </button>
                                                     </div>
                                                 )}
