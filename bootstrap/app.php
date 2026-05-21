@@ -3,6 +3,7 @@
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SecurityHeadersMiddleware;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ use Inertia\Inertia;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -46,7 +48,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        $middleware->trustProxies(at: '*', headers: SymfonyRequest::HEADER_X_FORWARDED_FOR |
+            SymfonyRequest::HEADER_X_FORWARDED_HOST |
+            SymfonyRequest::HEADER_X_FORWARDED_PORT |
+            SymfonyRequest::HEADER_X_FORWARDED_PROTO |
+            SymfonyRequest::HEADER_X_FORWARDED_AWS_ELB
+        );
+
         $middleware->web(append: [
+            SecurityHeadersMiddleware::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

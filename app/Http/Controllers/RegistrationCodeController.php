@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RegistrationCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class RegistrationCodeController extends Controller
@@ -99,9 +100,13 @@ class RegistrationCodeController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
+            Log::error('Registration code listing failed: '.$e->getMessage(), [
+                'exception' => $e,
+                'user_id' => auth()->id(),
+            ]);
+
             return response()->json([
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'error' => 'An error occurred while fetching registration codes.',
             ], 500);
         }
     }

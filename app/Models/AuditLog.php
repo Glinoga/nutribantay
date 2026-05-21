@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AuditLog extends Model
 {
@@ -38,7 +39,7 @@ class AuditLog extends Model
         $logData = array_merge([
             'user_id' => $user?->id,
             'user_name' => $user?->name,
-            'user_agent' => request()->userAgent(),
+            'user_agent' => Str::limit(request()->userAgent(), 500),
             'barangay' => $user?->barangay ?? null,
         ], $data);
 

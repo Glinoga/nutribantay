@@ -306,7 +306,7 @@ class HealthlogController extends Controller
             ]);
 
         return Inertia::render('Healthlog/Archived', [
-            'healthlogs' => archivedLogs,
+            'healthlogs' => $archivedLogs,
         ]);
     }
 

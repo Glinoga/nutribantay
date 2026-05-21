@@ -41,7 +41,9 @@ Route::get('/', function () {
 Route::get('/guest/announcements', [AnnouncementController::class, 'guestIndex'])->name('guest.announcements');
 Route::get('/guest/announcements/{announcement}', [AnnouncementController::class, 'guestShow'])->name('guest.announcements.show');
 Route::get('/guest/contact', [ContactController::class, 'showContactForm'])->name('guest.contact');
-Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])->name('guest.contact.send');
+Route::post('/guest/contact', [ContactController::class, 'sendContactForm'])
+    ->middleware('throttle:3,10')
+    ->name('guest.contact.send');
 
 /*
 |--------------------------------------------------------------------------
@@ -160,7 +162,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users/archived', [UserController::class, 'archived'])->name('users.archived');
         Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
         Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
-        Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/users/{id}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
         Route::post('/users/store-bulk', [UserController::class, 'storeBulk'])->name('users.storeBulk');
@@ -206,8 +207,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:Admin|Healthworker'])->group(function () {
-        Route::get('/admin/sendsms', [SMSController::class, 'index'])->name('sms.index');
-        Route::post('/admin/sendsms', [SMSController::class, 'send'])->name('sms.send');
+        Route::get('/admin/sendsms', [SMSController::class, 'index'])
+            ->middleware('throttle:60,1')
+            ->name('sms.index');
+        Route::post('/admin/sendsms', [SMSController::class, 'send'])
+            ->middleware('throttle:20,1')
+            ->name('sms.send');
     });
 
     /*

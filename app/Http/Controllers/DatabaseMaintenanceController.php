@@ -138,6 +138,7 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
+            $backupFileRel = basename($backupFileRel);
             $fullPath = storage_path('app/'.$backupFileRel);
 
             // Verify backup file exists
@@ -361,6 +362,7 @@ class DatabaseMaintenanceController extends Controller
 
         try {
             $backupFileRel = $request->input('backup_file');
+            $backupFileRel = basename($backupFileRel);
             $fullPath = storage_path('app/'.$backupFileRel);
 
             if (! file_exists($fullPath)) {

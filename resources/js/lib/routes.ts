@@ -101,7 +101,6 @@ export function route(name: string, params?: Record<string, string | number | nu
         'users.archived': '/users/archived',
         'users.restore': '/users/{id}/restore',
         'users.forceDelete': '/users/{id}/force-delete',
-        'users.updateRole': '/users/{id}/update-role',
         'users.approve': '/users/{id}/approve',
         'users.reject': '/users/{id}/reject',
         'users.storeBulk': '/users/store-bulk',

@@ -7,6 +7,7 @@ use App\Models\RegistrationCode;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -28,20 +29,29 @@ class RegisteredUserController extends Controller
             'registration_code' => ['required', 'string'],
         ]);
 
-        $affected = RegistrationCode::where('code', $request->registration_code)
-            ->where('is_used', false)
-            ->where(function ($q) {
-                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
-            })
-            ->update(['is_used' => true]);
+        $registrationCode = DB::transaction(function () use ($request) {
+            $code = RegistrationCode::where('code', $request->registration_code)
+                ->where('is_used', false)
+                ->where(function ($q) {
+                    $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->lockForUpdate()
+                ->first();
 
-        if ($affected === 0) {
+            if (! $code) {
+                return null;
+            }
+
+            $code->update(['is_used' => true]);
+
+            return $code;
+        });
+
+        if (! $registrationCode) {
             return back()->withErrors([
                 'registration_code' => 'The registration code is invalid, expired, or already used.',
             ])->onlyInput('registration_code');
         }
-
-        $registrationCode = RegistrationCode::where('code', $request->registration_code)->firstOrFail();
 
         $user = User::create([
             'name' => $request->name,
