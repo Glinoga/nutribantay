@@ -99,7 +99,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     };
 
     return (
-            <div className="min-h-screen bg-cyan-50 p-4 font-sans print:bg-white print:text-black dark:bg-gray-900 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title={`Nutribantay Dashboard Report - ${period}`} />
 
             <style>{`
@@ -134,8 +134,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Header */}
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-2xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-3xl">Nutribantay</h1>
-                <h2 className="text-xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-2xl">Dashboard Report</h2>
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Dashboard Report</h2>
                 <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400">{period} Report</p>
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     {data.summary.period_start} to {data.summary.period_end}
@@ -144,56 +144,68 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Summary Section */}
             <div className="mb-8">
-                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 dark:text-cyan-100 sm:text-xl">
-                    <TrendingUp className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 sm:text-xl dark:text-cyan-100">
+                    <TrendingUp className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Summary Statistics
                 </h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Total Children</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-600 dark:text-cyan-400 sm:text-3xl">{data.summary.total_children}</CardTitle>
+                            <CardTitle className="text-2xl text-cyan-600 sm:text-3xl dark:text-cyan-400">{data.summary.total_children}</CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-green-200 bg-green-50 print:bg-white dark:border-green-800 dark:bg-green-900/20">
+                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-green-600 dark:text-green-400">Normal</CardDescription>
-                            <CardTitle className="text-2xl text-green-600 dark:text-green-400 sm:text-3xl">{data.summary.nutrition_status.normal}</CardTitle>
+                            <CardTitle className="text-2xl text-green-600 sm:text-3xl dark:text-green-400">
+                                {data.summary.nutrition_status.normal}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-yellow-200 bg-yellow-50 print:bg-white dark:border-yellow-800 dark:bg-yellow-900/20">
+                    <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-yellow-600 dark:text-yellow-400">Underweight</CardDescription>
-                            <CardTitle className="text-2xl text-yellow-600 dark:text-yellow-400 sm:text-3xl">{data.summary.nutrition_status.underweight}</CardTitle>
+                            <CardTitle className="text-2xl text-yellow-600 sm:text-3xl dark:text-yellow-400">
+                                {data.summary.nutrition_status.underweight}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-red-200 bg-red-50 print:bg-white dark:border-red-800 dark:bg-red-900/20">
+                    <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-red-600 dark:text-red-400">Overweight</CardDescription>
-                            <CardTitle className="text-2xl text-red-600 dark:text-red-400 sm:text-3xl">{data.summary.nutrition_status.overweight}</CardTitle>
+                            <CardTitle className="text-2xl text-red-600 sm:text-3xl dark:text-red-400">
+                                {data.summary.nutrition_status.overweight}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-orange-200 bg-orange-50 print:bg-white dark:border-orange-800 dark:bg-orange-900/20">
+                    <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-orange-600 dark:text-orange-400">Stunted</CardDescription>
-                            <CardTitle className="text-2xl text-orange-600 dark:text-orange-400 sm:text-3xl">{data.summary.nutrition_status.stunted}</CardTitle>
+                            <CardTitle className="text-2xl text-orange-600 sm:text-3xl dark:text-orange-400">
+                                {data.summary.nutrition_status.stunted}
+                            </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Vitamin A Given</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 dark:text-cyan-100 sm:text-3xl">
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
                                 {data.summary.vitamin_a_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">({data.trends.vitamin_a_percentage}%)</span>
+                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
+                                    ({data.trends.vitamin_a_percentage}%)
+                                </span>
                             </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Deworming Given</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 dark:text-cyan-100 sm:text-3xl">
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
                                 {data.summary.deworming_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">({data.trends.deworming_percentage}%)</span>
+                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
+                                    ({data.trends.deworming_percentage}%)
+                                </span>
                             </CardTitle>
                         </CardHeader>
                     </Card>
@@ -203,8 +215,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             {/* Trend Charts Section */}
             {data.trends.trend.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 dark:text-cyan-100 sm:text-xl">
-                        <BarChart3 className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                    <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 sm:text-xl dark:text-cyan-100">
+                        <BarChart3 className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                         Trends
                     </h3>
 
@@ -247,7 +259,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </div>
 
                     <div className="chart-container mt-6">
-                        <Card className="w-full print:bg-white sm:max-w-md">
+                        <Card className="w-full sm:max-w-md print:bg-white">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg text-cyan-900 dark:text-cyan-100">
                                     <PieChart className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
@@ -281,37 +293,60 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Children Details Table */}
             <div className="mb-8">
-                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 dark:text-cyan-100 sm:text-xl">
-                    <Baby className="h-5 w-5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 sm:text-xl dark:text-cyan-100">
+                    <Baby className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Children Details
                 </h3>
                 <Card className="print:bg-white">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
-                                <TableCaption className="text-cyan-700 dark:text-cyan-300">List of children registered for the selected period.</TableCaption>
+                                <TableCaption className="text-cyan-700 dark:text-cyan-300">
+                                    List of children registered for the selected period.
+                                </TableCaption>
                                 <TableHeader>
                                     <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Birthday</TableHead>
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Sex</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Weight</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Height</TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Birthday
+                                        </TableHead>
+                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">
+                                            Age (months)
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Sex
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Weight
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Height
+                                        </TableHead>
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">Vit. A</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">Deworm</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">MNP</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Last Visit</TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                            Vit. A
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                            Deworm
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                            MNP
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Last Visit
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {data.healthlogs.map((log, index) => (
-                                        <TableRow key={index} className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs">
+                                        <TableRow
+                                            key={index}
+                                            className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs"
+                                        >
                                             <TableCell className="px-4 py-2">
                                                 <div className="flex flex-col gap-0.5">
                                                     <span>{log.child_name}</span>
-                                                    <span className="text-xs text-cyan-700 dark:text-cyan-300 sm:hidden">
+                                                    <span className="text-xs text-cyan-700 sm:hidden dark:text-cyan-300">
                                                         {log.age}mo · {log.nutrition_status}
                                                     </span>
                                                 </div>
@@ -350,7 +385,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             </div>
 
             {/* Footer */}
-            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 dark:border-gray-700 dark:text-cyan-300 sm:mt-8 sm:pt-4">
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>Generated on {data.generated_at}</p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />

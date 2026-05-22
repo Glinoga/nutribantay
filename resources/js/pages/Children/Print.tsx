@@ -39,7 +39,7 @@ const getFilterSummary = (filters: Filters) => {
 
 export default function ChildrenPrint({ children, filters, generated_at }: ChildrenPrintProps) {
     return (
-        <div className="min-h-screen bg-cyan-50 p-4 font-sans print:bg-white print:text-black dark:bg-gray-900 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title="Children Records - Print" />
 
             <style>{`
@@ -68,9 +68,9 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
             </div>
 
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-2xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-3xl">Nutribantay</h1>
-                <h2 className="text-xl font-bold text-cyan-900 dark:text-cyan-100 sm:text-2xl">Children Records</h2>
-                <p className="mt-2 text-base text-cyan-700 capitalize dark:text-cyan-300 sm:text-lg">{getFilterSummary(filters)}</p>
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Children Records</h2>
+                <p className="mt-2 text-base text-cyan-700 capitalize sm:text-lg dark:text-cyan-300">{getFilterSummary(filters)}</p>
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
             </div>
 
@@ -81,13 +81,21 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                         <TableHeader>
                             <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age (months)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Sex</TableHead>
-                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Birthdate</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    Birthdate
+                                </TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
-                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">Height</TableHead>
-                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 sm:table-cell">BMI</TableHead>
-                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100 md:table-cell">Contact</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    Height
+                                </TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    BMI
+                                </TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                    Contact
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -96,7 +104,7 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                                     <TableCell className="px-4 py-2 font-medium">
                                         <div className="flex flex-col gap-0.5">
                                             <span>{child.fullname}</span>
-                                            <span className="text-xs text-cyan-700 dark:text-cyan-300 sm:hidden">
+                                            <span className="text-xs text-cyan-700 sm:hidden dark:text-cyan-300">
                                                 {child.age ?? '-'}mo · {child.weight ?? '-'}kg · {child.sex}
                                             </span>
                                         </div>
@@ -115,7 +123,7 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                 </div>
             </div>
 
-            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 dark:border-gray-700 dark:text-cyan-300 sm:mt-8 sm:pt-4">
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>Generated on {generated_at}</p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />

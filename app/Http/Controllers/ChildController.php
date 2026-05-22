@@ -25,7 +25,8 @@ class ChildController extends Controller
         $now = Carbon::now();
 
         $query = Child::with(['creator', 'updater'])
-            ->where('barangay', $user->barangay);
+            ->where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60));
 
         // Search filter
         if ($request->search) {
@@ -181,6 +182,7 @@ class ChildController extends Controller
         $vitaminUpcomingCount = $vitaminUpcomingChildIds->count();
 
         $avgBmi = Child::where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60))
             ->whereNotNull('weight')
             ->whereNotNull('height')
             ->where('weight', '>', 0)
@@ -189,9 +191,9 @@ class ChildController extends Controller
             ->value('avg_bmi');
 
         $stats = [
-            'total' => Child::where('barangay', $user->barangay)->count(),
-            'male' => Child::where('barangay', $user->barangay)->where('sex', 'Male')->count(),
-            'female' => Child::where('barangay', $user->barangay)->where('sex', 'Female')->count(),
+            'total' => Child::where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60))->count(),
+            'male' => Child::where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60))->where('sex', 'Male')->count(),
+            'female' => Child::where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60))->where('sex', 'Female')->count(),
             'avgBMI' => number_format($avgBmi ?? 0, 1),
             'vaccine_overdue' => $overdueCount,
             'vaccine_upcoming' => $upcomingCount,
@@ -248,14 +250,13 @@ class ChildController extends Controller
     public function archived()
     {
         $user = auth()->user();
+        $barangay = $user->barangay;
 
-        $archivedChildren = Child::onlyTrashed()
-            ->where('barangay', $user->barangay)
+        $deletedChildren = Child::onlyTrashed()
+            ->where('barangay', $barangay)
             ->with(['creator', 'updater'])
-            ->get();
-
-        return Inertia::render('Children/Archived', [
-            'children' => $archivedChildren->map(fn ($child) => [
+            ->get()
+            ->map(fn ($child) => [
                 'id' => $child->id,
                 'slug' => $child->slug,
                 'fullname' => $child->fullname,
@@ -265,7 +266,33 @@ class ChildController extends Controller
                 'sex' => $child->sex,
                 'age' => $child->age,
                 'deleted_at' => $child->deleted_at,
-            ]),
+            ]);
+
+        $overagedChildren = Child::where('barangay', $barangay)
+            ->where('birthdate', '<=', now()->subMonths(60))
+            ->whereNull('deleted_at')
+            ->with(['creator', 'updater'])
+            ->get()
+            ->map(fn ($child) => [
+                'id' => $child->id,
+                'slug' => $child->slug,
+                'fullname' => $child->fullname,
+                'first_name' => $child->first_name,
+                'middle_initial' => $child->middle_initial,
+                'last_name' => $child->last_name,
+                'sex' => $child->sex,
+                'age' => $child->age,
+                'weight' => $child->weight,
+                'height' => $child->height,
+                'bmi' => $child->bmi,
+                'birthdate' => $child->birthdate?->format('Y-m-d'),
+                'address' => $child->address,
+                'contact_number' => $child->contact_number,
+            ]);
+
+        return Inertia::render('Children/Archived', [
+            'deleted' => $deletedChildren,
+            'overaged' => $overagedChildren,
         ]);
     }
 
@@ -352,6 +379,11 @@ class ChildController extends Controller
         if ($request->age_max) {
             $maxBirthdate = now()->subMonths($request->age_max + 1)->addDay()->toDateString();
             $query->where('birthdate', '<', $maxBirthdate);
+        }
+
+        // Overaged export
+        if ($request->type === 'overaged') {
+            $query->where('birthdate', '<=', now()->subMonths(60));
         }
 
         return $this->exportCSV($query->cursor());
@@ -831,6 +863,11 @@ class ChildController extends Controller
                 ->whereNotIn('cv.child_id', $overdueChildIds)
                 ->pluck('cv.child_id');
             $query->whereIn('id', $upcomingChildIds);
+        }
+
+        // Overaged print
+        if ($request->type === 'overaged') {
+            $query->where('birthdate', '<=', now()->subMonths(60));
         }
 
         $children = $query->cursor()->map(fn ($child) => [
