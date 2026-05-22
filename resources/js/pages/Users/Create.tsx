@@ -128,8 +128,8 @@ export default function Create() {
                                                 <SelectValue placeholder="Select Role" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="admin">Admin</SelectItem>
-                                                <SelectItem value="healthworker">Health Worker</SelectItem>
+<SelectItem value="Admin">Admin</SelectItem>
+<SelectItem value="Healthworker">Health Worker</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {errors.role && <p className="mt-1 text-sm text-destructive">{errors.role}</p>}
