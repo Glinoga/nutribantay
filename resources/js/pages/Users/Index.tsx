@@ -147,7 +147,15 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             }
         } catch (err: unknown) {
             let message = 'Failed to create user';
-            if (err instanceof Error) {
+            if (err && typeof err === 'object' && 'response' in err) {
+                const axiosErr = err as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } };
+                if (axiosErr.response?.data?.errors) {
+                    const firstError = Object.values(axiosErr.response.data.errors).flat()[0];
+                    if (firstError) message = firstError;
+                } else if (axiosErr.response?.data?.message) {
+                    message = axiosErr.response.data.message;
+                }
+            } else if (err instanceof Error) {
                 message = err.message;
             }
             setCreateError(message);
@@ -474,7 +482,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                             setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
                                             setShowCreateModal(true);
                                         }}
-                                        className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                        className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg sm:w-auto"
                                     >
                                         <Plus className="mr-2 h-4 w-4" />
                                         Create User
@@ -487,7 +495,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     </Button>
                                 </div>
                             </div>
-                            
                         </CardHeader>
                         <CardContent className="p-0">
                             {/* Search Bar */}
@@ -505,7 +512,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                                        className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md transition-all duration-300 hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg sm:w-auto"
                                     >
                                         <Search className="mr-2 h-4 w-4" />
                                         Search
@@ -685,7 +692,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
             {/* Codes Modal */}
             <Dialog open={showCodeModal} onOpenChange={setShowCodeModal}>
-                <DialogContent className="max-h-[80vh] sm:max-w-4xl overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle>Registration Codes</DialogTitle>
                         <DialogDescription>View and manage registration codes for admin users.</DialogDescription>
@@ -826,11 +833,16 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                     type="text"
                                     value={newUser.password}
                                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                                    placeholder="Password"
+                                    placeholder="Min 10 characters"
+                                    minLength={10}
                                     className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                     required
                                 />
-                                <Button type="button" className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600" onClick={generatePassword}>
+                                <Button
+                                    type="button"
+                                    className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600"
+                                    onClick={generatePassword}
+                                >
                                     Generate
                                 </Button>
                             </div>
@@ -890,7 +902,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                         >
                             Cancel
                         </Button>
-                        <Button className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600" onClick={() => handleCreateUser(false)} disabled={createLoading}>
+                        <Button
+                            className="bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600"
+                            onClick={() => handleCreateUser(false)}
+                            disabled={createLoading}
+                        >
                             {createLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -900,7 +916,6 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 'Create & Add Another'
                             )}
                         </Button>
-
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
