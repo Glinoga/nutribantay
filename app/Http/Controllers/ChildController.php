@@ -111,15 +111,7 @@ class ChildController extends Controller
                 ->join('child_vitamins as cv', 'child_vitamin_doses.child_vitamin_id', '=', 'cv.id')
                 ->whereNull('child_vitamin_doses.date_given')
                 ->whereNotNull('child_vitamin_doses.next_due_date')
-                ->where('child_vitamin_doses.next_due_date', '>=', $now->toDateString())
-                ->whereNotIn('cv.child_id', function ($q) use ($now) {
-                    $q->select('cv2.child_id')
-                        ->from('child_vitamin_doses as cvd2')
-                        ->join('child_vitamins as cv2', 'cvd2.child_vitamin_id', '=', 'cv2.id')
-                        ->whereNull('cvd2.date_given')
-                        ->whereNotNull('cvd2.next_due_date')
-                        ->where('cvd2.next_due_date', '<', $now->toDateString());
-                });
+                ->where('child_vitamin_doses.next_due_date', '>=', $now->toDateString());
             $query->whereIn('id', $upcomingVitaminChildIds);
         }
 

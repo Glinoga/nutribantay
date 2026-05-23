@@ -121,18 +121,42 @@ class RefreshDashboardCache extends Command
         $pendingDoses = ChildVaccineDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
             ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $barangay))
-            ->get();
+            ->with('childVaccine.child:id,barangay')
+            ->get()
+            ->groupBy('childVaccine.child_id');
 
-        $overdueCount = $pendingDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isPast())->count();
-        $upcomingCount = $pendingDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isFuture())->count();
+        $overdueCount = 0;
+        $upcomingCount = 0;
+        foreach ($pendingDoses as $doses) {
+            $hasOverdue = $doses->some(fn ($d) => $d->next_due_date && $d->next_due_date->lt($now));
+            $hasUpcoming = $doses->some(fn ($d) => $d->next_due_date && ! $d->next_due_date->lt($now));
+            if ($hasOverdue) {
+                $overdueCount++;
+            }
+            if ($hasUpcoming) {
+                $upcomingCount++;
+            }
+        }
 
         $pendingVitaminDoses = ChildVitaminDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
             ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $barangay))
-            ->get();
+            ->with('childVitamin.child:id,barangay')
+            ->get()
+            ->groupBy('childVitamin.child_id');
 
-        $vitaminOverdue = $pendingVitaminDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isPast())->count();
-        $vitaminUpcoming = $pendingVitaminDoses->filter(fn ($d) => $d->next_due_date && Carbon::parse($d->next_due_date)->isFuture())->count();
+        $vitaminOverdue = 0;
+        $vitaminUpcoming = 0;
+        foreach ($pendingVitaminDoses as $doses) {
+            $hasOverdue = $doses->some(fn ($d) => $d->next_due_date && $d->next_due_date->lt($now));
+            $hasUpcoming = $doses->some(fn ($d) => $d->next_due_date && ! $d->next_due_date->lt($now));
+            if ($hasOverdue) {
+                $vitaminOverdue++;
+            }
+            if ($hasUpcoming) {
+                $vitaminUpcoming++;
+            }
+        }
 
         DashboardCache::updateOrCreate(
             ['barangay' => $barangay],

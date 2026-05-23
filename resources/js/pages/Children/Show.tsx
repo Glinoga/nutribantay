@@ -384,17 +384,31 @@ export default function Show({ child }: { child: Child }) {
                             </Link>
                         )}
 
-                        {!isOveraged && (
+                        {true && (
                             <>
                                 <Link href={route('children.vaccines.index', { child: child.slug })}>
-                                    <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
+                                    <button
+                                        className={`action-btn inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:shadow-lg ${
+                                            isOveraged
+                                                ? 'cursor-pointer bg-gray-400 opacity-80 hover:bg-gray-500'
+                                                : 'bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600'
+                                        }`}
+                                        title={isOveraged ? 'Read-only — data cannot be modified' : undefined}
+                                    >
                                         <Syringe className="h-4 w-4" />
                                         Vaccine Tracker
                                     </button>
                                 </Link>
 
                                 <Link href={route('children.vitamins.index', { child: child.slug })}>
-                                    <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-orange-600 hover:to-amber-600 hover:shadow-lg">
+                                    <button
+                                        className={`action-btn inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:shadow-lg ${
+                                            isOveraged
+                                                ? 'cursor-pointer bg-gray-400 opacity-80 hover:bg-gray-500'
+                                                : 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600'
+                                        }`}
+                                        title={isOveraged ? 'Read-only — data cannot be modified' : undefined}
+                                    >
                                         <Pill className="h-4 w-4" />
                                         Vitamin Tracker
                                     </button>
