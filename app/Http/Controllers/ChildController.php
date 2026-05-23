@@ -120,7 +120,7 @@ class ChildController extends Controller
         // Get all pending vaccine doses for this barangay (for stats and badges)
         $pendingDoses = ChildVaccineDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
-            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60)))
             ->with(['childVaccine.child:id,barangay'])
             ->cursor()
             ->groupBy('childVaccine.child_id');
@@ -150,7 +150,7 @@ class ChildController extends Controller
         // Get all pending vitamin doses for this barangay (for stats and badges)
         $pendingVitaminDoses = ChildVitaminDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
-            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $user->barangay))
+            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60)))
             ->with(['childVitamin.child:id,barangay'])
             ->cursor()
             ->groupBy('childVitamin.child_id');

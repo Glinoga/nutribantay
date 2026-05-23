@@ -120,7 +120,7 @@ class RefreshDashboardCache extends Command
 
         $pendingDoses = ChildVaccineDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
-            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $barangay))
+            ->whereHas('childVaccine.child', fn ($q) => $q->where('barangay', $barangay)->where('birthdate', '>=', $now->copy()->subMonths(60)))
             ->with('childVaccine.child:id,barangay')
             ->get()
             ->groupBy('childVaccine.child_id');
@@ -140,7 +140,7 @@ class RefreshDashboardCache extends Command
 
         $pendingVitaminDoses = ChildVitaminDose::whereNull('date_given')
             ->whereNotNull('next_due_date')
-            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $barangay))
+            ->whereHas('childVitamin.child', fn ($q) => $q->where('barangay', $barangay)->where('birthdate', '>=', $now->copy()->subMonths(60)))
             ->with('childVitamin.child:id,barangay')
             ->get()
             ->groupBy('childVitamin.child_id');
