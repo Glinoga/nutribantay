@@ -563,8 +563,6 @@ class ChildController extends Controller
             abort(403);
         }
 
-        $child->abortIfOveraged();
-
         $barangay = $child->barangay;
         $child->delete();
 

@@ -15,7 +15,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
-import { Archive, ArrowLeft, Download, Loader2, Printer, Users } from 'lucide-react';
+import { Archive, ArrowLeft, Download, Loader2, Printer, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 
 type DeletedChild = {
@@ -63,6 +63,7 @@ export default function Archived({ deleted, overaged }: Props) {
     const [activeTab, setActiveTab] = useState<Tab>('deleted');
     const [restoreId, setRestoreId] = useState<number | null>(null);
     const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [archiveId, setArchiveId] = useState<number | null>(null);
     const [loading, setLoading] = useState<number | null>(null);
 
     const handleRestore = async (id: number) => {
@@ -88,6 +89,19 @@ export default function Archived({ deleted, overaged }: Props) {
         } finally {
             setLoading(null);
             setDeleteId(null);
+        }
+    };
+
+    const handleArchive = async (child: OveragedChild) => {
+        setLoading(child.id);
+        try {
+            await router.delete(route('children.destroy', { child: child.slug ?? child.id }));
+            smartToast.success('Child archived successfully.');
+        } catch {
+            smartToast.error('Failed to archive child.');
+        } finally {
+            setLoading(null);
+            setArchiveId(null);
         }
     };
 
@@ -256,12 +270,13 @@ export default function Archived({ deleted, overaged }: Props) {
                                     <TableHead>Birthdate</TableHead>
                                     <TableHead>Address</TableHead>
                                     <TableHead>Contact</TableHead>
+                                    <TableHead>Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {overaged.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={11} className="py-8 text-center text-muted-foreground">
+                                        <TableCell colSpan={12} className="py-8 text-center text-muted-foreground">
                                             No overaged children found.
                                         </TableCell>
                                     </TableRow>
@@ -285,6 +300,26 @@ export default function Archived({ deleted, overaged }: Props) {
                                             <TableCell>{child.birthdate ?? '-'}</TableCell>
                                             <TableCell className="max-w-[200px] truncate">{child.address ?? '-'}</TableCell>
                                             <TableCell>{child.contact_number ?? '-'}</TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    onClick={() => setArchiveId(child.id)}
+                                                    disabled={loading === child.id}
+                                                >
+                                                    {loading === child.id ? (
+                                                        <>
+                                                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                                            Archiving...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Trash2 className="mr-1 h-3 w-3" />
+                                                            Archive
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )}
@@ -325,6 +360,30 @@ export default function Archived({ deleted, overaged }: Props) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Archive Overaged Confirmation */}
+            <AlertDialog open={!!archiveId} onOpenChange={() => setArchiveId(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Archive Child</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will move this child to the archived section. The record can be restored later if needed.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                const child = overaged.find((c) => c.id === archiveId);
+                                if (child) handleArchive(child);
+                            }}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Archive
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
