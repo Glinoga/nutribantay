@@ -26,6 +26,8 @@ class RecommendationController extends Controller
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
         }
 
+        $child->abortIfOveraged();
+
         // Step 2: Calculate age accurately
         $birthdate = Carbon::parse($child->birthdate);
         $now = Carbon::now();

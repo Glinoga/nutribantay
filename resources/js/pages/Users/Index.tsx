@@ -141,10 +141,10 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                 setCreateSuccess('');
                 setGeneratedCode('');
                 setGeneratedPassword('');
-                router.reload();
             } else {
                 setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
             }
+            router.reload({ only: ['users'], preserveState: true, preserveScroll: true });
         } catch (err: unknown) {
             let message = 'Failed to create user';
             if (err && typeof err === 'object' && 'response' in err) {
@@ -910,7 +910,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 setGeneratedCode('');
                                 setGeneratedPassword('');
                                 setShowCreateModal(false);
-                                router.reload();
+                                router.reload({ only: ['users'], preserveState: true, preserveScroll: true });
                             }}
                         >
                             Cancel

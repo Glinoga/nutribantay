@@ -715,7 +715,7 @@ export default function Show({ child }: { child: Child }) {
                     )}
 
                     {/* AI Recommender Section */}
-                    {canViewAiRecommender && (
+                    {canViewAiRecommender && !isOveraged && (
                         <div
                             className="fade-in-up mb-8 rounded-xl border-0 bg-gradient-to-br from-teal-50 to-cyan-50 p-6 shadow-md dark:from-teal-900/20 dark:to-cyan-900/20"
                             style={{ animationDelay: '0.7s' }}
