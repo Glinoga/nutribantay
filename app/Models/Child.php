@@ -102,6 +102,13 @@ class Child extends Model
         return $this->age >= 60;
     }
 
+    public function abortIfOveraged(): void
+    {
+        if ($this->is_over_60_months) {
+            abort(403, 'Children aged 60 months or older cannot be modified.');
+        }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | RELATIONSHIPS

@@ -623,12 +623,17 @@ export default function Create({
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:px-8 sm:py-5 sm:text-lg"
+                                className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:w-auto sm:px-8 sm:py-5 sm:text-lg"
                             >
                                 {processing ? 'Saving...' : 'Save Health Log'}
                             </Button>
 
-                            <Button type="button" variant="outline" onClick={() => window.history.back()} className="w-full sm:w-auto px-6 py-3 text-base font-bold sm:px-8 sm:py-5 sm:text-lg">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => window.history.back()}
+                                className="w-full px-6 py-3 text-base font-bold sm:w-auto sm:px-8 sm:py-5 sm:text-lg"
+                            >
                                 Cancel & Go Back
                             </Button>
 

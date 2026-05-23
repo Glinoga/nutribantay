@@ -448,6 +448,8 @@ class ChildController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         $note->delete();
 
         return redirect()->back()->with('success', 'Note deleted successfully.');
@@ -507,6 +509,8 @@ class ChildController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         return Inertia::render('Children/Edit', [
             'child' => [
                 'id' => $child->id,
@@ -530,6 +534,8 @@ class ChildController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
@@ -564,6 +570,8 @@ class ChildController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $barangay = $child->barangay;
         $child->delete();
@@ -687,6 +695,8 @@ class ChildController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $request->validate([
             'note' => 'required|string|max:1000',

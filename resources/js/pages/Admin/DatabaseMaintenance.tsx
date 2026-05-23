@@ -330,39 +330,39 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                                 <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
                                         </TableHeader>
-                                    <TableBody>
-                                        {backups.map((backup) => (
-                                            <TableRow key={backup.filename}>
-                                                <TableCell className="font-medium">{backup.filename}</TableCell>
-                                                <TableCell>{backup.size}</TableCell>
-                                                <TableCell>{backup.date}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <Button
-                                                            onClick={() => openRestoreDialog(backup)}
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="gap-1 border-yellow-200 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-800 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
-                                                        >
-                                                            <UploadCloud className="h-3 w-3" />
-                                                            Restore
-                                                        </Button>
-                                                        <Button
-                                                            onClick={() => openDeleteDialog(backup)}
-                                                            size="sm"
-                                                            variant="destructive"
-                                                            className="gap-1"
-                                                        >
-                                                            <Trash2 className="h-3 w-3" />
-                                                            Delete
-                                                        </Button>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                        <TableBody>
+                                            {backups.map((backup) => (
+                                                <TableRow key={backup.filename}>
+                                                    <TableCell className="font-medium">{backup.filename}</TableCell>
+                                                    <TableCell>{backup.size}</TableCell>
+                                                    <TableCell>{backup.date}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <Button
+                                                                onClick={() => openRestoreDialog(backup)}
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="gap-1 border-yellow-200 text-yellow-700 hover:bg-yellow-50 dark:border-yellow-800 dark:text-yellow-400 dark:hover:bg-yellow-900/20"
+                                                            >
+                                                                <UploadCloud className="h-3 w-3" />
+                                                                Restore
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => openDeleteDialog(backup)}
+                                                                size="sm"
+                                                                variant="destructive"
+                                                                className="gap-1"
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                                Delete
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
                             )}
                         </CardContent>
                     </Card>

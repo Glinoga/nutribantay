@@ -95,9 +95,9 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     }, [users]);
 
     const copyCredentials = async () => {
-        const login = `${generatedCode} - ${generatedPassword}`;
+        const text = generatedCode ? `${generatedCode} - ${generatedPassword}` : generatedPassword;
         try {
-            await navigator.clipboard.writeText(login);
+            await navigator.clipboard.writeText(text);
             setCopiedLogin(true);
             setTimeout(() => setCopiedLogin(false), 2000);
         } catch (err) {
@@ -864,15 +864,24 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
                         {createError && <div className="text-sm text-destructive">{createError}</div>}
 
-                        {createSuccess && generatedCode && (
+                        {createSuccess && generatedPassword && (
                             <div className="rounded-md bg-green-50 p-3 text-sm dark:bg-green-900/20">
                                 <p className="mb-2 font-medium text-green-800 dark:text-green-400">User created successfully!</p>
                                 <div className="flex items-center justify-between gap-2">
                                     <div>
-                                        <p className="text-xs text-green-600 dark:text-green-400">Code - Password:</p>
-                                        <p className="font-mono text-lg font-bold text-green-900 dark:text-green-300">
-                                            {generatedCode} - {generatedPassword}
-                                        </p>
+                                        {generatedCode ? (
+                                            <>
+                                                <p className="text-xs text-green-600 dark:text-green-400">Code - Password:</p>
+                                                <p className="font-mono text-lg font-bold text-green-900 dark:text-green-300">
+                                                    {generatedCode} - {generatedPassword}
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="text-xs text-green-600 dark:text-green-400">Password:</p>
+                                                <p className="font-mono text-lg font-bold text-green-900 dark:text-green-300">{generatedPassword}</p>
+                                            </>
+                                        )}
                                     </div>
                                     <Button
                                         size="sm"
@@ -882,7 +891,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                         {copiedLogin ? 'Copied!' : 'Copy'}
                                     </Button>
                                 </div>
-                                <p className="mt-1 text-xs text-green-600 dark:text-green-400">Give these credentials to the healthworker</p>
+                                <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                                    {generatedCode
+                                        ? 'Give these credentials to the healthworker'
+                                        : 'Give this password to the healthworker (they will log in with their email)'}
+                                </p>
                             </div>
                         )}
                     </div>

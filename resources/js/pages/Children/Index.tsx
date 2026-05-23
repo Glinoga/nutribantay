@@ -17,6 +17,7 @@ import {
     Download,
     Edit2,
     FileSpreadsheet,
+    OctagonAlert,
     Phone,
     Plus,
     Printer,
@@ -41,6 +42,7 @@ type Child = {
     last_name: string;
     sex: string;
     age: number | null;
+    is_over_60_months?: boolean;
     birthdate?: string | null;
     weight?: number | null;
     height?: number | null;
@@ -92,7 +94,16 @@ type AuthProps = {
     };
 };
 
-export default function Index({ children, pagination, search = '', sex = '', flash, stats, vaccine_status = null, vitamin_status = null }: IndexProps) {
+export default function Index({
+    children,
+    pagination,
+    search = '',
+    sex = '',
+    flash,
+    stats,
+    vaccine_status = null,
+    vitamin_status = null,
+}: IndexProps) {
     const { auth } = usePage<AuthProps>().props;
     const [searchQuery, setSearchQuery] = useState(search);
 
@@ -553,7 +564,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                             {canManageChildren && (
                                 <Link href={route('children.archived')}>
-                                    <Button className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600">
+                                    <Button className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-sm shadow-md hover:from-amber-600 hover:to-yellow-600 sm:w-auto">
                                         <Trash2 className="mr-1.5 h-4 w-4" />
                                         View Archived
                                     </Button>
@@ -562,7 +573,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
 
                             {canManageChildren && (
                                 <Link href={route('children.create')}>
-                                    <Button className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600">
+                                    <Button className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 text-sm shadow-md hover:from-teal-600 hover:to-cyan-600 sm:w-auto">
                                         <Plus className="mr-1.5 h-4 w-4" />
                                         Add Child
                                     </Button>
@@ -805,7 +816,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                     </Link>
                                                 </div>
 
-                                                {canManageChildren && (
+                                                {canManageChildren && !child.is_over_60_months && (
                                                     <div className="flex border-t border-gray-100 dark:border-gray-700">
                                                         <Link
                                                             href={route('children.edit', { child: child.slug })}
@@ -821,6 +832,14 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                                             <Trash2 className="h-3.5 w-3.5" />
                                                             Archive
                                                         </button>
+                                                    </div>
+                                                )}
+                                                {canManageChildren && child.is_over_60_months && (
+                                                    <div className="flex border-t border-gray-100 py-2.5 dark:border-gray-700">
+                                                        <span className="flex w-full items-center justify-center gap-1 text-xs font-medium text-gray-400 dark:text-gray-500">
+                                                            <OctagonAlert className="h-3.5 w-3.5" />
+                                                            Read-only
+                                                        </span>
                                                     </div>
                                                 )}
                                             </CardContent>
@@ -844,7 +863,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         <span className="hidden sm:inline">Prev</span>
                     </button>
 
-                    <div className="hidden sm:flex items-center gap-1">
+                    <div className="hidden items-center gap-1 sm:flex">
                         {getPageNumbers().map((page, idx) =>
                             typeof page === 'number' ? (
                                 <button
@@ -866,7 +885,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         )}
                     </div>
 
-                    <span className="sm:hidden text-sm text-gray-600 font-medium dark:text-gray-400">
+                    <span className="text-sm font-medium text-gray-600 sm:hidden dark:text-gray-400">
                         Page {pagination.current_page} of {pagination.last_page}
                     </span>
 
@@ -889,7 +908,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Export / Print</h2>
                                 <p className="text-sm text-cyan-700 dark:text-cyan-400">
                                     {searchQuery || activeSex || activeVaccine
-                                                    ? `Filters: ${[searchQuery, activeSex, activeVaccine, activeVitamin].filter(Boolean).join(', ')}`
+                                        ? `Filters: ${[searchQuery, activeSex, activeVaccine, activeVitamin].filter(Boolean).join(', ')}`
                                         : 'All children'}
                                 </p>
                             </div>
@@ -899,7 +918,7 @@ export default function Index({ children, pagination, search = '', sex = '', fla
                         </div>
                         <div className="p-4">
                             <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">Choose an option:</p>
-                        <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <Button
                                     onClick={() => {
                                         setShowExportDialog(false);

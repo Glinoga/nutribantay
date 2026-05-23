@@ -49,7 +49,7 @@ class DashboardController extends Controller
             return Inertia::render('dashboard', [
                 'stats' => [
                     'total_children' => 0,
-                    'age_breakdown' => ['0to5' => 0, '6to11' => 0, '12to35' => 0, '36plus' => 0],
+                    'age_breakdown' => ['0to5' => 0, '6to11' => 0, '12to23' => 0, '24to56' => 0],
                     'nutrition_status' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0],
                     'vitamin_a' => ['given' => 0, 'total' => 0, 'percentage' => 0],
                     'deworming' => ['given' => 0, 'total' => 0, 'percentage' => 0],
@@ -94,8 +94,8 @@ class DashboardController extends Controller
                 'age_breakdown' => [
                     '0to5' => $ab['0to5'] ?? 0,
                     '6to11' => $ab['6to11'] ?? 0,
-                    '12to35' => $ab['12to35'] ?? 0,
-                    '36plus' => $ab['36plus'] ?? 0,
+                    '12to23' => $ab['12to23'] ?? 0,
+                    '24to56' => $ab['24to56'] ?? 0,
                 ],
                 'nutrition_status' => [
                     'normal' => $nb['normal'] ?? 0,

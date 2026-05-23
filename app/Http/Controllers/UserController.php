@@ -125,22 +125,35 @@ class UserController extends Controller
         }
 
         $result = DB::transaction(function () use ($request, $barangay, $email) {
-            $code = strtoupper(Str::random(8));
+            $userData = [
+                'name' => $request->name,
+                'email' => $email,
+                'password' => Hash::make($request->password),
+                'barangay' => $barangay,
+                'status' => 'approved',
+            ];
 
+            if ($email) {
+                // With email: no registration code needed
+                $newUser = User::create($userData);
+                $newUser->assignRole($request->role);
+
+                return [
+                    'code' => null,
+                    'password' => $request->password,
+                ];
+            }
+
+            // Without email: generate registration code
+            $code = strtoupper(Str::random(8));
             $registrationCode = RegistrationCode::create([
                 'code' => $code,
                 'barangay' => $barangay,
                 'is_used' => true,
             ]);
 
-            $newUser = User::create([
-                'name' => $request->name,
-                'email' => $email,
-                'password' => Hash::make($request->password),
-                'barangay' => $barangay,
-                'status' => 'approved',
-                'registration_code_id' => $registrationCode->id,
-            ]);
+            $userData['registration_code_id'] = $registrationCode->id;
+            $newUser = User::create($userData);
 
             $newUser->assignRole($request->role);
 
@@ -207,9 +220,6 @@ class UserController extends Controller
         }
 
         $targetUser->name = $request->name;
-
-        // Handle nullable email - convert empty string to null
-        $targetUser->email = $request->email ?: null;
 
         if ($request->filled('password')) {
             $targetUser->password = Hash::make($request->password);

@@ -5,9 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { route } from '@/lib/routes';
 import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
             <Head title="Register" />
@@ -69,29 +73,51 @@ export default function Register() {
                                     {/* Password */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="password">Password</Label>
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            name="password"
-                                            required
-                                            tabIndex={3}
-                                            autoComplete="new-password"
-                                            placeholder="Password"
-                                        />
+                                        <div className="relative">
+                                            <Input
+                                                id="password"
+                                                type={showPassword ? 'text' : 'password'}
+                                                name="password"
+                                                required
+                                                tabIndex={3}
+                                                autoComplete="new-password"
+                                                placeholder="Password"
+                                                className="pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                                tabIndex={-1}
+                                            >
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
                                         <InputError message={errors.password} />
                                     </div>
 
                                     {/* Confirm Password */}
                                     <div className="grid gap-2">
                                         <Label htmlFor="password_confirmation">Confirm Password</Label>
-                                        <Input
-                                            id="password_confirmation"
-                                            type="password"
-                                            name="password_confirmation"
-                                            required
-                                            tabIndex={4}
-                                            placeholder="Confirm your password"
-                                        />
+                                        <div className="relative">
+                                            <Input
+                                                id="password_confirmation"
+                                                type={showConfirmPassword ? 'text' : 'password'}
+                                                name="password_confirmation"
+                                                required
+                                                tabIndex={4}
+                                                placeholder="Confirm your password"
+                                                className="pr-10"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                                tabIndex={-1}
+                                            >
+                                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
                                         <InputError message={errors.password_confirmation} />
                                     </div>
 

@@ -352,7 +352,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full sm:w-auto rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:px-10 sm:py-5 sm:text-lg"
+                                            className="w-full rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:w-auto sm:px-10 sm:py-5 sm:text-lg"
                                         >
                                             {processing ? (
                                                 <>
@@ -368,7 +368,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                             onClick={handleClose}
                                             disabled={processing}
                                             variant="outline"
-                                            className="w-full sm:w-auto rounded-md px-6 py-3 text-base font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg dark:text-gray-100 dark:hover:bg-gray-700 sm:px-10 sm:py-5 sm:text-lg"
+                                            className="w-full rounded-md px-6 py-3 text-base font-bold text-gray-800 shadow-md transition-all hover:bg-gray-50 hover:shadow-lg sm:w-auto sm:px-10 sm:py-5 sm:text-lg dark:text-gray-100 dark:hover:bg-gray-700"
                                         >
                                             Cancel
                                         </Button>

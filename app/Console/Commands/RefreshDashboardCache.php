@@ -70,12 +70,13 @@ class RefreshDashboardCache extends Command
                 ->where('birthdate', '>=', $now->copy()->subMonthsNoOverflow(11)->startOfDay())
                 ->where('birthdate', '<', $now->copy()->subMonthsNoOverflow(5)->startOfDay())
                 ->count(),
-            '12to35' => (clone $childrenQuery)
-                ->where('birthdate', '>=', $now->copy()->subMonthsNoOverflow(35)->startOfDay())
+            '12to23' => (clone $childrenQuery)
+                ->where('birthdate', '>=', $now->copy()->subMonthsNoOverflow(23)->startOfDay())
                 ->where('birthdate', '<', $now->copy()->subMonthsNoOverflow(11)->startOfDay())
                 ->count(),
-            '36plus' => (clone $childrenQuery)
-                ->where('birthdate', '<', $now->copy()->subMonthsNoOverflow(35)->startOfDay())
+            '24to56' => (clone $childrenQuery)
+                ->where('birthdate', '>=', $now->copy()->subMonthsNoOverflow(56)->startOfDay())
+                ->where('birthdate', '<', $now->copy()->subMonthsNoOverflow(23)->startOfDay())
                 ->count(),
         ];
 

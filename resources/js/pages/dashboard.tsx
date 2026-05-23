@@ -21,8 +21,8 @@ type Stats = {
     age_breakdown: {
         '0to5': number;
         '6to11': number;
-        '12to35': number;
-        '36plus': number;
+        '12to23': number;
+        '24to56': number;
     };
     nutrition_status: {
         normal: number;
@@ -470,14 +470,14 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardDescription>12-35 months</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['12to35']}</CardTitle>
+                                    <CardDescription>12-23 months</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['12to23']}</CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-orange-800 dark:bg-orange-900/20">
                                 <CardHeader>
-                                    <CardDescription className="text-orange-600 dark:text-orange-400">36+ months</CardDescription>
-                                    <CardTitle className="text-3xl text-orange-600 dark:text-orange-400">{stats.age_breakdown['36plus']}</CardTitle>
+                                    <CardDescription className="text-orange-600 dark:text-orange-400">24-56 months</CardDescription>
+                                    <CardTitle className="text-3xl text-orange-600 dark:text-orange-400">{stats.age_breakdown['24to56']}</CardTitle>
                                 </CardHeader>
                             </Card>
                         </div>

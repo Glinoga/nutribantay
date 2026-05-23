@@ -430,13 +430,19 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                                                             <td className="px-4 py-3 text-gray-900 dark:text-gray-200">
                                                                 {dose.administered_by ?? '-'}
                                                             </td>
-                                                            <td className="max-w-[200px] truncate px-4 py-3 text-gray-900 dark:text-gray-200" title={dose.remarks ?? ''}>
+                                                            <td
+                                                                className="max-w-[200px] truncate px-4 py-3 text-gray-900 dark:text-gray-200"
+                                                                title={dose.remarks ?? ''}
+                                                            >
                                                                 {dose.remarks ?? '-'}
                                                             </td>
                                                             <td className="px-4 py-3">
                                                                 <div className="flex items-center justify-center">
                                                                     <button
-                                                                        onClick={(e) => { e.stopPropagation(); handleDeleteDose(cv, dose); }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleDeleteDose(cv, dose);
+                                                                        }}
                                                                         className="cursor-pointer rounded-md p-1.5 text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30"
                                                                     >
                                                                         <Trash2 className="h-4 w-4" />
@@ -628,7 +634,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
 
                             <div>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Remarks</p>
-                                <p className="mt-1 whitespace-pre-wrap rounded-md bg-gray-50 p-3 text-sm text-gray-900 dark:bg-gray-700 dark:text-gray-100">
+                                <p className="mt-1 rounded-md bg-gray-50 p-3 text-sm whitespace-pre-wrap text-gray-900 dark:bg-gray-700 dark:text-gray-100">
                                     {viewingDose.dose.remarks || 'No remarks.'}
                                 </p>
                             </div>

@@ -68,6 +68,8 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         $request->validate([
             'vaccine_id' => 'required|exists:vaccines,id',
         ]);
@@ -98,6 +100,8 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         if ($childVaccine->child_id !== $child->id) {
             abort(404);
         }
@@ -117,6 +121,8 @@ class ChildVaccineController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         if ($childVaccine->child_id !== $child->id) {
             abort(404);
@@ -165,6 +171,8 @@ class ChildVaccineController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         if ($childVaccine->child_id !== $child->id) {
             abort(404);
         }
@@ -198,6 +206,8 @@ class ChildVaccineController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         if ($childVaccine->child_id !== $child->id) {
             abort(404);

@@ -67,6 +67,7 @@ type Child = {
     last_name: string;
     sex: string;
     age: number | null;
+    is_over_60_months?: boolean;
     birthdate: string | null;
     weight: number | null;
     height: number | null;
@@ -140,6 +141,7 @@ export default function Show({ child }: { child: Child }) {
     const isAdmin = userRoles.some((r: string) => r.toLowerCase().replace(/[\s_]/g, '') === 'admin');
     const canManageHealthlogs = isHealthworker;
     const canViewAiRecommender = isHealthworker || isAdmin;
+    const isOveraged = child.is_over_60_months ?? false;
 
     const getStatusBadgeClass = (status: string | null | undefined) => {
         const s = status || '';
@@ -350,13 +352,20 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Action Buttons */}
                     <div className="fade-in-up mb-6 flex flex-wrap gap-3" style={{ animationDelay: '0.2s' }}>
-                        <button
-                            onClick={() => setShowEditModal(true)}
-                            className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
-                        >
-                            <Edit2 className="h-4 w-4" />
-                            Edit Record
-                        </button>
+                        {isOveraged ? (
+                            <span className="inline-flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                <OctagonAlert className="h-4 w-4" />
+                                Read-only — Overaged
+                            </span>
+                        ) : (
+                            <button
+                                onClick={() => setShowEditModal(true)}
+                                className="action-btn inline-flex cursor-pointer items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg"
+                            >
+                                <Edit2 className="h-4 w-4" />
+                                Edit Record
+                            </button>
+                        )}
 
                         <button
                             onClick={() => setShowExportDialog(true)}
@@ -366,7 +375,7 @@ export default function Show({ child }: { child: Child }) {
                             Export / Print
                         </button>
 
-                        {canManageHealthlogs && (
+                        {canManageHealthlogs && !isOveraged && (
                             <Link href={route('children.healthlogs.create', { child: child.slug })}>
                                 <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                     <Plus className="h-4 w-4" />
@@ -375,26 +384,23 @@ export default function Show({ child }: { child: Child }) {
                             </Link>
                         )}
 
-                        <Link href={route('children.vaccines.index', { child: child.slug })}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
-                                <Syringe className="h-4 w-4" />
-                                Vaccine Tracker
-                            </button>
-                        </Link>
+                        {!isOveraged && (
+                            <>
+                                <Link href={route('children.vaccines.index', { child: child.slug })}>
+                                    <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-purple-600 hover:to-violet-600 hover:shadow-lg">
+                                        <Syringe className="h-4 w-4" />
+                                        Vaccine Tracker
+                                    </button>
+                                </Link>
 
-                        <Link href={route('children.vitamins.index', { child: child.slug })}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-orange-600 hover:to-amber-600 hover:shadow-lg">
-                                <Pill className="h-4 w-4" />
-                                Vitamin Tracker
-                            </button>
-                        </Link>
-
-                        <Link href={route('children.index')}>
-                            <button className="action-btn inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                                <X className="h-4 w-4" />
-                                Back to List
-                            </button>
-                        </Link>
+                                <Link href={route('children.vitamins.index', { child: child.slug })}>
+                                    <button className="action-btn inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-orange-600 hover:to-amber-600 hover:shadow-lg">
+                                        <Pill className="h-4 w-4" />
+                                        Vitamin Tracker
+                                    </button>
+                                </Link>
+                            </>
+                        )}
                     </div>
 
                     {/* Child Details Card */}
@@ -649,7 +655,7 @@ export default function Show({ child }: { child: Child }) {
                                                         )}
                                                     </td>
                                                     <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.user?.name ?? '-'}</td>
-                                                    {canManageHealthlogs && (
+                                                    {canManageHealthlogs && !isOveraged && (
                                                         <td className="px-4 py-3 text-center">
                                                             <div className="flex items-center justify-center gap-2">
                                                                 <button
@@ -859,7 +865,7 @@ export default function Show({ child }: { child: Child }) {
                                 </div>
 
                                 <div className="mt-6 flex gap-2">
-                                    {canManageHealthlogs && (
+                                    {canManageHealthlogs && !isOveraged && (
                                         <Link href={route('healthlogs.edit', { healthlog: selectedLog.id })}>
                                             <button className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
                                                 <Edit2 className="h-4 w-4" />
@@ -888,7 +894,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 h-full max-w-[calc(100vw-2rem)] w-80 bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
+                        className={`fixed top-0 right-0 z-40 h-full w-80 max-w-[calc(100vw-2rem)] bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >
@@ -902,19 +908,21 @@ export default function Show({ child }: { child: Child }) {
                             </button>
                         </div>
 
-                        <form onSubmit={submitNote} className="mb-4">
-                            <textarea
-                                value={newNote}
-                                onChange={(e) => setNewNote(e.target.value)}
-                                className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
-                                rows={3}
-                                placeholder="Add a new note..."
-                            />
-                            <button className="mt-2 inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
-                                <Plus className="h-4 w-4" />
-                                Add Note
-                            </button>
-                        </form>
+                        {!isOveraged && (
+                            <form onSubmit={submitNote} className="mb-4">
+                                <textarea
+                                    value={newNote}
+                                    onChange={(e) => setNewNote(e.target.value)}
+                                    className="w-full rounded-md border border-gray-200 bg-gray-50 p-3 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                                    rows={3}
+                                    placeholder="Add a new note..."
+                                />
+                                <button className="mt-2 inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
+                                    <Plus className="h-4 w-4" />
+                                    Add Note
+                                </button>
+                            </form>
+                        )}
 
                         {child.notes?.length ? (
                             child.notes.map((note) => (
@@ -925,13 +933,15 @@ export default function Show({ child }: { child: Child }) {
                                             ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
                                             : 'N/A'}
                                     </small>
-                                    <button
-                                        className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                                        onClick={() => deleteNote(note.id)}
-                                    >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                        Delete
-                                    </button>
+                                    {!isOveraged && (
+                                        <button
+                                            className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                            onClick={() => deleteNote(note.id)}
+                                        >
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                            Delete
+                                        </button>
+                                    )}
                                 </div>
                             ))
                         ) : (

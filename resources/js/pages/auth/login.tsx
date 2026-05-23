@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { route } from '@/lib/routes';
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface LoginProps {
@@ -18,6 +18,7 @@ interface LoginProps {
 
 export default function Login({ status, canResetPassword, isMaintenanceMode, maintenance }: LoginProps) {
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         login: '',
@@ -90,16 +91,27 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                             {/* Password */}
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Enter your password"
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="current-password"
+                                        placeholder="Enter your password"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                        tabIndex={-1}
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
                                 <InputError message={errors.password} />
                             </div>
 
@@ -122,7 +134,9 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                         </DialogTrigger>
                                         <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl p-6">
                                             <DialogHeader>
-                                                <DialogTitle className="text-xl font-bold text-teal-700 dark:text-teal-400">Terms & Conditions</DialogTitle>
+                                                <DialogTitle className="text-xl font-bold text-teal-700 dark:text-teal-400">
+                                                    Terms & Conditions
+                                                </DialogTitle>
                                             </DialogHeader>
                                             <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
                                                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">1. Acceptance of Terms</h3>

@@ -89,16 +89,16 @@ export default function Create() {
 
                                     {/* Email */}
                                     <div>
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="email">Email (optional)</Label>
                                         <Input
                                             id="email"
                                             type="email"
                                             value={data.email}
                                             onChange={(e) => setData('email', e.target.value)}
-                                            placeholder="Enter email address"
+                                            placeholder="e.g. juan@example.com"
                                             className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
-                                            required
                                         />
+                                        <p className="mt-1 text-xs text-gray-400">Leave empty to use registration code login</p>
                                         {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
                                     </div>
 
@@ -128,8 +128,8 @@ export default function Create() {
                                                 <SelectValue placeholder="Select Role" />
                                             </SelectTrigger>
                                             <SelectContent>
-<SelectItem value="Admin">Admin</SelectItem>
-<SelectItem value="Healthworker">Health Worker</SelectItem>
+                                                <SelectItem value="Admin">Admin</SelectItem>
+                                                <SelectItem value="Healthworker">Health Worker</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {errors.role && <p className="mt-1 text-sm text-destructive">{errors.role}</p>}

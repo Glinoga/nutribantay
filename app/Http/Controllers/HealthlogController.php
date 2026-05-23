@@ -24,6 +24,8 @@ class HealthlogController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         $allHealthLogs = $child->healthlogs()->orderBy('created_at', 'desc')->get();
 
         return Inertia::render('Healthlog/Create', [
@@ -75,6 +77,8 @@ class HealthlogController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $validated = $request->validate([
             'weight' => 'nullable|numeric|min:0',
@@ -172,6 +176,8 @@ class HealthlogController extends Controller
             abort(403);
         }
 
+        $healthlog->child->abortIfOveraged();
+
         return Inertia::render('Healthlog/Edit', [
             'healthlog' => $healthlog->load('child'),
             'child_id' => $healthlog->child_id, // Explicitly pass child_id for reliable navigation
@@ -185,6 +191,8 @@ class HealthlogController extends Controller
         if ($healthlog->child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $healthlog->child->abortIfOveraged();
 
         $validated = $request->validate([
             'weight' => 'nullable|numeric|min:0',
@@ -279,6 +287,8 @@ class HealthlogController extends Controller
         if ($healthlog->child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $healthlog->child->abortIfOveraged();
 
         $childId = $healthlog->child_id;
         $barangay = $healthlog->child->barangay;

@@ -68,6 +68,8 @@ class ChildVitaminController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         $request->validate([
             'vitamin_id' => 'required|exists:vitamins,id',
         ]);
@@ -98,6 +100,8 @@ class ChildVitaminController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
@@ -117,6 +121,8 @@ class ChildVitaminController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         if ($childVitamin->child_id !== $child->id) {
             abort(404);
@@ -165,6 +171,8 @@ class ChildVitaminController extends Controller
             abort(403);
         }
 
+        $child->abortIfOveraged();
+
         if ($childVitamin->child_id !== $child->id) {
             abort(404);
         }
@@ -198,6 +206,8 @@ class ChildVitaminController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         if ($childVitamin->child_id !== $child->id) {
             abort(404);
