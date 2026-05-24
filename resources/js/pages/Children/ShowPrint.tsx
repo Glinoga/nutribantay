@@ -5,6 +5,8 @@ import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
 import { Doughnut, Line } from 'react-chartjs-2';
+import { useEffect } from 'react';
+import { initializeTheme } from '@/hooks/use-appearance';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
@@ -54,6 +56,25 @@ const getStatusColor = (status: string | null) => {
 };
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+    useEffect(() => {
+        const handleBeforePrint = () => {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        };
+
+        const handleAfterPrint = () => {
+            initializeTheme();
+        };
+
+        window.addEventListener('beforeprint', handleBeforePrint);
+        window.addEventListener('afterprint', handleAfterPrint);
+
+        return () => {
+            window.removeEventListener('beforeprint', handleBeforePrint);
+            window.removeEventListener('afterprint', handleAfterPrint);
+        };
+    }, []);
+
     const healthlogs = child.healthlogs || [];
 
     const lineChartData = {
@@ -113,12 +134,14 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
             <Head title={`${child.fullname} - Print`} />
 
             <style>{`
+                @page {
+                    margin: 1.5cm;
+                }
                 @media print {
                     .no-print { display: none !important; }
-                    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
                     table { break-inside: auto; }
                     tr { break-inside: avoid; page-break-inside: avoid; }
-                    .chart-container { break-inside: avoid; }
+                    .chart-container { break-inside: avoid; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
                 }
             `}</style>
 

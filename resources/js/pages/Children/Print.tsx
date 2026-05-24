@@ -3,6 +3,8 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
+import { useEffect } from 'react';
+import { initializeTheme } from '@/hooks/use-appearance';
 
 type Child = {
     id: number;
@@ -38,14 +40,35 @@ const getFilterSummary = (filters: Filters) => {
 };
 
 export default function ChildrenPrint({ children, filters, generated_at }: ChildrenPrintProps) {
+    useEffect(() => {
+        const handleBeforePrint = () => {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        };
+
+        const handleAfterPrint = () => {
+            initializeTheme();
+        };
+
+        window.addEventListener('beforeprint', handleBeforePrint);
+        window.addEventListener('afterprint', handleAfterPrint);
+
+        return () => {
+            window.removeEventListener('beforeprint', handleBeforePrint);
+            window.removeEventListener('afterprint', handleAfterPrint);
+        };
+    }, []);
+
     return (
         <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title="Children Records - Print" />
 
             <style>{`
+                @page {
+                    margin: 1.5cm;
+                }
                 @media print {
                     .no-print { display: none !important; }
-                    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
                     table { break-inside: auto; }
                     tr { break-inside: avoid; page-break-inside: avoid; }
                 }
