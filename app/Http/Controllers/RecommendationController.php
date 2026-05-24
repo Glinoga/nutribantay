@@ -162,28 +162,20 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
     private function generateWithRetry(string $apiKey, string $prompt, int $totalMonths, string $nutritionStatus, string $sex, int $months, float $bmi, string $vitaminAStatus, string $dewormingStatus): string
     {
-        // Skip API calls if no API key configured
         if (empty($apiKey)) {
-            \Log::info('No OpenAI API key configured, using local fallback');
+            \Log::info('No OpenAI API key configured');
 
-            return $this->getLocalFallback(
-                $nutritionStatus,
-                $sex,
-                $totalMonths,
-                $bmi,
-                $vitaminAStatus,
-                $dewormingStatus
-            );
+            return '⚠️ Hindi makagawa ng recommendation dahil walang OpenAI API key.';
         }
 
         $attempts = 0;
         $lastError = null;
         $lastValidationError = null;
+        $lastResponse = null;
 
         while ($attempts <= self::MAX_RETRIES) {
             $attempts++;
 
-            // If not first attempt, add generic warning to retry
             if ($attempts > 1 && $lastValidationError) {
                 $prompt .= "\n\n⚠️ WARNING: Ang nakaraang sagot ay INVALID. Paki-correct ang output ayon sa validation rules!";
             }
@@ -209,8 +201,8 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 }
 
                 $recommendation = $response->json('choices.0.message.content');
+                $lastResponse = $recommendation;
 
-                // Validate the output with age context
                 $validationResult = $this->validateRecommendation($recommendation, $totalMonths);
 
                 if ($validationResult === true) {
@@ -218,6 +210,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 } else {
                     $lastValidationError = $validationResult;
                     $lastError = $validationResult;
+                    \Log::warning('AI validation failed, keeping response as fallback', ['error' => $validationResult]);
                 }
 
             } catch (\Throwable $e) {
@@ -227,17 +220,15 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             }
         }
 
-        // All retries failed - use local fallback
-        \Log::warning("AI recommendation failed after {$attempts} attempts. Using fallback. Last error: {$lastError}");
+        if ($lastResponse) {
+            \Log::warning("AI recommendation failed validation after {$attempts} attempts, returning last AI response. Error: {$lastError}");
 
-        return $this->getLocalFallback(
-            $nutritionStatus,
-            $sex,
-            $totalMonths,
-            $bmi,
-            $vitaminAStatus,
-            $dewormingStatus
-        );
+            return $lastResponse;
+        }
+
+        \Log::error("AI recommendation failed after {$attempts} attempts with no valid response. Error: {$lastError}");
+
+        return '⚠️ Hindi makagawa ng recommendation. Pakisubukan muli mamaya.';
     }
 
     private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, ?string $vitaminA = null, ?string $deworming = null): string
