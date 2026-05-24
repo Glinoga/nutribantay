@@ -65,12 +65,38 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
 
             <style>{`
                 @page {
-                    margin: 1.5cm;
+                    size: A4 landscape;
+                    margin: 1.0cm;
                 }
                 @media print {
+                    body { orphans: 3; widows: 3; }
+                    .min-h-screen { min-height: 0 !important; }
+                    * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    table { break-inside: auto; }
+                    
+                    table { 
+                        break-inside: auto; 
+                        width: 100%;
+                        font-size: 9pt !important;
+                        border-collapse: collapse;
+                    }
+                    thead { display: table-header-group; }
+                    tfoot { display: table-footer-group; }
                     tr { break-inside: avoid; page-break-inside: avoid; }
+                    
+                    th, td {
+                        padding: 4px 6px !important;
+                        white-space: nowrap;
+                    }
+                    
+                    th {
+                        font-size: 8.5pt !important;
+                        font-weight: 600 !important;
+                    }
+                    
+                    td {
+                        font-size: 9pt !important;
+                    }
                 }
             `}</style>
 
