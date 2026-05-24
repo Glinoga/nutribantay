@@ -15,9 +15,11 @@ import {
     AlertTriangle,
     Check,
     ClipboardList,
+    Copy,
     Download,
     Edit2,
     Lightbulb,
+    MessageSquare,
     OctagonAlert,
     Pill,
     Plus,
@@ -754,6 +756,34 @@ export default function Show({ child }: { child: Child }) {
                                 <div className="mt-4 rounded-md bg-white p-4 shadow-inner dark:bg-gray-800">
                                     <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Recommendation:</h3>
                                     <p className="text-sm whitespace-pre-line text-gray-700 dark:text-gray-300">{recommendation}</p>
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(recommendation);
+                                                smartToast.success('Recommendation copied to clipboard');
+                                            }}
+                                            className="inline-flex items-center gap-2 rounded-md border border-teal-300 bg-white px-4 py-2 text-sm font-medium text-teal-700 transition-all hover:bg-teal-50 dark:border-teal-600 dark:bg-gray-700 dark:text-teal-300 dark:hover:bg-gray-600"
+                                        >
+                                            <Copy className="h-4 w-4" />
+                                            Copy
+                                        </button>
+                                        {child.contact_number && (
+                                            <button
+                                                onClick={() =>
+                                                    router.visit(route('sms.index'), {
+                                                        data: {
+                                                            prefilled_child_id: child.id,
+                                                            prefilled_message: recommendation,
+                                                        },
+                                                    })
+                                                }
+                                                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600"
+                                            >
+                                                <MessageSquare className="h-4 w-4" />
+                                                Send via SMS
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>

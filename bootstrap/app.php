@@ -63,7 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
             CheckMaintenanceMode::class,
         ]);
 
-        // 👇 Aliases so you can use them in routes
+        // Aliases so you can use them in routes
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,

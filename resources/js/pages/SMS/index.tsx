@@ -31,11 +31,13 @@ interface User {
 interface SMSPageProps {
     users: User[];
     credits: number;
+    prefilledChildId?: number | null;
+    prefilledMessage?: string | null;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'SMS', href: route('sms.index') }];
 
-export default function SMSIndex({ users, credits }: SMSPageProps) {
+export default function SMSIndex({ users, credits, prefilledChildId, prefilledMessage }: SMSPageProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string; warning?: string } }>().props;
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
     const [recipientType, setRecipientType] = useState<'single' | 'multiple' | 'all'>('multiple');
@@ -57,6 +59,19 @@ export default function SMSIndex({ users, credits }: SMSPageProps) {
             smartToast.info(flash.warning as string);
         }
     }, [flash]);
+
+    useEffect(() => {
+        if (prefilledChildId) {
+            setRecipientType('single');
+            setSelectedUsers([prefilledChildId]);
+            // Clear URL params to prevent re-apply on refresh
+            window.history.replaceState({}, '', route('sms.index'));
+        }
+        if (prefilledMessage) {
+            setMessage(prefilledMessage);
+            setCharacterCount(prefilledMessage.length);
+        }
+    }, []);
 
     const handleRecipientTypeChange = (value: 'single' | 'multiple' | 'all') => {
         setRecipientType(value);

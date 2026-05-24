@@ -16,7 +16,7 @@ class SMSController extends Controller
         $this->smsService = new IprogsmsService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -37,6 +37,21 @@ class SMSController extends Controller
                 ];
             });
 
+        // Validate prefilled child if coming from AI recommendation
+        $prefilledChildId = null;
+        if ($request->filled('prefilled_child_id')) {
+            $child = Child::where('id', $request->prefilled_child_id)
+                ->where('barangay', $user->barangay)
+                ->whereNotNull('contact_number')
+                ->where('contact_number', '!=', '')
+                ->first();
+            if ($child) {
+                $prefilledChildId = (int) $child->id;
+            }
+        }
+
+        $prefilledMessage = $request->input('prefilled_message');
+
         // Get SMS credits
         $credits = 0;
         try {
@@ -51,6 +66,8 @@ class SMSController extends Controller
         return Inertia::render('SMS/index', [
             'users' => $children,
             'credits' => $credits,
+            'prefilledChildId' => $prefilledChildId,
+            'prefilledMessage' => $prefilledMessage,
         ]);
     }
 
