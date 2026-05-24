@@ -24,7 +24,7 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::with(['creator', 'updater'])
+        $query = Child::with(['creator', 'updater', 'latestHealthlog'])
             ->where('barangay', $user->barangay)
             ->where('birthdate', '>=', now()->subMonths(60));
 
@@ -211,6 +211,10 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
+                'latest_weight' => $child->latestHealthlog?->weight,
+                'latest_height' => $child->latestHealthlog?->height,
+                'latest_bmi' => $child->latestHealthlog?->bmi,
+                'latest_nutrition_status' => $child->latestHealthlog?->nutrition_status,
 
                 'creator' => [
                     'name' => $child->creator?->name,
@@ -236,6 +240,7 @@ class ChildController extends Controller
             'sex' => $request->sex,
             'vaccine_status' => $vaccineStatus,
             'vitamin_status' => $vitaminStatus,
+            'view' => $request->query('view', 'card'),
         ]);
     }
 

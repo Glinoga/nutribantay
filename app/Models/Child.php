@@ -134,4 +134,9 @@ class Child extends Model
     {
         return $this->hasMany(HealthLog::class);
     }
+
+    public function latestHealthlog()
+    {
+        return $this->hasOne(HealthLog::class)->latestOfMany();
+    }
 }

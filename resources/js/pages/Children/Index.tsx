@@ -1,5 +1,7 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -17,6 +19,8 @@ import {
     Download,
     Edit2,
     FileSpreadsheet,
+    LayoutGrid,
+    List,
     OctagonAlert,
     Phone,
     Plus,
@@ -51,6 +55,10 @@ type Child = {
     creator?: { name: string | null };
     vaccine_alert?: 'overdue' | 'upcoming' | 'mixed' | null;
     vitamin_alert?: 'overdue' | 'upcoming' | null;
+    latest_weight?: number | null;
+    latest_height?: number | null;
+    latest_bmi?: number | null;
+    latest_nutrition_status?: string | null;
 };
 
 type Pagination = {
@@ -83,6 +91,7 @@ type IndexProps = {
     stats: Stats;
     vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
     vitamin_status?: 'overdue' | 'upcoming' | null;
+    view?: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
@@ -103,6 +112,7 @@ export default function Index({
     stats,
     vaccine_status = null,
     vitamin_status = null,
+    view = 'card',
 }: IndexProps) {
     const { auth } = usePage<AuthProps>().props;
     const [searchQuery, setSearchQuery] = useState(search);
@@ -284,6 +294,7 @@ export default function Index({
         if (activeSex) params.sex = activeSex;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
+        if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -307,6 +318,7 @@ export default function Index({
         if (searchQuery) params.search = searchQuery;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
+        if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -316,6 +328,7 @@ export default function Index({
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
         if (activeVitamin) params.vitamin_status = activeVitamin;
+        if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -325,7 +338,18 @@ export default function Index({
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
         if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
+    };
+
+    const handleViewChange = (newView: 'card' | 'list') => {
+        if (newView === view) return;
+        const params: Record<string, string> = { view: newView };
+        if (searchQuery) params.search = searchQuery;
+        if (activeSex) params.sex = activeSex;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
+        router.get(route('children.index'), params, { replace: true, preserveScroll: true });
     };
 
     const handlePageClick = (page: number) => {
@@ -333,6 +357,7 @@ export default function Index({
         if (activeSex) params.sex = activeSex;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
+        if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
 
@@ -386,6 +411,21 @@ export default function Index({
                 .child-card {
                     animation: slideIn 0.4s ease-out forwards;
                     opacity: 0;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(6px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out;
                 }
 
                 .stat-card {
@@ -530,10 +570,12 @@ export default function Index({
                             </button>
                             {searchQuery && (
                                 <button
-                                    onClick={() => {
-                                        setSearchQuery('');
-                                        router.get(route('children.index'), { search: '', sex: '', vaccine_status: '' }, { replace: true });
-                                    }}
+                                            onClick={() => {
+                                                setSearchQuery('');
+                                                const params: Record<string, string> = { search: '', sex: '', vaccine_status: '' };
+                                                if (view) params.view = view;
+                                                router.get(route('children.index'), params, { replace: true });
+                                            }}
                                     className="absolute top-1/2 right-10 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
                                     <X className="h-4 w-4" />
@@ -541,7 +583,34 @@ export default function Index({
                             )}
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700">
+                                <button
+                                    onClick={() => handleViewChange('card')}
+                                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
+                                        view === 'card'
+                                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
+                                            : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                    }`}
+                                    title="Card view"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                    <span className="hidden sm:inline">Grid</span>
+                                </button>
+                                <button
+                                    onClick={() => handleViewChange('list')}
+                                    className={`flex cursor-pointer items-center gap-1.5 px-3 py-2 text-sm font-medium transition-all ${
+                                        view === 'list'
+                                            ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-sm'
+                                            : 'bg-white text-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                    }`}
+                                    title="List view"
+                                >
+                                    <List className="h-4 w-4" />
+                                    <span className="hidden sm:inline">List</span>
+                                </button>
+                            </div>
+
                             {canExportChildren && (
                                 <button
                                     onClick={() => setShowExportDialog(true)}
@@ -584,11 +653,12 @@ export default function Index({
 
                     <div className="mb-4 flex flex-wrap gap-2">
                         <button
-                            onClick={() => {
-                                const params: Record<string, string> = {};
-                                if (searchQuery) params.search = searchQuery;
-                                router.get(route('children.index'), params, { replace: true });
-                            }}
+                                            onClick={() => {
+                                                const params: Record<string, string> = {};
+                                                if (searchQuery) params.search = searchQuery;
+                                                if (view) params.view = view;
+                                                router.get(route('children.index'), params, { replace: true });
+                                            }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                 !activeSex && !activeVaccine && !activeVitamin
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
@@ -710,10 +780,10 @@ export default function Index({
                             <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No children found</p>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
                         </div>
-                    ) : (
+                    ) : view === 'card' ? (
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {children.map((child, index) => {
-                                const bmi = calculateBMI(child.weight, child.height);
+                                const bmi = child.latest_bmi ?? calculateBMI(child.weight, child.height);
 
                                 return (
                                     <div key={child.id} className="child-card group block" style={{ animationDelay: `${index * 50}ms` }}>
@@ -772,14 +842,14 @@ export default function Index({
                                                         <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
                                                             <Scale className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                                                             <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
-                                                                {child.weight ?? '-'}
+                                                                {child.latest_weight ?? child.weight ?? '-'}
                                                             </p>
                                                             <p className="text-[10px] text-gray-500 dark:text-gray-400">kg</p>
                                                         </div>
                                                         <div className="rounded-md bg-gray-50 p-2 text-center dark:bg-gray-700">
                                                             <Ruler className="mx-auto mb-1 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                                                             <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
-                                                                {child.height ?? '-'}
+                                                                {child.latest_height ?? child.height ?? '-'}
                                                             </p>
                                                             <p className="text-[10px] text-gray-500 dark:text-gray-400">cm</p>
                                                         </div>
@@ -847,6 +917,168 @@ export default function Index({
                                     </div>
                                 );
                             })}
+                        </div>
+                    ) : (
+                        <div key="list" className="animate-fadeIn">
+                            <div className="overflow-x-auto rounded-xl bg-white shadow-md dark:bg-gray-800">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">
+                                            <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Name</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">Sex</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 md:table-cell dark:text-teal-200">Age</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest Wt</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest Ht</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest BMI</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Nutrition</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 xl:table-cell dark:text-teal-200">Contact</TableHead>
+                                            <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Alerts</TableHead>
+                                            <TableHead className="text-right font-semibold text-teal-800 dark:text-teal-200">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {children.map((child) => {
+                                            return (
+                                                <TableRow key={child.id} className="hover:bg-teal-50/50 dark:hover:bg-teal-900/20">
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-3">
+                                                            <div
+                                                                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm ${
+                                                                    child.sex === 'Male'
+                                                                        ? 'bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 dark:from-blue-800 dark:to-blue-700 dark:text-blue-200'
+                                                                        : 'bg-gradient-to-br from-pink-100 to-pink-200 text-pink-700 dark:from-pink-800 dark:to-pink-700 dark:text-pink-200'
+                                                                }`}
+                                                            >
+                                                                {child.fullname.charAt(0).toUpperCase()}
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium text-gray-900 dark:text-gray-50">{child.fullname}</span>
+                                                                <span className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</span>
+                                                                <span className="text-xs text-gray-500 sm:hidden dark:text-gray-400">
+                                                                    {child.sex}
+                                                                    {child.age ? ` · ${child.age}mo` : ''}
+                                                                    {child.contact_number ? ` · ${child.contact_number}` : ''}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 sm:table-cell dark:text-gray-300">
+                                                        {child.sex}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 md:table-cell dark:text-gray-300">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Calendar className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                                                            <span>{calculateAgeFromBirthdate(child.birthdate) ?? child.age ?? '-'} mo</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 lg:table-cell dark:text-gray-300">
+                                                        {child.latest_weight != null ? `${child.latest_weight} kg` : '-'}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 lg:table-cell dark:text-gray-300">
+                                                        {child.latest_height != null ? `${child.latest_height} cm` : '-'}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 lg:table-cell dark:text-gray-300">
+                                                        {child.latest_bmi ?? '-'}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 lg:table-cell dark:text-gray-300">
+                                                        {child.latest_nutrition_status ? (
+                                                            <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-400">
+                                                                {child.latest_nutrition_status}
+                                                            </Badge>
+                                                        ) : (
+                                                            <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-gray-600 xl:table-cell dark:text-gray-300">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Phone className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                                                            <span>{child.contact_number ?? '-'}</span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {(child.vaccine_alert === 'overdue' || child.vaccine_alert === 'mixed') && (
+                                                                <Badge className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+                                                                    <AlertTriangle className="mr-0.5 h-3 w-3" />
+                                                                    Vaccine
+                                                                </Badge>
+                                                            )}
+                                                            {(child.vaccine_alert === 'upcoming' || child.vaccine_alert === 'mixed') && (
+                                                                <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                                                    <Calendar className="mr-0.5 h-3 w-3" />
+                                                                    Due
+                                                                </Badge>
+                                                            )}
+                                                            {child.vitamin_alert === 'overdue' && (
+                                                                <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400">
+                                                                    <AlertTriangle className="mr-0.5 h-3 w-3" />
+                                                                    Vitamin
+                                                                </Badge>
+                                                            )}
+                                                            {child.vitamin_alert === 'upcoming' && (
+                                                                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400">
+                                                                    <Calendar className="mr-0.5 h-3 w-3" />
+                                                                    Vit Due
+                                                                </Badge>
+                                                            )}
+                                                            {!child.vaccine_alert && !child.vitamin_alert && (
+                                                                <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center justify-end gap-1">
+                                                            <Link
+                                                                href={route('children.show', { child: child.slug })}
+                                                            >
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-8 w-8 p-0 text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/30 dark:hover:text-teal-300"
+                                                                >
+                                                                    <Activity className="h-4 w-4" />
+                                                                    <span className="sr-only">View</span>
+                                                                </Button>
+                                                            </Link>
+                                                            {canManageChildren && !child.is_over_60_months && (
+                                                                <>
+                                                                    <Link
+                                                                        href={route('children.edit', { child: child.slug })}
+                                                                    >
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="h-8 w-8 p-0 text-teal-600 hover:bg-teal-50 hover:text-teal-700 dark:text-teal-400 dark:hover:bg-teal-900/30 dark:hover:text-teal-300"
+                                                                        >
+                                                                            <Edit2 className="h-4 w-4" />
+                                                                            <span className="sr-only">Edit</span>
+                                                                        </Button>
+                                                                    </Link>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+                                                                        onClick={() => handleDelete(child)}
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                        <span className="sr-only">Archive</span>
+                                                                    </Button>
+                                                                </>
+                                                            )}
+                                                            {canManageChildren && child.is_over_60_months && (
+                                                                <span className="inline-flex items-center gap-1 rounded bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                                                    <OctagonAlert className="h-3 w-3" />
+                                                                    Read-only
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
                     )}
                 </div>
