@@ -10,7 +10,9 @@ class VaccineController extends Controller
 {
     public function index()
     {
-        $vaccines = Vaccine::withCount('childVaccines')
+        $vaccines = Vaccine::withCount(['childVaccines' => function ($query) {
+            $query->whereHas('child', fn ($q) => $q->where('birthdate', '>=', now()->subMonths(60)));
+        }])
             ->with('creator:id,name')
             ->orderBy('name')
             ->get();

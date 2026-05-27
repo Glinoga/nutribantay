@@ -10,7 +10,9 @@ class VitaminController extends Controller
 {
     public function index()
     {
-        $vitamins = Vitamin::withCount('childVitamins')
+        $vitamins = Vitamin::withCount(['childVitamins' => function ($query) {
+            $query->whereHas('child', fn ($q) => $q->where('birthdate', '>=', now()->subMonths(60)));
+        }])
             ->with('creator:id,name')
             ->orderBy('name')
             ->get();

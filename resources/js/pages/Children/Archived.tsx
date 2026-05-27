@@ -343,7 +343,11 @@ export default function Archived({ deleted, overaged }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} disabled={loading !== null} className="bg-green-600 hover:bg-green-700">
+                        <AlertDialogAction
+                            onClick={() => restoreId && handleRestore(restoreId)}
+                            disabled={loading !== null}
+                            className="bg-green-600 hover:bg-green-700"
+                        >
                             Restore
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -361,7 +365,11 @@ export default function Archived({ deleted, overaged }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} disabled={loading !== null} className="bg-destructive hover:bg-destructive/90">
+                        <AlertDialogAction
+                            onClick={() => deleteId && handleForceDelete(deleteId)}
+                            disabled={loading !== null}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>

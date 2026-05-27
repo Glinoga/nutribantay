@@ -170,7 +170,9 @@ class DashboardController extends Controller
             fputcsv($handle, []);
 
             HealthLog::with(['child', 'user'])
-                ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+                ->whereHas('child', fn ($q) => $q
+                    ->where('barangay', $barangay)
+                    ->where('birthdate', '>=', now()->subMonths(60)))
                 ->whereBetween('created_at', [$range['start'], $range['end']])
                 ->orderBy('created_at', 'desc')
                 ->chunk(200, function ($healthlogs) use ($handle) {
@@ -219,7 +221,9 @@ class DashboardController extends Controller
         $barangay = $user->barangay;
 
         $healthLogs = HealthLog::with(['child', 'user'])
-            ->whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+            ->whereHas('child', fn ($q) => $q
+                ->where('barangay', $barangay)
+                ->where('birthdate', '>=', now()->subMonths(60)))
             ->where('created_at', '>=', $range['start'])
             ->where('created_at', '<=', $range['end'])
             ->latest('created_at')
@@ -230,7 +234,9 @@ class DashboardController extends Controller
         $totalChildren = $healthLogs->count();
 
         // All health logs in period for trend data (count of visits over time)
-        $allLogs = HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay))
+        $allLogs = HealthLog::whereHas('child', fn ($q) => $q
+            ->where('barangay', $barangay)
+            ->where('birthdate', '>=', now()->subMonths(60)))
             ->where('created_at', '>=', $range['start'])
             ->where('created_at', '<=', $range['end'])
             ->get();

@@ -24,7 +24,8 @@ class SMSController extends Controller
         $query = Child::select('id', 'first_name', 'middle_initial', 'last_name', 'contact_number')
             ->whereNotNull('contact_number')
             ->where('contact_number', '!=', '')
-            ->where('barangay', $user->barangay);
+            ->where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60));
 
         $children = $query->get()
             ->map(function ($child) {
@@ -93,7 +94,8 @@ class SMSController extends Controller
             if ($validated['recipient_type'] === 'all') {
                 $query = Child::whereNotNull('contact_number')
                     ->where('contact_number', '!=', '')
-                    ->where('barangay', $user->barangay);
+                    ->where('barangay', $user->barangay)
+                    ->where('birthdate', '>=', now()->subMonths(60));
 
                 $phones = $query->pluck('contact_number')
                     ->toArray();

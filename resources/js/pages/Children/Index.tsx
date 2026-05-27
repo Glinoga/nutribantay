@@ -574,12 +574,12 @@ export default function Index({
                             </button>
                             {searchQuery && (
                                 <button
-                                            onClick={() => {
-                                                setSearchQuery('');
-                                                const params: Record<string, string> = { search: '', sex: '', vaccine_status: '' };
-                                                if (view) params.view = view;
-                                                router.get(route('children.index'), params, { replace: true });
-                                            }}
+                                    onClick={() => {
+                                        setSearchQuery('');
+                                        const params: Record<string, string> = { search: '', sex: '', vaccine_status: '' };
+                                        if (view) params.view = view;
+                                        router.get(route('children.index'), params, { replace: true });
+                                    }}
                                     className="absolute top-1/2 right-10 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                                 >
                                     <X className="h-4 w-4" />
@@ -657,12 +657,12 @@ export default function Index({
 
                     <div className="mb-4 flex flex-wrap gap-2">
                         <button
-                                            onClick={() => {
-                                                const params: Record<string, string> = {};
-                                                if (searchQuery) params.search = searchQuery;
-                                                if (view) params.view = view;
-                                                router.get(route('children.index'), params, { replace: true });
-                                            }}
+                            onClick={() => {
+                                const params: Record<string, string> = {};
+                                if (searchQuery) params.search = searchQuery;
+                                if (view) params.view = view;
+                                router.get(route('children.index'), params, { replace: true });
+                            }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                 !activeSex && !activeVaccine && !activeVitamin
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
@@ -931,11 +931,21 @@ export default function Index({
                                             <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Name</TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">Sex</TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 md:table-cell dark:text-teal-200">Age</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest Wt</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest Ht</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Latest BMI</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">Nutrition</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 xl:table-cell dark:text-teal-200">Contact</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
+                                                Latest Wt
+                                            </TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
+                                                Latest Ht
+                                            </TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
+                                                Latest BMI
+                                            </TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
+                                                Nutrition
+                                            </TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 xl:table-cell dark:text-teal-200">
+                                                Contact
+                                            </TableHead>
                                             <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Alerts</TableHead>
                                             <TableHead className="text-right font-semibold text-teal-800 dark:text-teal-200">Actions</TableHead>
                                         </TableRow>
@@ -1032,9 +1042,7 @@ export default function Index({
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center justify-end gap-1">
-                                                            <Link
-                                                                href={route('children.show', { child: child.slug })}
-                                                            >
+                                                            <Link href={route('children.show', { child: child.slug })}>
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
@@ -1046,9 +1054,7 @@ export default function Index({
                                                             </Link>
                                                             {canManageChildren && !child.is_over_60_months && (
                                                                 <>
-                                                                    <Link
-                                                                        href={route('children.edit', { child: child.slug })}
-                                                                    >
+                                                                    <Link href={route('children.edit', { child: child.slug })}>
                                                                         <Button
                                                                             variant="ghost"
                                                                             size="sm"

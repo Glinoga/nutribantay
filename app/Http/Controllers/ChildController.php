@@ -298,7 +298,8 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::where('barangay', $user->barangay);
+        $query = Child::where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60));
 
         //  Search filter (matches index)
         if ($request->search) {
@@ -380,7 +381,7 @@ class ChildController extends Controller
 
         // Overaged export
         if ($request->type === 'overaged') {
-            $query->where('birthdate', '<=', now()->subMonths(60));
+            $query->where('birthdate', '<', now()->subMonths(60));
         }
 
         return $this->exportCSV($query->cursor());
@@ -830,7 +831,8 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::where('barangay', $user->barangay);
+        $query = Child::where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60));
 
         if ($request->search) {
             $search = $request->search;
@@ -880,7 +882,7 @@ class ChildController extends Controller
 
         // Overaged print
         if ($request->type === 'overaged') {
-            $query->where('birthdate', '<=', now()->subMonths(60));
+            $query->where('birthdate', '<', now()->subMonths(60));
         }
 
         $children = $query->cursor()->map(fn ($child) => [
@@ -915,6 +917,8 @@ class ChildController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $child->load(['healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')]);
 
@@ -966,6 +970,8 @@ class ChildController extends Controller
         if ($child->barangay !== $user->barangay) {
             abort(403);
         }
+
+        $child->abortIfOveraged();
 
         $child->load(['healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')]);
 

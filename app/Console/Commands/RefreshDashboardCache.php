@@ -45,7 +45,8 @@ class RefreshDashboardCache extends Command
         $month = $now->copy()->startOfMonth();
         $year = $now->copy()->startOfYear();
 
-        $childrenQuery = Child::where('barangay', $barangay);
+        $childrenQuery = Child::where('barangay', $barangay)
+            ->where('birthdate', '>=', $now->copy()->subMonths(60));
 
         $totalChildren = $childrenQuery->count();
         $maleCount = (clone $childrenQuery)->where('sex', 'Male')->count();
@@ -80,7 +81,9 @@ class RefreshDashboardCache extends Command
                 ->count(),
         ];
 
-        $healthLogsBase = HealthLog::whereHas('child', fn ($q) => $q->where('barangay', $barangay));
+        $healthLogsBase = HealthLog::whereHas('child', fn ($q) => $q
+            ->where('barangay', $barangay)
+            ->where('birthdate', '>=', $now->copy()->subMonths(60)));
 
         $totalHealthLogs = (clone $healthLogsBase)->count();
         $todayHealthLogs = (clone $healthLogsBase)->whereDate('created_at', $today)->count();
@@ -95,6 +98,7 @@ class RefreshDashboardCache extends Command
             })
             ->join('children', 'hl.child_id', '=', 'children.id')
             ->where('children.barangay', $barangay)
+            ->where('children.birthdate', '>=', $now->copy()->subMonths(60))
             ->select('hl.nutrition_status', 'hl.vitamin_a', 'hl.deworming')
             ->get();
 
