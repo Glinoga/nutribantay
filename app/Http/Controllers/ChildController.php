@@ -654,7 +654,11 @@ class ChildController extends Controller
     public function restore($id)
     {
         $user = auth()->user();
-        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->findOrFail($id);
+        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->find($id);
+
+        if (! $child) {
+            return redirect()->route('children.archived')->with('error', 'Record no longer exists or was already restored.');
+        }
 
         $child->restore();
 
@@ -670,7 +674,11 @@ class ChildController extends Controller
     public function forceDelete($id)
     {
         $user = auth()->user();
-        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->findOrFail($id);
+        $child = Child::onlyTrashed()->where('barangay', $user->barangay)->find($id);
+
+        if (! $child) {
+            return redirect()->route('children.archived')->with('error', 'Record no longer exists or was already deleted.');
+        }
 
         $child->forceDelete();
 

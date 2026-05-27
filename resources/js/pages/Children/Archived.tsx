@@ -67,6 +67,7 @@ export default function Archived({ deleted, overaged }: Props) {
     const [loading, setLoading] = useState<number | null>(null);
 
     const handleRestore = async (id: number) => {
+        if (loading !== null) return;
         setLoading(id);
         try {
             await router.post(route('children.restore', { id }));
@@ -80,6 +81,7 @@ export default function Archived({ deleted, overaged }: Props) {
     };
 
     const handleForceDelete = async (id: number) => {
+        if (loading !== null) return;
         setLoading(id);
         try {
             await router.delete(route('children.forceDelete', { id }));
@@ -93,6 +95,7 @@ export default function Archived({ deleted, overaged }: Props) {
     };
 
     const handleArchive = async (child: OveragedChild) => {
+        if (loading !== null) return;
         setLoading(child.id);
         try {
             await router.delete(route('children.destroy', { child: child.slug ?? child.id }));
@@ -340,7 +343,7 @@ export default function Archived({ deleted, overaged }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} className="bg-green-600 hover:bg-green-700">
+                        <AlertDialogAction onClick={() => restoreId && handleRestore(restoreId)} disabled={loading !== null} className="bg-green-600 hover:bg-green-700">
                             Restore
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -358,7 +361,7 @@ export default function Archived({ deleted, overaged }: Props) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} className="bg-destructive hover:bg-destructive/90">
+                        <AlertDialogAction onClick={() => deleteId && handleForceDelete(deleteId)} disabled={loading !== null} className="bg-destructive hover:bg-destructive/90">
                             Delete Permanently
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -381,6 +384,7 @@ export default function Archived({ deleted, overaged }: Props) {
                                 const child = overaged.find((c) => c.id === archiveId);
                                 if (child) handleArchive(child);
                             }}
+                            disabled={loading !== null}
                             className="bg-destructive hover:bg-destructive/90"
                         >
                             Archive

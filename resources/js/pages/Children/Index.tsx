@@ -137,6 +137,7 @@ export default function Index({
     const [importData, setImportData] = useState<any[]>([]);
     const [isImporting, setIsImporting] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
+    const [archiving, setArchiving] = useState(false);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -233,6 +234,7 @@ export default function Index({
     };
 
     const handleDelete = (child: Child) => {
+        if (archiving) return;
         MySwal.fire({
             ...swalTheme(),
             title: 'Archive Child Record?',
@@ -255,6 +257,7 @@ export default function Index({
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
+                setArchiving(true);
                 router.delete(route('children.destroy', { child: child.slug }), {
                     preserveScroll: true,
                     onSuccess: () => {
@@ -263,6 +266,7 @@ export default function Index({
                     onError: () => {
                         smartToast.error('Failed to archive record. Please try again.');
                     },
+                    onFinish: () => setArchiving(false),
                 });
             }
         });
