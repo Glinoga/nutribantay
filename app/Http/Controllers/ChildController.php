@@ -427,6 +427,7 @@ class ChildController extends Controller
             'weight' => $validated['weight'] ?? null,
             'height' => $validated['height'] ?? null,
             'created_by' => $user->id,
+            'updated_by' => $user->id,
             'barangay' => $user->barangay,
         ]);
 
