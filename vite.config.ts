@@ -17,6 +17,17 @@ export default defineConfig({
         //     formVariants: true,
         // }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('/node_modules/sweetalert2/')) return 'vendor-swal';
+                    if (id.includes('/node_modules/chart.js/')) return 'vendor-chartjs';
+                    if (id.includes('/node_modules/leaflet/')) return 'vendor-leaflet';
+                },
+            },
+        },
+    },
     esbuild: {
         jsx: 'automatic',
     },
