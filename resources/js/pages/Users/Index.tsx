@@ -83,6 +83,10 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [archiveUserId, setArchiveUserId] = useState<number | null>(null);
     const [deleteCodeId, setDeleteCodeId] = useState<number | null>(null);
     const [maintenanceConfirm, setMaintenanceConfirm] = useState(false);
+    const [resetPasswordUserId, setResetPasswordUserId] = useState<number | null>(null);
+    const [resetPasswordResult, setResetPasswordResult] = useState<string | null>(null);
+    const [resetLoading, setResetLoading] = useState(false);
+    const [copiedReset, setCopiedReset] = useState(false);
 
     const stats = useMemo(() => {
         const roles = new Set(users.flatMap((u) => u.roles));
@@ -318,6 +322,19 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             smartToast.error('Failed to archive user.');
         } finally {
             setArchiveUserId(null);
+        }
+    };
+
+    const handleResetPassword = async (userId: number) => {
+        setResetLoading(true);
+        try {
+            const res = await axios.post(route('users.reset-password', { id: userId }));
+            setResetPasswordResult(res.data.password);
+            smartToast.success('Password reset successfully!');
+        } catch (err) {
+            smartToast.error('Failed to reset password.');
+        } finally {
+            setResetLoading(false);
         }
     };
 
@@ -589,6 +606,14 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                                         >
                                                             <Link href={route('users.edit', { user: user.id })}>Edit</Link>
                                                         </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                                                            onClick={() => setResetPasswordUserId(user.id)}
+                                                        >
+                                                            Reset Password
+                                                        </Button>
                                                         <Button size="sm" variant="destructive" onClick={() => setArchiveUserId(user.id)}>
                                                             Archive
                                                         </Button>
@@ -664,6 +689,91 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Reset Password Dialog */}
+            <Dialog
+                open={!!resetPasswordUserId}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setResetPasswordUserId(null);
+                        setResetPasswordResult(null);
+                    }
+                }}
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Reset Password</DialogTitle>
+                        <DialogDescription>
+                            {resetPasswordResult
+                                ? 'The password has been reset successfully. Share the new password with the user.'
+                                : "Are you sure you want to reset this user's password? A new random password will be generated."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {resetPasswordResult ? (
+                        <div className="space-y-4 py-4">
+                            <div className="rounded-md bg-amber-50 p-3 text-sm dark:bg-amber-900/20">
+                                <p className="mb-2 font-medium text-amber-800 dark:text-amber-400">New Password</p>
+                                <div className="flex items-center justify-between gap-2">
+                                    <p className="font-mono text-lg font-bold text-amber-900 dark:text-amber-300">{resetPasswordResult}</p>
+                                    <Button
+                                        size="sm"
+                                        className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                                        onClick={async () => {
+                                            try {
+                                                await navigator.clipboard.writeText(resetPasswordResult);
+                                                setCopiedReset(true);
+                                                setTimeout(() => setCopiedReset(false), 2000);
+                                            } catch (err) {
+                                                console.error('Failed to copy:', err);
+                                            }
+                                        }}
+                                    >
+                                        {copiedReset ? 'Copied!' : 'Copy'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+
+                    <DialogFooter className="gap-2">
+                        {resetPasswordResult ? (
+                            <Button
+                                onClick={() => {
+                                    setResetPasswordUserId(null);
+                                    setResetPasswordResult(null);
+                                }}
+                            >
+                                Done
+                            </Button>
+                        ) : (
+                            <>
+                                <Button variant="outline" onClick={() => setResetPasswordUserId(null)}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                                    disabled={resetLoading}
+                                    onClick={async () => {
+                                        if (resetPasswordUserId) {
+                                            await handleResetPassword(resetPasswordUserId);
+                                        }
+                                    }}
+                                >
+                                    {resetLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Resetting...
+                                        </>
+                                    ) : (
+                                        'Reset Password'
+                                    )}
+                                </Button>
+                            </>
+                        )}
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Maintenance Toggle Confirmation */}
             <AlertDialog open={maintenanceConfirm} onOpenChange={setMaintenanceConfirm}>

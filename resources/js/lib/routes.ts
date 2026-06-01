@@ -103,6 +103,7 @@ export function route(name: string, params?: Record<string, string | number | nu
         'users.forceDelete': '/users/{id}/force-delete',
         'users.approve': '/users/{id}/approve',
         'users.reject': '/users/{id}/reject',
+        'users.reset-password': '/users/{id}/reset-password',
         'users.storeBulk': '/users/store-bulk',
 
         // Admin Database

@@ -115,6 +115,14 @@ export default function Login({ status, canResetPassword, isMaintenanceMode, mai
                                 <InputError message={errors.password} />
                             </div>
 
+                            {canResetPassword && (
+                                <div className="flex justify-end">
+                                    <TextLink href={route('password.request')} className="text-sm">
+                                        Forgot password?
+                                    </TextLink>
+                                </div>
+                            )}
+
                             {/* Terms & Conditions Checkbox */}
                             <div className="flex items-start gap-2">
                                 <input

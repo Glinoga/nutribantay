@@ -7,6 +7,7 @@ use App\Models\User;
 use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -268,6 +269,19 @@ class UserController extends Controller
         $user->forceDelete();
 
         return to_route('users.index')->with('success', 'User permanently deleted.');
+    }
+
+    public function resetPassword(string $id)
+    {
+        $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
+        $password = Str::random(12);
+        $user->password = Hash::make($password);
+        $user->save();
+
+        $admin = auth()->user();
+        Log::info("Password reset for user #{$user->id} ({$user->name}) by admin #{$admin->id} ({$admin->name}): new password = {$password}");
+
+        return response()->json(['password' => $password]);
     }
 
     public function approve(string $id)

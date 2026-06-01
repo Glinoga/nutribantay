@@ -164,6 +164,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
         Route::post('/users/{id}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::post('/users/store-bulk', [UserController::class, 'storeBulk'])->name('users.storeBulk');
 
         Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
