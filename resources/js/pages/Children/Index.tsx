@@ -705,7 +705,7 @@ export default function Index({
                                 aria-pressed={activeVaccine === 'overdue'}
                             >
                                 <AlertTriangle className="h-3.5 w-3.5" />
-                                Overdue ({stats.vaccine_overdue})
+                                Overdue Vaccine({stats.vaccine_overdue})
                             </button>
                         )}
                         {stats.vaccine_upcoming > 0 && (
@@ -719,7 +719,7 @@ export default function Index({
                                 aria-pressed={activeVaccine === 'upcoming'}
                             >
                                 <Calendar className="h-3.5 w-3.5" />
-                                Due Soon ({stats.vaccine_upcoming})
+                                Vaccine Due Soon ({stats.vaccine_upcoming})
                             </button>
                         )}
 
@@ -929,7 +929,7 @@ export default function Index({
                                     <TableHeader>
                                         <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">
                                             <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Name</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">Sex</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">Gender</TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 md:table-cell dark:text-teal-200">Age</TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
                                                 Latest Wt
@@ -1014,19 +1014,19 @@ export default function Index({
                                                             {(child.vaccine_alert === 'overdue' || child.vaccine_alert === 'mixed') && (
                                                                 <Badge className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400">
                                                                     <AlertTriangle className="mr-0.5 h-3 w-3" />
-                                                                    Vaccine
+                                                                    Overdue Vacc
                                                                 </Badge>
                                                             )}
                                                             {(child.vaccine_alert === 'upcoming' || child.vaccine_alert === 'mixed') && (
                                                                 <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400">
                                                                     <Calendar className="mr-0.5 h-3 w-3" />
-                                                                    Due
+                                                                    Vacc Due
                                                                 </Badge>
                                                             )}
                                                             {child.vitamin_alert === 'overdue' && (
                                                                 <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400">
                                                                     <AlertTriangle className="mr-0.5 h-3 w-3" />
-                                                                    Vitamin
+                                                                    Overdue Vit
                                                                 </Badge>
                                                             )}
                                                             {child.vitamin_alert === 'upcoming' && (

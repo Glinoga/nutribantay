@@ -31,3 +31,4 @@ BRANCH_INIT.md
 AGENTS.md   
 *.md
 /.opencode
+vite-output.log

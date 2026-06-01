@@ -275,7 +275,7 @@
         <div class="bg-decoration bg-decoration-2"></div>
         <div class="card">
             <a href="/" class="logo" aria-label="Go to NutriBantay Home">
-                <img src="/NutriBantay Logo.svg" alt="NutriBantay logo">
+                <img src="/NutriBantayLogo.svg" alt="NutriBantay logo">
                 <span class="logo-text">NutriBantay</span>
             </a>
 

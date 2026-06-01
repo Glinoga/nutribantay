@@ -21,7 +21,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                     * {
                         font-family: inherit;
                     }
-                    
+
                     @theme {
                         --inset-shadow-sm: inset 0 0 7px 0 hsla(178 100% 95% 1);
                     }
@@ -48,15 +48,13 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                         --radius-md: 1.25rem;
                         --radius-lg: 100%;
 
-                        
-                        
                         /* Additional modern design variables */
                         --box-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
                         --box-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
                         --box-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
                         --transition-standard: all 0.3s ease;
                     }
-                    
+
                     /* Additional global styles */
                     .card-hover {
                         transition: var(--transition-standard);
@@ -89,7 +87,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
                                 <Link href="/" className="flex items-center gap-2">
-                                    <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
+                                    <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
                                     <span className="gradient-text text-xl font-bold md:text-2xl">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
@@ -186,7 +184,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-3">
                             <div>
                                 <div className="mb-3 flex items-center gap-3">
-                                    <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="40" height="40" className="h-10 w-auto" />
+                                    <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-10 w-auto" />
                                     <h3 className="gradient-text text-2xl font-bold">NutriBantay</h3>
                                 </div>
                                 <div className="section-divider"></div>
@@ -338,7 +336,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                             </div>
                         </div>
                         <div className="border-t border-[var(--border-muted)] pt-8 text-center">
-                            <p className="text-sm text-[var(--text-muted)]">© {new Date().getFullYear()} NutriBantay. All rights reserved.</p>
+                            <p className="text-sm text-[var(--text-muted)]">&copy; {new Date().getFullYear()} NutriBantay. All rights reserved.</p>
                         </div>
                     </div>
                 </footer>

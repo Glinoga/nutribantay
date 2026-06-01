@@ -48,11 +48,9 @@ export default function Welcome() {
                 className="relative flex min-h-screen flex-col items-center overflow-hidden bg-gradient-to-br from-[hsl(178,100%,98%)] via-[hsl(178,61%,92%)] to-[hsl(178,36%,87%)] p-6 lg:justify-center lg:p-8"
                 style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-                {/* Radial Overlay */}
                 <div className="pointer-events-none absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-[hsl(180,100%,8%)] opacity-[0.03] blur-3xl"></div>
                 <div className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-[hsl(180,80%,30%)] opacity-[0.03] blur-3xl"></div>
 
-                {/* Glassmorphic Nav */}
                 <header className="animate-fade-in-up fixed top-4 z-50 w-full max-w-[335px] lg:max-w-4xl" style={{ animationDelay: '0.1s' }}>
                     <nav className="glass-card flex items-center justify-between gap-4 rounded-full px-6 py-2.5 shadow-lg">
                         <Link
@@ -91,14 +89,13 @@ export default function Welcome() {
 
                 <div className="hidden h-14.5 lg:block"></div>
 
-                {/* Hero Section */}
                 <section className="animate-fade-in-up m-8 w-full max-w-2xl text-center" style={{ animationDelay: '0.3s' }}>
                     <span className="mb-3 inline-block rounded-full bg-white/80 px-4 py-1 text-xs font-medium text-[hsl(180,100%,8%)] shadow-sm backdrop-blur-sm">
                         WELCOME
                     </span>
                     <h1 className="mb-2 text-3xl font-bold md:text-4xl">
                         <div className="flex items-center justify-center gap-3">
-                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="56" height="56" className="h-10 w-auto md:h-14" />
+                            <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="56" height="56" className="h-10 w-auto md:h-14" />
                             <span className="gradient-text">NutriBantay</span>
                         </div>
                     </h1>
@@ -110,11 +107,9 @@ export default function Welcome() {
                     </div>
                 </section>
 
-                {/* Highlights Section */}
                 <section className="animate-fade-in-up mb-8 w-full max-w-4xl" style={{ animationDelay: '0.5s' }}>
                     <h3 className="mb-8 text-center text-xl font-semibold text-[hsl(181,100%,2%)]">Barangay Highlights</h3>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                        {/* Health Center */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
                                 <svg
@@ -134,7 +129,6 @@ export default function Welcome() {
                             <p className="mt-2 text-xs text-[hsl(179,40%,22%)]/70">Phase 3 Bagong Silang</p>
                         </div>
 
-                        {/* Community Hall */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
                                 <svg
@@ -155,7 +149,6 @@ export default function Welcome() {
                             <p className="mt-2 text-xs text-[hsl(179,40%,22%)]/70">Barangay Center</p>
                         </div>
 
-                        {/* Playground */}
                         <div className="card-hover glass-card flex flex-col items-center rounded-2xl p-8 text-center">
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(180,100%,8%)] text-white">
                                 <svg

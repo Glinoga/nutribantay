@@ -5,7 +5,6 @@ import { Link } from '@inertiajs/react';
 import { Activity, ArrowRight, Baby, Check, Share2, Users } from 'lucide-react';
 import { useState } from 'react';
 
-// Define interface for the announcements
 interface Category {
     id: number;
     name: string;
@@ -33,7 +32,6 @@ interface HomeProps {
     maintenance?: string | null;
 }
 
-// get color class based on category
 function getCategoryColorClass(categoryColor: string) {
     const colorMap: Record<string, string> = {
         primary: 'bg-[var(--primary)]',
@@ -82,7 +80,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 }
             `}</style>
 
-            {/* Maintenance Message Banner */}
             {maintenance && (
                 <div
                     className="mb-8 border-l-4 border-red-500 bg-red-100 p-4 text-red-800 dark:border-red-700 dark:bg-red-900/20 dark:text-red-300"
@@ -100,7 +97,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                     </div>
                 </div>
             )}
-            {/* Hero Section */}
             <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-20 md:pt-32 md:pb-24">
                 <div className="absolute top-0 right-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +111,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 <div className="container mx-auto px-6 text-center lg:px-8">
                     <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
                         <div className="flex items-center justify-center gap-4">
-                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="64" height="64" className="h-10 w-auto md:h-14 lg:h-16" />
+                            <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="64" height="64" className="h-10 w-auto md:h-14 lg:h-16" />
                             <span className="gradient-text">NutriBantay</span>
                         </div>
                     </h1>
@@ -132,7 +128,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                         </a>
                     </div>
 
-                    {/* Floating Health Stats Cards */}
                     <div className="relative mx-auto mt-16 max-w-5xl">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
@@ -161,7 +156,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 </div>
             </section>
 
-            {/* Announcements Preview Section */}
             <section id="announcements" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mb-12 flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -246,7 +240,6 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 </div>
             </section>
 
-            {/* Call to Action Section */}
             <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 dark:to-gray-900">
                 <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20 dark:bg-teal-400 dark:opacity-30" />
                 <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20 dark:bg-cyan-400 dark:opacity-30" />

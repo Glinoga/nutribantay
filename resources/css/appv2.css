@@ -5,6 +5,8 @@
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+@custom-variant dark (&:is(.dark *));
+
 body {
     font-family: var(--font-sans);
 }
@@ -67,7 +69,8 @@ body {
     --shadows-inner: inset 7px 0 0 0 okclh(var(--highlight));
 }
 
-.dark {
+.dark,
+html[data-theme="dark"] {
     --bg-dark: hsl(180 100% 1%);
     --bg: hsl(179 96% 3%);
     --bg-light: hsl(179 58% 6%);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark']) data-theme="{{ ($appearance ?? 'system') === 'dark' ? 'dark' : (($appearance ?? 'system') === 'light' ? 'light' : '') }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,13 +8,20 @@
         <script>
             (function() {
                 const appearance = '{{ $appearance ?? "system" }}';
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
                 if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
                     if (prefersDark) {
                         document.documentElement.classList.add('dark');
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        document.documentElement.setAttribute('data-theme', 'light');
                     }
+                } else if (appearance === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
                 }
             })();
         </script>
@@ -25,7 +32,8 @@
                 background-color: var(--bg-light);
             }
 
-            html.dark {
+            html.dark,
+            html[data-theme="dark"] {
                 background-color: var(--bg-dark);
             }
         </style>
