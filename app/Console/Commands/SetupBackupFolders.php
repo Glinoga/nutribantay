@@ -29,6 +29,7 @@ class SetupBackupFolders extends Command
             storage_path('app/Laravel'),
             storage_path('app/backup-temp'),
             storage_path('app/restore-temp'),
+            storage_path('app/NutriBantay'),
         ];
 
         foreach ($folders as $folder) {

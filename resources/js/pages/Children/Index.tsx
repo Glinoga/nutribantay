@@ -929,7 +929,9 @@ export default function Index({
                                     <TableHeader>
                                         <TableRow className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/30 dark:to-cyan-900/30">
                                             <TableHead className="font-semibold text-teal-800 dark:text-teal-200">Name</TableHead>
-                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">Gender</TableHead>
+                                            <TableHead className="hidden font-semibold text-teal-800 sm:table-cell dark:text-teal-200">
+                                                Gender
+                                            </TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 md:table-cell dark:text-teal-200">Age</TableHead>
                                             <TableHead className="hidden font-semibold text-teal-800 lg:table-cell dark:text-teal-200">
                                                 Latest Wt

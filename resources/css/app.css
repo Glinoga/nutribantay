@@ -105,7 +105,7 @@
 }
 
 .dark,
-html[data-theme="dark"] {
+html[data-theme='dark'] {
     --background: oklch(0.2 0.02 190);
     --foreground: oklch(0.95 0.005 190);
     --card: oklch(0.22 0.02 190);

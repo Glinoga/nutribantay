@@ -70,7 +70,7 @@ body {
 }
 
 .dark,
-html[data-theme="dark"] {
+html[data-theme='dark'] {
     --bg-dark: hsl(180 100% 1%);
     --bg: hsl(179 96% 3%);
     --bg-light: hsl(179 58% 6%);

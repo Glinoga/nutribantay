@@ -67,7 +67,7 @@ return [
         /*
          * The database dump can be compressed to decrease diskspace usage.
          */
-        'database_dump_compressor' => 'gzip',
+        'database_dump_compressor' => null,
 
         /*
          * If specified, the backup zip file will be encrypted with the given password.
