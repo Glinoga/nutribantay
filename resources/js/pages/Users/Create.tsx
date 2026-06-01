@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+﻿import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,8 +33,8 @@ export default function Create() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
 
-            <div className="min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)]" />
+            <div className="relative min-h-screen bg-gradient-to-br from-teal-50/50 via-white to-cyan-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.12),transparent_50%)] pointer-events-none" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     {/* Pill Badge */}
@@ -79,7 +79,7 @@ export default function Create() {
                                             id="name"
                                             type="text"
                                             value={data.name}
-                                            onChange={(e) => setData('name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
+                                            onChange={(e) => setData('name', e.target.value.replace(/[^a-zA-ZÃ±Ã‘\s'-.]/g, ''))}
                                             placeholder="Enter full name"
                                             className="border transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
                                             required
@@ -183,3 +183,5 @@ export default function Create() {
         </AppLayout>
     );
 }
+
+

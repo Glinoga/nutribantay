@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 set -euo pipefail
 
 # ============================================================
@@ -41,9 +41,16 @@ sudo supervisorctl restart nutribantay-ssr:*
 sudo supervisorctl restart nutribantay-queue-default:*
 sudo supervisorctl restart nutribantay-queue-dashboard:*
 
-echo "==> 3. Clearing opcache and Laravel caches..."
+echo "==> 3. Ensuring Laravel scheduler cron job exists..."
+SCHEDULE_CRON="* * * * * cd $(pwd) && php artisan schedule:run >> /dev/null 2>&1"
+(crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "$SCHEDULE_CRON") | crontab -
+echo "  Scheduler cron added/verified."
+
+echo "==> 4. Clearing opcache and Laravel caches..."
 php8.3 artisan optimize:clear || php artisan optimize:clear || true
 
 echo ""
 echo "==> DONE! Run PageSpeed Insights at https://pagespeed.web.dev"
 echo "    Baseline: Mobile 49, Desktop 89"
+
+

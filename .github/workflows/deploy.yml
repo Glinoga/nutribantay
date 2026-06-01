@@ -1,4 +1,4 @@
-name: Deploy to KVM 2 VPS
+﻿name: Deploy to KVM 2 VPS
 
 on:
   push:
@@ -59,6 +59,10 @@ jobs:
             php artisan view:cache
             php artisan queue:restart
             test -L public/storage || ln -s storage/app/public public/storage
+            php artisan schedule:run
+            # Ensure scheduler cron job exists (idempotent)
+            (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd ${{ secrets.VPS_DEPLOY_PATH }} && php artisan schedule:run >> /dev/null 2>&1") | crontab -
             sudo supervisorctl reread
             sudo supervisorctl update
             sudo supervisorctl start all
+
