@@ -59,9 +59,12 @@ jobs:
             php artisan view:cache
             php artisan queue:restart
             test -L public/storage || ln -s storage/app/public public/storage
-            php artisan schedule:run
-            # Ensure scheduler cron job exists (idempotent)
-            (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd ${{ secrets.VPS_DEPLOY_PATH }} && php artisan schedule:run >> /dev/null 2>&1") | crontab -
+            # Run due scheduled tasks once during deploy
+            php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
+            # Persistent cron job — runs every minute, logs errors for debugging
+            PHP_BIN=$(command -v php)
+            SCHED_LOG='${{ secrets.VPS_DEPLOY_PATH }}/storage/logs/scheduler.log'
+            (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab -
             sudo supervisorctl reread
             sudo supervisorctl update
             sudo supervisorctl start all
