@@ -14,16 +14,9 @@ class CheckMaintenanceMode
         $maintenance = Setting::get('maintenance_mode', '0') === '1';
 
         // Whitelisted routes that can always be accessed (including home/landing)
-        $whitelist = [
-            '/',
-            'home',
-            'login',
-            'logout',
-            'forgot-password',
-            'reset-password/*',
-            'announcements',
-            'contact',
-        ];
+        $whitelist = config('maintenance.whitelist', [
+            '/', 'home', 'login', 'logout', 'forgot-password', 'reset-password/*',
+        ]);
 
         // Check if current route matches whitelist
         foreach ($whitelist as $path) {

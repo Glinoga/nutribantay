@@ -29,6 +29,7 @@ type ChildrenPrintProps = {
     children: Child[];
     filters: Filters;
     generated_at: string;
+    type?: string;
 };
 
 const getFilterSummary = (filters: Filters) => {
@@ -39,7 +40,7 @@ const getFilterSummary = (filters: Filters) => {
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
-export default function ChildrenPrint({ children, filters, generated_at }: ChildrenPrintProps) {
+export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
     useEffect(() => {
         const handleBeforePrint = () => {
             document.documentElement.classList.remove('dark');
@@ -108,10 +109,10 @@ export default function ChildrenPrint({ children, filters, generated_at }: Child
                     <Printer className="mr-2 h-4 w-4" />
                     Print
                 </Button>
-                <Link href={route('children.index')}>
+                <Link href={type === 'overaged' ? route('children.archived') : route('children.index')}>
                     <Button variant="outline" className="cursor-pointer border-cyan-300 dark:border-cyan-700">
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Children
+                        {type === 'overaged' ? 'Back to Archived' : 'Back to Children'}
                     </Button>
                 </Link>
             </div>

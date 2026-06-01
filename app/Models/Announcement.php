@@ -33,7 +33,7 @@ class Announcement extends Model
                 $slug = $base;
                 $counter = 1;
 
-                while (static::where('slug', $slug)->exists()) {
+                while (static::withTrashed()->where('slug', $slug)->exists()) {
                     $slug = $base.'-'.++$counter;
                 }
 

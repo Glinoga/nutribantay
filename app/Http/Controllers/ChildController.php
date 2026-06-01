@@ -298,8 +298,7 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::where('barangay', $user->barangay)
-            ->where('birthdate', '>=', now()->subMonths(60));
+        $query = Child::where('barangay', $user->barangay);
 
         //  Search filter (matches index)
         if ($request->search) {
@@ -381,7 +380,10 @@ class ChildController extends Controller
 
         // Overaged export
         if ($request->type === 'overaged') {
-            $query->where('birthdate', '<', now()->subMonths(60));
+            $query->where('birthdate', '<=', now()->subMonths(60))
+                ->whereNull('deleted_at');
+        } else {
+            $query->where('birthdate', '>', now()->subMonths(60));
         }
 
         return $this->exportCSV($query->cursor());
@@ -832,8 +834,7 @@ class ChildController extends Controller
         $user = auth()->user();
         $now = Carbon::now();
 
-        $query = Child::where('barangay', $user->barangay)
-            ->where('birthdate', '>=', now()->subMonths(60));
+        $query = Child::where('barangay', $user->barangay);
 
         if ($request->search) {
             $search = $request->search;
@@ -883,7 +884,10 @@ class ChildController extends Controller
 
         // Overaged print
         if ($request->type === 'overaged') {
-            $query->where('birthdate', '<', now()->subMonths(60));
+            $query->where('birthdate', '<=', now()->subMonths(60))
+                ->whereNull('deleted_at');
+        } else {
+            $query->where('birthdate', '>', now()->subMonths(60));
         }
 
         $children = $query->cursor()->map(fn ($child) => [
@@ -905,6 +909,7 @@ class ChildController extends Controller
             'children' => $children,
             'filters' => $request->only(['search', 'sex', 'vaccine_status']),
             'generated_at' => now()->format('Y-m-d H:i:s'),
+            'type' => $request->type,
         ]);
     }
 
