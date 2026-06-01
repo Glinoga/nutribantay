@@ -115,7 +115,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 <div className="container mx-auto px-6 text-center lg:px-8">
                     <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
                         <div className="flex items-center justify-center gap-4">
-                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" className="h-10 w-auto md:h-14 lg:h-16" />
+                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="64" height="64" className="h-10 w-auto md:h-14 lg:h-16" />
                             <span className="gradient-text">NutriBantay</span>
                         </div>
                     </h1>

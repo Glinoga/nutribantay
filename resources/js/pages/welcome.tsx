@@ -98,7 +98,7 @@ export default function Welcome() {
                     </span>
                     <h1 className="mb-2 text-3xl font-bold md:text-4xl">
                         <div className="flex items-center justify-center gap-3">
-                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" className="h-10 w-auto md:h-14" />
+                            <img src="/NutriBantay Logo.svg" alt="NutriBantay" width="56" height="56" className="h-10 w-auto md:h-14" />
                             <span className="gradient-text">NutriBantay</span>
                         </div>
                     </h1>

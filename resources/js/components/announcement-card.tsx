@@ -76,6 +76,8 @@ export default function AnnouncementCard({
                     <img
                         src={`/storage/${announcement.image}`}
                         alt={announcement.title}
+                        width="400"
+                        height="192"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                     />
