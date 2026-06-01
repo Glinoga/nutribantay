@@ -64,8 +64,15 @@ export const readExcel = async (file: File) => {
                 lastName = fullName.substring(0, commaIndex).trim();
                 const givenPart = fullName.substring(commaIndex + 2).trim();
                 const givenParts = givenPart.split(' ');
-                firstName = givenParts[0] || '';
-                middleInitial = givenParts.slice(1).join(' ') || null;
+                const lastWord = givenParts[givenParts.length - 1] || '';
+                const cleaned = lastWord.replace('.', '');
+                if (cleaned.length >= 1 && cleaned.length <= 3) {
+                    middleInitial = cleaned.toUpperCase();
+                    firstName = givenParts.slice(0, -1).join(' ') || '';
+                } else {
+                    firstName = givenPart;
+                    middleInitial = null;
+                }
             } else {
                 const nameParts = fullName.split(' ');
                 lastName = nameParts[0] || '';
