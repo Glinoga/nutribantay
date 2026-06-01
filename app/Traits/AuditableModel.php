@@ -15,7 +15,7 @@ trait AuditableModel
             $model->auditCreated();
         });
 
-        static::updated(function ($model) {
+        static::updating(function ($model) {
             $model->auditUpdated();
         });
 
