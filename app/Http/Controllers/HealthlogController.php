@@ -122,7 +122,9 @@ class HealthlogController extends Controller
                 $evaluation['overall'],
                 $child->sex,
                 $evaluation['age_months'],
-                $evaluation['bmi']
+                $evaluation['bmi'],
+                ! empty($validated['vitamin_a']) ? 'Yes' : 'No',
+                ! empty($validated['deworming']) ? 'Yes' : 'No',
             );
         }
 
@@ -233,7 +235,9 @@ class HealthlogController extends Controller
                 $evaluation['overall'],
                 $child->sex,
                 $evaluation['age_months'],
-                $evaluation['bmi']
+                $evaluation['bmi'],
+                ! empty($validated['vitamin_a']) ? 'Yes' : 'No',
+                ! empty($validated['deworming']) ? 'Yes' : 'No',
             );
         }
 

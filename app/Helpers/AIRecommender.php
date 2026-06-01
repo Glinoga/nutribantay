@@ -20,8 +20,8 @@ class AIRecommender
 
         $mealPlan = self::generateMealPlan($ageMonths);
 
-        // Personalized recommendations (age-aware)
-        $supplements = self::getSupplementRecommendations($vitaminA, $deworming, $ageMonths);
+        // Enhanced vitamins and nutrients based on health assessment
+        $vitamins = self::getSupplementRecommendations($vitaminA, $deworming, $ageMonths, $status);
 
         $output = "MGA NUTRITIOUS NA TIP:\n";
         foreach ($tips as $index => $tip) {
@@ -33,8 +33,8 @@ class AIRecommender
         $output .= 'Tanghali: '.$mealPlan['afternoon']."\n";
         $output .= 'Gabi: '.$mealPlan['evening']."\n";
 
-        if (! empty($supplements)) {
-            $output .= "\nMGA SUPPLEMENTS:\n".$supplements."\n";
+        if (! empty($vitamins)) {
+            $output .= "\nMGA VITAMIN AT NUTRIENTS:\n".$vitamins."\n";
         }
 
         $output .= "\nMGA RESTRICTIONS SA PAGKAIN:\n";
@@ -217,18 +217,70 @@ class AIRecommender
         ];
     }
 
-    private static function getSupplementRecommendations(?string $vitaminA, ?string $deworming, int $ageMonths): string
+    private static function getSupplementRecommendations(?string $vitaminA, ?string $deworming, int $ageMonths, string $status): string
     {
         $recommendations = [];
+        $isSevere = str_starts_with($status, 'Severely ');
+        $baseStatus = $isSevere ? substr($status, 9) : $status;
 
-        // Vitamin A: WHO recommends for 6-59 months (6+ months)
+        // Universal: Vitamin A for all 6+ months (if not yet given)
         if ($ageMonths >= 6 && ($vitaminA === 'No' || $vitaminA === null)) {
-            $recommendations[] = 'Kumuha ng Vitamin A capsule mula sa health center - importante para sa mata at immune system.';
+            $dose = $ageMonths < 12 ? '100,000 IU' : '200,000 IU';
+            $recommendations[] = "Vitamin A ({$dose}) — kunin sa health center tuwing 6 na buwan. Mahalaga para sa immune system at paningin.";
         }
 
-        // Deworming: WHO recommends for 12+ months (12+ months)
+        // Universal: Deworming for all 12+ months (if not yet given)
         if ($ageMonths >= 12 && ($deworming === 'No' || $deworming === null)) {
-            $recommendations[] = 'Deworming tablets dapat kumuha sa health center taun-taon para maiwasan ang worm infection.';
+            $recommendations[] = 'Deworming (Albendazole o Mebendazole) — inumin tuwing 6 na buwan. Mahalaga para maiwasan ang worm infection na nagdudulot ng malnutrisyon.';
+        }
+
+        // Status-specific vitamins and nutrients
+        switch ($baseStatus) {
+            case 'Underweight':
+                if ($ageMonths >= 6) {
+                    $recommendations[] = 'Iron (Ferrous Sulfate drops) — 1 patak/kg araw-araw sa loob ng 60 araw. Mahalaga para sa red blood cells at dagdag energy.';
+                }
+                $recommendations[] = 'Zinc — tumutulong sa gana kumain at tamang paglaki. Bigyan ng zinc-rich foods tulad ng isda, manok, at itlog.';
+                $recommendations[] = 'Multivitamins — para sa pangkalahatang kalusugan at dagdag na nutrients.';
+                $recommendations[] = 'High-protein foods — isama ang itlog, isda, manok, at monggo sa araw-araw para sa weight gain.';
+                break;
+
+            case 'Stunted':
+                $recommendations[] = 'Zinc — pinakamahalaga para sa linear growth at height development. Bigyan ng shellfish, karne, at itlog.';
+                if ($ageMonths >= 6) {
+                    $recommendations[] = 'Iron (Ferrous Sulfate drops) — 1 patak/kg araw-araw sa loob ng 60 araw. Mahalaga para sa overall development.';
+                }
+                $recommendations[] = 'Calcium — para sa buto. Magdagdag ng maliliit na isda (dilis), gatas, at dark green leafy vegetables.';
+                $recommendations[] = 'Vitamin D — tumutulong sa calcium absorption. Maglaro sa araw (maaga sa umaga) ng 10-15 minuto.';
+                break;
+
+            case 'Wasted':
+                $recommendations[] = 'Iron (Ferrous Sulfate drops) — 1 patak/kg araw-araw. Kritikal para sa malnutrisyon recovery.';
+                $recommendations[] = 'Zinc — mahalaga para sa immune system at paghilom ng tissue.';
+                $recommendations[] = 'Multivitamins — agarang nutritional support para sa severe malnutrition.';
+                $recommendations[] = 'High-energy therapeutic foods — kumunsulta sa health center para sa ready-to-use therapeutic foods (RUTF).';
+                $recommendations[] = '⚠️ KAILANGAN NG MEDICAL CONSULTATION — dalhin agad sa health center o doctor para sa tamang assessment at treatment.';
+                break;
+
+            case 'Overweight':
+            case 'Obese':
+                $recommendations[] = 'Vitamin B complex — tumutulong sa metabolism ng carbohydrates, protina, at taba.';
+                $recommendations[] = 'Fiber — magdagdag ng prutas, gulay, at whole grains para sa digestion at pagkabusog.';
+                $recommendations[] = 'Limitahan ang matatamis na pagkain, soft drinks, at processed foods.';
+                $recommendations[] = 'Hikayatin ang regular na pisikal na aktibidad — paglalaro sa labas, pagtakbo, at iba pa.';
+                break;
+
+            default: // Normal
+                if ($ageMonths >= 6) {
+                    $recommendations[] = 'Iron (Ferrous Sulfate drops) — 1 patak/kg araw-araw sa loob ng 60 araw bilang maintenance.';
+                }
+                $recommendations[] = 'Patuloy ang balanced diet na may prutas, gulay, protina, at carbohydrates.';
+                break;
+        }
+
+        // Severe case additional note
+        if ($isSevere && $baseStatus !== 'Wasted') {
+            $recommendations[] = '⚠️ KAILANGAN NG MEDICAL CONSULTATION — dalhin sa pinakamalapit na health center o doctor para sa tamang assessment.';
         }
 
         return implode("\n", $recommendations);

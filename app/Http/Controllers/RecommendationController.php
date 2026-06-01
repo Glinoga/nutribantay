@@ -137,6 +137,27 @@ NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - SUNUGIN LAMANG):
 - Dalas: 4-5 beses isang araw + 2 meryenda
 - Pagkain: Regular solid foods - sundin ang 12-23 months guidelines
 
+VITAMINS AND NUTRIENTS REFERENCE (AYON SA NUTRITION STATUS):
+=====================================================================
+Gamitin ang reference na ito para sa 3. Mga Vitamin, Supplements, at Nutrients section:
+
+LAHAT NG BATA (6-59 months):
+- Vitamin A: Tuwing 6 na buwan (6-11mo: 100,000 IU, 12-59mo: 200,000 IU)
+- Deworming: Tuwing 6 na buwan simula 12 months (Albendazole o Mebendazole)
+- Iron (Ferrous Sulfate drops): 1 patak/kg araw-araw sa loob ng 60 araw (simula 6 months)
+
+BATAY SA NUTRITION STATUS:
+- Underweight: Iron (+), Zinc (gana kumain at paglaki), Multivitamins, High-protein foods
+- Stunted: Zinc (linear growth), Iron, Calcium (buto), Vitamin D (sun exposure)
+- Wasted: Iron, Zinc, Multivitamins, Therapeutic foods (RUTF), MEDICAL CONSULTATION
+- Overweight/Obese: Vitamin B complex (metabolism), Fiber (digestion), limitahan asukal/taba
+- Normal: Iron (maintenance), patuloy ang balanced diet
+
+BAWAT RECOMMENDATION AY DAPAT:
+a) Tukuyin ang SPECIFIC nutrient/vitamin (hindi lang pangkalahatan)
+b) Ipaliwanag kung BAKIT ito kailangan para sa bata
+c) Banggitin ang PAGKUKUNAN (dietary sources) kung maaari
+
 STRICT RULES:
 1. **Bawat meal AY ISANG PAGKAIN LAMANG** sa listahan - HUWAG COMBINE
 2. **HUWAG UMIULIT NG PAGKAIN SA SAME DAY** - iba dapat bawat meal (Umaga/Tanghali/Gabi)
@@ -144,6 +165,7 @@ STRICT RULES:
 4. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
 5. **Bawal ang pagkain na wala sa listahan**
 6. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
+7. **Vitamins/nutrients ay dapat naaayon sa Nutrition Status ng bata** - hindi lahat ay pare-pareho ang kailangan
 
 OUTPUT FORMAT:
 1. Mga Nutrition Tips (3-4 items)
@@ -151,7 +173,7 @@ OUTPUT FORMAT:
    - Umaga: [isang pagkain sa listahan]
    - Tanghali: [isang pagkain sa listahan - DI IULIT]
    - Gabi: [isang pagkain sa listahan - DI IULIT]
-3. Mga Vitamin/Supplements (ayon sa status)
+3. Mga Vitamin, Supplements, at Nutrients (ayon sa health assessment ng bata)
 4. Food Restrictions
 5. Disclaimer
 6. Pinagkuhanan ng Datos: National Nutrition Council
