@@ -32,7 +32,7 @@ jobs:
       - name: Build frontend
         run: |
           npm ci
-          npm run build
+          npm run build:ssr
 
       - name: Deploy to VPS via rsync
         uses: easingthemes/ssh-deploy@v6.0.1
