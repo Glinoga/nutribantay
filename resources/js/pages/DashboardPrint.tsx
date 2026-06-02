@@ -59,6 +59,12 @@ type DashboardPrintProps = {
 };
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
+    const handlePrint = () => {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+        setTimeout(() => window.print(), 50);
+    };
+
     useEffect(() => {
         const handleBeforePrint = () => {
             document.documentElement.classList.remove('dark');
@@ -134,6 +140,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
                     
+                    html.dark * { color: black !important; background-color: white !important; border-color: #ccc !important; }
+                    
                     table { 
                         break-inside: auto; 
                         width: 100%;
@@ -168,7 +176,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             {/* Print Controls */}
             <div className="no-print mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button
-                    onClick={() => window.print()}
+                    onClick={handlePrint}
                     className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 dark:from-cyan-500 dark:to-cyan-300 dark:text-gray-900"
                 >
                     <Printer className="mr-2 h-4 w-4" />
@@ -187,10 +195,10 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Header */}
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
-                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Dashboard Report</h2>
-                <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400">{period} Report</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100 print:text-black">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100 print:text-black">Dashboard Report</h2>
+                <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400 print:text-black">{period} Report</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300 print:text-black">
                     {data.summary.period_start} to {data.summary.period_end}
                 </p>
             </div>
@@ -438,10 +446,10 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             </div>
 
             {/* Footer */}
-            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {data.generated_at}</p>
-                <p className="mt-1 flex items-center justify-center gap-2">
-                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300 print:text-black">
+                <p className="print:text-black">Generated on {data.generated_at}</p>
+                <p className="mt-1 flex items-center justify-center gap-2 print:text-black">
+                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400 print:text-black" />
                     Nutribantay - Nutrition Monitoring System
                 </p>
             </div>
