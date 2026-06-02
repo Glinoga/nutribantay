@@ -39,14 +39,15 @@ function useChartCapture() {
 
     useEffect(() => {
         let rafId: number;
+        let attempts = 0;
         const check = () => {
+            attempts++;
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const chart: any = chartRef.current;
             if (chart && chart.canvas && chart.canvas.width > 0) {
                 try {
-                    chart.draw();
                     const dataUrl = chart.toBase64Image();
-                    if (dataUrl && dataUrl.length > 200) {
+                    if (dataUrl && dataUrl.length > 500) {
                         setImgSrc(dataUrl);
                         return;
                     }
@@ -54,7 +55,9 @@ function useChartCapture() {
                     // canvas not ready
                 }
             }
-            rafId = requestAnimationFrame(check);
+            if (attempts < 60) {
+                rafId = requestAnimationFrame(check);
+            }
         };
         rafId = requestAnimationFrame(check);
         return () => cancelAnimationFrame(rafId);
@@ -315,6 +318,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                         options={{
                                             responsive: true,
                                             maintainAspectRatio: false,
+                                            animation: false,
                                             plugins: {
                                                 legend: {
                                                     position: 'bottom',
@@ -351,6 +355,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                             options={{
                                                 responsive: true,
                                                 maintainAspectRatio: false,
+                                                animation: false,
                                                 plugins: {
                                                     legend: {
                                                         position: 'bottom',
