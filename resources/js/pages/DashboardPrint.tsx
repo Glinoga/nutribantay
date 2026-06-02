@@ -59,10 +59,6 @@ type DashboardPrintProps = {
 };
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
-    const handlePrint = () => {
-        window.print();
-    };
-
     useEffect(() => {
         const handleBeforePrint = () => {
             document.documentElement.classList.remove('dark');
@@ -172,7 +168,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             {/* Print Controls */}
             <div className="no-print mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button
-                    onClick={handlePrint}
+                    onClick={() => window.print()}
                     className="cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-md transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 dark:from-cyan-500 dark:to-cyan-300 dark:text-gray-900"
                 >
                     <Printer className="mr-2 h-4 w-4" />
