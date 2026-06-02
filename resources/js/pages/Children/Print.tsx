@@ -1,10 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
-import { useEffect } from 'react';
 
 type Child = {
     id: number;
@@ -41,25 +39,6 @@ const getFilterSummary = (filters: Filters) => {
 };
 
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
-    useEffect(() => {
-        const handleBeforePrint = () => {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.style.colorScheme = 'light';
-        };
-
-        const handleAfterPrint = () => {
-            initializeTheme();
-        };
-
-        window.addEventListener('beforeprint', handleBeforePrint);
-        window.addEventListener('afterprint', handleAfterPrint);
-
-        return () => {
-            window.removeEventListener('beforeprint', handleBeforePrint);
-            window.removeEventListener('afterprint', handleAfterPrint);
-        };
-    }, []);
-
     return (
         <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title="Children Records - Print" />

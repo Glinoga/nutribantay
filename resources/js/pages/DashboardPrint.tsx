@@ -1,12 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
-import { useEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -59,25 +57,6 @@ type DashboardPrintProps = {
 };
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
-    useEffect(() => {
-        const handleBeforePrint = () => {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.style.colorScheme = 'light';
-        };
-
-        const handleAfterPrint = () => {
-            initializeTheme();
-        };
-
-        window.addEventListener('beforeprint', handleBeforePrint);
-        window.addEventListener('afterprint', handleAfterPrint);
-
-        return () => {
-            window.removeEventListener('beforeprint', handleBeforePrint);
-            window.removeEventListener('afterprint', handleAfterPrint);
-        };
-    }, []);
-
     const lineChartData = {
         labels: data.trends.trend.map((t) => t.label),
         datasets: [
