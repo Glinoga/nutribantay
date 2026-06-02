@@ -49,6 +49,11 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
     }, []);
 
     useEffect(() => {
+        const html = document.documentElement;
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+
         const handleBeforePrint = () => {
             const html = document.documentElement;
             html.classList.remove('dark');
