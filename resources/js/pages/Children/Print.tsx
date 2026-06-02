@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
-import { useEffect } from 'react';
 
 type Child = {
     id: number;
@@ -38,21 +38,6 @@ const getFilterSummary = (filters: Filters) => {
     if (filters.vaccine_status) parts.push(`Vaccine: ${filters.vaccine_status}`);
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
-
-function useForceLightMode() {
-    useEffect(() => {
-        const html = document.documentElement;
-        const wasDark = html.classList.contains('dark');
-        if (wasDark) {
-            html.classList.remove('dark');
-        }
-        return () => {
-            if (wasDark) {
-                html.classList.add('dark');
-            }
-        };
-    }, []);
-}
 
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
     useForceLightMode();

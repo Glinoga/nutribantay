@@ -1,65 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChartWithPrintFallback, useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
-import { useEffect } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
-
-function useForceLightMode() {
-    useEffect(() => {
-        const html = document.documentElement;
-        const wasDark = html.classList.contains('dark');
-        if (wasDark) {
-            html.classList.remove('dark');
-        }
-        return () => {
-            if (wasDark) {
-                html.classList.add('dark');
-            }
-        };
-    }, []);
-}
-
-function useCanvasPrintFix() {
-    useEffect(() => {
-        let snapshots: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] = [];
-
-        const beforePrint = () => {
-            document.querySelectorAll('canvas.chartjs-render-monitor').forEach((el) => {
-                try {
-                    const canvas = el as HTMLCanvasElement;
-                    const img = document.createElement('img');
-                    img.src = canvas.toDataURL();
-                    img.style.cssText = canvas.style.cssText;
-                    img.width = canvas.width;
-                    img.height = canvas.height;
-                    canvas.parentNode?.replaceChild(img, canvas);
-                    snapshots.push({ canvas, img });
-                } catch {
-                    /* canvas tainted — skip */
-                }
-            });
-        };
-
-        const afterPrint = () => {
-            snapshots.forEach(({ canvas, img }) => {
-                img.parentNode?.replaceChild(canvas, img);
-            });
-            snapshots = [];
-        };
-
-        window.addEventListener('beforeprint', beforePrint);
-        window.addEventListener('afterprint', afterPrint);
-        return () => {
-            window.removeEventListener('beforeprint', beforePrint);
-            window.removeEventListener('afterprint', afterPrint);
-        };
-    }, []);
-}
 
 type HealthLog = {
     weight: number | null;
@@ -108,7 +56,6 @@ const getStatusColor = (status: string | null) => {
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
     useForceLightMode();
-    useCanvasPrintFix();
     const healthlogs = child.healthlogs || [];
 
     const lineChartData = {
@@ -177,6 +124,8 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
+                    .chart-print-canvas { display: none !important; }
+                    .chart-print-image { display: block !important; }
 
                     table { 
                         break-inside: auto; 
@@ -206,6 +155,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                         padding: 1px 3px !important;
                         font-size: 7.5pt !important;
                     }
+                }
+                @media screen {
+                    .chart-print-image { display: none !important; }
                 }
             `}</style>
 
@@ -303,39 +255,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                 Weight, Height & BMI Over Time
                             </h4>
                             <div className="relative" style={{ height: '280px' }}>
-                                <Line
-                                    data={lineChartData}
-                                    options={{
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: {
-                                                position: 'bottom',
-                                                labels: { boxWidth: 12, padding: 12 },
-                                            },
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: false,
-                                                ticks: { font: { size: 11 } },
-                                            },
-                                            x: {
-                                                ticks: { font: { size: 10 } },
-                                            },
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="rounded-md border border-cyan-200 bg-white p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800">
-                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
-                                Nutrition Status Distribution
-                            </h4>
-                            <div className="relative" style={{ height: '280px' }}>
-                                {hasNutritionData ? (
-                                    <Doughnut
-                                        data={doughnutData}
+                                <ChartWithPrintFallback id="show-line">
+                                    <Line
+                                        data={lineChartData}
                                         options={{
                                             responsive: true,
                                             maintainAspectRatio: false,
@@ -345,8 +267,42 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                                     labels: { boxWidth: 12, padding: 12 },
                                                 },
                                             },
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: false,
+                                                    ticks: { font: { size: 11 } },
+                                                },
+                                                x: {
+                                                    ticks: { font: { size: 10 } },
+                                                },
+                                            },
                                         }}
                                     />
+                                </ChartWithPrintFallback>
+                            </div>
+                        </div>
+
+                        <div className="rounded-md border border-cyan-200 bg-white p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800">
+                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
+                                Nutrition Status Distribution
+                            </h4>
+                            <div className="relative" style={{ height: '280px' }}>
+                                {hasNutritionData ? (
+                                    <ChartWithPrintFallback id="show-doughnut">
+                                        <Doughnut
+                                            data={doughnutData}
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: {
+                                                        position: 'bottom',
+                                                        labels: { boxWidth: 12, padding: 12 },
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    </ChartWithPrintFallback>
                                 ) : (
                                     <div className="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                                         No nutrition status data available.

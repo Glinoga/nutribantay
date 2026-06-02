@@ -1,66 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ChartWithPrintFallback, useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
-import { useEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
-
-function useForceLightMode() {
-    useEffect(() => {
-        const html = document.documentElement;
-        const wasDark = html.classList.contains('dark');
-        if (wasDark) {
-            html.classList.remove('dark');
-        }
-        return () => {
-            if (wasDark) {
-                html.classList.add('dark');
-            }
-        };
-    }, []);
-}
-
-function useCanvasPrintFix() {
-    useEffect(() => {
-        let snapshots: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] = [];
-
-        const beforePrint = () => {
-            document.querySelectorAll('canvas.chartjs-render-monitor').forEach((el) => {
-                try {
-                    const canvas = el as HTMLCanvasElement;
-                    const img = document.createElement('img');
-                    img.src = canvas.toDataURL();
-                    img.style.cssText = canvas.style.cssText;
-                    img.width = canvas.width;
-                    img.height = canvas.height;
-                    canvas.parentNode?.replaceChild(img, canvas);
-                    snapshots.push({ canvas, img });
-                } catch {
-                    /* canvas tainted — skip */
-                }
-            });
-        };
-
-        const afterPrint = () => {
-            snapshots.forEach(({ canvas, img }) => {
-                img.parentNode?.replaceChild(canvas, img);
-            });
-            snapshots = [];
-        };
-
-        window.addEventListener('beforeprint', beforePrint);
-        window.addEventListener('afterprint', afterPrint);
-        return () => {
-            window.removeEventListener('beforeprint', beforePrint);
-            window.removeEventListener('afterprint', afterPrint);
-        };
-    }, []);
-}
 
 type PrintData = {
     healthlogs: Array<{
@@ -111,7 +59,6 @@ type DashboardPrintProps = {
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     useForceLightMode();
-    useCanvasPrintFix();
     const lineChartData = {
         labels: data.trends.trend.map((t) => t.label),
         datasets: [
@@ -167,6 +114,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
+                    .chart-print-canvas { display: none !important; }
+                    .chart-print-image { display: block !important; }
 
                     table { 
                         break-inside: auto; 
@@ -196,6 +145,9 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                         padding: 1px 3px !important;
                         font-size: 7.5pt !important;
                     }
+                }
+                @media screen {
+                    .chart-print-image { display: none !important; }
                 }
             `}</style>
 
@@ -313,16 +265,18 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <Line
-                                    data={lineChartData}
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'bottom' },
-                                        },
-                                    }}
-                                    aria-label="Line chart showing health logs over time"
-                                />
+                                <ChartWithPrintFallback id="dashboard-line">
+                                    <Line
+                                        data={lineChartData}
+                                        options={{
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'bottom' },
+                                            },
+                                        }}
+                                        aria-label="Line chart showing health logs over time"
+                                    />
+                                </ChartWithPrintFallback>
                             </CardContent>
                         </Card>
 
@@ -331,16 +285,18 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <Bar
-                                    data={barChartData}
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            legend: { position: 'bottom' },
-                                        },
-                                    }}
-                                    aria-label="Bar chart showing monthly health log comparison"
-                                />
+                                <ChartWithPrintFallback id="dashboard-bar">
+                                    <Bar
+                                        data={barChartData}
+                                        options={{
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'bottom' },
+                                            },
+                                        }}
+                                        aria-label="Bar chart showing monthly health log comparison"
+                                    />
+                                </ChartWithPrintFallback>
                             </CardContent>
                         </Card>
                     </div>
@@ -359,16 +315,18 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                     data.trends.status_distribution.overweight +
                                     data.trends.status_distribution.stunted >
                                 0 ? (
-                                    <Doughnut
-                                        data={doughnutData}
-                                        options={{
-                                            responsive: true,
-                                            plugins: {
-                                                legend: { position: 'bottom' },
-                                            },
-                                        }}
-                                        aria-label="Doughnut chart showing nutrition status distribution"
-                                    />
+                                    <ChartWithPrintFallback id="dashboard-doughnut">
+                                        <Doughnut
+                                            data={doughnutData}
+                                            options={{
+                                                responsive: true,
+                                                plugins: {
+                                                    legend: { position: 'bottom' },
+                                                },
+                                            }}
+                                            aria-label="Doughnut chart showing nutrition status distribution"
+                                        />
+                                    </ChartWithPrintFallback>
                                 ) : (
                                     <p className="py-8 text-center text-cyan-700 dark:text-cyan-300">No nutrition status data available.</p>
                                 )}
