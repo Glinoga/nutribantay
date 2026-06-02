@@ -5,7 +5,7 @@ import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
@@ -56,10 +56,19 @@ const getStatusColor = (status: string | null) => {
 };
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+    useLayoutEffect(() => {
+        const html = document.documentElement;
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+    }, []);
+
     useEffect(() => {
         const handleBeforePrint = () => {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.style.colorScheme = 'light';
+            const html = document.documentElement;
+            html.classList.remove('dark');
+            html.style.colorScheme = 'light';
+            html.setAttribute('data-theme', 'light');
         };
 
         const handleAfterPrint = () => {

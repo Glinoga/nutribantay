@@ -4,7 +4,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 type Child = {
     id: number;
@@ -41,10 +41,19 @@ const getFilterSummary = (filters: Filters) => {
 };
 
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
+    useLayoutEffect(() => {
+        const html = document.documentElement;
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+    }, []);
+
     useEffect(() => {
         const handleBeforePrint = () => {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.style.colorScheme = 'light';
+            const html = document.documentElement;
+            html.classList.remove('dark');
+            html.style.colorScheme = 'light';
+            html.setAttribute('data-theme', 'light');
         };
 
         const handleAfterPrint = () => {
