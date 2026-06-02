@@ -5,9 +5,47 @@ import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
+import { useEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
+
+function useCanvasPrintFix() {
+    useEffect(() => {
+        let snapshots: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] = [];
+
+        const beforePrint = () => {
+            document.querySelectorAll('canvas.chartjs-render-monitor').forEach((el) => {
+                try {
+                    const canvas = el as HTMLCanvasElement;
+                    const img = document.createElement('img');
+                    img.src = canvas.toDataURL();
+                    img.style.cssText = canvas.style.cssText;
+                    img.width = canvas.width;
+                    img.height = canvas.height;
+                    canvas.parentNode?.replaceChild(img, canvas);
+                    snapshots.push({ canvas, img });
+                } catch {
+                    /* canvas tainted — skip */
+                }
+            });
+        };
+
+        const afterPrint = () => {
+            snapshots.forEach(({ canvas, img }) => {
+                img.parentNode?.replaceChild(canvas, img);
+            });
+            snapshots = [];
+        };
+
+        window.addEventListener('beforeprint', beforePrint);
+        window.addEventListener('afterprint', afterPrint);
+        return () => {
+            window.removeEventListener('beforeprint', beforePrint);
+            window.removeEventListener('afterprint', afterPrint);
+        };
+    }, []);
+}
 
 type PrintData = {
     healthlogs: Array<{
@@ -57,6 +95,7 @@ type DashboardPrintProps = {
 };
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
+    useCanvasPrintFix();
     const lineChartData = {
         labels: data.trends.trend.map((t) => t.label),
         datasets: [
@@ -99,7 +138,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     };
 
     return (
-        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900">
             <Head title={`Nutribantay Dashboard Report - ${period}`} />
 
             <style>{`
@@ -112,7 +151,24 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    
+
+                    /* Force white background / black text everywhere — overrides dark mode specificity */
+                    * {
+                        background-color: white !important;
+                        color: black !important;
+                        border-color: #ccc !important;
+                    }
+
+                    /* Restore nutrition status badge colors */
+                    .bg-green-100 { background-color: #dcfce7 !important; }
+                    .bg-yellow-100 { background-color: #fef9c3 !important; }
+                    .bg-red-100 { background-color: #fee2e2 !important; }
+                    .bg-orange-100 { background-color: #ffedd5 !important; }
+                    .text-green-800 { color: #166534 !important; }
+                    .text-yellow-800 { color: #854d0e !important; }
+                    .text-red-800 { color: #991b1b !important; }
+                    .text-orange-800 { color: #9a3412 !important; }
+
                     table { 
                         break-inside: auto; 
                         width: 100%;
@@ -166,10 +222,10 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Header */}
             <div className="mb-8 text-center">
-                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100 print:text-black">Nutribantay</h1>
-                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100 print:text-black">Dashboard Report</h2>
-                <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400 print:text-black">{period} Report</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300 print:text-black">
+                <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
+                <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Dashboard Report</h2>
+                <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400">{period} Report</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     {data.summary.period_start} to {data.summary.period_end}
                 </p>
             </div>
@@ -181,13 +237,13 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     Summary Statistics
                 </h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <Card className="print:bg-white">
+                    <Card>
                         <CardHeader>
                             <CardDescription>Total Children</CardDescription>
                             <CardTitle className="text-2xl text-cyan-600 sm:text-3xl dark:text-cyan-400">{data.summary.total_children}</CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20 print:bg-white">
+                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
                         <CardHeader>
                             <CardDescription className="text-green-600 dark:text-green-400">Normal</CardDescription>
                             <CardTitle className="text-2xl text-green-600 sm:text-3xl dark:text-green-400">
@@ -195,7 +251,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20 print:bg-white">
+                    <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
                         <CardHeader>
                             <CardDescription className="text-yellow-600 dark:text-yellow-400">Underweight</CardDescription>
                             <CardTitle className="text-2xl text-yellow-600 sm:text-3xl dark:text-yellow-400">
@@ -203,7 +259,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20 print:bg-white">
+                    <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
                         <CardHeader>
                             <CardDescription className="text-red-600 dark:text-red-400">Overweight</CardDescription>
                             <CardTitle className="text-2xl text-red-600 sm:text-3xl dark:text-red-400">
@@ -211,7 +267,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20 print:bg-white">
+                    <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20">
                         <CardHeader>
                             <CardDescription className="text-orange-600 dark:text-orange-400">Stunted</CardDescription>
                             <CardTitle className="text-2xl text-orange-600 sm:text-3xl dark:text-orange-400">
@@ -219,7 +275,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="print:bg-white">
+                    <Card>
                         <CardHeader>
                             <CardDescription>Vitamin A Given</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
@@ -230,7 +286,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="print:bg-white">
+                    <Card>
                         <CardHeader>
                             <CardDescription>Deworming Given</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
@@ -253,7 +309,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </h3>
 
                     <div className="chart-container grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <Card className="print:bg-white">
+                        <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
                             </CardHeader>
@@ -271,7 +327,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardContent>
                         </Card>
 
-                        <Card className="print:bg-white">
+                        <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
                             </CardHeader>
@@ -291,7 +347,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </div>
 
                     <div className="chart-container mt-6">
-                        <Card className="w-full sm:max-w-md print:bg-white">
+                        <Card className="w-full sm:max-w-md">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg text-cyan-900 dark:text-cyan-100">
                                     <PieChart className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
@@ -329,7 +385,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <Baby className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Children Details
                 </h3>
-                <Card className="print:bg-white">
+                <Card>
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
@@ -417,10 +473,10 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
             </div>
 
             {/* Footer */}
-            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300 print:text-black">
-                <p className="print:text-black">Generated on {data.generated_at}</p>
-                <p className="mt-1 flex items-center justify-center gap-2 print:text-black">
-                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400 print:text-black" />
+            <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
+                <p>Generated on {data.generated_at}</p>
+                <p className="mt-1 flex items-center justify-center gap-2">
+                    <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System
                 </p>
             </div>
