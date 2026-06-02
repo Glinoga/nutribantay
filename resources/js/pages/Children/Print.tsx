@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
@@ -39,33 +40,28 @@ const getFilterSummary = (filters: Filters) => {
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
-function useForceLightMode() {
+export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
     useEffect(() => {
-        const html = document.documentElement;
-        const wasDark = html.classList.contains('dark');
-        const prevColorScheme = html.style.colorScheme;
-        const prevDataTheme = html.getAttribute('data-theme');
+        const handleBeforePrint = () => {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        };
 
-        html.classList.remove('dark');
-        html.style.colorScheme = 'light';
-        html.setAttribute('data-theme', 'light');
+        const handleAfterPrint = () => {
+            initializeTheme();
+        };
+
+        window.addEventListener('beforeprint', handleBeforePrint);
+        window.addEventListener('afterprint', handleAfterPrint);
 
         return () => {
-            if (wasDark) html.classList.add('dark');
-            html.style.colorScheme = prevColorScheme;
-            if (prevDataTheme) {
-                html.setAttribute('data-theme', prevDataTheme);
-            } else {
-                html.removeAttribute('data-theme');
-            }
+            window.removeEventListener('beforeprint', handleBeforePrint);
+            window.removeEventListener('afterprint', handleAfterPrint);
         };
     }, []);
-}
 
-export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
-    useForceLightMode();
     return (
-        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title="Children Records - Print" />
 
             <style>{`
@@ -78,7 +74,7 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-
+                    
                     table { 
                         break-inside: auto; 
                         width: 100%;

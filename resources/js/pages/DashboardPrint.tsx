@@ -1,71 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
-
-function useForceLightMode() {
-    useEffect(() => {
-        const html = document.documentElement;
-        const wasDark = html.classList.contains('dark');
-        const prevColorScheme = html.style.colorScheme;
-        const prevDataTheme = html.getAttribute('data-theme');
-
-        html.classList.remove('dark');
-        html.style.colorScheme = 'light';
-        html.setAttribute('data-theme', 'light');
-
-        return () => {
-            if (wasDark) html.classList.add('dark');
-            html.style.colorScheme = prevColorScheme;
-            if (prevDataTheme) {
-                html.setAttribute('data-theme', prevDataTheme);
-            } else {
-                html.removeAttribute('data-theme');
-            }
-        };
-    }, []);
-}
-
-function useChartCapture() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const chartRef = useRef<any>(null);
-    const [imgSrc, setImgSrc] = useState<string | null>(null);
-
-    useEffect(() => {
-        let rafId: number;
-        let attempts = 0;
-        const check = () => {
-            attempts++;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chart: any = chartRef.current;
-            if (chart && chart.canvas && chart.canvas.width > 0) {
-                try {
-                    const dataUrl = chart.toBase64Image();
-                    if (dataUrl && dataUrl.length > 500) {
-                        setImgSrc(dataUrl);
-                        return;
-                    }
-                } catch {
-                    // canvas not ready
-                }
-            }
-            if (attempts < 60) {
-                rafId = requestAnimationFrame(check);
-            }
-        };
-        rafId = requestAnimationFrame(check);
-        return () => cancelAnimationFrame(rafId);
-    }, []);
-
-    return { chartRef, imgSrc };
-}
 
 type PrintData = {
     healthlogs: Array<{
@@ -115,10 +59,25 @@ type DashboardPrintProps = {
 };
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
-    useForceLightMode();
-    const { chartRef: lineRef, imgSrc: lineImg } = useChartCapture();
-    const { chartRef: barRef, imgSrc: barImg } = useChartCapture();
-    const { chartRef: doughnutRef, imgSrc: doughnutImg } = useChartCapture();
+    useEffect(() => {
+        const handleBeforePrint = () => {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        };
+
+        const handleAfterPrint = () => {
+            initializeTheme();
+        };
+
+        window.addEventListener('beforeprint', handleBeforePrint);
+        window.addEventListener('afterprint', handleAfterPrint);
+
+        return () => {
+            window.removeEventListener('beforeprint', handleBeforePrint);
+            window.removeEventListener('afterprint', handleAfterPrint);
+        };
+    }, []);
+
     const lineChartData = {
         labels: data.trends.trend.map((t) => t.label),
         datasets: [
@@ -161,7 +120,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     };
 
     return (
-        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900">
+        <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900 print:bg-white print:text-black">
             <Head title={`Nutribantay Dashboard Report - ${period}`} />
 
             <style>{`
@@ -174,7 +133,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-
+                    
                     table { 
                         break-inside: auto; 
                         width: 100%;
@@ -243,13 +202,13 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     Summary Statistics
                 </h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <Card>
+                    <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Total Children</CardDescription>
                             <CardTitle className="text-2xl text-cyan-600 sm:text-3xl dark:text-cyan-400">{data.summary.total_children}</CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
+                    <Card className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-green-600 dark:text-green-400">Normal</CardDescription>
                             <CardTitle className="text-2xl text-green-600 sm:text-3xl dark:text-green-400">
@@ -257,7 +216,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20">
+                    <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-yellow-600 dark:text-yellow-400">Underweight</CardDescription>
                             <CardTitle className="text-2xl text-yellow-600 sm:text-3xl dark:text-yellow-400">
@@ -265,7 +224,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+                    <Card className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-red-600 dark:text-red-400">Overweight</CardDescription>
                             <CardTitle className="text-2xl text-red-600 sm:text-3xl dark:text-red-400">
@@ -273,7 +232,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20">
+                    <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20 print:bg-white">
                         <CardHeader>
                             <CardDescription className="text-orange-600 dark:text-orange-400">Stunted</CardDescription>
                             <CardTitle className="text-2xl text-orange-600 sm:text-3xl dark:text-orange-400">
@@ -281,7 +240,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card>
+                    <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Vitamin A Given</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
@@ -292,7 +251,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card>
+                    <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Deworming Given</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
@@ -315,57 +274,45 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </h3>
 
                     <div className="chart-container grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <Card>
+                        <Card className="print:bg-white">
                             <CardHeader>
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {lineImg ? (
-                                    <img src={lineImg} alt="Line chart showing health logs over time" className="h-auto w-full" />
-                                ) : (
-                                    <Line
-                                        ref={lineRef}
-                                        data={lineChartData}
-                                        options={{
-                                            responsive: true,
-                                            animation: false,
-                                            plugins: {
-                                                legend: { position: 'bottom' },
-                                            },
-                                        }}
-                                        aria-label="Line chart showing health logs over time"
-                                    />
-                                )}
+                                <Line
+                                    data={lineChartData}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { position: 'bottom' },
+                                        },
+                                    }}
+                                    aria-label="Line chart showing health logs over time"
+                                />
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="print:bg-white">
                             <CardHeader>
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {barImg ? (
-                                    <img src={barImg} alt="Bar chart showing monthly health log comparison" className="h-auto w-full" />
-                                ) : (
-                                    <Bar
-                                        ref={barRef}
-                                        data={barChartData}
-                                        options={{
-                                            responsive: true,
-                                            animation: false,
-                                            plugins: {
-                                                legend: { position: 'bottom' },
-                                            },
-                                        }}
-                                        aria-label="Bar chart showing monthly health log comparison"
-                                    />
-                                )}
+                                <Bar
+                                    data={barChartData}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            legend: { position: 'bottom' },
+                                        },
+                                    }}
+                                    aria-label="Bar chart showing monthly health log comparison"
+                                />
                             </CardContent>
                         </Card>
                     </div>
 
                     <div className="chart-container mt-6">
-                        <Card className="w-full sm:max-w-md">
+                        <Card className="w-full sm:max-w-md print:bg-white">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg text-cyan-900 dark:text-cyan-100">
                                     <PieChart className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
@@ -378,22 +325,16 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                     data.trends.status_distribution.overweight +
                                     data.trends.status_distribution.stunted >
                                 0 ? (
-                                    doughnutImg ? (
-                                        <img src={doughnutImg} alt="Doughnut chart showing nutrition status distribution" className="h-auto w-full" />
-                                    ) : (
-                                        <Doughnut
-                                            ref={doughnutRef}
-                                            data={doughnutData}
-                                            options={{
-                                                responsive: true,
-                                                animation: false,
-                                                plugins: {
-                                                    legend: { position: 'bottom' },
-                                                },
-                                            }}
-                                            aria-label="Doughnut chart showing nutrition status distribution"
-                                        />
-                                    )
+                                    <Doughnut
+                                        data={doughnutData}
+                                        options={{
+                                            responsive: true,
+                                            plugins: {
+                                                legend: { position: 'bottom' },
+                                            },
+                                        }}
+                                        aria-label="Doughnut chart showing nutrition status distribution"
+                                    />
                                 ) : (
                                     <p className="py-8 text-center text-cyan-700 dark:text-cyan-300">No nutrition status data available.</p>
                                 )}
@@ -409,7 +350,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <Baby className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Children Details
                 </h3>
-                <Card>
+                <Card className="print:bg-white">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
