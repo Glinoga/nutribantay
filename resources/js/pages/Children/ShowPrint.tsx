@@ -9,6 +9,21 @@ import { Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
+function useForceLightMode() {
+    useEffect(() => {
+        const html = document.documentElement;
+        const wasDark = html.classList.contains('dark');
+        if (wasDark) {
+            html.classList.remove('dark');
+        }
+        return () => {
+            if (wasDark) {
+                html.classList.add('dark');
+            }
+        };
+    }, []);
+}
+
 function useCanvasPrintFix() {
     useEffect(() => {
         let snapshots: { canvas: HTMLCanvasElement; img: HTMLImageElement }[] = [];
@@ -92,6 +107,7 @@ const getStatusColor = (status: string | null) => {
 };
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+    useForceLightMode();
     useCanvasPrintFix();
     const healthlogs = child.healthlogs || [];
 
@@ -161,23 +177,6 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-
-                    /* Force white background / black text everywhere — overrides dark mode specificity */
-                    * {
-                        background-color: white !important;
-                        color: black !important;
-                        border-color: #ccc !important;
-                    }
-
-                    /* Restore nutrition status badge colors */
-                    .bg-green-100 { background-color: #dcfce7 !important; }
-                    .bg-yellow-100 { background-color: #fef9c3 !important; }
-                    .bg-red-100 { background-color: #fee2e2 !important; }
-                    .bg-orange-100 { background-color: #ffedd5 !important; }
-                    .text-green-800 { color: #166534 !important; }
-                    .text-yellow-800 { color: #854d0e !important; }
-                    .text-red-800 { color: #991b1b !important; }
-                    .text-orange-800 { color: #9a3412 !important; }
 
                     table { 
                         break-inside: auto; 

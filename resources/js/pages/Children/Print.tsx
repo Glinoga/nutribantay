@@ -3,6 +3,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
+import { useEffect } from 'react';
 
 type Child = {
     id: number;
@@ -38,7 +39,23 @@ const getFilterSummary = (filters: Filters) => {
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
+function useForceLightMode() {
+    useEffect(() => {
+        const html = document.documentElement;
+        const wasDark = html.classList.contains('dark');
+        if (wasDark) {
+            html.classList.remove('dark');
+        }
+        return () => {
+            if (wasDark) {
+                html.classList.add('dark');
+            }
+        };
+    }, []);
+}
+
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
+    useForceLightMode();
     return (
         <div className="min-h-screen bg-cyan-50 p-4 font-sans sm:p-6 lg:p-8 dark:bg-gray-900">
             <Head title="Children Records - Print" />
@@ -53,13 +70,6 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-
-                    /* Force white background / black text everywhere — overrides dark mode specificity */
-                    * {
-                        background-color: white !important;
-                        color: black !important;
-                        border-color: #ccc !important;
-                    }
 
                     table { 
                         break-inside: auto; 
