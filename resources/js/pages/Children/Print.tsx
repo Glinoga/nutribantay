@@ -42,9 +42,7 @@ const getFilterSummary = (filters: Filters) => {
 
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
     const handlePrint = () => {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
-        setTimeout(() => window.print(), 50);
+        window.print();
     };
 
     useEffect(() => {
@@ -80,8 +78,6 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    
-                    html.dark * { color: black !important; background-color: white !important; border-color: #ccc !important; }
                     
                     table { 
                         break-inside: auto; 

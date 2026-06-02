@@ -60,9 +60,7 @@ type DashboardPrintProps = {
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     const handlePrint = () => {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
-        setTimeout(() => window.print(), 50);
+        window.print();
     };
 
     useEffect(() => {
@@ -139,8 +137,6 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    
-                    html.dark * { color: black !important; background-color: white !important; border-color: #ccc !important; }
                     
                     table { 
                         break-inside: auto; 
