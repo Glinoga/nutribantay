@@ -1,14 +1,68 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartWithPrintFallback, useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
+
+function useForceLightMode() {
+    useEffect(() => {
+        const html = document.documentElement;
+        const wasDark = html.classList.contains('dark');
+        const prevColorScheme = html.style.colorScheme;
+        const prevDataTheme = html.getAttribute('data-theme');
+
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+
+        return () => {
+            if (wasDark) html.classList.add('dark');
+            html.style.colorScheme = prevColorScheme;
+            if (prevDataTheme) {
+                html.setAttribute('data-theme', prevDataTheme);
+            } else {
+                html.removeAttribute('data-theme');
+            }
+        };
+    }, []);
+}
+
+function useChartCapture() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chartRef = useRef<any>(null);
+    const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+    useEffect(() => {
+        let rafId: number;
+        const check = () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const chart: any = chartRef.current;
+            if (chart && chart.canvas && chart.canvas.width > 0) {
+                try {
+                    chart.draw();
+                    const dataUrl = chart.toBase64Image();
+                    if (dataUrl && dataUrl.length > 200) {
+                        setImgSrc(dataUrl);
+                        return;
+                    }
+                } catch {
+                    // canvas not ready
+                }
+            }
+            rafId = requestAnimationFrame(check);
+        };
+        rafId = requestAnimationFrame(check);
+        return () => cancelAnimationFrame(rafId);
+    }, []);
+
+    return { chartRef, imgSrc };
+}
 
 type PrintData = {
     healthlogs: Array<{
@@ -59,6 +113,9 @@ type DashboardPrintProps = {
 
 export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     useForceLightMode();
+    const { chartRef: lineRef, imgSrc: lineImg } = useChartCapture();
+    const { chartRef: barRef, imgSrc: barImg } = useChartCapture();
+    const { chartRef: doughnutRef, imgSrc: doughnutImg } = useChartCapture();
     const lineChartData = {
         labels: data.trends.trend.map((t) => t.label),
         datasets: [
@@ -114,8 +171,6 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    .chart-print-canvas { display: none !important; }
-                    .chart-print-image { display: block !important; }
 
                     table { 
                         break-inside: auto; 
@@ -145,9 +200,6 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                         padding: 1px 3px !important;
                         font-size: 7.5pt !important;
                     }
-                }
-                @media screen {
-                    .chart-print-image { display: none !important; }
                 }
             `}</style>
 
@@ -265,8 +317,11 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ChartWithPrintFallback id="dashboard-line">
+                                {lineImg ? (
+                                    <img src={lineImg} alt="Line chart showing health logs over time" className="h-auto w-full" />
+                                ) : (
                                     <Line
+                                        ref={lineRef}
                                         data={lineChartData}
                                         options={{
                                             responsive: true,
@@ -276,7 +331,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                         }}
                                         aria-label="Line chart showing health logs over time"
                                     />
-                                </ChartWithPrintFallback>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -285,8 +340,11 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                 <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ChartWithPrintFallback id="dashboard-bar">
+                                {barImg ? (
+                                    <img src={barImg} alt="Bar chart showing monthly health log comparison" className="h-auto w-full" />
+                                ) : (
                                     <Bar
+                                        ref={barRef}
                                         data={barChartData}
                                         options={{
                                             responsive: true,
@@ -296,7 +354,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                         }}
                                         aria-label="Bar chart showing monthly health log comparison"
                                     />
-                                </ChartWithPrintFallback>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
@@ -315,8 +373,11 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                     data.trends.status_distribution.overweight +
                                     data.trends.status_distribution.stunted >
                                 0 ? (
-                                    <ChartWithPrintFallback id="dashboard-doughnut">
+                                    doughnutImg ? (
+                                        <img src={doughnutImg} alt="Doughnut chart showing nutrition status distribution" className="h-auto w-full" />
+                                    ) : (
                                         <Doughnut
+                                            ref={doughnutRef}
                                             data={doughnutData}
                                             options={{
                                                 responsive: true,
@@ -326,7 +387,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                             }}
                                             aria-label="Doughnut chart showing nutrition status distribution"
                                         />
-                                    </ChartWithPrintFallback>
+                                    )
                                 ) : (
                                     <p className="py-8 text-center text-cyan-700 dark:text-cyan-300">No nutrition status data available.</p>
                                 )}

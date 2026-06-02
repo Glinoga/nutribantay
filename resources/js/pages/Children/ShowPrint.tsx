@@ -1,13 +1,67 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChartWithPrintFallback, useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
+
+function useForceLightMode() {
+    useEffect(() => {
+        const html = document.documentElement;
+        const wasDark = html.classList.contains('dark');
+        const prevColorScheme = html.style.colorScheme;
+        const prevDataTheme = html.getAttribute('data-theme');
+
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+
+        return () => {
+            if (wasDark) html.classList.add('dark');
+            html.style.colorScheme = prevColorScheme;
+            if (prevDataTheme) {
+                html.setAttribute('data-theme', prevDataTheme);
+            } else {
+                html.removeAttribute('data-theme');
+            }
+        };
+    }, []);
+}
+
+function useChartCapture() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chartRef = useRef<any>(null);
+    const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+    useEffect(() => {
+        let rafId: number;
+        const check = () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const chart: any = chartRef.current;
+            if (chart && chart.canvas && chart.canvas.width > 0) {
+                try {
+                    chart.draw();
+                    const dataUrl = chart.toBase64Image();
+                    if (dataUrl && dataUrl.length > 200) {
+                        setImgSrc(dataUrl);
+                        return;
+                    }
+                } catch {
+                    // canvas not ready
+                }
+            }
+            rafId = requestAnimationFrame(check);
+        };
+        rafId = requestAnimationFrame(check);
+        return () => cancelAnimationFrame(rafId);
+    }, []);
+
+    return { chartRef, imgSrc };
+}
 
 type HealthLog = {
     weight: number | null;
@@ -56,6 +110,8 @@ const getStatusColor = (status: string | null) => {
 
 export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
     useForceLightMode();
+    const { chartRef: lineRef, imgSrc: lineImg } = useChartCapture();
+    const { chartRef: doughnutRef, imgSrc: doughnutImg } = useChartCapture();
     const healthlogs = child.healthlogs || [];
 
     const lineChartData = {
@@ -124,8 +180,6 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     .min-h-screen { min-height: 0 !important; }
                     * { print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
-                    .chart-print-canvas { display: none !important; }
-                    .chart-print-image { display: block !important; }
 
                     table { 
                         break-inside: auto; 
@@ -155,9 +209,6 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                         padding: 1px 3px !important;
                         font-size: 7.5pt !important;
                     }
-                }
-                @media screen {
-                    .chart-print-image { display: none !important; }
                 }
             `}</style>
 
@@ -255,8 +306,11 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                 Weight, Height & BMI Over Time
                             </h4>
                             <div className="relative" style={{ height: '280px' }}>
-                                <ChartWithPrintFallback id="show-line">
+                                {lineImg ? (
+                                    <img src={lineImg} alt="Weight, Height & BMI Over Time" className="h-auto w-full" />
+                                ) : (
                                     <Line
+                                        ref={lineRef}
                                         data={lineChartData}
                                         options={{
                                             responsive: true,
@@ -278,7 +332,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                             },
                                         }}
                                     />
-                                </ChartWithPrintFallback>
+                                )}
                             </div>
                         </div>
 
@@ -288,8 +342,11 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                             </h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 {hasNutritionData ? (
-                                    <ChartWithPrintFallback id="show-doughnut">
+                                    doughnutImg ? (
+                                        <img src={doughnutImg} alt="Nutrition Status Distribution" className="h-auto w-full" />
+                                    ) : (
                                         <Doughnut
+                                            ref={doughnutRef}
                                             data={doughnutData}
                                             options={{
                                                 responsive: true,
@@ -302,7 +359,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                                 },
                                             }}
                                         />
-                                    </ChartWithPrintFallback>
+                                    )
                                 ) : (
                                     <div className="flex h-full items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                                         No nutrition status data available.

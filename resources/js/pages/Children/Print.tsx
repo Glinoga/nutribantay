@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useForceLightMode } from '@/hooks/use-print';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
+import { useEffect } from 'react';
 
 type Child = {
     id: number;
@@ -38,6 +38,29 @@ const getFilterSummary = (filters: Filters) => {
     if (filters.vaccine_status) parts.push(`Vaccine: ${filters.vaccine_status}`);
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
+
+function useForceLightMode() {
+    useEffect(() => {
+        const html = document.documentElement;
+        const wasDark = html.classList.contains('dark');
+        const prevColorScheme = html.style.colorScheme;
+        const prevDataTheme = html.getAttribute('data-theme');
+
+        html.classList.remove('dark');
+        html.style.colorScheme = 'light';
+        html.setAttribute('data-theme', 'light');
+
+        return () => {
+            if (wasDark) html.classList.add('dark');
+            html.style.colorScheme = prevColorScheme;
+            if (prevDataTheme) {
+                html.setAttribute('data-theme', prevDataTheme);
+            } else {
+                html.removeAttribute('data-theme');
+            }
+        };
+    }, []);
+}
 
 export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
     useForceLightMode();
