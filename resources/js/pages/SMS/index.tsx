@@ -21,7 +21,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface User {
     id: number;
@@ -61,14 +61,6 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
             smartToast.info(flash.warning as string);
         }
     }, [flash]);
-
-    // Search debounce: wait 300ms then trigger server request
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            router.get(route('sms.index'), { search: searchQuery, page: 1 }, { preserveState: true });
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [searchQuery]);
 
     useEffect(() => {
         if (prefilledChildId) {
@@ -120,12 +112,17 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
         return selectedUsers.length;
     };
 
+    const filteredUsers = useMemo(
+        () => users.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.phone.includes(searchQuery)),
+        [users, searchQuery],
+    );
+
     const handlePageChange = (page: number) => {
-        router.get(route('sms.index'), { page, search: searchQuery }, { preserveState: true });
+        router.get(route('sms.index'), { page }, { preserveState: true });
     };
 
     const selectAllFiltered = () => {
-        const filteredIds = users.map((u) => u.id);
+        const filteredIds = filteredUsers.map((u) => u.id);
         setSelectedUsers(filteredIds);
     };
 
@@ -382,7 +379,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                                             </div>
 
                                             {/* Quick Actions */}
-                                            {recipientType === 'multiple' && users.length > 0 && (
+                                            {recipientType === 'multiple' && filteredUsers.length > 0 && (
                                                 <div className="flex gap-2">
                                                     <Button
                                                         type="button"
@@ -407,8 +404,8 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
 
                                             {/* User List */}
                                             <div className="custom-scrollbar max-h-96 space-y-2 overflow-y-auto pr-2">
-                                                {users.length > 0 ? (
-                                                    users.map((user, index) => (
+                                                {filteredUsers.length > 0 ? (
+                                                    filteredUsers.map((user, index) => (
                                                         <div
                                                             key={user.id}
                                                             className={`group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ${

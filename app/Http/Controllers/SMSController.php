@@ -27,15 +27,6 @@ class SMSController extends Controller
             ->where('barangay', $user->barangay)
             ->where('birthdate', '>=', now()->subMonths(60));
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('middle_initial', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('contact_number', 'like', "%{$search}%");
-            });
-        }
-
         $query->orderBy('first_name');
 
         $children = $query->paginate(25);
