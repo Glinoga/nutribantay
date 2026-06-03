@@ -1,4 +1,4 @@
-﻿name: Deploy to KVM 2 VPS
+name: Deploy to KVM 2 VPS
 
 on:
   push:
@@ -56,4 +56,3 @@ jobs:
           sudo supervisorctl reread
           sudo supervisorctl update
           sudo supervisorctl start all
-
