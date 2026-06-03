@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     timeout-minutes: 15
 
     steps:
@@ -34,69 +34,26 @@ jobs:
           npm ci
           npm run build:ssr
 
-      - name: Diagnose VPS before deploy
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          timeout: 60s
-          use_insecure_cipher: true
-          script: |
-            echo "=== Disk space ==="
-            df -h ${{ secrets.VPS_DEPLOY_PATH }}
-            echo "=== Target directory ==="
-            ls -la ${{ secrets.VPS_DEPLOY_PATH }} 2>&1 || echo "DIR NOT FOUND"
-            echo "=== Memory ==="
-            free -h
-            echo "=== Uptime ==="
-            uptime
-
-      - name: Estimate transfer size
+      - name: Deploy to target directory
         run: |
-          echo "=== vendor/ size ==="
-          du -sh vendor/
-          echo "=== public/build/ size ==="
-          du -sh public/build/
-          echo "=== Dry-run: files to sync (excl .deployignore) ==="
-          rsync -ahn --delete --exclude-from=.deployignore . /dev/null 2>&1 | tail -3
-
-      - name: Deploy to VPS via rsync
-        uses: easingthemes/ssh-deploy@v6.0.3
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          ARGS: '-rlgoDzvc --delete --exclude-from=.deployignore'
-          SOURCE: '.'
-          REMOTE_HOST: ${{ secrets.VPS_HOST }}
-          REMOTE_USER: ${{ secrets.VPS_USER }}
-          TARGET: ${{ secrets.VPS_DEPLOY_PATH }}
-          SSH_EXTRA_ARGS: '-oKexAlgorithms=+diffie-hellman-group1-sha1 -oCiphers=+aes256-cbc -oHostKeyAlgorithms=+ssh-rsa'
+          sudo rsync -rlgoDzvc --delete --exclude-from=.deployignore . ${{ secrets.VPS_DEPLOY_PATH }}
 
       - name: Post-deploy (migrate, cache, restart queue)
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          timeout: 60s
-          use_insecure_cipher: true
-          script: |
-            cd ${{ secrets.VPS_DEPLOY_PATH }}
-            php artisan migrate --force
-            php artisan db:seed --class=VitaminSeeder --force
-            php artisan dashboard:refresh
-            php artisan config:cache
-            php artisan view:cache
-            php artisan queue:restart
-            test -L public/storage || ln -s storage/app/public public/storage
-            php artisan app:setup-backup-folders || true
-            # Run due scheduled tasks once during deploy
-            php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
-            # Persistent cron job — runs every minute, logs errors for debugging
-            PHP_BIN=$(command -v php)
-            SCHED_LOG='${{ secrets.VPS_DEPLOY_PATH }}/storage/logs/scheduler.log'
-            (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab -
-            sudo supervisorctl reread
-            sudo supervisorctl update
-            sudo supervisorctl start all
+        run: |
+          cd ${{ secrets.VPS_DEPLOY_PATH }}
+          php artisan migrate --force
+          php artisan db:seed --class=VitaminSeeder --force
+          php artisan dashboard:refresh
+          php artisan config:cache
+          php artisan view:cache
+          php artisan queue:restart
+          test -L public/storage || ln -s storage/app/public public/storage
+          php artisan app:setup-backup-folders || true
+          php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
+          PHP_BIN=$(command -v php)
+          SCHED_LOG='${{ secrets.VPS_DEPLOY_PATH }}/storage/logs/scheduler.log'
+          (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab -
+          sudo supervisorctl reread
+          sudo supervisorctl update
+          sudo supervisorctl start all
 
