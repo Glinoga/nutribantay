@@ -34,11 +34,36 @@ jobs:
           npm ci
           npm run build:ssr
 
+      - name: Diagnose VPS before deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "=== Disk space ==="
+            df -h ${{ secrets.VPS_DEPLOY_PATH }}
+            echo "=== Target directory ==="
+            ls -la ${{ secrets.VPS_DEPLOY_PATH }} 2>&1 || echo "DIR NOT FOUND"
+            echo "=== Memory ==="
+            free -h
+            echo "=== Uptime ==="
+            uptime
+
+      - name: Estimate transfer size
+        run: |
+          echo "=== vendor/ size ==="
+          du -sh vendor/
+          echo "=== public/build/ size ==="
+          du -sh public/build/
+          echo "=== Dry-run: files to sync (excl .deployignore) ==="
+          rsync -ahn --delete --exclude-from=.deployignore . /dev/null 2>&1 | tail -3
+
       - name: Deploy to VPS via rsync
         uses: easingthemes/ssh-deploy@v6.0.3
         with:
           SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
-          ARGS: '-rlgoDzvc --timeout=30 --delete --exclude-from=.deployignore'
+          ARGS: '-rlgoDzvc --delete --exclude-from=.deployignore'
           SOURCE: '.'
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
