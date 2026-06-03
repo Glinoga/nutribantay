@@ -75,25 +75,32 @@ class RegistrationCodeController extends Controller
                 $query->where('code', 'like', "%{$search}%");
             }
 
-            $codes = $query->limit(100)->get()->map(function ($code) {
-                $isUsed = $code->is_used;
-                $expiresAt = $code->expires_at ? Carbon::parse($code->expires_at) : null;
-                $isExpired = $expiresAt && $expiresAt->isPast();
-                $status = $isUsed ? 'used' : ($isExpired ? 'expired' : 'active');
-
-                return [
-                    'id' => $code->id,
-                    'code' => $code->code,
-                    'barangay' => $code->barangay,
-                    'expires_at' => $expiresAt?->toIso8601String(),
-                    'is_used' => $isUsed,
-                    'status' => $status,
-                    'created_at' => $code->created_at->toIso8601String(),
-                ];
-            });
+            $codes = $query->paginate(25);
 
             return response()->json([
-                'codes' => $codes,
+                'codes' => collect($codes->items())->map(function ($code) {
+                    $isUsed = $code->is_used;
+                    $expiresAt = $code->expires_at ? Carbon::parse($code->expires_at) : null;
+                    $isExpired = $expiresAt && $expiresAt->isPast();
+                    $status = $isUsed ? 'used' : ($isExpired ? 'expired' : 'active');
+
+                    return [
+                        'id' => $code->id,
+                        'code' => $code->code,
+                        'barangay' => $code->barangay,
+                        'expires_at' => $expiresAt?->toIso8601String(),
+                        'is_used' => $isUsed,
+                        'status' => $status,
+                        'created_at' => $code->created_at->toIso8601String(),
+                    ];
+                })->values(),
+                'pagination' => [
+                    'current_page' => $codes->currentPage(),
+                    'last_page' => $codes->lastPage(),
+                    'from' => $codes->firstItem(),
+                    'to' => $codes->lastItem(),
+                    'total' => $codes->total(),
+                ],
                 'debug' => [
                     'barangay' => $adminBarangay,
                     'count' => $codes->count(),

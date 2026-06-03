@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
@@ -20,7 +21,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface User {
     id: number;
@@ -30,6 +31,7 @@ interface User {
 
 interface SMSPageProps {
     users: User[];
+    pagination?: PaginationData;
     credits: number;
     prefilledChildId?: number | null;
     prefilledMessage?: string | null;
@@ -37,7 +39,7 @@ interface SMSPageProps {
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'SMS', href: route('sms.index') }];
 
-export default function SMSIndex({ users, credits, prefilledChildId, prefilledMessage }: SMSPageProps) {
+export default function SMSIndex({ users, pagination, credits, prefilledChildId, prefilledMessage }: SMSPageProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string; warning?: string } }>().props;
     const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
     const [recipientType, setRecipientType] = useState<'single' | 'multiple' | 'all'>('multiple');
@@ -59,6 +61,14 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
             smartToast.info(flash.warning as string);
         }
     }, [flash]);
+
+    // Search debounce: wait 300ms then trigger server request
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            router.get(route('sms.index'), { search: searchQuery, page: 1 }, { preserveState: true });
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
 
     useEffect(() => {
         if (prefilledChildId) {
@@ -105,18 +115,17 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
 
     const getRecipientCount = () => {
         if (recipientType === 'all') {
-            return users.length;
+            return pagination?.total ?? users.length;
         }
         return selectedUsers.length;
     };
 
-    const filteredUsers = useMemo(
-        () => users.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()) || user.phone.includes(searchQuery)),
-        [users, searchQuery],
-    );
+    const handlePageChange = (page: number) => {
+        router.get(route('sms.index'), { page, search: searchQuery }, { preserveState: true });
+    };
 
     const selectAllFiltered = () => {
-        const filteredIds = filteredUsers.map((u) => u.id);
+        const filteredIds = users.map((u) => u.id);
         setSelectedUsers(filteredIds);
     };
 
@@ -243,7 +252,7 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{users.length}</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{pagination?.total ?? users.length}</p>
                                 </div>
                                 <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
                                     <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
@@ -344,7 +353,8 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
                                                 <div>
                                                     <p className="font-semibold text-teal-900 dark:text-teal-100">Broadcast Mode</p>
                                                     <p className="mt-1 text-sm text-teal-700 dark:text-teal-300">
-                                                        Your message will reach all {users.length} guardians with registered numbers
+                                                        Your message will reach all {pagination?.total ?? users.length} guardians with registered
+                                                        numbers
                                                     </p>
                                                 </div>
                                             </div>
@@ -372,7 +382,7 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
                                             </div>
 
                                             {/* Quick Actions */}
-                                            {recipientType === 'multiple' && filteredUsers.length > 0 && (
+                                            {recipientType === 'multiple' && users.length > 0 && (
                                                 <div className="flex gap-2">
                                                     <Button
                                                         type="button"
@@ -397,8 +407,8 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
 
                                             {/* User List */}
                                             <div className="custom-scrollbar max-h-96 space-y-2 overflow-y-auto pr-2">
-                                                {filteredUsers.length > 0 ? (
-                                                    filteredUsers.map((user, index) => (
+                                                {users.length > 0 ? (
+                                                    users.map((user, index) => (
                                                         <div
                                                             key={user.id}
                                                             className={`group relative cursor-pointer overflow-hidden rounded-xl transition-all duration-300 ${
@@ -469,6 +479,8 @@ export default function SMSIndex({ users, credits, prefilledChildId, prefilledMe
                                                     </div>
                                                 )}
                                             </div>
+
+                                            {pagination && <Pagination pagination={pagination} onPageChange={handlePageChange} />}
                                         </>
                                     )}
                                 </CardContent>

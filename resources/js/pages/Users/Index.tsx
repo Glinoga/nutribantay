@@ -66,6 +66,8 @@ interface Props {
 export default function Index({ users, pagination, stats, filters, isSeededAdmin = false }: Props) {
     const safeStats = stats ?? { total: 0, pending: 0, roles: 0 };
     const [codes, setCodes] = useState<RegistrationCode[]>([]);
+    const [codePagination, setCodePagination] = useState<PaginationData | null>(null);
+    const [codePage, setCodePage] = useState(1);
     const [count, setCount] = useState(1);
     const [search, setSearch] = useState(filters.search || '');
     const [loading, setLoading] = useState(false);
@@ -203,8 +205,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
             setCodes(response.data.codes);
 
             if (showCodeModal) {
-                const modalResponse = await axios.get('/registration-codes');
-                setCodes(modalResponse.data.codes || modalResponse.data);
+                await fetchCodes(1);
             }
 
             smartToast.success(`Successfully generated ${response.data.codes.length} code(s)!`);
@@ -216,18 +217,24 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
         }
     };
 
-    const openCodeModal = async () => {
-        setShowCodeModal(true);
+    const fetchCodes = async (page = 1) => {
         setModalLoading(true);
         try {
-            const response = await axios.get('/registration-codes');
-            setCodes(response.data.codes || response.data);
+            const response = await axios.get(`/registration-codes?page=${page}`);
+            setCodes(response.data.codes || []);
+            setCodePagination(response.data.pagination ?? null);
+            setCodePage(page);
         } catch (error: unknown) {
             console.error('Failed to fetch codes:', error);
             smartToast.error('Failed to load codes');
         } finally {
             setModalLoading(false);
         }
+    };
+
+    const openCodeModal = async () => {
+        setShowCodeModal(true);
+        await fetchCodes(1);
     };
 
     const copyToClipboard = async (code: string) => {
@@ -258,7 +265,8 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
         if (!deleteCodeId) return;
         try {
             await axios.delete(`/registration-codes/${deleteCodeId}`);
-            setCodes(codes.filter((c) => c.id !== deleteCodeId));
+            const nextPage = codes.length === 1 && codePage > 1 ? codePage - 1 : codePage;
+            await fetchCodes(nextPage);
             smartToast.success('Code deleted successfully.');
         } catch (error) {
             console.error('Failed to delete code:', error);
@@ -294,6 +302,10 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
 
     const handlePageChange = (page: number) => {
         router.get(route('users.index'), { page, search }, { preserveScroll: true });
+    };
+
+    const handleCodePageChange = (page: number) => {
+        fetchCodes(page);
     };
 
     const handleApprove = async (userId: number) => {
@@ -420,7 +432,9 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Admin Codes</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{codes.length}</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">
+                                        {codePagination?.total ?? codes.length}
+                                    </p>
                                 </div>
                                 <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
                                     <Key className="h-5 w-5 text-teal-500 dark:text-teal-400" />
@@ -877,7 +891,10 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
                             </TableBody>
                         </Table>
                     )}
-                    <div className="mt-4 text-sm text-muted-foreground">Total: {filteredCodes.length} code(s)</div>
+                    <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+                        <div>Total: {codePagination?.total ?? codes.length} code(s)</div>
+                        {codePagination && <Pagination pagination={codePagination} onPageChange={handleCodePageChange} />}
+                    </div>
                 </DialogContent>
             </Dialog>
 

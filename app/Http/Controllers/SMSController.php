@@ -27,16 +27,18 @@ class SMSController extends Controller
             ->where('barangay', $user->barangay)
             ->where('birthdate', '>=', now()->subMonths(60));
 
-        $children = $query->limit(200)->orderBy('first_name')->get()
-            ->map(function ($child) {
-                $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
-
-                return [
-                    'id' => $child->id,
-                    'name' => $fullname.' (Child)',
-                    'phone' => $child->contact_number,
-                ];
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_initial', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('contact_number', 'like', "%{$search}%");
             });
+        }
+
+        $query->orderBy('first_name');
+
+        $children = $query->paginate(25);
 
         // Validate prefilled child if coming from AI recommendation
         $prefilledChildId = null;
@@ -65,7 +67,22 @@ class SMSController extends Controller
         }
 
         return Inertia::render('SMS/index', [
-            'users' => $children,
+            'users' => collect($children->items())->map(function ($child) {
+                $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
+
+                return [
+                    'id' => $child->id,
+                    'name' => $fullname.' (Child)',
+                    'phone' => $child->contact_number,
+                ];
+            })->values(),
+            'pagination' => [
+                'current_page' => $children->currentPage(),
+                'last_page' => $children->lastPage(),
+                'from' => $children->firstItem(),
+                'to' => $children->lastItem(),
+                'total' => $children->total(),
+            ],
             'credits' => $credits,
             'prefilledChildId' => $prefilledChildId,
             'prefilledMessage' => $prefilledMessage,
