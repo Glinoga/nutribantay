@@ -35,11 +35,13 @@ jobs:
           npm run build:ssr
 
       - name: Diagnose VPS before deploy
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 60s
+          use_insecure_cipher: true
           script: |
             echo "=== Disk space ==="
             df -h ${{ secrets.VPS_DEPLOY_PATH }}
@@ -68,13 +70,16 @@ jobs:
           REMOTE_HOST: ${{ secrets.VPS_HOST }}
           REMOTE_USER: ${{ secrets.VPS_USER }}
           TARGET: ${{ secrets.VPS_DEPLOY_PATH }}
+          SSH_EXTRA_ARGS: '-oKexAlgorithms=+diffie-hellman-group1-sha1 -oCiphers=+aes256-cbc -oHostKeyAlgorithms=+ssh-rsa'
 
       - name: Post-deploy (migrate, cache, restart queue)
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          timeout: 60s
+          use_insecure_cipher: true
           script: |
             cd ${{ secrets.VPS_DEPLOY_PATH }}
             php artisan migrate --force
