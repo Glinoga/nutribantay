@@ -6,6 +6,7 @@ use App\Models\Child;
 use App\Models\HealthLog;
 use App\Models\User;
 use Carbon\Carbon;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class ChildSeeder extends Seeder
@@ -22,7 +23,7 @@ class ChildSeeder extends Seeder
 
         $barangay = $admin->barangay ?? '176B';
 
-        $faker = \Faker\Factory::create('en_PH');
+        $faker = Factory::create('en_PH');
 
         $children = [
             // ── Normal children (under 60 months) ──────────────────────────

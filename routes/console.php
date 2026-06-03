@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Monthly database backup (runs on the first day of each month at 02:00)
-Schedule::command('app:backup-database')->monthly()->at('02:00');
+// Daily database backup at 2:00 AM
+Schedule::command('app:backup-database')->dailyAt('02:00');

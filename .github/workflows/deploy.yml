@@ -59,6 +59,7 @@ jobs:
             php artisan view:cache
             php artisan queue:restart
             test -L public/storage || ln -s storage/app/public public/storage
+            php artisan app:setup-backup-folders || true
             # Run due scheduled tasks once during deploy
             php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
             # Persistent cron job — runs every minute, logs errors for debugging

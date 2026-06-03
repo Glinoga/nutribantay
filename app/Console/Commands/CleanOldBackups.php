@@ -6,7 +6,6 @@ use App\Models\AuditLog;
 use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class CleanOldBackups extends Command
 {
@@ -20,47 +19,52 @@ class CleanOldBackups extends Command
 
         $this->info("Starting backup cleanup (retention: {$retentionDays} days)...");
 
-        $backupPath = 'NutriBantay';
+        $locations = [
+            storage_path('app/NutriBantay'),
+            storage_path('app/private/NutriBantay'),
+        ];
 
-        if (! Storage::disk('local')->exists($backupPath)) {
-            $this->info('No backup directory found. Exiting.');
-
-            return Command::SUCCESS;
-        }
-
-        $files = Storage::disk('local')->files($backupPath);
         $cutoffDate = now()->subDays($retentionDays);
         $deletedCount = 0;
         $deletedFiles = [];
 
-        foreach ($files as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) !== 'zip') {
+        foreach ($locations as $path) {
+            if (! is_dir($path)) {
                 continue;
             }
 
-            $lastModified = Storage::disk('local')->lastModified($file);
-            $fileDate = Carbon::createFromTimestamp($lastModified);
+            $files = glob($path.'/*.zip');
 
-            if ($fileDate->isBefore($cutoffDate)) {
-                $filename = basename($file);
-                Storage::disk('local')->delete($file);
-                $deletedCount++;
-                $deletedFiles[] = $filename;
-                $this->line("Deleted: {$filename}");
+            foreach ($files as $file) {
+                if (! is_file($file)) {
+                    continue;
+                }
+
+                $lastModified = filemtime($file);
+                $fileDate = Carbon::createFromTimestamp($lastModified);
+
+                if ($fileDate->isBefore($cutoffDate)) {
+                    $filename = basename($file);
+                    unlink($file);
+                    $deletedCount++;
+                    $deletedFiles[] = $filename;
+                    $this->line("Deleted: {$filename}");
+                }
             }
         }
 
-        // Log the cleanup action
-        AuditLog::logAction([
-            'action' => 'backups_cleaned',
-            'model_type' => 'System',
-            'description' => "Cleaned {$deletedCount} old backup(s) older than {$retentionDays} days",
-            'new_values' => [
-                'deleted_count' => $deletedCount,
-                'deleted_files' => $deletedFiles,
-                'retention_days' => $retentionDays,
-            ],
-        ]);
+        if ($deletedCount > 0) {
+            AuditLog::logAction([
+                'action' => 'backups_cleaned',
+                'model_type' => 'System',
+                'description' => "Cleaned {$deletedCount} old backup(s) older than {$retentionDays} days",
+                'new_values' => [
+                    'deleted_count' => $deletedCount,
+                    'deleted_files' => $deletedFiles,
+                    'retention_days' => $retentionDays,
+                ],
+            ]);
+        }
 
         $this->info("Cleanup complete. Deleted {$deletedCount} file(s).");
 

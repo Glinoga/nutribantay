@@ -30,36 +30,24 @@ class CheckScheduler extends Command
         }
         $this->newLine();
 
-        // 3. Check mysqldump
-        $this->line('3. mysqldump (required by spatie backup):');
-        $mysqldump = shell_exec('command -v mysqldump 2>&1') ?? '';
-        if ($mysqldump) {
-            $version = shell_exec('mysqldump --version 2>&1');
-            $this->line("   Found: {$mysqldump}");
-            $this->line('   Version: '.trim(explode("\n", $version ?? '')[0]));
-        } else {
-            $this->warn('   NOT FOUND — spatie daily backup will fail! Install mysqldump.');
-        }
-        $this->newLine();
-
-        // 4. Check queue worker
-        $this->line('4. Queue worker (supervisor):');
+        // 3. Check queue worker
+        $this->line('3. Queue worker (supervisor):');
         $supervisor = shell_exec('supervisorctl status 2>&1') ?? '(unavailable)';
         foreach (explode("\n", trim($supervisor)) as $line) {
             $this->line("   {$line}");
         }
         $this->newLine();
 
-        // 5. Show next scheduled tasks
-        $this->line('5. Upcoming scheduled tasks (schedule:list):');
+        // 4. Show next scheduled tasks
+        $this->line('4. Upcoming scheduled tasks (schedule:list):');
         $list = shell_exec(PHP_BINARY.' artisan schedule:list --no-interaction 2>&1') ?? '(failed to list)';
         foreach (explode("\n", trim($list)) as $line) {
             $this->line("   {$line}");
         }
         $this->newLine();
 
-        // 6. Check storage write permissions
-        $this->line('6. Storage write check:');
+        // 5. Check storage write permissions
+        $this->line('5. Storage write check:');
         $paths = [
             storage_path('logs'),
             storage_path('app/backup-temp'),
@@ -74,9 +62,9 @@ class CheckScheduler extends Command
         }
         $this->newLine();
 
-        // 7. Check scheduler log
+        // 6. Check scheduler log
         $schedLog = storage_path('logs/scheduler.log');
-        $this->line('7. Scheduler log:');
+        $this->line('6. Scheduler log:');
         if (file_exists($schedLog)) {
             $lines = file($schedLog);
             $last = array_slice($lines, -10);
