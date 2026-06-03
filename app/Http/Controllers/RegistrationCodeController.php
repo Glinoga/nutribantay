@@ -75,7 +75,7 @@ class RegistrationCodeController extends Controller
                 $query->where('code', 'like', "%{$search}%");
             }
 
-            $codes = $query->get()->map(function ($code) {
+            $codes = $query->limit(100)->get()->map(function ($code) {
                 $isUsed = $code->is_used;
                 $expiresAt = $code->expires_at ? Carbon::parse($code->expires_at) : null;
                 $isExpired = $expiresAt && $expiresAt->isPast();

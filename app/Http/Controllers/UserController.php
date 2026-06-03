@@ -41,10 +41,23 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->get();
+        $stats = [
+            'total' => (clone $query)->count(),
+            'pending' => (clone $query)->where('status', 'pending')->count(),
+            'roles' => DB::table('model_has_roles')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->whereIn('model_has_roles.model_id', (clone $query)->select('id'))
+                ->where('model_has_roles.model_type', (new User)->getMorphClass())
+                ->distinct()
+                ->count('roles.name'),
+        ];
+
+        $query->orderBy('created_at', 'desc');
+
+        $users = $query->paginate(25);
 
         return Inertia::render('Users/Index', [
-            'users' => $users->map(fn ($u) => [
+            'users' => collect($users->items())->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'email' => $u->email,
@@ -52,6 +65,14 @@ class UserController extends Controller
                 'status' => $u->status,
                 'registration_code' => $u->registrationCode?->code,
             ]),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+                'total' => $users->total(),
+            ],
+            'stats' => $stats,
             'filters' => $request->only('search'),
         ]);
     }

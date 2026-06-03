@@ -27,7 +27,7 @@ class SMSController extends Controller
             ->where('barangay', $user->barangay)
             ->where('birthdate', '>=', now()->subMonths(60));
 
-        $children = $query->get()
+        $children = $query->limit(200)->orderBy('first_name')->get()
             ->map(function ($child) {
                 $fullname = trim($child->first_name.' '.($child->middle_initial ? $child->middle_initial.' ' : '').$child->last_name);
 

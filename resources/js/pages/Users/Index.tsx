@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
@@ -22,7 +23,7 @@ import { smartToast } from '@/utils/smartToast';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
 import { Archive, Clock, HardDrive, Key, Loader2, Plus, Search, Shield, ShieldAlert, Users } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type User = {
     id: number;
@@ -52,11 +53,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Props {
     users: User[];
+    pagination?: PaginationData;
+    stats?: {
+        total: number;
+        pending: number;
+        roles: number;
+    };
     filters: { search?: string };
     isSeededAdmin?: boolean;
 }
 
-export default function Index({ users, filters, isSeededAdmin = false }: Props) {
+export default function Index({ users, pagination, stats, filters, isSeededAdmin = false }: Props) {
+    const safeStats = stats ?? { total: 0, pending: 0, roles: 0 };
     const [codes, setCodes] = useState<RegistrationCode[]>([]);
     const [count, setCount] = useState(1);
     const [search, setSearch] = useState(filters.search || '');
@@ -88,15 +96,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
     const [resetLoading, setResetLoading] = useState(false);
     const [copiedReset, setCopiedReset] = useState(false);
 
-    const stats = useMemo(() => {
-        const roles = new Set(users.flatMap((u) => u.roles));
-        const pending = users.filter((u) => u.status === 'pending').length;
-        return {
-            total: users.length,
-            roles: roles.size,
-            pending,
-        };
-    }, [users]);
+    // Stats come from server (computed from full filtered query before pagination)
 
     const copyCredentials = async () => {
         const text = generatedCode ? `${generatedCode} - ${generatedPassword}` : generatedPassword;
@@ -148,7 +148,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
             } else {
                 setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
             }
-            router.reload({ only: ['users'], preserveState: true, preserveScroll: true });
+            router.visit(route('users.index'), { data: { page: 1 }, preserveScroll: true });
         } catch (err: unknown) {
             let message = 'Failed to create user';
             if (err && typeof err === 'object' && 'response' in err) {
@@ -289,7 +289,11 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('users.index'), { search }, { preserveState: true });
+        router.get(route('users.index'), { search, page: 1 }, { preserveState: true });
+    };
+
+    const handlePageChange = (page: number) => {
+        router.get(route('users.index'), { page, search }, { preserveScroll: true });
     };
 
     const handleApprove = async (userId: number) => {
@@ -383,7 +387,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{stats.total}</p>
+                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">{safeStats.total}</p>
                                 </div>
                                 <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
                                     <Users className="h-5 w-5 text-teal-500 dark:text-teal-400" />
@@ -394,7 +398,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Roles</p>
-                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{stats.roles}</p>
+                                    <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">{safeStats.roles}</p>
                                 </div>
                                 <div className="rounded-full bg-cyan-50 p-2.5 dark:bg-cyan-900/30">
                                     <Shield className="h-5 w-5 text-cyan-500 dark:text-cyan-400" />
@@ -405,7 +409,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
-                                    <p className="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">{stats.pending}</p>
+                                    <p className="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">{safeStats.pending}</p>
                                 </div>
                                 <div className="rounded-full bg-yellow-50 p-2.5 dark:bg-yellow-900/30">
                                     <Clock className="h-5 w-5 text-yellow-500 dark:text-yellow-400" />
@@ -626,6 +630,8 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                             </div>
                         </CardContent>
                     </Card>
+
+                    {pagination && <Pagination pagination={pagination} onPageChange={handlePageChange} />}
                 </div>
             </div>
 
@@ -1020,7 +1026,7 @@ export default function Index({ users, filters, isSeededAdmin = false }: Props) 
                                 setGeneratedCode('');
                                 setGeneratedPassword('');
                                 setShowCreateModal(false);
-                                router.reload({ only: ['users'], preserveState: true, preserveScroll: true });
+                                router.get(route('users.index'), {}, { preserveScroll: true });
                             }}
                         >
                             Cancel
