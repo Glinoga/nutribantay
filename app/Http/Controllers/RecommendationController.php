@@ -45,11 +45,20 @@ class RecommendationController extends Controller
         $bmi = $request->bmi ?? $latestHealthLog?->bmi ?? $child->bmi ?? 0;
         $nutritionStatus = $request->nutrition_status ?? $latestHealthLog?->nutrition_status ?? $child->nutrition_status ?? 'Normal';
 
-        // Step 4: Get Vitamin A and Deworming status from health log (latest one)
-        $vitaminAStatus = $latestHealthLog?->vitamin_a ? 'Yes' : 'No';
-        $dewormingStatus = $latestHealthLog?->deworming ? 'Yes' : 'No';
+        // Step 4: Get Vitamin A and Deworming status — check if given within the last 6 months
+        $lastVitaminA = $child->healthLogs()
+            ->where('vitamin_a', true)
+            ->latest('created_at')
+            ->first();
+        $vitaminAStatus = $lastVitaminA && $lastVitaminA->created_at->gt(now()->subMonths(6)) ? 'Yes' : 'No';
 
-        // Compute deworming recommendation flag - only for 12+ months AND no deworming yet
+        $lastDeworming = $child->healthLogs()
+            ->where('deworming', true)
+            ->latest('created_at')
+            ->first();
+        $dewormingStatus = $lastDeworming && $lastDeworming->created_at->gt(now()->subMonths(6)) ? 'Yes' : 'No';
+
+        // Compute deworming recommendation flag — only for 12+ months AND not given within 6 months
         $needsDeworming = ($totalMonths >= 12 && $dewormingStatus === 'No') ? 'Yes' : 'No';
 
         // Step 5: Build the prompt
