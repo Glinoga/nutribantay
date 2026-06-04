@@ -143,7 +143,8 @@ NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - SUNUGIN LAMANG):
 
 VITAMINS AND NUTRIENTS REFERENCE (AYON SA NUTRITION STATUS):
 =====================================================================
-Gamitin ang reference na ito para sa 3. Mga Vitamin, Supplements, at Nutrients section:
+Gamitin ang reference na ito para sa 3. Mga Vitamin, Supplements, at Nutrients section.
+**Para sa 0-5 buwan: WALANG vitamins o supplements — sapat na ang breastmilk o formula.**
 
 LAHAT NG BATA (6-59 months):
 - Vitamin A: Tuwing 6 na buwan (6-11mo: 100,000 IU, 12-59mo: 200,000 IU)
@@ -165,7 +166,7 @@ c) Banggitin ang PAGKUKUNAN (dietary sources) kung maaari
 STRICT RULES:
 1. **Bawat meal AY ISANG PAGKAIN LAMANG** sa listahan - HUWAG COMBINE
 2. **HUWAG UMIULIT NG PAGKAIN SA SAME DAY** - iba dapat bawat meal (Umaga/Tanghali/Gabi)
-3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD**
+3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD, WALANG VITAMINS O SUPPLEMENTS**
 4. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
 5. **Bawal ang pagkain na wala sa listahan**
 6. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
@@ -367,39 +368,97 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         // Fix meals that have only light foods (prutas/gulay) without heavy food base
         $lines = explode("\n", $recommendation);
         $fixedLines = [];
+        $currentSection = '';
+
+        // Section header patterns
+        $sectionHeaders = [
+            '/MGA NUTRITIOUS NA TIP/i',
+            '/MEAL PLAN/i',
+            '/MGA VITAMIN/i',
+            '/MGA RESTRICTIONS/i',
+            '/DISCLAIMER/i',
+            '/Pinagkuhanan/i',
+            '/PAALALA/i',
+        ];
 
         $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
-        $lightFoods = ['saging', 'prutas', 'gulay', 'vegetables', 'salad', 'sabaw'];
 
         foreach ($lines as $line) {
+            $lineTrimmed = trim($line);
             $lineLower = strtolower($line);
+
+            // Detect section headers
+            foreach ($sectionHeaders as $pattern) {
+                if (preg_match($pattern, $line)) {
+                    $currentSection = $pattern;
+                    break;
+                }
+            }
 
             // Check if this is a meal line
             if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $matches)) {
                 $mealTime = $matches[1];
                 $mealContent = trim($matches[2]);
-                $mealContentLower = strtolower($mealContent);
-
-                // Check if meal has heavy food
-                $hasHeavyFood = false;
-                foreach ($heavyFoods as $heavy) {
-                    if (strpos($mealContentLower, $heavy) !== false) {
-                        $hasHeavyFood = true;
-                        break;
-                    }
-                }
 
                 // For 0-5 months, override ALL meal lines to gatas-only
                 if ($ageInMonths < 6) {
                     $mealContent = 'Gatas lamang (breastmilk/formula)';
-                } elseif (! $hasHeavyFood && $ageInMonths < 12) {
-                    // 6-11 months: NCS requires a carb base. Add lugaw if missing.
-                    $mealContent = 'Lugaw na may '.$mealContent;
                     $line = $mealTime.': '.$mealContent;
+                } else {
+                    $mealContentLower = strtolower($mealContent);
+                    // Check if meal has heavy food
+                    $hasHeavyFood = false;
+                    foreach ($heavyFoods as $heavy) {
+                        if (strpos($mealContentLower, $heavy) !== false) {
+                            $hasHeavyFood = true;
+                            break;
+                        }
+                    }
+                    if (! $hasHeavyFood && $ageInMonths < 12) {
+                        // 6-11 months: NCS requires a carb base. Add lugaw if missing.
+                        $mealContent = 'Lugaw na may '.$mealContent;
+                        $line = $mealTime.': '.$mealContent;
+                    }
+                }
+            }
+
+            // For 0-5 months: sanitize non-meal sections
+            if ($ageInMonths < 6) {
+                // Skip original tips in "MGA NUTRITIOUS NA TIP" section
+                if ($currentSection === '/MGA NUTRITIOUS NA TIP/i' && preg_match('/^\d+\./', $lineTrimmed)) {
+                    $fixedLines[] = $line;
+
+                    continue;
+                }
+
+                // Skip all lines in "MGA VITAMIN" section (no supplements for 0-5mo)
+                if ($currentSection === '/MGA VITAMIN/i') {
+                    continue;
+                }
+
+                // Adjust restrictions section for 0-5 months
+                if ($currentSection === '/MGA RESTRICTIONS/i' && preg_match('/^- /', $lineTrimmed)) {
+                    continue; // Skip original restrictions, we add our own below
                 }
             }
 
             $fixedLines[] = $line;
+        }
+
+        // For 0-5 months: inject gatas-only restrictions after the meal plan
+        if ($ageInMonths < 6) {
+            $result = [];
+            $injected = false;
+            foreach ($fixedLines as $line) {
+                $result[] = $line;
+                if (! $injected && preg_match('/MGA RESTRICTIONS/i', $line)) {
+                    $result[] = '- WALANG solid food para sa 0-5 buwan — gatas lamang ang kailangan.';
+                    $result[] = '- Iwasan ang anumang pagkain maliban sa breastmilk o formula.';
+                    $result[] = '- Walang kailangang vitamins o supplements — sapat na ang gatas.';
+                    $injected = true;
+                }
+            }
+            $fixedLines = $result;
         }
 
         return implode("\n", $fixedLines);

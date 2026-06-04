@@ -24,6 +24,11 @@ class DatabaseMaintenanceController extends Controller
     {
         try {
             set_time_limit(0);
+
+            if (! class_exists(\ZipArchive::class)) {
+                throw new \RuntimeException('ZipArchive class not found — PHP zip extension is not installed.');
+            }
+
             \Log::info('=== Starting synchronous web-triggered backup (PHP-native dumper) ===');
 
             $appName = 'NutriBantay';

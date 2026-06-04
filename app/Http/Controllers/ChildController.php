@@ -520,7 +520,7 @@ class ChildController extends Controller
                 'middle_initial' => $child->middle_initial,
                 'last_name' => $child->last_name,
                 'sex' => $child->sex,
-                'birthdate' => $child->birthdate,
+                'birthdate' => $child->birthdate?->format('Y-m-d'),
                 'contact_number' => $child->contact_number,
                 'weight' => $child->weight,
                 'height' => $child->height,

@@ -44,7 +44,7 @@ class IprogsmsService
     {
         $normalizedPhone = $this->normalizePhoneNumber($phone);
 
-        $response = Http::asForm()->timeout(15)->connectTimeout(5)->post($this->baseUrl.'/sms_messages', [
+        $response = Http::asForm()->timeout(30)->connectTimeout(5)->post($this->baseUrl.'/sms_messages', [
             'api_token' => $this->apiToken,
             'phone_number' => $normalizedPhone,
             'message' => $message,
