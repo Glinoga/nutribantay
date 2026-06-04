@@ -14,7 +14,7 @@ type Child = {
     birthdate: string | null;
     weight: number | null;
     height: number | null;
-    bmi: number | null;
+    nutrition_status: string | null;
     address: string | null;
     contact_number: string | null;
 };
@@ -155,7 +155,7 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                                     Height
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    BMI
+                                    Nutrition Status
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                     Contact
@@ -178,7 +178,7 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.birthdate ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.weight ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.height ?? '-'}</TableCell>
-                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.bmi ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.nutrition_status ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 md:table-cell">{child.contact_number ?? '-'}</TableCell>
                                 </TableRow>
                             ))}

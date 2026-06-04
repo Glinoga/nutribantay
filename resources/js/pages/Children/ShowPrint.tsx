@@ -35,7 +35,7 @@ type Child = {
     age: number;
     weight: number | null;
     height: number | null;
-    bmi: number | null;
+    nutrition_status: string | null;
     address: string | null;
     contact_number: string | null;
     created_at: string | null;
@@ -116,7 +116,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 borderColor: 'rgb(168, 85, 247)',
                 backgroundColor: 'rgba(168, 85, 247, 0.5)',
                 tension: 0.3,
-            },
+            }
         ],
     };
 
@@ -262,8 +262,8 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                             <span className="font-medium">{child.height ?? '-'} cm</span>
                         </div>
                         <div className="flex justify-between gap-2">
-                            <span className="text-cyan-700 dark:text-cyan-300">BMI:</span>
-                            <span className="font-medium">{child.bmi ?? '-'}</span>
+                            <span className="text-cyan-700 dark:text-cyan-300">Nutrition Status:</span>
+                            <span className="font-medium">{child.nutrition_status ?? '-'}</span>
                         </div>
                     </div>
                 </div>
@@ -279,8 +279,8 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div className="rounded-md border border-cyan-200 bg-white p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800 print:bg-white">
-                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
-                                Weight, Height & BMI Over Time
+                            <h4 className="mb-4 text-center text-xs                     font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
+                                Weight & Height Over Time
                             </h4>
                             <div className="relative" style={{ height: '280px' }}>
                                 <Line
@@ -351,9 +351,8 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                         Height
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        BMI
+                                        Nutrition Status
                                     </TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                         Vit A
                                     </TableHead>
@@ -372,13 +371,12 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                             <div className="flex flex-col gap-0.5">
                                                 <span>{log.created_at ?? '-'}</span>
                                                 <span className="text-xs text-cyan-700 sm:hidden dark:text-cyan-300">
-                                                    {log.weight ?? '-'}kg · {log.bmi ?? '-'} · {log.nutrition_status ?? '-'}
+                                                    {log.weight ?? '-'}kg · {log.nutrition_status ?? '-'}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-4 py-2">{log.weight ?? '-'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.height ?? '-'}</TableCell>
-                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.bmi ?? '-'}</TableCell>
                                         <TableCell className="px-4 py-2">
                                             <span
                                                 className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap ${getStatusColor(log.nutrition_status)}`}

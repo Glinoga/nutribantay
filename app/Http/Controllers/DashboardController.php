@@ -181,7 +181,7 @@ class DashboardController extends Controller
                     if (! $headerWritten) {
                         fputcsv($handle, [
                             'ID', 'Child Name', 'Birthday', 'Age (Months)', 'Sex',
-                            'Weight (kg)', 'Height (cm)', 'BMI', 'Nutrition Status',
+                            'Weight (kg)', 'Height (cm)', 'Nutrition Status',
                             'Vitamin A', 'Deworming', 'MNP', 'Last Visit',
                         ]);
                         $headerWritten = true;
@@ -196,7 +196,6 @@ class DashboardController extends Controller
                             $log->child->sex ?? '',
                             $log->weight ?? '',
                             $log->height ?? '',
-                            $log->bmi ?? '',
                             $log->nutrition_status ?? 'N/A',
                             $log->vitamin_a ? 'Yes' : 'No',
                             $log->deworming ? 'Yes' : 'No',

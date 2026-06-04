@@ -476,7 +476,7 @@ class ChildController extends Controller
                 'Birthdate',
                 'Weight (kg)',
                 'Height (cm)',
-                'BMI',
+                'Nutrition Status',
                 'Address',
                 'Contact Number',
             ]);
@@ -490,7 +490,7 @@ class ChildController extends Controller
                     $child->birthdate?->format('Y-m-d'),
                     $child->weight,
                     $child->height,
-                    $child->bmi,
+                    $child->nutrition_status,
                     $child->address,
                     $child->contact_number,
                 ]);
@@ -730,8 +730,10 @@ class ChildController extends Controller
             return back()->with('error', 'Invalid import data.');
         }
 
-        $created = 0;
+        $imported = 0;
         $skipped = 0;
+        $withoutHealthLog = 0;
+        $failures = 0;
 
         $existingMap = Child::where('barangay', $user->barangay)
             ->get()
@@ -751,74 +753,85 @@ class ChildController extends Controller
 
             $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
 
-            $child = Child::create([
-                'first_name' => $row['first_name'],
-                'middle_initial' => $row['middle_initial'] ?? null,
-                'last_name' => $row['last_name'],
-                'sex' => $sex,
-                'weight' => $row['weight'] ?? 0,
-                'height' => $row['height'] ?? 0,
-                'birthdate' => $row['birthdate'] ?? null,
-                'barangay' => $user->barangay,
-                'created_by' => $user->id,
-                'address' => $row['address'] ?? null,
-                'contact_number' => null,
-            ]);
-
-            if (
-                ! empty($row['weight']) && floatval($row['weight']) > 0 &&
+            $hasAnthropometricData = ! empty($row['weight']) && floatval($row['weight']) > 0 &&
                 ! empty($row['height']) && floatval($row['height']) > 0 &&
-                ! empty($row['birthdate'])
-            ) {
-                try {
-                    $evaluation = GrowthHelper::evaluateChild(
-                        $sex,
-                        $row['birthdate'],
-                        $row['weight'],
-                        $row['height']
-                    );
+                ! empty($row['birthdate']);
 
-                    $overall = $evaluation['overall'] ?? 'Normal';
+            try {
+                DB::transaction(function () use ($row, $user, $sex, $hasAnthropometricData, &$imported, &$withoutHealthLog) {
+                    $child = Child::create([
+                        'first_name' => $row['first_name'],
+                        'middle_initial' => $row['middle_initial'] ?? null,
+                        'last_name' => $row['last_name'],
+                        'sex' => $sex,
+                        'weight' => $row['weight'] ?? 0,
+                        'height' => $row['height'] ?? 0,
+                        'birthdate' => $row['birthdate'] ?? null,
+                        'barangay' => $user->barangay,
+                        'created_by' => $user->id,
+                        'address' => $row['address'] ?? null,
+                        'contact_number' => null,
+                    ]);
 
-                    HealthLog::create([
-                        'child_id' => $child->id,
-                        'user_id' => $user->id,
-                        'age_in_months' => $evaluation['age_months'],
-                        'weight' => $row['weight'],
-                        'height' => $row['height'],
-                        'bmi' => $evaluation['bmi'],
-                        'status_wfa' => $evaluation['status_wfa'],
-                        'status_lfa' => $evaluation['status_lfa'],
-                        'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
-                        'nutrition_status' => $overall,
-                        'recommendation' => AIRecommender::getRecommendation(
-                            $overall,
+                    if ($hasAnthropometricData) {
+                        $evaluation = GrowthHelper::evaluateChild(
                             $sex,
-                            $evaluation['age_months'] ?? 0,
-                            $evaluation['bmi'] ?? 0
-                        ),
-                    ]);
+                            $row['birthdate'],
+                            $row['weight'],
+                            $row['height']
+                        );
 
-                    $child->update([
-                        'nutrition_status' => $overall,
-                        'updated_by' => $user->id,
-                    ]);
-                } catch (\Throwable $e) {
-                    Log::error('Failed to create healthlog for imported child', [
-                        'child_id' => $child->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                }
+                        $overall = $evaluation['overall'] ?? 'Normal';
+
+                        HealthLog::create([
+                            'child_id' => $child->id,
+                            'user_id' => $user->id,
+                            'age_in_months' => $evaluation['age_months'],
+                            'weight' => $row['weight'],
+                            'height' => $row['height'],
+                            'bmi' => $evaluation['bmi'],
+                            'status_wfa' => $evaluation['status_wfa'],
+                            'status_lfa' => $evaluation['status_lfa'],
+                            'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
+                            'nutrition_status' => $overall,
+                            'recommendation' => AIRecommender::getRecommendation(
+                                $overall,
+                                $sex,
+                                $evaluation['age_months'] ?? 0,
+                                $evaluation['bmi'] ?? 0
+                            ),
+                        ]);
+
+                        $child->update([
+                            'nutrition_status' => $overall,
+                            'updated_by' => $user->id,
+                        ]);
+                    } else {
+                        $withoutHealthLog++;
+                    }
+
+                    $imported++;
+                });
+            } catch (\Throwable $e) {
+                Log::error('Failed to import child row', [
+                    'row' => $row,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                $failures++;
             }
-
-            $created++;
         }
 
         RefreshDashboardForBarangay::dispatch($user->barangay)
             ->delay(now()->addSeconds(10));
 
-        $message = "Import complete! {$created} children imported.";
+        $message = "Import complete! {$imported} children imported.";
+        if ($withoutHealthLog > 0) {
+            $message .= " {$withoutHealthLog} child(ren) created without health evaluation (missing weight, height, or birthdate).";
+        }
+        if ($failures > 0) {
+            $message .= " {$failures} row(s) failed and were rolled back.";
+        }
         if ($skipped > 0) {
             $message .= " {$skipped} duplicates skipped.";
         }
@@ -900,7 +913,7 @@ class ChildController extends Controller
             'birthdate' => $child->birthdate?->format('Y-m-d'),
             'weight' => $child->weight,
             'height' => $child->height,
-            'bmi' => $child->bmi,
+            'nutrition_status' => $child->nutrition_status,
             'address' => $child->address,
             'contact_number' => $child->contact_number,
         ]);
@@ -941,6 +954,7 @@ class ChildController extends Controller
                 'birthdate' => $child->birthdate?->format('Y-m-d'),
                 'weight' => $child->weight,
                 'height' => $child->height,
+                'nutrition_status' => $child->nutrition_status,
                 'bmi' => $child->bmi,
                 'address' => $child->address,
                 'contact_number' => $child->contact_number,
@@ -1009,7 +1023,7 @@ class ChildController extends Controller
             fputcsv($file, [
                 'ID', 'Full Name', 'Age (months)', 'Sex', 'Birthdate',
                 'Address', 'Contact Number',
-                'Weight (kg)', 'Height (cm)', 'BMI',
+                'Weight (kg)', 'Height (cm)', 'Nutrition Status',
             ]);
             fputcsv($file, [
                 $child->id,
@@ -1021,7 +1035,7 @@ class ChildController extends Controller
                 $child->contact_number,
                 $child->weight,
                 $child->height,
-                $child->bmi,
+                $child->nutrition_status,
             ]);
 
             // Blank separator row
@@ -1030,7 +1044,7 @@ class ChildController extends Controller
             // ── Section 2: Health Logs ──
             fputcsv($file, ['Health Logs']);
             fputcsv($file, [
-                'ID', 'Date', 'Weight (kg)', 'Height (cm)', 'BMI',
+                'ID', 'Date', 'Weight (kg)', 'Height (cm)',
                 'Nutrition Status', 'WFA', 'LFA', 'WFL/WFH',
                 'Vitamin A', 'Deworming', 'MNP',
                 'RUTF', 'RUSF', 'Complementary Food',
@@ -1046,7 +1060,6 @@ class ChildController extends Controller
                         $log->created_at?->format('Y-m-d'),
                         $log->weight,
                         $log->height,
-                        $log->bmi,
                         $log->nutrition_status,
                         $log->status_wfa,
                         $log->status_lfa,
