@@ -424,10 +424,8 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
             // For 0-5 months: sanitize non-meal sections
             if ($ageInMonths < 6) {
-                // Skip original tips in "MGA NUTRITIOUS NA TIP" section
+                // Skip original AI-generated tips — inject gatas-only tips after the header
                 if ($currentSection === '/MGA NUTRITIOUS NA TIP/i' && preg_match('/^\d+\./', $lineTrimmed)) {
-                    $fixedLines[] = $line;
-
                     continue;
                 }
 
@@ -445,17 +443,25 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             $fixedLines[] = $line;
         }
 
-        // For 0-5 months: inject gatas-only restrictions after the meal plan
+        // For 0-5 months: inject gatas-only tips and restrictions after their respective headers
         if ($ageInMonths < 6) {
             $result = [];
-            $injected = false;
+            $tipsInjected = false;
+            $restrictionsInjected = false;
             foreach ($fixedLines as $line) {
                 $result[] = $line;
-                if (! $injected && preg_match('/MGA RESTRICTIONS/i', $line)) {
+                if (! $tipsInjected && preg_match('/MGA NUTRITIOUS NA TIP/i', $line)) {
+                    $result[] = '1. Magbigay ng gatas (breastmilk o formula) 8-12 beses sa isang araw para sa tamang nutrisyon.';
+                    $result[] = '2. Siguraduhing wastong posisyon ang baby habang nagpapadede.';
+                    $result[] = '3. Walang kailangang tubig o ibang pagkain — sapat na ang breastmilk o formula.';
+                    $result[] = '4. Regular na i-monitor ang pagtaas ng timbang at dalhin sa health center para sa check-up.';
+                    $tipsInjected = true;
+                }
+                if (! $restrictionsInjected && preg_match('/MGA RESTRICTIONS/i', $line)) {
                     $result[] = '- WALANG solid food para sa 0-5 buwan — gatas lamang ang kailangan.';
                     $result[] = '- Iwasan ang anumang pagkain maliban sa breastmilk o formula.';
-                    $result[] = '- Walang kailangang vitamins o supplements — sapat na ang gatas.';
-                    $injected = true;
+                    $result[] = '- Walang kailangang vitamins o supplements — sapat na na ang gatas.';
+                    $restrictionsInjected = true;
                 }
             }
             $fixedLines = $result;

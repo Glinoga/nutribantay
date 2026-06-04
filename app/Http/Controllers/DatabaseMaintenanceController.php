@@ -107,6 +107,8 @@ class DatabaseMaintenanceController extends Controller
 
     public function restore(Request $request)
     {
+        set_time_limit(0);
+
         $request->validate([
             'backup_file' => 'required|string',
             'confirmation' => 'required|string|in:RESTORE DATABASE',
