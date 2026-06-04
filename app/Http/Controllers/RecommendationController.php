@@ -77,6 +77,33 @@ class RecommendationController extends Controller
         return response()->json(['recommendation' => trim($recommendation)]);
     }
 
+    private function getNCSGuidelinesSection(int $months): string
+    {
+        if ($months < 6) {
+            return "0-5 BUWAN (Gatas lamang):\n- Dalas: 8-12 beses isang araw (on-demand)\n- Pagkain: Gatas lamang (breastmilk o formula) - WALANG SOLID FOOD";
+        }
+
+        if ($months === 6) {
+            return "6 NA BUWAN:\n- Dalas: 2 beses isang araw\n- Pagkain: Malapot na Lugaw (2-3 kutsara)";
+        }
+
+        if ($months <= 8) {
+            return "6-8 BUWAN:\n- Dalas: 2-3 beses isang araw\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na may kalabasa (1/2 tasa)\n  - Lugaw na may malunggay (1/2 tasa)\n  - Lugaw na may pritong isda (1/2 tasa)";
+        }
+
+        if ($months <= 11) {
+            return "9-11 BUWAN:\n- Dalas: 3-4 beses isang araw + 2 meryenda\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na monggo, sayote, at saluyot (1/2 tasa)\n  - Papaya na minasa (1/2 tasa)\n  - Lugaw na may kalabasa at pritong isda (1/2 tasa)\n  - Kalabasa at repolyong sopas (1/2 tasa)";
+        }
+
+        $section = "12-23 BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang saging (1 tasa)\n  - Ginataang kadyos na may kalabasa (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang itlog (1 tasa)\n  - Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)";
+
+        if ($months >= 24) {
+            $section .= "\n\n24+ BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda\n- Pagkain: Regular solid foods - sundin ang 12-23 months guidelines";
+        }
+
+        return $section;
+    }
+
     private function buildPrompt(
         string $ageFormatted,
         int $months,
@@ -88,6 +115,8 @@ class RecommendationController extends Controller
         string $dewormingStatus,
         string $needsDeworming,
     ): string {
+        $ncsSection = $this->getNCSGuidelinesSection($months);
+
         return "
 Ikaw ay isang AI nutrition assistant para sa mga barangay health workers sa Pilipinas.
 Sagutin sa simpleng Tagalog. Huwag lalampas sa 500 tokens.
@@ -102,44 +131,10 @@ IMPORMASYON NG BATA:
 - Deworming: {$dewormingStatus}
 - NEEDS DEWORMING: {$needsDeworming}
 
-NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - SUNUGIN LAMANG):
+NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - PARA SA EDAD LANG NG BATA):
 ====================================================================================
 
-0-5 BUWAN (Gatas lamang):
-- Dalas: 8-12 beses isang araw (on-demand)
-- Pagkain: Gatas lamang (breastmilk o formula) - WALANG SOLID FOOD
-
-6 NA BUWAN:
-- Dalas: 2 beses isang araw
-- Pagkain: Malapot na Lugaw (2-3 kutsara)
-
-6-8 BUWAN:
-- Dalas: 2-3 beses isang araw
-- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
-  - Lugaw na may kalabasa (1/2 tasa)
-  - Lugaw na may malunggay (1/2 tasa)
-  - Lugaw na may pritong isda (1/2 tasa)
-
-9-11 BUWAN:
-- Dalas: 3-4 beses isang araw + 2 meryenda
-- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
-  - Lugaw na monggo, sayote, at saluyot (1/2 tasa)
-  - Papaya na minasa (1/2 tasa)
-  - Lugaw na may kalabasa at pritong isda (1/2 tasa)
-  - Kalabasa at repolyong sopas (1/2 tasa)
-
-12-23 BUWAN:
-- Dalas: 4-5 beses isang araw + 2 meryenda
-- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):
-  - Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)
-  - Hiniwang saging (1 tasa)
-  - Ginataang kadyos na may kalabasa (1 tasa kanin + 1/2 tasa ulam)
-  - Hiniwang itlog (1 tasa)
-  - Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)
-
-24+ BUWAN:
-- Dalas: 4-5 beses isang araw + 2 meryenda
-- Pagkain: Regular solid foods - sundin ang 12-23 months guidelines
+{$ncsSection}
 
 VITAMINS AND NUTRIENTS REFERENCE (AYON SA NUTRITION STATUS):
 =====================================================================
@@ -181,6 +176,20 @@ OUTPUT FORMAT:
 3. Mga Vitamin, Supplements, at Nutrients (ayon sa health assessment ng bata)
 4. Food Restrictions
 5. Disclaimer
+6. Pinagkuhanan ng Datos: National Nutrition Council
+
+**EXAMPLE OUTPUT PARA SA 0-5 BUWAN (sundin ito kung 0-5 buwan ang bata):**
+1. Mga Nutrition Tips:
+   1. Magpasuso tuwing 2-3 oras o ayon sa pangangailangan ng sanggol.
+   2. Ang breastmilk o formula ay sapat na pagkain at inumin — walang kailangang tubig.
+   3. Dalhin sa health center para sa regular na check-up at growth monitoring.
+2. Meal Plan:
+   - Umaga: Gatas lamang (breastmilk o formula)
+   - Tanghali: Gatas lamang (breastmilk o formula)
+   - Gabi: Gatas lamang (breastmilk o formula)
+3. Mga Vitamin, Supplements, at Nutrients: Wala — sapat na ang gatas.
+4. Food Restrictions: WALANG solid food, tubig, o anumang pagkain maliban sa gatas.
+5. Disclaimer: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines.
 6. Pinagkuhanan ng Datos: National Nutrition Council
 
 IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bago ilabas ang sagot. HUWAG GUMAMIT NG # (HASHTAG) SA OUTPUT.
@@ -272,12 +281,13 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 
     private function validateRecommendation(string $recommendation, int $ageInMonths = 0): true|string
     {
-        // For 0-5 months, check that meal plan lines don't contain solid foods
-        // (restrictions/disclaimers may mention foods to avoid — that's fine)
+        // For 0-5 months, check that meal plan has gatas-only meal lines
         if ($ageInMonths < 6) {
             $solidFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'itlog', 'karne', 'isda', 'manok', 'gulay', 'prutas'];
+            $hasMealLine = false;
             foreach (preg_split('/\R/', $recommendation) as $line) {
                 if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                    $hasMealLine = true;
                     $lineLower = strtolower($line);
                     foreach ($solidFoods as $food) {
                         if (strpos($lineLower, $food) !== false) {
@@ -285,6 +295,9 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                         }
                     }
                 }
+            }
+            if (! $hasMealLine) {
+                return self::VALIDATION_FAILED.': Walang meal lines sa 0-5 months - dapat may GATAS LAMANG!';
             }
         }
 
@@ -371,47 +384,73 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         $supplementWords = ['vitamin', 'iron', 'zinc', 'calcium', 'supplement', 'nutrient', 'ferrous', 'albendazole', 'mebendazole', 'deworming'];
 
         if ($ageInMonths < 6) {
+            $originalMealCount = 0;
+            $originalTipCount = 0;
+            $hasMealHeader = false;
+
             foreach ($lines as $line) {
+                $trimmed = trim($line);
                 $lower = strtolower($line);
 
+                if (preg_match('/meal plan/i', $line)) {
+                    $hasMealHeader = true;
+                }
+
                 if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                    $originalMealCount++;
                     $fixed[] = trim(preg_replace('/^(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
 
                     continue;
                 }
 
-                if (preg_match('/^\d+\.\s/', $line)) {
+                if (preg_match('/^\d+[\.\)]\s/', $trimmed)) {
+                    $originalTipCount++;
+
                     continue;
                 }
 
-                $hasSolid = false;
-                foreach ($solidFoods as $food) {
-                    if (str_contains($lower, $food)) {
-                        $hasSolid = true;
-                        break;
-                    }
-                }
-                if ($hasSolid) {
+                if (preg_match('/^[-*]\s/', $trimmed)) {
                     continue;
                 }
 
-                $hasSupplement = false;
-                foreach ($supplementWords as $word) {
-                    if (str_contains($lower, $word)) {
-                        $hasSupplement = true;
-                        break;
-                    }
-                }
-                if ($hasSupplement) {
+                if ($trimmed === '' || preg_match('/^\*{1,2}/', $trimmed) || preg_match('/^[A-Z \/:]+$/', $trimmed)) {
+                    $fixed[] = $line;
+
                     continue;
                 }
 
-                $fixed[] = $line;
+                if (preg_match('/gatas|breastmilk|formula|dede|pagpapasuso/i', $lower)) {
+                    $fixed[] = $line;
+
+                    continue;
+                }
             }
 
-            $result = implode("\n", $fixed);
+            if ($originalTipCount === 0 && $originalMealCount === 0) {
+                return self::buildZeroToFiveOutput();
+            }
 
-            return trim($result) === '' ? 'Hindi available ang AI recommendation para sa edad na ito.' : $result;
+            if ($originalMealCount === 0 && $hasMealHeader) {
+                $result = [];
+                foreach ($fixed as $line) {
+                    $result[] = $line;
+                    if (preg_match('/meal plan/i', $line)) {
+                        $result[] = 'Umaga: Gatas lamang (breastmilk/formula)';
+                        $result[] = 'Tanghali: Gatas lamang (breastmilk/formula)';
+                        $result[] = 'Gabi: Gatas lamang (breastmilk/formula)';
+                    }
+                }
+                $fixed = $result;
+            }
+
+            $output = implode("\n", $fixed);
+            $output = trim($output);
+
+            if ($output === '' || ! preg_match('/[a-zA-Z]{3,}/', $output)) {
+                return self::buildZeroToFiveOutput();
+            }
+
+            return $output;
         }
 
         if ($ageInMonths >= 6 && $ageInMonths < 12) {
@@ -437,6 +476,28 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         }
 
         return $recommendation;
+    }
+
+    private static function buildZeroToFiveOutput(): string
+    {
+        return '**Mga Nutrition Tips:**
+1. Magpasuso tuwing 2-3 oras o ayon sa pangangailangan ng sanggol.
+2. Ang breastmilk o formula ay sapat na pagkain at inumin — walang kailangang tubig.
+3. Dalhin sa health center para sa regular na check-up at growth monitoring.
+
+**Meal Plan:**
+- Umaga: Gatas lamang (breastmilk o formula)
+- Tanghali: Gatas lamang (breastmilk o formula)
+- Gabi: Gatas lamang (breastmilk o formula)
+
+**Food Restrictions:**
+- WALANG solid food para sa 0-5 buwan — gatas lamang ang kailangan.
+- Iwasan ang anumang pagkain maliban sa breastmilk o formula.
+
+**Disclaimer:**
+Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines at hindi kapalit ng medikal na payo.
+
+**Pinagkuhanan ng Datos:** National Nutrition Council';
     }
 
     private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
