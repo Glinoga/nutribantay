@@ -230,7 +230,7 @@ export default function Create({ categories }: CreateProps) {
                         <div className="fade-in-up grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: '0.15s' }}>
                             <div className="rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800">
                                 <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">
-                                    Publication Date <span className="text-red-500">*</span>
+                                    Published Date <span className="text-red-500">*</span>
                                 </Label>
                                 <Input
                                     type="date"

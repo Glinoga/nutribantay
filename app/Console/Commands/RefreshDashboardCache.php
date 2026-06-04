@@ -99,14 +99,14 @@ class RefreshDashboardCache extends Command
             ->join('children', 'hl.child_id', '=', 'children.id')
             ->where('children.barangay', $barangay)
             ->where('children.birthdate', '>=', $now->copy()->subMonths(60))
-            ->select('hl.nutrition_status', 'hl.vitamin_a', 'hl.deworming')
+            ->select('hl.nutrition_status', 'hl.vitamin_a', 'hl.deworming', 'hl.status_lfa', 'hl.status_wfa', 'hl.status_wfl_wfh')
             ->get();
 
         $nutritionBreakdown = [
             'normal' => $latestPerChild->where('nutrition_status', 'Normal')->count(),
-            'underweight' => $latestPerChild->filter(fn ($l) => in_array($l->nutrition_status, ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition']))->count(),
-            'overweight' => $latestPerChild->filter(fn ($l) => in_array($l->nutrition_status, ['Overweight', 'Obese']))->count(),
-            'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->nutrition_status, ['Stunted', 'Severely Stunted']))->count(),
+            'underweight' => $latestPerChild->filter(fn ($l) => in_array($l->nutrition_status, ['Moderate Malnutrition', 'Severe Malnutrition']) || in_array($l->status_wfa, ['Underweight', 'Severely Underweight']))->count(),
+            'overweight' => $latestPerChild->filter(fn ($l) => $l->nutrition_status === 'Overweight/Obese' || in_array($l->status_wfl_wfh, ['Overweight', 'Obese']))->count(),
+            'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
         ];
 
         $vitaminAGiven = $latestPerChild->where('vitamin_a', true)->count();

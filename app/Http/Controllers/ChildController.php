@@ -807,7 +807,9 @@ class ChildController extends Controller
                                 $overall,
                                 $sex,
                                 $evaluation['age_months'] ?? 0,
-                                $evaluation['bmi'] ?? 0
+                                null,
+                                null,
+                                $child->id,
                             ),
                         ]);
 

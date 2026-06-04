@@ -118,14 +118,15 @@ class HealthlogController extends Controller
             $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
-            $validated['recommendation'] = AIRecommender::getRecommendation(
+            $recommendation = AIRecommender::getRecommendation(
                 $evaluation['overall'],
                 $child->sex,
                 $evaluation['age_months'],
-                $evaluation['bmi'],
                 ! empty($validated['vitamin_a']) ? 'Yes' : 'No',
                 ! empty($validated['deworming']) ? 'Yes' : 'No',
+                $child->id,
             );
+            $validated['recommendation'] = $recommendation !== '' ? $recommendation : null;
         }
 
         DB::transaction(function () use ($validated, $child) {
@@ -231,14 +232,15 @@ class HealthlogController extends Controller
             $validated['status_wfl_wfh'] = $evaluation['status_wfl_wfh'];
             $validated['nutrition_status'] = $evaluation['overall'];
 
-            $validated['recommendation'] = AIRecommender::getRecommendation(
+            $recommendation = AIRecommender::getRecommendation(
                 $evaluation['overall'],
                 $child->sex,
                 $evaluation['age_months'],
-                $evaluation['bmi'],
                 ! empty($validated['vitamin_a']) ? 'Yes' : 'No',
                 ! empty($validated['deworming']) ? 'Yes' : 'No',
+                $child->id,
             );
+            $validated['recommendation'] = $recommendation !== '' ? $recommendation : null;
         }
 
         DB::transaction(function () use ($validated, $healthlog, $child, $weight, $height) {

@@ -66,10 +66,10 @@ class RecommendationController extends Controller
         );
 
         // Step 7: Try API with retry logic
-        $recommendation = $this->generateWithRetry($apiKey, $prompt, $totalMonths, $nutritionStatus, $child->sex, $totalMonths, $bmi, $vitaminAStatus, $dewormingStatus);
+        $recommendation = $this->generateWithRetry($apiKey, $prompt, $totalMonths, $nutritionStatus, $child->sex, $totalMonths, $vitaminAStatus, $dewormingStatus, $child->id);
 
-        // Step 8: Post-process to fix any meals with only light foods
-        $recommendation = $this->fixMealPlan($recommendation, $totalMonths);
+        // Step 8: Post-process to enforce age-appropriate content
+        $recommendation = $this->enforceAgeSafety($recommendation, $totalMonths);
 
         // Step 9: Post-process to fix deworming if AI missed it
         $recommendation = $this->fixDewormingRecommendation($recommendation, $totalMonths, $dewormingStatus);
@@ -187,7 +187,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
 ";
     }
 
-    private function generateWithRetry(string $apiKey, string $prompt, int $totalMonths, string $nutritionStatus, string $sex, int $months, float $bmi, string $vitaminAStatus, string $dewormingStatus): string
+    private function generateWithRetry(string $apiKey, string $prompt, int $totalMonths, string $nutritionStatus, string $sex, int $months, string $vitaminAStatus, string $dewormingStatus, int $childId): string
     {
         if (empty($apiKey)) {
             \Log::info('No OpenAI API key configured');
@@ -250,24 +250,23 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         if ($lastResponse) {
             \Log::warning("AI recommendation failed validation after {$attempts} attempts, falling back to local AI recommender. Error: {$lastError}");
 
-            return $this->getLocalFallback($nutritionStatus, $sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
+            return $this->getLocalFallback($nutritionStatus, $sex, $months, $vitaminAStatus, $dewormingStatus, $childId);
         }
 
         \Log::error("AI recommendation failed after {$attempts} attempts with no valid response. Error: {$lastError}");
 
-        return $this->getLocalFallback($nutritionStatus, $sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
+        return $this->getLocalFallback($nutritionStatus, $sex, $months, $vitaminAStatus, $dewormingStatus, $childId);
     }
 
-    private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, ?string $vitaminA = null, ?string $deworming = null): string
+    private function getLocalFallback(string $status, string $sex, int $ageInMonths, ?string $vitaminA = null, ?string $deworming = null, int $childId = 0): string
     {
-        // Call the improved local recommender
         return AIRecommender::getRecommendation(
             $status,
             $sex,
             $ageInMonths,
-            $bmi,
             $vitaminA,
-            $deworming
+            $deworming,
+            $childId
         );
     }
 
@@ -363,111 +362,81 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         return true;
     }
 
-    private function fixMealPlan(string $recommendation, int $ageInMonths): string
+    private function enforceAgeSafety(string $recommendation, int $ageInMonths): string
     {
-        // Fix meals that have only light foods (prutas/gulay) without heavy food base
         $lines = explode("\n", $recommendation);
-        $fixedLines = [];
-        $currentSection = '';
+        $fixed = [];
 
-        // Section header patterns
-        $sectionHeaders = [
-            '/MGA NUTRITIOUS NA TIP/i',
-            '/MEAL PLAN/i',
-            '/MGA VITAMIN/i',
-            '/MGA RESTRICTIONS/i',
-            '/DISCLAIMER/i',
-            '/Pinagkuhanan/i',
-            '/PAALALA/i',
-        ];
+        $solidFoods = ['lugaw', 'kanin', 'itlog', 'isda', 'manok', 'baka', 'baboy', 'gulay', 'prutas', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'monggo', 'kalabasa', 'saging', 'papaya'];
+        $supplementWords = ['vitamin', 'iron', 'zinc', 'calcium', 'supplement', 'nutrient', 'ferrous', 'albendazole', 'mebendazole', 'deworming'];
 
-        $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
+        if ($ageInMonths < 6) {
+            foreach ($lines as $line) {
+                $lower = strtolower($line);
 
-        foreach ($lines as $line) {
-            $lineTrimmed = trim($line);
-            $lineLower = strtolower($line);
+                if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                    $fixed[] = trim(preg_replace('/^(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
 
-            // Detect section headers
-            foreach ($sectionHeaders as $pattern) {
-                if (preg_match($pattern, $line)) {
-                    $currentSection = $pattern;
-                    break;
+                    continue;
                 }
+
+                if (preg_match('/^\d+\.\s/', $line)) {
+                    continue;
+                }
+
+                $hasSolid = false;
+                foreach ($solidFoods as $food) {
+                    if (str_contains($lower, $food)) {
+                        $hasSolid = true;
+                        break;
+                    }
+                }
+                if ($hasSolid) {
+                    continue;
+                }
+
+                $hasSupplement = false;
+                foreach ($supplementWords as $word) {
+                    if (str_contains($lower, $word)) {
+                        $hasSupplement = true;
+                        break;
+                    }
+                }
+                if ($hasSupplement) {
+                    continue;
+                }
+
+                $fixed[] = $line;
             }
 
-            // Check if this is a meal line
-            if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $matches)) {
-                $mealTime = $matches[1];
-                $mealContent = trim($matches[2]);
+            $result = implode("\n", $fixed);
 
-                // For 0-5 months, override ALL meal lines to gatas-only
-                if ($ageInMonths < 6) {
-                    $mealContent = 'Gatas lamang (breastmilk/formula)';
-                    $line = $mealTime.': '.$mealContent;
-                } else {
-                    $mealContentLower = strtolower($mealContent);
-                    // Check if meal has heavy food
-                    $hasHeavyFood = false;
-                    foreach ($heavyFoods as $heavy) {
-                        if (strpos($mealContentLower, $heavy) !== false) {
-                            $hasHeavyFood = true;
+            return trim($result) === '' ? 'Hindi available ang AI recommendation para sa edad na ito.' : $result;
+        }
+
+        if ($ageInMonths >= 6 && $ageInMonths < 12) {
+            $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
+            foreach ($lines as $line) {
+                if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $m)) {
+                    $content = strtolower(trim($m[2]));
+                    $hasHeavy = false;
+                    foreach ($heavyFoods as $h) {
+                        if (str_contains($content, $h)) {
+                            $hasHeavy = true;
                             break;
                         }
                     }
-                    if (! $hasHeavyFood && $ageInMonths < 12) {
-                        // 6-11 months: NCS requires a carb base. Add lugaw if missing.
-                        $mealContent = 'Lugaw na may '.$mealContent;
-                        $line = $mealTime.': '.$mealContent;
+                    if (! $hasHeavy) {
+                        $line = $m[1].': Lugaw na may '.trim($m[2]);
                     }
                 }
+                $fixed[] = $line;
             }
 
-            // For 0-5 months: sanitize non-meal sections
-            if ($ageInMonths < 6) {
-                // Skip original AI-generated tips — inject gatas-only tips after the header
-                if ($currentSection === '/MGA NUTRITIOUS NA TIP/i' && preg_match('/^\d+\./', $lineTrimmed)) {
-                    continue;
-                }
-
-                // Skip all lines in "MGA VITAMIN" section (no supplements for 0-5mo)
-                if ($currentSection === '/MGA VITAMIN/i') {
-                    continue;
-                }
-
-                // Adjust restrictions section for 0-5 months
-                if ($currentSection === '/MGA RESTRICTIONS/i' && preg_match('/^- /', $lineTrimmed)) {
-                    continue; // Skip original restrictions, we add our own below
-                }
-            }
-
-            $fixedLines[] = $line;
+            return implode("\n", $fixed);
         }
 
-        // For 0-5 months: inject gatas-only tips and restrictions after their respective headers
-        if ($ageInMonths < 6) {
-            $result = [];
-            $tipsInjected = false;
-            $restrictionsInjected = false;
-            foreach ($fixedLines as $line) {
-                $result[] = $line;
-                if (! $tipsInjected && preg_match('/MGA NUTRITIOUS NA TIP/i', $line)) {
-                    $result[] = '1. Magbigay ng gatas (breastmilk o formula) 8-12 beses sa isang araw para sa tamang nutrisyon.';
-                    $result[] = '2. Siguraduhing wastong posisyon ang baby habang nagpapadede.';
-                    $result[] = '3. Walang kailangang tubig o ibang pagkain — sapat na ang breastmilk o formula.';
-                    $result[] = '4. Regular na i-monitor ang pagtaas ng timbang at dalhin sa health center para sa check-up.';
-                    $tipsInjected = true;
-                }
-                if (! $restrictionsInjected && preg_match('/MGA RESTRICTIONS/i', $line)) {
-                    $result[] = '- WALANG solid food para sa 0-5 buwan — gatas lamang ang kailangan.';
-                    $result[] = '- Iwasan ang anumang pagkain maliban sa breastmilk o formula.';
-                    $result[] = '- Walang kailangang vitamins o supplements — sapat na na ang gatas.';
-                    $restrictionsInjected = true;
-                }
-            }
-            $fixedLines = $result;
-        }
-
-        return implode("\n", $fixedLines);
+        return $recommendation;
     }
 
     private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
