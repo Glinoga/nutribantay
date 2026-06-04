@@ -65,6 +65,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->respond(function ($response, $e, Request $request) {
+            Log::error('[ExceptionHandler] '.get_class($e).': '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
+
             if ($e instanceof HttpException && $request->header('X-Inertia')) {
                 $status = $e->getStatusCode();
                 $errorPages = [400, 401, 403, 404, 419, 429, 500, 503];
