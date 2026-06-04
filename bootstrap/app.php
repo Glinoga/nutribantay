@@ -65,8 +65,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->respond(function ($response, $e, Request $request) {
-            @file_put_contents('/tmp/exception_debug.log', date('Y-m-d H:i:s').' RESPOND '.get_class($e).': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().PHP_EOL, FILE_APPEND);
-
             if ($e instanceof HttpException && $request->header('X-Inertia')) {
                 $status = $e->getStatusCode();
                 $errorPages = [400, 401, 403, 404, 419, 429, 500, 503];
@@ -78,9 +76,5 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return $response;
-        });
-
-        $exceptions->render(function ($e, Request $request) {
-            @file_put_contents('/tmp/exception_debug.log', date('Y-m-d H:i:s').' RENDER '.get_class($e).': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine().PHP_EOL, FILE_APPEND);
         });
     })->create();
