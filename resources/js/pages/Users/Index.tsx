@@ -149,6 +149,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
                 setGeneratedPassword('');
             } else {
                 setNewUser({ name: '', email: '', password: '', role: 'Healthworker' });
+                return;
             }
             router.visit(route('users.index'), { data: { page: 1 }, preserveScroll: true });
         } catch (err: unknown) {

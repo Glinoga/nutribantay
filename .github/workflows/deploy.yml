@@ -44,4 +44,4 @@ jobs:
           (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab -
           sudo supervisorctl reread
           sudo supervisorctl update
-          sudo supervisorctl start all
+          sudo supervisorctl restart all
