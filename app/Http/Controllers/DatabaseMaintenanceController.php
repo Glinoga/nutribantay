@@ -23,6 +23,7 @@ class DatabaseMaintenanceController extends Controller
     public function backup()
     {
         try {
+            set_time_limit(0);
             \Log::info('=== Starting synchronous web-triggered backup (PHP-native dumper) ===');
 
             $appName = 'NutriBantay';
@@ -77,7 +78,7 @@ class DatabaseMaintenanceController extends Controller
 
             return back()->with('success', "✅ Backup created successfully: {$zipName} ({$sizeFormatted})");
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Backup failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
             AuditLog::logAction([
@@ -186,7 +187,7 @@ class DatabaseMaintenanceController extends Controller
 
             return back()->with('success', '✅ Database restored successfully from MySQL backup.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Database restore failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
             if (file_exists($extractPath)) {
@@ -328,7 +329,7 @@ class DatabaseMaintenanceController extends Controller
 
             return back()->with('success', '✅ Backup deleted successfully.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Backup deletion failed: '.$e->getMessage());
 
             return back()->with('error', '❌ Delete failed: '.$e->getMessage());

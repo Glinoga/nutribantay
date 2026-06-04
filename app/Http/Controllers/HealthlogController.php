@@ -46,7 +46,7 @@ class HealthlogController extends Controller
                     'bmi' => $log->bmi,
                     'nutrition_status' => $log->nutrition_status,
                     'micronutrient_powder' => $log->micronutrient_powder,
-                    'rutf' => $log->rutf,
+                    'rutf' => $log->ruf,
                     'rusf' => $log->rusf,
                     'complementary_food' => $log->complementary_food,
                     'vitamin_a' => $log->vitamin_a,

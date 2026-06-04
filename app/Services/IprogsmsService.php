@@ -44,7 +44,7 @@ class IprogsmsService
     {
         $normalizedPhone = $this->normalizePhoneNumber($phone);
 
-        $response = Http::asForm()->post($this->baseUrl.'/sms_messages', [
+        $response = Http::asForm()->timeout(15)->connectTimeout(5)->post($this->baseUrl.'/sms_messages', [
             'api_token' => $this->apiToken,
             'phone_number' => $normalizedPhone,
             'message' => $message,
@@ -76,7 +76,7 @@ class IprogsmsService
         $normalizedPhones = array_map([$this, 'normalizePhoneNumber'], $phones);
         $phoneString = implode(',', $normalizedPhones);
 
-        $response = Http::asForm()->post($this->baseUrl.'/sms_messages/send_bulk', [
+        $response = Http::asForm()->timeout(30)->connectTimeout(5)->post($this->baseUrl.'/sms_messages/send_bulk', [
             'api_token' => $this->apiToken,
             'phone_number' => $phoneString,
             'message' => $message,
@@ -164,7 +164,7 @@ class IprogsmsService
      */
     public function checkCredits(): array
     {
-        $response = Http::get($this->baseUrl.'/account/sms_credits', [
+        $response = Http::timeout(5)->connectTimeout(3)->get($this->baseUrl.'/account/sms_credits', [
             'api_token' => $this->apiToken,
         ]);
 
@@ -188,7 +188,7 @@ class IprogsmsService
      */
     public function checkStatus(string $messageId): array
     {
-        $response = Http::get($this->baseUrl.'/sms_messages/status', [
+        $response = Http::timeout(5)->connectTimeout(3)->get($this->baseUrl.'/sms_messages/status', [
             'api_token' => $this->apiToken,
             'message_id' => $messageId,
         ]);

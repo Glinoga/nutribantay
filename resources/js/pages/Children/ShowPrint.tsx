@@ -18,7 +18,7 @@ type HealthLog = {
     vitamin_a: boolean | null;
     deworming: boolean | null;
     micronutrient_powder: string | null;
-    rutf: string | null;
+    ruf: string | null;
     rusf: string | null;
     complementary_food: string | null;
     status_wfa: string | null;
@@ -116,7 +116,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 borderColor: 'rgb(168, 85, 247)',
                 backgroundColor: 'rgba(168, 85, 247, 0.5)',
                 tension: 0.3,
-            }
+            },
         ],
     };
 
@@ -279,7 +279,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <div className="rounded-md border border-cyan-200 bg-white p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800 print:bg-white">
-                            <h4 className="mb-4 text-center text-xs                     font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
+                            <h4 className="mb-4 text-center text-xs font-semibold text-cyan-900 sm:text-sm dark:text-cyan-100">
                                 Weight & Height Over Time
                             </h4>
                             <div className="relative" style={{ height: '280px' }}>

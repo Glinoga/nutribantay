@@ -193,7 +193,7 @@ export default function ChildrenCreate() {
                                         <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
                                             <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
                                                 <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                                                Birthdate
+                                                Birthdate *
                                             </Label>
                                             <Input
                                                 type="date"

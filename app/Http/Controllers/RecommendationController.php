@@ -19,8 +19,12 @@ class RecommendationController extends Controller
         $apiKey = config('openai.api_key');
 
         // Step 1: Validate and fetch child (no eager load - load healthLogs only when needed)
+        $validated = $request->validate([
+            'child_id' => 'required|integer|exists:children,id',
+        ]);
+
         $user = auth()->user();
-        $child = Child::where('barangay', $user->barangay)->find($request->child_id);
+        $child = Child::where('barangay', $user->barangay)->find($validated['child_id']);
 
         if (! $child || ! $child->birthdate) {
             return response()->json(['recommendation' => '❌ Child data incomplete.']);
@@ -203,7 +207,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             }
 
             try {
-                $response = Http::withHeaders([
+                $response = Http::timeout(30)->connectTimeout(10)->withHeaders([
                     'Authorization' => "Bearer {$apiKey}",
                     'Content-Type' => 'application/json',
                 ])->post('https://api.openai.com/v1/chat/completions', [
@@ -243,14 +247,14 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         }
 
         if ($lastResponse) {
-            \Log::warning("AI recommendation failed validation after {$attempts} attempts, returning last AI response. Error: {$lastError}");
+            \Log::warning("AI recommendation failed validation after {$attempts} attempts, falling back to local AI recommender. Error: {$lastError}");
 
-            return $lastResponse;
+            return $this->getLocalFallback($nutritionStatus, $sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
         }
 
         \Log::error("AI recommendation failed after {$attempts} attempts with no valid response. Error: {$lastError}");
 
-        return '⚠️ Hindi makagawa ng recommendation. Pakisubukan muli mamaya.';
+        return $this->getLocalFallback($nutritionStatus, $sex, $months, $bmi, $vitaminAStatus, $dewormingStatus);
     }
 
     private function getLocalFallback(string $status, string $sex, int $ageInMonths, float $bmi, ?string $vitaminA = null, ?string $deworming = null): string

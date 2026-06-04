@@ -198,7 +198,7 @@ export default function Edit({ child }: Props) {
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
-                                        <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Birthdate</Label>
+                                        <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Birthdate *</Label>
                                         <Input
                                             type="date"
                                             value={data.birthdate}

@@ -89,7 +89,7 @@ export default function Create() {
 
                                     {/* Email */}
                                     <div>
-                                        <Label htmlFor="email">Email (optional)</Label>
+                                        <Label htmlFor="email">Email (Optional)</Label>
                                         <Input
                                             id="email"
                                             type="email"

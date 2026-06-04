@@ -32,6 +32,13 @@ class ContactController extends Controller
             'message' => 'required|string|min:20',
             'privacy' => 'required|accepted',
         ]);
+
+        if (! $this->emailUsername) {
+            \Log::warning('Contact form submitted but mail is not configured (MAIL_MAILER=log or no SMTP username).');
+
+            return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
+        }
+
         Mail::to($this->emailUsername)->send(new ContactFormMail($data));
 
         return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');

@@ -53,7 +53,7 @@ type HealthLog = {
     vitamin_a: boolean;
     deworming: boolean;
     micronutrient_powder: string | null;
-    rutf: string | null;
+    ruf: string | null;
     rusf: string | null;
     complementary_food: string | null;
     created_at: string;
@@ -93,6 +93,7 @@ export default function Show({ child }: { child: Child }) {
     const logsPerPage = 10;
     const [recommendation, setRecommendation] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [recommendationGenerated, setRecommendationGenerated] = useState(false);
     const [selectedLog, setSelectedLog] = useState<HealthLog | null>(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showExportDialog, setShowExportDialog] = useState(false);
@@ -209,6 +210,7 @@ export default function Show({ child }: { child: Child }) {
                 child_id: child.id,
             });
             setRecommendation(response.data.recommendation);
+            setRecommendationGenerated(true);
         } catch (error) {
             console.error(error);
             setRecommendation('Unable to generate recommendation at this time.');
@@ -746,7 +748,7 @@ export default function Show({ child }: { child: Child }) {
 
                             <button
                                 onClick={handleRecommendation}
-                                disabled={loading}
+                                disabled={loading || recommendationGenerated}
                                 className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading ? 'Analyzing...' : 'Generate Recommendation'}
@@ -869,7 +871,7 @@ export default function Show({ child }: { child: Child }) {
                                                 { label: 'Deworming', value: selectedLog.deworming },
                                                 { label: 'Micronutrient Powder (MNP)', value: selectedLog.micronutrient_powder },
                                                 { label: 'Complementary Food', value: selectedLog.complementary_food },
-                                                { label: 'RUTF (Severely Wasted)', value: selectedLog.rutf },
+                                                { label: 'RUTF (Severely Wasted)', value: selectedLog.ruf },
                                                 { label: 'RUSF (Moderately Wasted)', value: selectedLog.rusf },
                                             ].map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-2">

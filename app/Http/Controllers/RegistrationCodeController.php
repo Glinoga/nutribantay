@@ -106,7 +106,7 @@ class RegistrationCodeController extends Controller
                     'count' => $codes->count(),
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Registration code listing failed: '.$e->getMessage(), [
                 'exception' => $e,
                 'user_id' => auth()->id(),

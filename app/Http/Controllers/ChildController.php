@@ -401,7 +401,7 @@ class ChildController extends Controller
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:M,F,Male,Female',
-            'birthdate' => 'nullable|date',
+            'birthdate' => 'required|date',
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
             'weight' => 'nullable|numeric|min:0|max:200',
@@ -423,7 +423,7 @@ class ChildController extends Controller
             'middle_initial' => $validated['middle_initial'] ?? null,
             'last_name' => $validated['last_name'],
             'sex' => $validated['sex'],
-            'birthdate' => $validated['birthdate'] ?? null,
+            'birthdate' => $validated['birthdate'],
             'address' => $validated['address'] ?? null,
             'contact_number' => $validated['contact_number'] ?? null,
             'weight' => $validated['weight'] ?? null,
@@ -543,18 +543,14 @@ class ChildController extends Controller
             'middle_initial' => 'nullable|string|max:5',
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
-            'birthdate' => 'nullable|date',
+            'birthdate' => 'required|date',
             'contact_number' => 'nullable|string|max:50',
             'weight' => 'nullable|numeric|min:0|max:200',
             'height' => 'nullable|numeric|min:0|max:250',
         ]);
 
         $child->update(array_merge(
-            $request->only([
-                'first_name', 'middle_initial', 'last_name',
-                'sex', 'birthdate', 'contact_number',
-                'weight', 'height',
-            ]),
+            $validated,
             ['updated_by' => auth()->id()]
         ));
 

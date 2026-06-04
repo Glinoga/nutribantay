@@ -27,7 +27,7 @@ type HealthLogRecord = {
     bmi?: number;
     nutrition_status?: string;
     micronutrient_powder?: string;
-    rutf?: string;
+    ruf?: string;
     rusf?: string;
     complementary_food?: string;
     vitamin_a?: boolean;
@@ -49,7 +49,7 @@ type HealthLogForm = {
     bmi: string;
     nutrition_status: string;
     micronutrient_powder: string;
-    rutf: string;
+    ruf: string;
     rusf: string;
     complementary_food: string;
     vitamin_a: boolean;
@@ -80,7 +80,7 @@ export default function Create({
         bmi: '',
         nutrition_status: '',
         micronutrient_powder: '',
-        rutf: '',
+        ruf: '',
         rusf: '',
         complementary_food: '',
         vitamin_a: false,
@@ -363,10 +363,10 @@ export default function Create({
                                                     </p>
                                                 </div>
                                             )}
-                                            {selectedRecord.rutf && (
+                                            {selectedRecord.ruf && (
                                                 <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                     <p className="text-xs font-medium text-gray-500 dark:text-gray-400">RUTF</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.rutf}</p>
+                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">{selectedRecord.ruf}</p>
                                                 </div>
                                             )}
                                             {selectedRecord.rusf && (
@@ -564,14 +564,14 @@ export default function Create({
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rutf" className="text-gray-700 dark:text-gray-200">
+                                    <Label htmlFor="ruf" className="text-gray-700 dark:text-gray-200">
                                         RUTF (Severely Wasted)
                                     </Label>
                                     <Input
-                                        id="rutf"
+                                        id="ruf"
                                         type="text"
-                                        value={data.rutf}
-                                        onChange={(e) => setData('rutf', e.target.value)}
+                                        value={data.ruf}
+                                        onChange={(e) => setData('ruf', e.target.value)}
                                         className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />

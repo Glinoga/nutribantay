@@ -70,7 +70,7 @@ class BackupDatabase extends Command
 
             return Command::SUCCESS;
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->error('Backup failed: '.$e->getMessage());
 
             AuditLog::logAction([

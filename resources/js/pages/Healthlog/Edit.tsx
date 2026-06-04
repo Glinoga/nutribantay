@@ -16,7 +16,7 @@ type HealthLogForm = {
     bmi: string | number;
     nutrition_status: string;
     micronutrient_powder: string;
-    rutf: string;
+    ruf: string;
     rusf: string;
     complementary_food: string;
     vitamin_a: boolean;
@@ -30,7 +30,7 @@ type HealthLog = {
     bmi?: number | null;
     nutrition_status?: string | null;
     micronutrient_powder?: string | null;
-    rutf?: string | null;
+    ruf?: string | null;
     rusf?: string | null;
     complementary_food?: string | null;
     vitamin_a?: boolean;
@@ -62,7 +62,7 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
         nutrition_status: healthlog.nutrition_status ?? '',
 
         micronutrient_powder: healthlog.micronutrient_powder ?? '',
-        rutf: healthlog.rutf ?? '',
+        ruf: healthlog.ruf ?? '',
         rusf: healthlog.rusf ?? '',
         complementary_food: healthlog.complementary_food ?? '',
         vitamin_a: !!healthlog.vitamin_a,
@@ -305,14 +305,14 @@ export default function Edit({ healthlog, child_id: propChildId }: EditProps) {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="rutf" className="text-gray-700 dark:text-gray-200">
+                                    <Label htmlFor="ruf" className="text-gray-700 dark:text-gray-200">
                                         RUTF (Severely Wasted)
                                     </Label>
                                     <Input
-                                        id="rutf"
+                                        id="ruf"
                                         type="text"
-                                        value={data.rutf}
-                                        onChange={(e) => setData('rutf', e.target.value)}
+                                        value={data.ruf}
+                                        onChange={(e) => setData('ruf', e.target.value)}
                                         className="mt-1 bg-gray-50 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/30"
                                         placeholder="Enter details"
                                     />

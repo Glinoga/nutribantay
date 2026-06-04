@@ -53,7 +53,7 @@ class SMSController extends Controller
             if ($creditsResult['success']) {
                 $credits = $creditsResult['credits'];
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::warning('Could not fetch SMS credits: '.$e->getMessage());
         }
 
@@ -175,7 +175,7 @@ class SMSController extends Controller
                 return back()->with('error', 'Failed to send SMS to all recipients. Errors: '.implode(', ', $errors));
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('SMS Controller Error: '.$e->getMessage());
 
             return back()->with('error', 'Error sending SMS: '.$e->getMessage());
