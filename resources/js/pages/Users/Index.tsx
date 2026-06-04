@@ -175,6 +175,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
             .get('/maintenance/status')
             .then((res) => setMaintenance(res.data.status))
             .catch((err) => console.error('Failed to fetch maintenance status', err));
+        fetchCodes(1);
     }, []);
 
     const toggleMaintenance = async () => {
