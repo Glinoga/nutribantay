@@ -410,6 +410,19 @@ class ChildController extends Controller
 
         $user = auth()->user();
 
+        /** @var Child|null $existing */
+        $existing = Child::where('barangay', $user->barangay)
+            ->where('first_name', $validated['first_name'])
+            ->where('last_name', $validated['last_name'])
+            ->where('birthdate', $validated['birthdate'])
+            ->first();
+
+        if ($existing) {
+            return back()->withErrors([
+                'first_name' => 'A child with this name and birthdate already exists in your barangay.',
+            ])->withInput();
+        }
+
         // ✅ Normalize sex
         $validated['sex'] = in_array(strtoupper($validated['sex']), ['M', 'MALE']) ? 'Male' : 'Female';
 
