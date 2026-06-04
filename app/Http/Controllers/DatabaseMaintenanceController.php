@@ -129,10 +129,14 @@ class DatabaseMaintenanceController extends Controller
                 return back()->with('error', 'Backup file not found.');
             }
 
-            if (file_exists($extractPath)) {
-                $this->recursiveDelete($extractPath);
+            try {
+                if (file_exists($extractPath)) {
+                    $this->recursiveDelete($extractPath);
+                }
+            } catch (\Throwable) {
+                // Best-effort cleanup — ignore permission failures on parent dir
             }
-            mkdir($extractPath, 0755, true);
+            @mkdir($extractPath, 0755, true);
 
             $zip = new \ZipArchive;
             if ($zip->open($fullPath) !== true) {
@@ -301,7 +305,11 @@ class DatabaseMaintenanceController extends Controller
             }
         }
 
-        rmdir($directory);
+        try {
+            rmdir($directory);
+        } catch (\Throwable) {
+            // Best-effort cleanup — ignore permission failures
+        }
     }
 
     public function delete(Request $request)
