@@ -65,7 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->respond(function ($response, $e, Request $request) {
-            Log::error('[ExceptionHandler] '.get_class($e).': '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
+            error_log('[EXCEPTION] '.get_class($e).': '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine());
 
             if ($e instanceof HttpException && $request->header('X-Inertia')) {
                 $status = $e->getStatusCode();
