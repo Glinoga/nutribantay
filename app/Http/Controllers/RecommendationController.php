@@ -175,9 +175,10 @@ STRICT RULES:
 5. **Bawal ang pagkain na wala sa listahan**
 6. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
 7. **Vitamins/nutrients ay dapat naaayon sa Nutrition Status ng bata** - hindi lahat ay pare-pareho ang kailangan
+8. **Ang Nutrition Tips ay dapat naka-angkop sa Nutrition Status ng bata** - halimbawa, kung Underweight ang bata, bigyang-diin ang iron at zinc; kung Overweight, focus sa fiber at limitahan ang asukal
 
 OUTPUT FORMAT:
-1. Mga Nutrition Tips (3-4 items)
+1. Mga Nutrition Tips (3-4 items, i-angkop sa Nutrition Status ng bata)
 2. Meal Plan (Bawat meal ay ISA lamang - HUWAG COMBINE):
    - Umaga: [isang pagkain sa listahan]
    - Tanghali: [isang pagkain sa listahan - DI IULIT]
@@ -187,11 +188,12 @@ OUTPUT FORMAT:
 5. Disclaimer
 6. Pinagkuhanan ng Datos: National Nutrition Council
 
-**EXAMPLE OUTPUT PARA SA 0-5 BUWAN (sundin ito kung 0-5 buwan ang bata):**
+**EXAMPLE OUTPUT PARA SA 0-5 BUWAN (i-angkop ang tips sa Nutrition Status ng bata):**
 1. Mga Nutrition Tips:
    1. Magpasuso tuwing 2-3 oras o ayon sa pangangailangan ng sanggol.
    2. Ang breastmilk o formula ay sapat na pagkain at inumin — walang kailangang tubig.
    3. Dalhin sa health center para sa regular na check-up at growth monitoring.
+   [Kung ang Nutrition Status ay hindi Normal, magdagdag ng karagdagang tip na angkop sa kondisyon ng bata]
 2. Meal Plan:
    - Umaga: Gatas lamang (breastmilk o formula)
    - Tanghali: Gatas lamang (breastmilk o formula)
@@ -389,77 +391,34 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         $lines = explode("\n", $recommendation);
         $fixed = [];
 
-        $solidFoods = ['lugaw', 'kanin', 'itlog', 'isda', 'manok', 'baka', 'baboy', 'gulay', 'prutas', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'monggo', 'kalabasa', 'saging', 'papaya'];
-        $supplementWords = ['vitamin', 'iron', 'zinc', 'calcium', 'supplement', 'nutrient', 'ferrous', 'albendazole', 'mebendazole', 'deworming'];
-
         if ($ageInMonths < 6) {
-            $originalMealCount = 0;
-            $originalTipCount = 0;
-            $hasMealHeader = false;
+            $suppressing = false;
 
             foreach ($lines as $line) {
-                $trimmed = trim($line);
-                $lower = strtolower($line);
+                if ($suppressing) {
+                    if (preg_match('/^4\.\s/', trim($line)) || preg_match('/^#{0,2}\s*Food Restrictions/i', trim($line)) || preg_match('/^(4\.|Food Restrictions)/i', trim($line))) {
+                        $suppressing = false;
+                    } else {
+                        continue;
+                    }
+                }
 
-                if (preg_match('/meal plan/i', $line)) {
-                    $hasMealHeader = true;
+                if (preg_match('/^3\.\s*Mga Vitamin/i', trim($line)) || preg_match('/^#{0,2}\s*Mga Vitamin/i', trim($line))) {
+                    $suppressing = true;
+
+                    continue;
                 }
 
                 if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
-                    $originalMealCount++;
                     $fixed[] = trim(preg_replace('/^(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
 
                     continue;
                 }
 
-                if (preg_match('/^\d+[\.\)]\s/', $trimmed)) {
-                    $originalTipCount++;
-
-                    continue;
-                }
-
-                if (preg_match('/^[-*]\s/', $trimmed)) {
-                    continue;
-                }
-
-                if ($trimmed === '' || preg_match('/^\*{1,2}/', $trimmed) || preg_match('/^[A-Z \/:]+$/', $trimmed)) {
-                    $fixed[] = $line;
-
-                    continue;
-                }
-
-                if (preg_match('/gatas|breastmilk|formula|dede|pagpapasuso/i', $lower)) {
-                    $fixed[] = $line;
-
-                    continue;
-                }
+                $fixed[] = $line;
             }
 
-            if ($originalTipCount === 0 && $originalMealCount === 0) {
-                return self::buildZeroToFiveOutput();
-            }
-
-            if ($originalMealCount === 0 && $hasMealHeader) {
-                $result = [];
-                foreach ($fixed as $line) {
-                    $result[] = $line;
-                    if (preg_match('/meal plan/i', $line)) {
-                        $result[] = 'Umaga: Gatas lamang (breastmilk/formula)';
-                        $result[] = 'Tanghali: Gatas lamang (breastmilk/formula)';
-                        $result[] = 'Gabi: Gatas lamang (breastmilk/formula)';
-                    }
-                }
-                $fixed = $result;
-            }
-
-            $output = implode("\n", $fixed);
-            $output = trim($output);
-
-            if ($output === '' || ! preg_match('/[a-zA-Z]{3,}/', $output)) {
-                return self::buildZeroToFiveOutput();
-            }
-
-            return $output;
+            return implode("\n", $fixed);
         }
 
         if ($ageInMonths >= 6 && $ageInMonths < 12) {
@@ -485,28 +444,6 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         }
 
         return $recommendation;
-    }
-
-    private static function buildZeroToFiveOutput(): string
-    {
-        return '**Mga Nutrition Tips:**
-1. Magpasuso tuwing 2-3 oras o ayon sa pangangailangan ng sanggol.
-2. Ang breastmilk o formula ay sapat na pagkain at inumin — walang kailangang tubig.
-3. Dalhin sa health center para sa regular na check-up at growth monitoring.
-
-**Meal Plan:**
-- Umaga: Gatas lamang (breastmilk o formula)
-- Tanghali: Gatas lamang (breastmilk o formula)
-- Gabi: Gatas lamang (breastmilk o formula)
-
-**Food Restrictions:**
-- WALANG solid food para sa 0-5 buwan — gatas lamang ang kailangan.
-- Iwasan ang anumang pagkain maliban sa breastmilk o formula.
-
-**Disclaimer:**
-Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines at hindi kapalit ng medikal na payo.
-
-**Pinagkuhanan ng Datos:** National Nutrition Council';
     }
 
     private function fixDewormingRecommendation(string $recommendation, int $ageInMonths, string $dewormingStatus): string
