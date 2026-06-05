@@ -84,7 +84,7 @@ export default function Archived({ deleted, overaged }: Props) {
         if (loading !== null) return;
         setLoading(id);
         try {
-            await router.delete(route('children.forceDelete', { id }));
+            await router.delete(route('children.force-delete', { id }));
             smartToast.success('Child permanently deleted.');
         } catch {
             smartToast.error('Failed to delete child.');

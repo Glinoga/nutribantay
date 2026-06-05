@@ -58,7 +58,7 @@ export default function Archived({ users }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('users.forceDelete', { id }));
+            await router.delete(route('users.force-delete', { id }));
             smartToast.success('User permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete user.');

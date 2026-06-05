@@ -21,7 +21,7 @@ import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2, Mail, MessageSquare, Phone, Search, Send, Sparkles, Users, X, Zap } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 interface User {
     id: number;
@@ -51,6 +51,15 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [lastFormData, setLastFormData] = useState<{ recipientType: string; recipients: number[]; message: string } | null>(null);
     const maxCharacters = 1600;
+    const typingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const retryTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(typingTimerRef.current);
+            clearTimeout(retryTimerRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         if (flash?.success) {
@@ -102,7 +111,8 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
         setMessage(messageText);
         setIsTyping(true);
 
-        setTimeout(() => setIsTyping(false), 2000);
+        clearTimeout(typingTimerRef.current);
+        typingTimerRef.current = setTimeout(() => setIsTyping(false), 2000);
     };
 
     const getRecipientCount = () => {
@@ -188,12 +198,17 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
 
     const handleRetry = () => {
         if (lastFormData) {
-            setRecipientType(lastFormData.recipientType as 'single' | 'multiple' | 'all');
+            const validTypes = ['single', 'multiple', 'all'] as const;
+            const restoredType = validTypes.includes(lastFormData.recipientType as (typeof validTypes)[number])
+                ? (lastFormData.recipientType as (typeof validTypes)[number])
+                : 'multiple';
+            setRecipientType(restoredType);
             setSelectedUsers(lastFormData.recipients);
             setMessage(lastFormData.message);
             setCharacterCount(lastFormData.message.length);
             // Trigger send again
-            setTimeout(() => {
+            clearTimeout(retryTimerRef.current);
+            retryTimerRef.current = setTimeout(() => {
                 const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
                 handleSubmit(fakeEvent);
             }, 100);

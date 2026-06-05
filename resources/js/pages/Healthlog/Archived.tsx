@@ -58,7 +58,7 @@ export default function Archived({ healthlogs }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('healthlogs.forceDelete', { id }));
+            await router.delete(route('healthlogs.force-delete', { id }));
             smartToast.success('Health log permanently deleted.');
         } catch (err) {
             smartToast.error('Failed to delete health log.');

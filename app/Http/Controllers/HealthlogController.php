@@ -81,8 +81,8 @@ class HealthlogController extends Controller
         $child->abortIfOveraged();
 
         $validated = $request->validate([
-            'weight' => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|numeric|min:0.1|max:200',
+            'height' => 'nullable|numeric|min:0.1|max:250',
 
             'micronutrient_powder' => 'nullable|string|max:255',
             'ruf' => 'nullable|string|max:255',
@@ -95,8 +95,6 @@ class HealthlogController extends Controller
 
         $validated['user_id'] = auth()->id();
         $validated['child_id'] = $child->id;
-
-        // Note: vaccine_status is auto-calculated by the model accessor
 
         $weight = $validated['weight'] ?? null;
         $height = $validated['height'] ?? null;
@@ -198,8 +196,8 @@ class HealthlogController extends Controller
         $healthlog->child->abortIfOveraged();
 
         $validated = $request->validate([
-            'weight' => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|numeric|min:0.1|max:200',
+            'height' => 'nullable|numeric|min:0.1|max:250',
 
             'micronutrient_powder' => 'nullable|string|max:255',
             'ruf' => 'nullable|string|max:255',
@@ -209,8 +207,6 @@ class HealthlogController extends Controller
             'vitamin_a' => 'nullable|boolean',
             'deworming' => 'nullable|boolean',
         ]);
-
-        // Note: vaccine_status is auto-calculated by the model accessor
 
         // Resolve child from the existing healthlog (child-centric: child_id is immutable)
         $child = Child::findOrFail($healthlog->child_id);

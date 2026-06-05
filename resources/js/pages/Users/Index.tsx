@@ -130,7 +130,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
         setCreateError('');
 
         try {
-            const res = await axios.post(route('users.storeBulk'), {
+            const res = await axios.post(route('users.store-bulk'), {
                 name: newUser.name,
                 email: newUser.email || null,
                 password: newUser.password,

@@ -69,7 +69,7 @@ export default function Archived({ announcements }: Props) {
     const handleForceDelete = async (id: number) => {
         setLoading(id);
         try {
-            await router.delete(route('announcements.forceDelete', { id }));
+            await router.delete(route('announcements.force-delete', { id }));
             smartToast.success('Announcement permanently deleted.');
         } catch {
             smartToast.error('Failed to delete announcement.');

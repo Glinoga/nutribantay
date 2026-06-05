@@ -404,8 +404,8 @@ class ChildController extends Controller
             'birthdate' => 'required|date',
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
-            'weight' => 'nullable|numeric|min:0|max:200',
-            'height' => 'nullable|numeric|min:0|max:250',
+            'weight' => 'nullable|numeric|min:0.1|max:200',
+            'height' => 'nullable|numeric|min:0.1|max:250',
         ]);
 
         $user = auth()->user();
@@ -558,8 +558,8 @@ class ChildController extends Controller
             'sex' => 'required|in:Male,Female',
             'birthdate' => 'required|date',
             'contact_number' => 'nullable|string|max:50',
-            'weight' => 'nullable|numeric|min:0|max:200',
-            'height' => 'nullable|numeric|min:0|max:250',
+            'weight' => 'nullable|numeric|min:0.1|max:200',
+            'height' => 'nullable|numeric|min:0.1|max:250',
         ]);
 
         $child->update(array_merge(
@@ -753,6 +753,13 @@ class ChildController extends Controller
                 continue;
             }
 
+            $normalizedSex = strtoupper(trim($row['sex']));
+            if (! in_array($normalizedSex, ['M', 'MALE', 'F', 'FEMALE'], true)) {
+                $skipped++;
+
+                continue;
+            }
+
             $dupeKey = strtolower($row['first_name']).'|'.strtolower($row['last_name']).'|'.($row['birthdate'] ?? '');
             if ($existingMap->has($dupeKey)) {
                 $skipped++;
@@ -760,21 +767,21 @@ class ChildController extends Controller
                 continue;
             }
 
-            $sex = strtoupper($row['sex']) === 'M' ? 'Male' : 'Female';
+            $sex = $normalizedSex === 'M' || $normalizedSex === 'MALE' ? 'Male' : 'Female';
 
-            $hasAnthropometricData = ! empty($row['weight']) && floatval($row['weight']) > 0 &&
-                ! empty($row['height']) && floatval($row['height']) > 0 &&
-                ! empty($row['birthdate']);
+            $weight = isset($row['weight']) && is_numeric($row['weight']) ? floatval($row['weight']) : 0;
+            $height = isset($row['height']) && is_numeric($row['height']) ? floatval($row['height']) : 0;
+            $hasAnthropometricData = $weight > 0 && $height > 0 && ! empty($row['birthdate']);
 
             try {
-                DB::transaction(function () use ($row, $user, $sex, $hasAnthropometricData, &$imported, &$withoutHealthLog) {
+                DB::transaction(function () use ($row, $user, $sex, $weight, $height, $hasAnthropometricData, &$imported, &$withoutHealthLog) {
                     $child = Child::create([
                         'first_name' => $row['first_name'],
                         'middle_initial' => $row['middle_initial'] ?? null,
                         'last_name' => $row['last_name'],
                         'sex' => $sex,
-                        'weight' => $row['weight'] ?? 0,
-                        'height' => $row['height'] ?? 0,
+                        'weight' => $weight ?: 0,
+                        'height' => $height ?: 0,
                         'birthdate' => $row['birthdate'] ?? null,
                         'barangay' => $user->barangay,
                         'created_by' => $user->id,
@@ -786,8 +793,8 @@ class ChildController extends Controller
                         $evaluation = GrowthHelper::evaluateChild(
                             $sex,
                             $row['birthdate'],
-                            $row['weight'],
-                            $row['height']
+                            $weight,
+                            $height
                         );
 
                         $overall = $evaluation['overall'] ?? 'Normal';
@@ -796,8 +803,8 @@ class ChildController extends Controller
                             'child_id' => $child->id,
                             'user_id' => $user->id,
                             'age_in_months' => $evaluation['age_months'],
-                            'weight' => $row['weight'],
-                            'height' => $row['height'],
+                            'weight' => $weight,
+                            'height' => $height,
                             'bmi' => $evaluation['bmi'],
                             'status_wfa' => $evaluation['status_wfa'],
                             'status_lfa' => $evaluation['status_lfa'],

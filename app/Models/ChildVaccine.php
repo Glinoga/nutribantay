@@ -39,17 +39,16 @@ class ChildVaccine extends Model
 
     public function getProgressAttribute(): array
     {
-        $totalDoses = $this->doses()->count();
-        $completedDoses = $this->doses()->whereNotNull('date_given')->count();
+        $doses = $this->relationLoaded('doses') ? $this->doses : $this->doses()->get();
+        $totalDoses = $doses->count();
+        $completedDoses = $doses->whereNotNull('date_given')->count();
 
-        $lastDose = $this->lastDose;
+        $lastDose = $doses->sortByDesc('dose_number')->first();
 
         if ($lastDose && $lastDose->date_given && ! $lastDose->next_due_date) {
             $status = 'Completed';
         } elseif ($completedDoses > 0) {
             $status = 'In Progress';
-        } elseif ($totalDoses > 0) {
-            $status = 'Not Started';
         } else {
             $status = 'Not Started';
         }

@@ -363,9 +363,9 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {vaccine_followups.follow_ups.slice(0, 10).map((fu, idx) => (
+                                                        {vaccine_followups.follow_ups.slice(0, 10).map((fu) => (
                                                             <tr
-                                                                key={idx}
+                                                                key={`${fu.child_id}-${fu.vaccine_name}-${fu.dose_number}`}
                                                                 className="border-t border-amber-100 transition-colors hover:bg-amber-50/50 dark:border-amber-800 dark:hover:bg-amber-900/20"
                                                             >
                                                                 <td className="px-4 py-2">

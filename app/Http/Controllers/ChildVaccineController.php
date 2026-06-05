@@ -137,25 +137,31 @@ class ChildVaccineController extends Controller
 
         $doseNumber = (int) $request->dose_number;
 
-        $duplicate = DB::transaction(function () use ($childVaccine, $doseNumber) {
-            return ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
+        [$existing, $dose] = DB::transaction(function () use ($childVaccine, $doseNumber, $request, $user) {
+            $existing = ChildVaccineDose::where('child_vaccine_id', $childVaccine->id)
                 ->where('dose_number', $doseNumber)
                 ->lockForUpdate()
                 ->first();
+
+            if ($existing) {
+                return [$existing, null];
+            }
+
+            $dose = ChildVaccineDose::create([
+                'child_vaccine_id' => $childVaccine->id,
+                'dose_number' => $doseNumber,
+                'date_given' => $request->date_given ?: null,
+                'next_due_date' => $request->next_due_date ?: null,
+                'remarks' => $request->remarks,
+                'administered_by' => $user->id,
+            ]);
+
+            return [null, $dose];
         });
 
-        if ($duplicate) {
+        if ($existing) {
             return back()->withErrors(['dose_number' => 'Dose #'.$doseNumber.' already exists for this vaccine.']);
         }
-
-        ChildVaccineDose::create([
-            'child_vaccine_id' => $childVaccine->id,
-            'dose_number' => $doseNumber,
-            'date_given' => $request->date_given ? $request->date_given : null,
-            'next_due_date' => $request->next_due_date ? $request->next_due_date : null,
-            'remarks' => $request->remarks,
-            'administered_by' => $user->id,
-        ]);
 
         RefreshDashboardForBarangay::dispatch($child->barangay)
             ->delay(now()->addSeconds(10));

@@ -300,7 +300,7 @@ class UserController extends Controller
         $user->save();
 
         $admin = auth()->user();
-        Log::info("Password reset for user #{$user->id} ({$user->name}) by admin #{$admin->id} ({$admin->name}): new password = {$password}");
+        Log::info("Password reset for user #{$user->id} ({$user->name}) by admin #{$admin->id} ({$admin->name})");
 
         return response()->json(['password' => $password]);
     }

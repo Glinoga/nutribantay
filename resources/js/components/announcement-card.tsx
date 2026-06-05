@@ -48,6 +48,7 @@ export default function AnnouncementCard({
 }: AnnouncementCardProps) {
     const isAdmin = variant === 'admin';
     const [copied, setCopied] = useState(false);
+    const [imgError, setImgError] = useState(false);
 
     const handleShare = () => {
         if (onShare) {
@@ -72,7 +73,7 @@ export default function AnnouncementCard({
             />
 
             <div className="relative h-48 shrink-0 overflow-hidden">
-                {announcement.image ? (
+                {announcement.image && !imgError ? (
                     <img
                         src={`/storage/${announcement.image}`}
                         alt={announcement.title}
@@ -80,6 +81,7 @@ export default function AnnouncementCard({
                         height="192"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
+                        onError={() => setImgError(true)}
                     />
                 ) : (
                     <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]">

@@ -58,28 +58,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | CHILDREN
+    | CHILDREN (Admin + Healthworker only)
     |--------------------------------------------------------------------------
     */
-    Route::get('/children-archived', [ChildController::class, 'archived'])->name('children.archived');
-    Route::post('/children/{id}/restore', [ChildController::class, 'restore'])->name('children.restore');
-    Route::delete('/children/{id}/force-delete', [ChildController::class, 'forceDelete'])->name('children.forceDelete');
-    Route::get('/children/export', [ChildController::class, 'export'])
-        ->name('children.export')
-        ->middleware(['role:Admin|Healthworker']);
-    Route::get('/children/print', [ChildController::class, 'print'])
-        ->name('children.print')
-        ->middleware(['role:Admin|Healthworker']);
-    Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
-    Route::resource('children', ChildController::class);
-    Route::get('/children/{child}/print', [ChildController::class, 'showPrint'])
-        ->name('children.show.print')
-        ->middleware(['role:Admin|Healthworker']);
-    Route::get('/children/{child}/export', [ChildController::class, 'exportSingle'])
-        ->name('children.export.single')
-        ->middleware(['role:Admin|Healthworker']);
-    Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
-    Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
+    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+        Route::get('/children-archived', [ChildController::class, 'archived'])->name('children.archived');
+        Route::post('/children/{id}/restore', [ChildController::class, 'restore'])->name('children.restore');
+        Route::delete('/children/{id}/force-delete', [ChildController::class, 'forceDelete'])->name('children.force-delete');
+        Route::get('/children/export', [ChildController::class, 'export'])->name('children.export');
+        Route::get('/children/print', [ChildController::class, 'print'])->name('children.print');
+        Route::post('/children/import', [ChildController::class, 'import'])->name('children.import');
+        Route::resource('children', ChildController::class);
+        Route::get('/children/{child}/print', [ChildController::class, 'showPrint'])->name('children.show.print');
+        Route::get('/children/{child}/export', [ChildController::class, 'exportSingle'])->name('children.export.single');
+        Route::post('/children/{child}/notes', [ChildController::class, 'storeNote'])->name('children.notes.store');
+        Route::delete('/children/{child}/notes/{note}', [ChildController::class, 'destroyNote'])->name('children.notes.destroy');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +98,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Archived health logs
         Route::get('/healthlogs-archived', [HealthlogController::class, 'archived'])->name('healthlogs.archived');
         Route::post('/healthlogs/{id}/restore', [HealthlogController::class, 'restore'])->name('healthlogs.restore');
-        Route::delete('/healthlogs/{id}/force-delete', [HealthlogController::class, 'forceDelete'])->name('healthlogs.forceDelete');
+        Route::delete('/healthlogs/{id}/force-delete', [HealthlogController::class, 'forceDelete'])->name('healthlogs.force-delete');
     });
 
     /*
@@ -161,16 +155,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:Admin'])->group(function () {
         Route::get('/users/archived', [UserController::class, 'archived'])->name('users.archived');
         Route::post('/users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
-        Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.forceDelete');
+        Route::delete('/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('users.force-delete');
         Route::post('/users/{id}/approve', [UserController::class, 'approve'])->name('users.approve');
         Route::post('/users/{id}/reject', [UserController::class, 'reject'])->name('users.reject');
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
-        Route::post('/users/store-bulk', [UserController::class, 'storeBulk'])->name('users.storeBulk');
+        Route::post('/users/store-bulk', [UserController::class, 'storeBulk'])->name('users.store-bulk');
 
-        Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate']);
-        Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest']);
-        Route::get('/registration-codes', [RegistrationCodeController::class, 'index']);
-        Route::delete('/registration-codes/{id}', [RegistrationCodeController::class, 'destroy']);
+        Route::post('/registration-codes/generate', [RegistrationCodeController::class, 'generate'])->name('registration-codes.generate');
+        Route::get('/registration-codes/latest', [RegistrationCodeController::class, 'latest'])->name('registration-codes.latest');
+        Route::get('/registration-codes', [RegistrationCodeController::class, 'index'])->name('registration-codes.index');
+        Route::delete('/registration-codes/{id}', [RegistrationCodeController::class, 'destroy'])->name('registration-codes.destroy');
         Route::get('/maintenance/status', [SystemController::class, 'status']);
         Route::post('/maintenance/toggle', [SystemController::class, 'toggle']);
         Route::get('/admin/database', [DatabaseMaintenanceController::class, 'index'])
@@ -232,7 +226,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Archived announcements
         Route::get('/admin/announcements-archived', [AnnouncementController::class, 'archived'])->name('announcements.archived');
         Route::post('/admin/announcements/{id}/restore', [AnnouncementController::class, 'restore'])->name('announcements.restore');
-        Route::delete('/admin/announcements/{id}/force-delete', [AnnouncementController::class, 'forceDelete'])->name('announcements.forceDelete');
+        Route::delete('/admin/announcements/{id}/force-delete', [AnnouncementController::class, 'forceDelete'])->name('announcements.force-delete');
     });
 
     Route::post('/recommendations', [RecommendationController::class, 'generate'])->middleware('throttle:recommendations')->name('recommendations.generate');
