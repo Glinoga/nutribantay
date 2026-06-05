@@ -328,20 +328,18 @@ export default function Index({
 
     const handleVaccineFilter = (vaccineValue: string) => {
         const params: Record<string, string> = {};
-        if (vaccineValue !== 'all') params.vaccine_status = vaccineValue;
+        if (vaccineValue !== activeVaccine) params.vaccine_status = vaccineValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
-        if (activeVitamin) params.vitamin_status = activeVitamin;
         if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
 
     const handleVitaminFilter = (vitaminValue: string) => {
         const params: Record<string, string> = {};
-        if (vitaminValue !== 'all') params.vitamin_status = vitaminValue;
+        if (vitaminValue !== activeVitamin) params.vitamin_status = vitaminValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
-        if (activeVaccine) params.vaccine_status = activeVaccine;
         if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };

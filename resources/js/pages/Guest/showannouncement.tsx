@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Megaphone, Share2, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Share2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface Category {
@@ -26,6 +26,7 @@ interface Announcement {
     summary: string;
     content: string;
     image?: string;
+    image_url?: string | null;
 }
 
 interface ShowAnnouncementProps {
@@ -147,19 +148,17 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
             <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
-                        {announcement.image && !imgError ? (
+                        {announcement.image_url && !imgError ? (
                             <div className="mb-12 overflow-hidden rounded-2xl shadow-lg">
                                 <img
-                                    src={`/storage/${announcement.image}`}
+                                    src={announcement.image_url}
                                     alt={announcement.title}
                                     className="h-[400px] w-full object-cover"
                                     onError={() => setImgError(true)}
                                 />
                             </div>
-                        ) : announcement.image && imgError ? (
-                            <div className="mb-12 flex h-[400px] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-lg dark:from-[var(--bg)] dark:to-[var(--bg)]">
-                                <Megaphone className="h-20 w-20 text-teal-300 dark:text-[var(--text-muted)]" />
-                            </div>
+                        ) : announcement.image_url && imgError ? (
+                            <div className="mb-12 h-[400px] overflow-hidden rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-lg dark:from-[var(--bg)] dark:to-[var(--bg)]" />
                         ) : null}
 
                         <div

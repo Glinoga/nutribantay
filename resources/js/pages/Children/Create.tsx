@@ -60,13 +60,6 @@ export default function ChildrenCreate() {
 
     const bmi = data.weight && data.height ? (Number(data.weight) / Math.pow(Number(data.height) / 100, 2)).toFixed(1) : null;
 
-    const getBMIStatus = (bmi: number) => {
-        if (bmi < 18.5) return { text: 'Underweight', color: 'text-orange-600 dark:text-orange-400' };
-        if (bmi < 25) return { text: 'Normal', color: 'text-green-600 dark:text-green-400' };
-        if (bmi < 30) return { text: 'Overweight', color: 'text-yellow-600 dark:text-yellow-400' };
-        return { text: 'Obese', color: 'text-red-600 dark:text-red-400' };
-    };
-
     return (
         <AppLayout>
             <Head title="Add Child" />
@@ -244,17 +237,12 @@ export default function ChildrenCreate() {
 
                                     {bmi && (
                                         <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Body Mass Index (BMI)</p>
-                                                    <p className="text-3xl font-bold text-teal-600 dark:text-teal-400">{bmi}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Status</p>
-                                                    <p className={`text-xl font-bold ${getBMIStatus(Number(bmi)).color}`}>
-                                                        {getBMIStatus(Number(bmi)).text}
-                                                    </p>
-                                                </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-600 dark:text-gray-300">Body Mass Index (BMI)</p>
+                                                <p className="text-3xl font-bold text-teal-600 dark:text-teal-400">{bmi}</p>
+                                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                    Nutritional assessment is recorded upon saving (WHO child standards)
+                                                </p>
                                             </div>
                                         </div>
                                     )}

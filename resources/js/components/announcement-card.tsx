@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Check, Megaphone, Share2, User } from 'lucide-react';
+import { Calendar, Check, Share2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface Category {
@@ -22,6 +22,7 @@ export interface AnnouncementData {
     summary: string;
     content: string;
     image?: string;
+    image_url?: string | null;
     is_expired?: boolean;
 }
 
@@ -73,9 +74,9 @@ export default function AnnouncementCard({
             />
 
             <div className="relative h-48 shrink-0 overflow-hidden">
-                {announcement.image && !imgError ? (
+                {announcement.image_url && !imgError ? (
                     <img
-                        src={`/storage/${announcement.image}`}
+                        src={announcement.image_url}
                         alt={announcement.title}
                         width="400"
                         height="192"
@@ -84,9 +85,7 @@ export default function AnnouncementCard({
                         onError={() => setImgError(true)}
                     />
                 ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]">
-                        <Megaphone className="h-14 w-14 text-teal-300 dark:text-[var(--text-muted)]" />
-                    </div>
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
                 )}
             </div>
 

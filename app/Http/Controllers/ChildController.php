@@ -431,23 +431,62 @@ class ChildController extends Controller
             $validated['contact_number'] = trim($validated['contact_number']);
         }
 
-        Child::create([
-            'first_name' => $validated['first_name'],
-            'middle_initial' => $validated['middle_initial'] ?? null,
-            'last_name' => $validated['last_name'],
-            'sex' => $validated['sex'],
-            'birthdate' => $validated['birthdate'],
-            'address' => $validated['address'] ?? null,
-            'contact_number' => $validated['contact_number'] ?? null,
-            'weight' => $validated['weight'] ?? null,
-            'height' => $validated['height'] ?? null,
-            'created_by' => $user->id,
-            'updated_by' => $user->id,
-            'barangay' => $user->barangay,
-        ]);
+        DB::transaction(function () use ($validated, $user) {
+            $child = Child::create([
+                'first_name' => $validated['first_name'],
+                'middle_initial' => $validated['middle_initial'] ?? null,
+                'last_name' => $validated['last_name'],
+                'sex' => $validated['sex'],
+                'birthdate' => $validated['birthdate'],
+                'address' => $validated['address'] ?? null,
+                'contact_number' => $validated['contact_number'] ?? null,
+                'weight' => $validated['weight'] ?? null,
+                'height' => $validated['height'] ?? null,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+                'barangay' => $user->barangay,
+            ]);
 
-        RefreshDashboardForBarangay::dispatch($user->barangay)
-            ->delay(now()->addSeconds(10));
+            if (! empty($validated['weight']) && ! empty($validated['height'])) {
+                $evaluation = GrowthHelper::evaluateChild(
+                    $validated['sex'],
+                    $validated['birthdate'],
+                    $validated['weight'],
+                    $validated['height'],
+                );
+
+                $overall = $evaluation['overall'] ?? 'Normal';
+
+                HealthLog::create([
+                    'child_id' => $child->id,
+                    'user_id' => $user->id,
+                    'age_in_months' => $evaluation['age_months'],
+                    'weight' => $validated['weight'],
+                    'height' => $validated['height'],
+                    'bmi' => $evaluation['bmi'],
+                    'status_wfa' => $evaluation['status_wfa'],
+                    'status_lfa' => $evaluation['status_lfa'],
+                    'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
+                    'nutrition_status' => $overall,
+                    'recommendation' => AIRecommender::getRecommendation(
+                        $overall,
+                        $validated['sex'],
+                        $evaluation['age_months'] ?? 0,
+                        null,
+                        null,
+                        $child->id,
+                    ),
+                ]);
+
+                $child->update([
+                    'nutrition_status' => $overall,
+                    'updated_by' => $user->id,
+                ]);
+            }
+
+            RefreshDashboardForBarangay::dispatch($user->barangay)
+                ->delay(now()->addSeconds(10));
+        });
 
         return redirect()->route('children.index')->with('success', 'Child added successfully!');
     }

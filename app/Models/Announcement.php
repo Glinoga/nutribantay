@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Announcement extends Model
@@ -23,7 +24,7 @@ class Announcement extends Model
         'slug',
     ];
 
-    protected $appends = ['is_expired'];
+    protected $appends = ['is_expired', 'image_url'];
 
     protected static function booted(): void
     {
@@ -45,6 +46,15 @@ class Announcement extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->image);
     }
 
     public function getIsExpiredAttribute(): bool

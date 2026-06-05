@@ -52,7 +52,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         image: null as File | null,
     });
 
-    const [preview, setPreview] = useState<string | null>(announcement.image_url ?? (announcement.image ? `/storage/${announcement.image}` : null));
+    const [preview, setPreview] = useState<string | null>(announcement.image_url ?? null);
     const [isDirty, setIsDirty] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showModal, setShowModal] = useState(true);

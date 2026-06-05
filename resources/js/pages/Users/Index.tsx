@@ -949,7 +949,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
                         </div>
 
                         <div>
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">Email (Optional)</Label>
                             <Input
                                 id="email"
                                 type="email"
