@@ -392,23 +392,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         $fixed = [];
 
         if ($ageInMonths < 6) {
-            $suppressing = false;
-
             foreach ($lines as $line) {
-                if ($suppressing) {
-                    if (preg_match('/^4\.\s/', trim($line)) || preg_match('/^#{0,2}\s*Food Restrictions/i', trim($line)) || preg_match('/^(4\.|Food Restrictions)/i', trim($line))) {
-                        $suppressing = false;
-                    } else {
-                        continue;
-                    }
-                }
-
-                if (preg_match('/^3\.\s*Mga Vitamin/i', trim($line)) || preg_match('/^#{0,2}\s*Mga Vitamin/i', trim($line))) {
-                    $suppressing = true;
-
-                    continue;
-                }
-
                 if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):/i', $line)) {
                     $fixed[] = trim(preg_replace('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
 
