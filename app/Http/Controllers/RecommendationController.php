@@ -297,7 +297,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
             $solidFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais', 'itlog', 'karne', 'isda', 'manok', 'gulay', 'prutas'];
             $hasMealLine = false;
             foreach (preg_split('/\R/', $recommendation) as $line) {
-                if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
+                if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):/i', $line)) {
                     $hasMealLine = true;
                     $lineLower = strtolower($line);
                     foreach ($solidFoods as $food) {
@@ -373,7 +373,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         // Check for processed foods (banned) — only in meal content, not in advisory notes
         $bannedFoods = ['Pancit Canton', 'De Lata', 'soft drinks', 'instant noodles'];
         foreach (preg_split('/\R/', $recommendation) as $line) {
-            if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.*?)(?:\s*[-–—(]|$)/i', $line, $matches)) {
+            if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):\s*(.*?)(?:\s*[-–—(]|$)/i', $line, $matches)) {
                 $mealContent = $matches[2];
                 foreach ($bannedFoods as $banned) {
                     if (stripos($mealContent, $banned) !== false) {
@@ -409,8 +409,8 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                     continue;
                 }
 
-                if (preg_match('/^(Umaga|Tanghali|Gabi):/i', $line)) {
-                    $fixed[] = trim(preg_replace('/^(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
+                if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):/i', $line)) {
+                    $fixed[] = trim(preg_replace('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
 
                     continue;
                 }
@@ -424,7 +424,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         if ($ageInMonths >= 6 && $ageInMonths < 12) {
             $heavyFoods = ['lugaw', 'kanin', 'kamote', 'tinapay', 'pasta', 'noodles', 'mais'];
             foreach ($lines as $line) {
-                if (preg_match('/^(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $m)) {
+                if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):\s*(.+)$/i', $line, $m)) {
                     $content = strtolower(trim($m[2]));
                     $hasHeavy = false;
                     foreach ($heavyFoods as $h) {
