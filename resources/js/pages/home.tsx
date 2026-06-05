@@ -25,6 +25,7 @@ interface Announcement {
     summary: string;
     content: string;
     image?: string;
+    image_url?: string | null;
 }
 
 interface HomeProps {
@@ -46,6 +47,11 @@ function getCategoryColorClass(categoryColor: string) {
 
 export default function Home({ announcements = [], maintenance = null }: HomeProps) {
     const [sharedId, setSharedId] = useState<number | null>(null);
+    const [erroredImages, setErroredImages] = useState<Set<number>>(new Set());
+
+    const handleImageError = (id: number) => {
+        setErroredImages((prev) => new Set([...prev, id]));
+    };
 
     const shareAnnouncement = (announcement: Announcement) => {
         const url = `${window.location.origin}/guest/announcements/${announcement.slug}`;
@@ -181,15 +187,27 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                     key={announcement.id}
                                     className="card-hover group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm dark:bg-[var(--bg-light)]/80"
                                 >
-                                    <div className="absolute inset-0 bg-[var(--bg-light)] dark:bg-[var(--bg)]"></div>
-                                    <div className="absolute top-0 right-0 left-0 z-10 p-6">
-                                        <span
-                                            className={`inline-block rounded-full ${getCategoryColorClass(announcement.category.color)} px-3 py-1 text-xs font-medium text-white`}
-                                        >
-                                            {announcement.category.name}
-                                        </span>
+                                    <div className="relative h-48 shrink-0 overflow-hidden">
+                                        {announcement.image_url && !erroredImages.has(announcement.id) ? (
+                                            <img
+                                                src={announcement.image_url}
+                                                alt={announcement.title}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                loading="lazy"
+                                                onError={() => handleImageError(announcement.id)}
+                                            />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
+                                        )}
+                                        <div className="absolute top-0 left-0 z-10 p-6">
+                                            <span
+                                                className={`inline-block rounded-full ${getCategoryColorClass(announcement.category.color)} px-3 py-1 text-xs font-medium text-white shadow-sm`}
+                                            >
+                                                {announcement.category.name}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="relative z-20 flex h-full flex-col p-6 pt-16">
+                                    <div className="flex h-full flex-col p-6">
                                         <h3 className="mb-3 text-xl font-semibold group-hover:text-[var(--info)]">{announcement.title}</h3>
                                         <p
                                             className="mb-4 flex-1 text-[var(--text-muted)]"
