@@ -212,7 +212,7 @@ export default function DatabaseMaintenance({ backups }: Props) {
                     </div>
 
                     {/* Stats Row */}
-                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
                             <div className="flex items-center justify-between">
                                 <div>
@@ -245,17 +245,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
                                 </div>
                                 <div className="rounded-full bg-green-50 p-2.5 dark:bg-green-900/20">
                                     <Calendar className="h-5 w-5 text-green-500 dark:text-green-400" />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="stat-card rounded-xl border border-teal-100/50 bg-white p-4 shadow-md transition-all hover:border-teal-200 hover:shadow-lg dark:border-teal-800/50 dark:bg-gray-800/80">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Storage Engine</p>
-                                    <p className="mt-1 text-2xl font-bold text-teal-600 dark:text-teal-400">SQLite</p>
-                                </div>
-                                <div className="rounded-full bg-teal-50 p-2.5 dark:bg-teal-900/30">
-                                    <Database className="h-5 w-5 text-teal-500 dark:text-teal-400" />
                                 </div>
                             </div>
                         </div>
@@ -472,7 +461,6 @@ export default function DatabaseMaintenance({ backups }: Props) {
                 .stat-card:nth-child(1) { animation-delay: 0.1s; }
                 .stat-card:nth-child(2) { animation-delay: 0.2s; }
                 .stat-card:nth-child(3) { animation-delay: 0.3s; }
-                .stat-card:nth-child(4) { animation-delay: 0.4s; }
                 .stat-card:hover {
                     transform: translateY(-4px);
                     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);

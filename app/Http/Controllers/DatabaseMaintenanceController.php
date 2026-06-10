@@ -209,35 +209,6 @@ class DatabaseMaintenanceController extends Controller
         }
     }
 
-    private function findSqliteFile($directory)
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        foreach ($iterator as $file) {
-            if ($file->isFile()) {
-                $ext = strtolower($file->getExtension());
-                if ($ext === 'sqlite' || $ext === 'db' || $ext === '') {
-                    if ($this->isSqliteFile($file->getPathname())) {
-                        return $file->getPathname();
-                    }
-                }
-            }
-        }
-
-        foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getSize() > 1000) {
-                if ($this->isSqliteFile($file->getPathname())) {
-                    return $file->getPathname();
-                }
-            }
-        }
-
-        return null;
-    }
-
     private function findSqlFile(string $directory): ?string
     {
         $iterator = new \RecursiveIteratorIterator(
@@ -252,23 +223,6 @@ class DatabaseMaintenanceController extends Controller
         }
 
         return null;
-    }
-
-    private function isSqliteFile($path)
-    {
-        if (! file_exists($path)) {
-            return false;
-        }
-
-        $handle = fopen($path, 'rb');
-        if (! $handle) {
-            return false;
-        }
-
-        $header = fread($handle, 16);
-        fclose($handle);
-
-        return strpos($header, 'SQLite') !== false || strpos($header, "\x53\x51\x4c\x69") !== false;
     }
 
     private function listAllFiles($directory)
