@@ -15,7 +15,7 @@ class CleanOldBackups extends Command
 
     public function handle(): int
     {
-        $retentionDays = Setting::get('backup_retention_days', 14);
+        $retentionDays = Setting::get('backup_retention_days', 30);
 
         $this->info("Starting backup cleanup (retention: {$retentionDays} days)...");
 
