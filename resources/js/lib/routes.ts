@@ -38,7 +38,7 @@ export function route(name: string, params?: Record<string, string | number | nu
         'children.destroy': '/children/{child}',
         'children.archived': '/children-archived',
         'children.restore': '/children/{id}/restore',
-        'children.forceDelete': '/children/{id}/force-delete',
+        'children.force-delete': '/children/{id}/force-delete',
         'children.export': '/children/export',
         'children.print': '/children/print',
         'children.import': '/children/import',
@@ -57,7 +57,7 @@ export function route(name: string, params?: Record<string, string | number | nu
         'healthlogs.destroy': '/healthlogs/{healthlog}',
         'healthlogs.archived': '/healthlogs-archived',
         'healthlogs.restore': '/healthlogs/{id}/restore',
-        'healthlogs.forceDelete': '/healthlogs/{id}/force-delete',
+        'healthlogs.force-delete': '/healthlogs/{id}/force-delete',
 
         // Vaccines
         'vaccines.index': '/vaccines',
@@ -84,7 +84,7 @@ export function route(name: string, params?: Record<string, string | number | nu
         'announcements.destroy': '/admin/announcements/{announcement}',
         'announcements.archived': '/admin/announcements-archived',
         'announcements.restore': '/admin/announcements/{id}/restore',
-        'announcements.forceDelete': '/admin/announcements/{id}/force-delete',
+        'announcements.force-delete': '/admin/announcements/{id}/force-delete',
 
         // SMS
         'sms.index': '/admin/sendsms',
@@ -100,11 +100,11 @@ export function route(name: string, params?: Record<string, string | number | nu
         'users.destroy': '/users/{user}',
         'users.archived': '/users/archived',
         'users.restore': '/users/{id}/restore',
-        'users.forceDelete': '/users/{id}/force-delete',
+        'users.force-delete': '/users/{id}/force-delete',
         'users.approve': '/users/{id}/approve',
         'users.reject': '/users/{id}/reject',
         'users.reset-password': '/users/{id}/reset-password',
-        'users.storeBulk': '/users/store-bulk',
+        'users.store-bulk': '/users/store-bulk',
 
         // Admin Database
         'admin.database.index': '/admin/database',
