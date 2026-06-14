@@ -1130,6 +1130,7 @@ export default function Show({ child }: { child: Child }) {
                                     type="date"
                                     value={data.birthdate}
                                     onChange={(e) => setData('birthdate', e.target.value)}
+                                    max={new Date().toISOString().split('T')[0]}
                                     className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                 />
                             </div>
