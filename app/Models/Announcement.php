@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Announcement extends Model
@@ -38,6 +39,12 @@ class Announcement extends Model
                 }
 
                 $announcement->slug = $slug;
+            }
+        });
+
+        static::forceDeleting(function (Announcement $announcement) {
+            if ($announcement->image) {
+                Storage::disk('public')->delete($announcement->image);
             }
         });
     }

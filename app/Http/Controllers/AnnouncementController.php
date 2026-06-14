@@ -198,14 +198,7 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement)
     {
-        if ($announcement->image) {
-            Storage::disk('public')->delete($announcement->image);
-        }
-
         $announcement->delete();
-
-        // for forceDeletion
-        // $announcement->forceDelete();
 
         return redirect()->route('announcements.index')->with('success', 'Announcement deleted successfully.');
     }
@@ -243,10 +236,6 @@ class AnnouncementController extends Controller
     public function forceDelete($id)
     {
         $announcement = Announcement::onlyTrashed()->findOrFail($id);
-
-        if ($announcement->image) {
-            Storage::disk('public')->delete($announcement->image);
-        }
 
         $announcement->forceDelete();
 
