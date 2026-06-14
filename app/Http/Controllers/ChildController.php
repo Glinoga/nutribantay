@@ -601,13 +601,54 @@ class ChildController extends Controller
             'height' => 'nullable|numeric|min:0.1|max:250',
         ]);
 
-        $child->update(array_merge(
-            $validated,
-            ['updated_by' => auth()->id()]
-        ));
+        DB::transaction(function () use ($validated, $child) {
+            $oldWeight = $child->weight;
+            $oldHeight = $child->height;
 
-        RefreshDashboardForBarangay::dispatch($child->barangay)
-            ->delay(now()->addSeconds(10));
+            $child->update(array_merge(
+                $validated,
+                ['updated_by' => auth()->id()]
+            ));
+
+            $newWeight = $validated['weight'] ?? null;
+            $newHeight = $validated['height'] ?? null;
+
+            // Auto-create health log if weight or height changed and both are present
+            if (($oldWeight != $newWeight || $oldHeight != $newHeight) && $newWeight && $newHeight) {
+                $evaluation = GrowthHelper::evaluateChild(
+                    $child->sex,
+                    $child->birthdate,
+                    $newWeight,
+                    $newHeight,
+                );
+
+                $overall = $evaluation['overall'] ?? 'Normal';
+
+                HealthLog::create([
+                    'child_id' => $child->id,
+                    'user_id' => auth()->id(),
+                    'age_in_months' => $evaluation['age_months'],
+                    'weight' => $newWeight,
+                    'height' => $newHeight,
+                    'bmi' => $evaluation['bmi'],
+                    'status_wfa' => $evaluation['status_wfa'],
+                    'status_lfa' => $evaluation['status_lfa'],
+                    'status_wfl_wfh' => $evaluation['status_wfl_wfh'],
+                    'nutrition_status' => $overall,
+                    'recommendation' => AIRecommender::getRecommendation(
+                        $overall,
+                        $child->sex,
+                        $evaluation['age_months'] ?? 0,
+                        null,
+                        null,
+                        $child->id,
+                    ),
+                ]);
+            }
+
+            RefreshDashboardForBarangay::dispatch($child->barangay)
+                ->delay(now()->addSeconds(10));
+        });
 
         return redirect()->route('children.show', $child->id)->with('success', 'Child updated successfully!');
     }

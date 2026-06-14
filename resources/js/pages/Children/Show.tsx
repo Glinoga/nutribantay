@@ -1014,7 +1014,7 @@ export default function Show({ child }: { child: Child }) {
                         <DialogDescription className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
                             <span className="inline-flex items-center gap-2 rounded-md bg-amber-50 px-3 py-1.5 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                                 <AlertTriangle className="h-4 w-4" />
-                                Only edit if you entered wrong data. Otherwise, create a health log.
+                                Editing weight or height will create a new health log.
                             </span>
                         </DialogDescription>
                     </DialogHeader>
@@ -1026,8 +1026,8 @@ export default function Show({ child }: { child: Child }) {
                             <div>
                                 <h4 className="font-semibold text-amber-800 dark:text-amber-400">Confirmation Required</h4>
                                 <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                                    Only edit this record if <span className="font-semibold">you confirmed you entered wrong data</span>. For new
-                                    health measurements, please{' '}
+                                    Changing weight or height will <span className="font-semibold">automatically create a new health log</span>.
+                                    For additional measurements like vitamins or deworming, please{' '}
                                     <Link
                                         href={route('children.healthlogs.create', { child: child.slug })}
                                         className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
