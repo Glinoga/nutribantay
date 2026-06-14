@@ -974,7 +974,7 @@ export default function Show({ child }: { child: Child }) {
                             {child.notes?.length ? (
                                 child.notes.map((note) => (
                                     <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                        <p className="text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
+                                        <p className="break-words text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
                                         <small className="mt-1 block text-gray-500 dark:text-gray-400">
                                             {note.created_at
                                                 ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
