@@ -170,7 +170,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                 <div className="mx-auto max-w-7xl">
                     {/* Header Section */}
                     <div className="mb-8">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                             <div>
                                 <h1 className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">Dashboard</h1>
                             </div>
@@ -214,7 +214,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         </div>
                                     </RadioGroup>
 
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-wrap gap-2">
                                         <Button
                                             onClick={handlePrint}
                                             className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
@@ -313,7 +313,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             </Badge>
                                         )}
                                     </div>
-                                    <div className="mt-4 flex gap-2">
+                                    <div className="mt-4 flex flex-wrap gap-2">
                                         <Link href={`${route('children.index')}?vaccine_status=overdue`}>
                                             <Button
                                                 size="sm"
@@ -447,7 +447,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             </Link>
                                         )}
                                     </div>
-                                    <div className="mt-4 flex gap-2">
+                                    <div className="mt-4 flex flex-wrap gap-2">
                                         <Link href={`${route('children.index')}?vitamin_status=overdue`}>
                                             <Button
                                                 size="sm"
@@ -645,7 +645,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                     <div className="mb-8">
                         <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Trends</h2>
 
-                        <div className="mb-4 flex gap-2">
+                        <div className="mb-4 flex flex-wrap gap-2">
                             <Button
                                 onClick={() => setTrendRange('6months')}
                                 variant={trendRange === '6months' ? 'default' : 'outline'}
