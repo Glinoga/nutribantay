@@ -341,6 +341,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                             onChange={handleImageChange}
                                             className="rounded-md border-teal-200 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:file:bg-teal-900/30 dark:file:text-teal-400 dark:hover:file:bg-teal-900/50"
                                         />
+                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Max file size: 5 MB (JPG, PNG, GIF)</p>
                                         {preview && data.image === null && (
                                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                                                 Upload a new image to replace the existing one
