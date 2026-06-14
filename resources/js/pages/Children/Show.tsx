@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { displayPhoneNumber, formatPhoneNumber } from '@/lib/phoneUtils';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
@@ -106,7 +107,7 @@ export default function Show({ child }: { child: Child }) {
         birthdate: child.birthdate || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
-        contact_number: child.contact_number ?? '',
+        contact_number: child.contact_number ? formatPhoneNumber(child.contact_number) : '',
     });
 
     const handleEditSubmit = (e: React.FormEvent) => {
@@ -432,12 +433,21 @@ export default function Show({ child }: { child: Child }) {
                                     {[
                                         { label: 'Full Name', value: child.fullname },
                                         { label: 'Sex', value: child.sex },
-                                        { label: 'Birthdate', value: child.birthdate ? new Date(child.birthdate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' },
+                                        {
+                                            label: 'Birthdate',
+                                            value: child.birthdate
+                                                ? new Date(child.birthdate).toLocaleDateString('en-US', {
+                                                      year: 'numeric',
+                                                      month: 'long',
+                                                      day: 'numeric',
+                                                  })
+                                                : 'N/A',
+                                        },
                                         { label: 'Age', value: `${child.age ?? 'N/A'} months` },
                                         { label: 'Weight', value: `${child.weight ?? 'N/A'} kg` },
                                         { label: 'Height', value: `${child.height ?? 'N/A'} cm` },
                                         { label: 'Address', value: child.address ?? 'N/A' },
-                                        { label: 'Contact Number', value: child.contact_number ?? 'N/A' },
+                                        { label: 'Contact Number', value: displayPhoneNumber(child.contact_number) },
                                         { label: 'Created by', value: child.creator?.name ?? 'N/A' },
                                         { label: 'Updated by', value: child.updater?.name ?? 'N/A' },
                                     ].map((item, idx) => (
@@ -866,7 +876,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Supplements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Supplements & Programs</h3>
-                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700 sm:grid-cols-2">
+                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-2 dark:bg-gray-700">
                                             {[
                                                 { label: 'Vitamin A', value: selectedLog.vitamin_a },
                                                 { label: 'Deworming', value: selectedLog.deworming },
@@ -896,7 +906,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Metadata */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Record Info</h3>
-                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700 sm:grid-cols-2">
+                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-2 dark:bg-gray-700">
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Created By</p>
                                                 <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.user?.name ?? '-'}</p>
@@ -941,7 +951,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 flex flex-col h-full w-80 max-w-[calc(100vw-2rem)] bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
+                        className={`fixed top-0 right-0 z-40 flex h-full w-80 max-w-[calc(100vw-2rem)] flex-col bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >
@@ -975,7 +985,7 @@ export default function Show({ child }: { child: Child }) {
                             {child.notes?.length ? (
                                 child.notes.map((note) => (
                                     <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                        <p className="break-words text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
+                                        <p className="text-sm break-words text-gray-700 dark:text-gray-200">{note.note}</p>
                                         <small className="mt-1 block text-gray-500 dark:text-gray-400">
                                             {note.created_at
                                                 ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
@@ -1026,8 +1036,8 @@ export default function Show({ child }: { child: Child }) {
                             <div>
                                 <h4 className="font-semibold text-amber-800 dark:text-amber-400">Confirmation Required</h4>
                                 <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                                    Changing weight or height will <span className="font-semibold">automatically create a new health log</span>.
-                                    For additional measurements like vitamins or deworming, please{' '}
+                                    Changing weight or height will <span className="font-semibold">automatically create a new health log</span>. For
+                                    additional measurements like vitamins or deworming, please{' '}
                                     <Link
                                         href={route('children.healthlogs.create', { child: child.slug })}
                                         className="font-semibold text-teal-600 hover:underline dark:text-teal-400"
@@ -1178,12 +1188,11 @@ export default function Show({ child }: { child: Child }) {
                             </div>
                             <div className="p-6">
                                 <Input
-                                    type="text"
-                                    placeholder="e.g., 09171234567"
+                                    type="tel"
+                                    placeholder="+63 XXX XXX XXXX"
                                     value={data.contact_number}
-                                    onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
+                                    onChange={(e) => setData('contact_number', formatPhoneNumber(e.target.value))}
                                     className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                    maxLength={11}
                                 />
                             </div>
                         </div>

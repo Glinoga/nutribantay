@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { formatPhoneNumber } from '@/lib/phoneUtils';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
@@ -41,7 +42,7 @@ export default function Edit({ child }: Props) {
         birthdate: child.birthdate || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
-        contact_number: child.contact_number ?? '',
+        contact_number: child.contact_number ? formatPhoneNumber(child.contact_number) : '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -66,6 +67,11 @@ export default function Edit({ child }: Props) {
                 smartToast.error('Failed to update record. Please try again.');
             },
         });
+    };
+
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatPhoneNumber(e.target.value);
+        setData('contact_number', formatted);
     };
 
     const handleClose = () => {
@@ -237,12 +243,11 @@ export default function Edit({ child }: Props) {
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
                                         <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Contact Number</Label>
                                         <Input
-                                            type="text"
-                                            placeholder="e.g., 09171234567"
+                                            type="tel"
+                                            placeholder="+63 XXX XXX XXXX"
                                             value={data.contact_number}
-                                            onChange={(e) => setData('contact_number', e.target.value.replace(/\D/g, ''))}
+                                            onChange={handlePhoneNumberChange}
                                             className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
-                                            maxLength={11}
                                         />
                                     </div>
 

@@ -178,19 +178,23 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                 message: message,
             },
             {
-                onSuccess: () => {
+                onSuccess: (page) => {
                     smartToast.dismiss(loadingToast);
                     setIsSending(false);
-                    setMessage('');
-                    setSelectedUsers([]);
-                    setCharacterCount(0);
-                    setLastFormData(null);
+                    const flash = page.props.flash as { success?: string; error?: string; warning?: string } | undefined;
+                    if (flash?.success) {
+                        setMessage('');
+                        setSelectedUsers([]);
+                        setCharacterCount(0);
+                        setLastFormData(null);
+                    }
+                    // On flash.error or flash.warning: keep form data for retry
                 },
-                onError: () => {
+                onError: (errors) => {
                     smartToast.dismiss(loadingToast);
                     setIsSending(false);
                     // Keep form data for retry - show retry option
-                    smartToast.error('Failed to send SMS. Please try again.');
+                    smartToast.error(errors?.sms || errors?.message || 'Failed to send SMS. Please try again.');
                 },
             },
         );
@@ -583,6 +587,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                                                     setSelectedUsers([]);
                                                     setCharacterCount(0);
                                                     setSearchQuery('');
+                                                    setLastFormData(null);
                                                 }}
                                                 disabled={isSending}
                                                 className="border px-6 py-6 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
@@ -595,7 +600,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                             </Card>
 
                             {/* Retry Section - shown when last send failed */}
-                            {lastFormData && !showConfirmDialog && (
+                            {lastFormData && !showConfirmDialog && !isSending && (
                                 <Card className="border border-red-200 bg-red-50 shadow-lg dark:border-red-800 dark:bg-red-900/20">
                                     <CardContent className="p-4">
                                         <div className="flex items-center justify-between">
