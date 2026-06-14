@@ -940,7 +940,7 @@ export default function Show({ child }: { child: Child }) {
 
                     {/* Sliding Notes Panel */}
                     <div
-                        className={`fixed top-0 right-0 z-40 h-full w-80 max-w-[calc(100vw-2rem)] bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
+                        className={`fixed top-0 right-0 z-40 flex flex-col h-full w-80 max-w-[calc(100vw-2rem)] bg-white p-4 shadow-lg transition-transform duration-300 sm:w-96 sm:p-6 dark:bg-gray-800 ${
                             notesOpen ? 'translate-x-0' : 'translate-x-full'
                         }`}
                     >
@@ -970,29 +970,31 @@ export default function Show({ child }: { child: Child }) {
                             </form>
                         )}
 
-                        {child.notes?.length ? (
-                            child.notes.map((note) => (
-                                <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                    <p className="text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
-                                    <small className="mt-1 block text-gray-500 dark:text-gray-400">
-                                        {note.created_at
-                                            ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
-                                            : 'N/A'}
-                                    </small>
-                                    {!isOveraged && (
-                                        <button
-                                            className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                                            onClick={() => deleteNote(note.id)}
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                            Delete
-                                        </button>
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-gray-500 dark:text-gray-400">No notes yet.</p>
-                        )}
+                        <div className="flex-1 overflow-y-auto">
+                            {child.notes?.length ? (
+                                child.notes.map((note) => (
+                                    <div key={note.id} className="mb-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700">
+                                        <p className="text-sm text-gray-700 dark:text-gray-200">{note.note}</p>
+                                        <small className="mt-1 block text-gray-500 dark:text-gray-400">
+                                            {note.created_at
+                                                ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
+                                                : 'N/A'}
+                                        </small>
+                                        {!isOveraged && (
+                                            <button
+                                                className="mt-2 inline-flex items-center gap-1 text-sm text-red-600 transition-colors hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                                onClick={() => deleteNote(note.id)}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                Delete
+                                            </button>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 dark:text-gray-400">No notes yet.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
