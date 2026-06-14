@@ -333,7 +333,7 @@ export default function Show({ child }: { child: Child }) {
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -865,7 +865,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Supplements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Supplements & Programs</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
+                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700 sm:grid-cols-2">
                                             {[
                                                 { label: 'Vitamin A', value: selectedLog.vitamin_a },
                                                 { label: 'Deworming', value: selectedLog.deworming },
@@ -895,7 +895,7 @@ export default function Show({ child }: { child: Child }) {
                                     {/* Metadata */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Record Info</h3>
-                                        <div className="grid grid-cols-2 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
+                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 dark:bg-gray-700 sm:grid-cols-2">
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Created By</p>
                                                 <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.user?.name ?? '-'}</p>

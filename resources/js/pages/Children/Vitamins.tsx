@@ -263,7 +263,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                 }
             `}</style>
 
-            <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+            <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-br from-teal-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.12),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.12),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top_left,rgba(8,145,178,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,211,238,0.25),transparent_50%)]" />
 
                 <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -609,7 +609,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                         </DialogHeader>
 
                         <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Dose Number</p>
                                     <p className="font-medium text-gray-900 dark:text-gray-100">{viewingDose.dose.dose_number}</p>

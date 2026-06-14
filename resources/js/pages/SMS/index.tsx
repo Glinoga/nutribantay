@@ -310,7 +310,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {/* Recipients Panel */}
                         <div className="space-y-4 lg:col-span-1">
-                            <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <Card className="overflow-x-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                                 <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -502,7 +502,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                         {/* Message Composer & Summary */}
                         <div className="space-y-4 lg:col-span-2">
                             {/* Message Composer */}
-                            <Card className="overflow-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
+                            <Card className="overflow-x-hidden border-0 bg-white/80 shadow-xl backdrop-blur-xl dark:bg-gray-800/80">
                                 <CardHeader className="bg-gradient-to-r from-teal-500/10 to-cyan-500/10 py-4 dark:from-teal-900/20 dark:to-cyan-900/20">
                                     <CardTitle className="flex items-center gap-2">
                                         <Mail className="h-5 w-5 text-teal-600 dark:text-teal-400" />
@@ -617,7 +617,7 @@ export default function SMSIndex({ users, pagination, credits, prefilledChildId,
                             )}
 
                             {/* Summary Card */}
-                            <Card className="overflow-hidden border-0 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
+                            <Card className="overflow-x-hidden border-0 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-xl dark:from-gray-800 dark:to-gray-900">
                                 <CardContent className="p-6">
                                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                                         <div className="rounded-xl bg-white p-4 shadow-md transition-shadow hover:shadow-lg dark:bg-gray-800">
