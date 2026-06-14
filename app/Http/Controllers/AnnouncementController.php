@@ -138,7 +138,7 @@ class AnnouncementController extends Controller
             'end_date' => 'nullable|date|after_or_equal:date',
             'summary' => 'required|string',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
         if ($request->hasFile('image')) {
@@ -169,7 +169,7 @@ class AnnouncementController extends Controller
             'category_id' => 'sometimes|exists:categories,id',
             'summary' => 'sometimes|string',
             'content' => 'sometimes|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
         if ($request->hasFile('image')) {
