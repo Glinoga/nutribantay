@@ -447,6 +447,94 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             </Link>
                                         )}
                                     </div>
+                                    <div className="mt-4 flex gap-2">
+                                        <Link href={`${route('children.index')}?vitamin_status=overdue`}>
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                aria-label="View overdue vitamin follow-ups"
+                                            >
+                                                View Overdue
+                                            </Button>
+                                        </Link>
+                                        <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
+                                            <Button
+                                                size="sm"
+                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                aria-label="View upcoming vitamin follow-ups"
+                                            >
+                                                View Upcoming
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                    {vitamin_followups.follow_ups.length > 0 && (
+                                        <div
+                                            className="mt-4 max-h-64 overflow-y-auto rounded-md border border-orange-200 dark:border-orange-800"
+                                            role="region"
+                                            aria-label="Vitamin follow-ups table"
+                                        >
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-sm">
+                                                    <thead className="sticky top-0 bg-orange-100/50 dark:bg-orange-900/30">
+                                                        <tr>
+                                                            <th className="px-4 py-2 text-left font-medium text-orange-800 dark:text-orange-300">
+                                                                Child
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-orange-800 dark:text-orange-300">
+                                                                Vitamin
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-orange-800 dark:text-orange-300">
+                                                                Dose
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-orange-800 dark:text-orange-300">
+                                                                Due Date
+                                                            </th>
+                                                            <th className="px-4 py-2 text-left font-medium text-orange-800 dark:text-orange-300">
+                                                                Status
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {vitamin_followups.follow_ups.slice(0, 10).map((fu) => (
+                                                            <tr
+                                                                key={`${fu.child_id}-${fu.vitamin_name}-${fu.dose_number}`}
+                                                                className="border-t border-orange-100 transition-colors hover:bg-orange-50/50 dark:border-orange-800 dark:hover:bg-orange-900/20"
+                                                            >
+                                                                <td className="px-4 py-2">
+                                                                    <Link
+                                                                        href={route('children.show', { child: fu.child_id })}
+                                                                        className="cursor-pointer rounded text-teal-600 hover:underline focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 dark:text-teal-400"
+                                                                    >
+                                                                        {fu.child_name}
+                                                                    </Link>
+                                                                </td>
+                                                                <td className="px-4 py-2 text-orange-700 dark:text-orange-300">{fu.vitamin_name}</td>
+                                                                <td className="px-4 py-2 text-orange-700 dark:text-orange-300">{fu.dose_number}</td>
+                                                                <td className="px-4 py-2 text-orange-700 dark:text-orange-300">{fu.next_due_date}</td>
+                                                                <td className="px-4 py-2">
+                                                                    <Badge
+                                                                        className={
+                                                                            fu.status === 'Overdue'
+                                                                                ? 'cursor-pointer bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                                                                : 'cursor-pointer bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                                                        }
+                                                                    >
+                                                                        {fu.status}
+                                                                    </Badge>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            {vitamin_followups.follow_ups.length > 10 && (
+                                                <div className="border-t border-orange-200 px-4 py-2 text-center text-sm text-orange-600 dark:border-orange-800 dark:text-orange-400">
+                                                    ...and {vitamin_followups.follow_ups.length - 10} more
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </AlertDescription>
                             </Alert>
                         </div>
