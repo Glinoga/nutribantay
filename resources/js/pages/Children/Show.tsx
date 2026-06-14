@@ -432,6 +432,7 @@ export default function Show({ child }: { child: Child }) {
                                     {[
                                         { label: 'Full Name', value: child.fullname },
                                         { label: 'Sex', value: child.sex },
+                                        { label: 'Birthdate', value: child.birthdate ? new Date(child.birthdate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' },
                                         { label: 'Age', value: `${child.age ?? 'N/A'} months` },
                                         { label: 'Weight', value: `${child.weight ?? 'N/A'} kg` },
                                         { label: 'Height', value: `${child.height ?? 'N/A'} cm` },

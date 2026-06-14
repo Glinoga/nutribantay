@@ -192,6 +192,7 @@ export default function ChildrenCreate() {
                                                 type="date"
                                                 value={data.birthdate}
                                                 onChange={(e) => setData('birthdate', e.target.value)}
+                                                max={new Date().toISOString().split('T')[0]}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
                                             />
                                         </div>

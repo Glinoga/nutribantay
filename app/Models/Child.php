@@ -63,7 +63,7 @@ class Child extends Model
     // Full name accessor: "Firstname M. Lastname"
     public function getFullnameAttribute()
     {
-        $mi = $this->middle_initial ? strtoupper($this->middle_initial).'.' : '';
+        $mi = $this->middle_initial ? strtoupper(rtrim($this->middle_initial, '.')).'.' : '';
 
         return trim("{$this->first_name} {$mi} {$this->last_name}");
     }
@@ -71,7 +71,7 @@ class Child extends Model
     // Lastname, Firstname (M.)
     public function getFormattedNameAttribute()
     {
-        $mi = $this->middle_initial ? strtoupper($this->middle_initial).'.' : '';
+        $mi = $this->middle_initial ? strtoupper(rtrim($this->middle_initial, '.')).'.' : '';
 
         return trim("{$this->last_name}, {$this->first_name} {$mi}");
     }
@@ -93,7 +93,13 @@ class Child extends Model
             return null;
         }
 
-        return floor(Carbon::parse($this->birthdate)->diffInMonths(Carbon::now()));
+        $birthdate = Carbon::parse($this->birthdate);
+
+        if ($birthdate->isFuture()) {
+            return null;
+        }
+
+        return floor($birthdate->diffInMonths(Carbon::now()));
     }
 
     // Boolean flag - 60 months and above (no longer in 0-5 years bracket)
