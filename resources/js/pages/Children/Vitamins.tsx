@@ -475,7 +475,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                 <Dialog open={true} onOpenChange={() => closeDoseModal()}>
                     <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold text-gray-900">
+                            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 {editingDose ? `Edit Dose #${editingDose.dose.dose_number}` : 'Record New Dose'}
                             </DialogTitle>
                         </DialogHeader>
@@ -603,7 +603,7 @@ export default function Vitamins({ child, child_vitamins, available_vitamins }: 
                 <Dialog open={true} onOpenChange={() => setViewingDose(null)}>
                     <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold text-gray-900">
+                            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 Dose #{viewingDose.dose.dose_number} — {viewingDose.cv.vitamin.name}
                             </DialogTitle>
                         </DialogHeader>

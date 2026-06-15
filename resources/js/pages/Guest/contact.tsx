@@ -361,12 +361,12 @@ export default function Contact() {
                                                                 privacy policy
                                                             </button>
                                                         </DialogTrigger>
-                                                        <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl">
+                                                        <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl dark:bg-gray-800">
                                                             <DialogHeader>
-                                                                <DialogTitle className="text-xl font-bold text-teal-800">Privacy Policy</DialogTitle>
+                                                                <DialogTitle className="text-xl font-bold text-teal-800 dark:text-teal-300">Privacy Policy</DialogTitle>
                                                             </DialogHeader>
-                                                            <div className="space-y-4 text-sm text-gray-600">
-                                                                <h3 className="font-semibold text-gray-900">1. Information We Collect</h3>
+                                                            <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">1. Information We Collect</h3>
                                                                 <p>
                                                                     We collect personal information that you voluntarily provide to us when you use
                                                                     the NutriBantay contact form, including your name, email address, phone number,
@@ -374,7 +374,7 @@ export default function Contact() {
                                                                     nutrition and health data if you register for our monitoring program.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">2. How We Use Your Information</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">2. How We Use Your Information</h3>
                                                                 <p>
                                                                     The information we collect is used to respond to your inquiries, provide nutrition
                                                                     monitoring services, improve our community health programs, and comply with legal
@@ -382,7 +382,7 @@ export default function Contact() {
                                                                     tracking and community wellness initiatives.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">3. Data Protection</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">3. Data Protection</h3>
                                                                 <p>
                                                                     We implement appropriate technical and organizational measures to protect your
                                                                     personal data against unauthorized access, alteration, disclosure, or destruction.
@@ -390,21 +390,21 @@ export default function Contact() {
                                                                     protected under applicable data privacy laws.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">4. Data Sharing</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">4. Data Sharing</h3>
                                                                 <p>
                                                                     We do not sell, trade, or rent your personal information to third parties. We may
                                                                     share information with authorized barangay health personnel and government
                                                                     agencies as required by law or with your explicit consent.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">5. Data Retention</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">5. Data Retention</h3>
                                                                 <p>
                                                                     We retain your personal data only for as long as necessary to fulfill the purposes
                                                                     for which it was collected, or as required by applicable laws and regulations.
                                                                     When data is no longer needed, it is securely disposed of.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">6. Your Rights</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">6. Your Rights</h3>
                                                                 <p>
                                                                     You have the right to access, correct, update, or request deletion of your
                                                                     personal data. You may also withdraw your consent to data processing at any time.
@@ -412,7 +412,7 @@ export default function Contact() {
                                                                     barangay health center.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900">7. Updates to This Policy</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">7. Updates to This Policy</h3>
                                                                 <p>
                                                                     We may update this Privacy Policy from time to time. Any changes will be posted on
                                                                     this page, and we encourage you to review this policy periodically for any
@@ -475,7 +475,7 @@ export default function Contact() {
                                 <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
-                                            <h3 className="text-lg font-bold text-gray-800">Bagong Silang Phase 3 Health Center</h3>
+                                            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">Bagong Silang Phase 3 Health Center</h3>
                                             <p className="mt-1 text-sm text-gray-600">
                                                 Q29X+VJC, Caloocan
                                                 <br />

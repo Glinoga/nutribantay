@@ -559,7 +559,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
                                     <CardDescription>12-23 months</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-600">{stats.age_breakdown['12to23']}</CardTitle>
+                                    <CardTitle className="text-3xl text-cyan-600 dark:text-cyan-400">{stats.age_breakdown['12to23']}</CardTitle>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer border-orange-200 bg-orange-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:border-orange-800 dark:bg-orange-900/20">
