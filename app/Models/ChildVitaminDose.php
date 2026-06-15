@@ -12,6 +12,7 @@ class ChildVitaminDose extends Model
 
     protected $fillable = [
         'child_vitamin_id',
+        'healthlog_id',
         'dose_number',
         'date_given',
         'next_due_date',
@@ -33,6 +34,11 @@ class ChildVitaminDose extends Model
     public function administeredBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'administered_by');
+    }
+
+    public function healthLog(): BelongsTo
+    {
+        return $this->belongsTo(HealthLog::class, 'healthlog_id');
     }
 
     public function getDoseStatusAttribute(): string

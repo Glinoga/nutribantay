@@ -128,7 +128,7 @@ class HealthlogController extends Controller
         }
 
         DB::transaction(function () use ($validated, $child) {
-            HealthLog::create($validated);
+            $healthLog = HealthLog::create($validated);
 
             // Auto-create Vitamin Tracker dose when Vitamin A is checked
             if (! empty($validated['vitamin_a'])) {
@@ -143,6 +143,7 @@ class HealthlogController extends Controller
                         ->max('dose_number') ?? 0) + 1;
                     ChildVitaminDose::create([
                         'child_vitamin_id' => $childVitamin->id,
+                        'healthlog_id' => $healthLog->id,
                         'dose_number' => $nextDoseNumber,
                         'date_given' => now()->toDateString(),
                         'administered_by' => auth()->id(),
@@ -256,6 +257,7 @@ class HealthlogController extends Controller
                         ->max('dose_number') ?? 0) + 1;
                     ChildVitaminDose::create([
                         'child_vitamin_id' => $childVitamin->id,
+                        'healthlog_id' => $healthlog->id,
                         'dose_number' => $nextDoseNumber,
                         'date_given' => now()->toDateString(),
                         'administered_by' => auth()->id(),

@@ -6,6 +6,7 @@ use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\Child;
 use App\Models\ChildVitamin;
 use App\Models\ChildVitaminDose;
+use App\Models\HealthLog;
 use App\Models\Vitamin;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -221,6 +222,13 @@ class ChildVitaminController extends Controller
 
         if ($dose->child_vitamin_id !== $childVitamin->id) {
             abort(404);
+        }
+
+        // Uncheck vitamin_a on the originating health log if this dose was created from one
+        if ($dose->healthlog_id) {
+            HealthLog::where('id', $dose->healthlog_id)
+                ->where('vitamin_a', true)
+                ->update(['vitamin_a' => false]);
         }
 
         $dose->delete();

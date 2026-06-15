@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HealthLog extends Model
@@ -56,5 +57,10 @@ class HealthLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function vitaminDoses(): HasMany
+    {
+        return $this->hasMany(ChildVitaminDose::class, 'healthlog_id');
     }
 }
