@@ -38,8 +38,15 @@ class ChildController extends Controller
             } else {
                 $query->where(function ($q) use ($search) {
                     $searchLower = strtolower($search);
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
+                    $q->where(function ($wq) use ($search) {
+                        $words = explode(' ', $search);
+                        foreach ($words as $word) {
+                            $wq->where(function ($xq) use ($word) {
+                                $xq->where('first_name', 'like', "%{$word}%")
+                                    ->orWhere('last_name', 'like', "%{$word}%");
+                            });
+                        }
+                    })
                         ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
                 });
             }
@@ -309,8 +316,15 @@ class ChildController extends Controller
             } else {
                 $query->where(function ($q) use ($search) {
                     $searchLower = strtolower($search);
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
+                    $q->where(function ($wq) use ($search) {
+                        $words = explode(' ', $search);
+                        foreach ($words as $word) {
+                            $wq->where(function ($xq) use ($word) {
+                                $xq->where('first_name', 'like', "%{$word}%")
+                                    ->orWhere('last_name', 'like', "%{$word}%");
+                            });
+                        }
+                    })
                         ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
                 });
             }
@@ -955,8 +969,15 @@ class ChildController extends Controller
             } else {
                 $query->where(function ($q) use ($search) {
                     $searchLower = strtolower($search);
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
+                    $q->where(function ($wq) use ($search) {
+                        $words = explode(' ', $search);
+                        foreach ($words as $word) {
+                            $wq->where(function ($xq) use ($word) {
+                                $xq->where('first_name', 'like', "%{$word}%")
+                                    ->orWhere('last_name', 'like', "%{$word}%");
+                            });
+                        }
+                    })
                         ->orWhereRaw('LOWER(sex) = ?', [$searchLower]);
                 });
             }

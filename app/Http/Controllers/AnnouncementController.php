@@ -29,9 +29,14 @@ class AnnouncementController extends Controller
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('summary', 'like', "%{$search}%")
-                    ->orWhere('author', 'like', "%{$search}%");
+                $words = explode(' ', $search);
+                foreach ($words as $word) {
+                    $q->where(function ($wq) use ($word) {
+                        $wq->where('title', 'like', "%{$word}%")
+                            ->orWhere('summary', 'like', "%{$word}%")
+                            ->orWhere('author', 'like', "%{$word}%");
+                    });
+                }
             });
         }
 
