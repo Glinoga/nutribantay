@@ -95,10 +95,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/healthlogs/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
         Route::delete('/healthlogs/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');
 
-        // Archived health logs
-        Route::get('/healthlogs-archived', [HealthlogController::class, 'archived'])->name('healthlogs.archived');
-        Route::post('/healthlogs/{id}/restore', [HealthlogController::class, 'restore'])->name('healthlogs.restore');
-        Route::delete('/healthlogs/{id}/force-delete', [HealthlogController::class, 'forceDelete'])->name('healthlogs.force-delete');
     });
 
     /*

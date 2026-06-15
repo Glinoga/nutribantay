@@ -14,7 +14,6 @@ import axios from 'axios';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import {
     AlertTriangle,
-    Archive,
     Check,
     ClipboardList,
     Copy,
@@ -573,13 +572,6 @@ export default function Show({ child }: { child: Child }) {
                             <div className="mb-4 flex items-center gap-2">
                                 <ClipboardList className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Health Log Records</h2>
-                                <Link
-                                    href={route('healthlogs.archived')}
-                                    className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 transition-all hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
-                                >
-                                    <Archive className="h-3.5 w-3.5" />
-                                    View Archived
-                                </Link>
                             </div>
 
                             <div className="overflow-x-auto rounded-xl border-0 bg-white shadow-md dark:bg-gray-800">

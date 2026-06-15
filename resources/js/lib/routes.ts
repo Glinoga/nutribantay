@@ -55,9 +55,6 @@ export function route(name: string, params?: Record<string, string | number | nu
         'healthlogs.edit': '/healthlogs/{healthlog}/edit',
         'healthlogs.update': '/healthlogs/{healthlog}',
         'healthlogs.destroy': '/healthlogs/{healthlog}',
-        'healthlogs.archived': '/healthlogs-archived',
-        'healthlogs.restore': '/healthlogs/{id}/restore',
-        'healthlogs.force-delete': '/healthlogs/{id}/force-delete',
 
         // Vaccines
         'vaccines.index': '/vaccines',
