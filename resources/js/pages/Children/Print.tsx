@@ -29,6 +29,7 @@ type ChildrenPrintProps = {
     children: Child[];
     filters: Filters;
     generated_at: string;
+    generated_by: string;
     type?: string;
 };
 
@@ -40,7 +41,7 @@ const getFilterSummary = (filters: Filters) => {
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
-export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
+export default function ChildrenPrint({ children, filters, generated_at, generated_by, type }: ChildrenPrintProps) {
     useLayoutEffect(() => {
         const html = document.documentElement;
         html.classList.remove('dark');
@@ -135,7 +136,9 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                 <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
                 <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Children Records</h2>
                 <p className="mt-2 text-base text-cyan-700 capitalize sm:text-lg dark:text-cyan-300">{getFilterSummary(filters)}</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
+                    Generated on {generated_at} by {generated_by}
+                </p>
             </div>
 
             <div className="mb-8">
@@ -188,7 +191,9 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
             </div>
 
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {generated_at}</p>
+                <p>
+                    Generated on {generated_at} by {generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System

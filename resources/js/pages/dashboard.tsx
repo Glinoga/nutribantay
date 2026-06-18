@@ -573,7 +573,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
 
                     {/* Nutrition Status */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Nutrition Status (This Year)</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Nutrition Status (Last 12 Months)</h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer border-green-200 bg-green-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:border-green-800 dark:bg-green-900/20">
                                 <CardHeader>

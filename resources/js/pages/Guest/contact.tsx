@@ -363,10 +363,14 @@ export default function Contact() {
                                                         </DialogTrigger>
                                                         <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl dark:bg-gray-800">
                                                             <DialogHeader>
-                                                                <DialogTitle className="text-xl font-bold text-teal-800 dark:text-teal-300">Privacy Policy</DialogTitle>
+                                                                <DialogTitle className="text-xl font-bold text-teal-800 dark:text-teal-300">
+                                                                    Privacy Policy
+                                                                </DialogTitle>
                                                             </DialogHeader>
                                                             <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">1. Information We Collect</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                                                    1. Information We Collect
+                                                                </h3>
                                                                 <p>
                                                                     We collect personal information that you voluntarily provide to us when you use
                                                                     the NutriBantay contact form, including your name, email address, phone number,
@@ -374,7 +378,9 @@ export default function Contact() {
                                                                     nutrition and health data if you register for our monitoring program.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">2. How We Use Your Information</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                                                    2. How We Use Your Information
+                                                                </h3>
                                                                 <p>
                                                                     The information we collect is used to respond to your inquiries, provide nutrition
                                                                     monitoring services, improve our community health programs, and comply with legal
@@ -412,7 +418,9 @@ export default function Contact() {
                                                                     barangay health center.
                                                                 </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">7. Updates to This Policy</h3>
+                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                                                    7. Updates to This Policy
+                                                                </h3>
                                                                 <p>
                                                                     We may update this Privacy Policy from time to time. Any changes will be posted on
                                                                     this page, and we encourage you to review this policy periodically for any
@@ -475,7 +483,9 @@ export default function Contact() {
                                 <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
-                                            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">Bagong Silang Phase 3 Health Center</h3>
+                                            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                                                Bagong Silang Phase 3 Health Center
+                                            </h3>
                                             <p className="mt-1 text-sm text-gray-600">
                                                 Q29X+VJC, Caloocan
                                                 <br />

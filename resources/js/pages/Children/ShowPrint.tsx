@@ -46,6 +46,7 @@ type Child = {
 type ShowPrintProps = {
     child: Child;
     generated_at: string;
+    generated_by: string;
 };
 
 const getStatusColor = (status: string | null) => {
@@ -55,7 +56,7 @@ const getStatusColor = (status: string | null) => {
     return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
 };
 
-export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+export default function ShowPrint({ child, generated_at, generated_by }: ShowPrintProps) {
     useLayoutEffect(() => {
         const html = document.documentElement;
         html.classList.remove('dark');
@@ -209,7 +210,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
                 <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Child Profile</h2>
                 <p className="mt-2 text-base text-cyan-700 sm:text-lg dark:text-cyan-300">{child.fullname}</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
+                    Generated on {generated_at} by {generated_by}
+                </p>
             </div>
 
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -396,7 +399,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
             )}
 
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {generated_at}</p>
+                <p>
+                    Generated on {generated_at} by {generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System

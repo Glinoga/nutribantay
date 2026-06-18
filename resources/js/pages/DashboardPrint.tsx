@@ -40,6 +40,7 @@ type PrintData = {
         deworming_given: number;
     };
     generated_at: string;
+    generated_by: string;
     trends: {
         trend: Array<{ label: string; count: number }>;
         status_distribution: {
@@ -453,7 +454,9 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {data.generated_at}</p>
+                <p>
+                    Generated on {data.generated_at} by {data.generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System
