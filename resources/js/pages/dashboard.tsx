@@ -33,12 +33,10 @@ type Stats = {
     vitamin_a: {
         given: number;
         total: number;
-        percentage: number;
     };
     deworming: {
         given: number;
         total: number;
-        percentage: number;
     };
     daily: {
         children_registered: number;
@@ -610,20 +608,14 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardDescription>Vitamin A Given</CardDescription>
+                                    <CardDescription>Vitamin A Doses</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
-                                        ({stats.vitamin_a.percentage}%)
-                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardDescription>Deworming Given</CardDescription>
+                                    <CardDescription>Deworming Doses</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
-                                        ({stats.deworming.percentage}%)
-                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">

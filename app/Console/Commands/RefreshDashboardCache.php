@@ -118,9 +118,17 @@ class RefreshDashboardCache extends Command
             'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
         ];
 
-        $vitaminAGiven = $latestPerChild->where('vitamin_a', true)->count();
-        $dewormingGiven = $latestPerChild->where('deworming', true)->count();
-        $totalWithLogs = $latestPerChild->count();
+        $childrenWithLogs = $latestPerChild->count();
+
+        $vitaminAGiven = (clone $healthLogsBase)
+            ->where('created_at', '>=', $twelveMonthsAgo)
+            ->where('vitamin_a', true)
+            ->count();
+
+        $dewormingGiven = (clone $healthLogsBase)
+            ->where('created_at', '>=', $twelveMonthsAgo)
+            ->where('deworming', true)
+            ->count();
 
         $monthlyLogs = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -193,7 +201,7 @@ class RefreshDashboardCache extends Command
                 'female_count' => $femaleCount,
                 'vitamin_a_given' => $vitaminAGiven,
                 'deworming_given' => $dewormingGiven,
-                'total_with_logs' => $totalWithLogs,
+                'total_with_logs' => $childrenWithLogs,
             ]
         );
     }

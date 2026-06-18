@@ -52,8 +52,8 @@ class DashboardController extends Controller
                     'total_children' => 0,
                     'age_breakdown' => ['0to5' => 0, '6to11' => 0, '12to23' => 0, '24to56' => 0],
                     'nutrition_status' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0],
-                    'vitamin_a' => ['given' => 0, 'total' => 0, 'percentage' => 0],
-                    'deworming' => ['given' => 0, 'total' => 0, 'percentage' => 0],
+                    'vitamin_a' => ['given' => 0, 'total' => 0],
+                    'deworming' => ['given' => 0, 'total' => 0],
                     'daily' => ['children_registered' => 0, 'healthlogs' => 0],
                     'weekly' => ['healthlogs' => 0],
                     'monthly' => ['healthlogs' => 0],
@@ -87,8 +87,6 @@ class DashboardController extends Controller
         $months6 = collect($ml)->take(-6)->map(fn ($count, $month) => ['month' => $month, 'count' => $count])->values();
         $months12 = collect($ml)->map(fn ($count, $month) => ['month' => $month, 'count' => $count])->values();
 
-        $totalWithLogs = $cache->total_with_logs;
-
         return Inertia::render('dashboard', [
             'stats' => [
                 'total_children' => $cache->total_children,
@@ -106,13 +104,11 @@ class DashboardController extends Controller
                 ],
                 'vitamin_a' => [
                     'given' => $cache->vitamin_a_given,
-                    'total' => $totalWithLogs,
-                    'percentage' => $totalWithLogs > 0 ? round(($cache->vitamin_a_given / $totalWithLogs) * 100, 1) : 0,
+                    'total' => $cache->total_with_logs,
                 ],
                 'deworming' => [
                     'given' => $cache->deworming_given,
-                    'total' => $totalWithLogs,
-                    'percentage' => $totalWithLogs > 0 ? round(($cache->deworming_given / $totalWithLogs) * 100, 1) : 0,
+                    'total' => $cache->total_with_logs,
                 ],
                 'daily' => [
                     'children_registered' => $cache->today_children,
@@ -284,8 +280,8 @@ class DashboardController extends Controller
                 'overweight' => $healthLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
                 'stunted' => $healthLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
             ],
-            'vitamin_a_percentage' => $totalChildren > 0 ? round(($healthLogs->where('vitamin_a', true)->count() / $totalChildren) * 100) : 0,
-            'deworming_percentage' => $totalChildren > 0 ? round(($healthLogs->where('deworming', true)->count() / $totalChildren) * 100) : 0,
+            'vitamin_a_doses' => $allLogs->where('vitamin_a', true)->count(),
+            'deworming_doses' => $allLogs->where('deworming', true)->count(),
         ];
 
         return Inertia::render('DashboardPrint', [
@@ -315,8 +311,8 @@ class DashboardController extends Controller
                         'overweight' => $healthLogs->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
                         'stunted' => $healthLogs->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
                     ],
-                    'vitamin_a_given' => $healthLogs->where('vitamin_a', true)->count(),
-                    'deworming_given' => $healthLogs->where('deworming', true)->count(),
+                    'vitamin_a_given' => $allLogs->where('vitamin_a', true)->count(),
+                    'deworming_given' => $allLogs->where('deworming', true)->count(),
                 ],
                 'barangay' => $barangay,
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),

@@ -49,8 +49,8 @@ type PrintData = {
             overweight: number;
             stunted: number;
         };
-        vitamin_a_percentage: number;
-        deworming_percentage: number;
+        vitamin_a_doses: number;
+        deworming_doses: number;
     };
 };
 
@@ -262,23 +262,17 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
-                            <CardDescription>Vitamin A Given</CardDescription>
+                            <CardDescription>Vitamin A Doses</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.summary.vitamin_a_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
-                                    ({data.trends.vitamin_a_percentage}%)
-                                </span>
+                                {data.trends.vitamin_a_doses}
                             </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
-                            <CardDescription>Deworming Given</CardDescription>
+                            <CardDescription>Deworming Doses</CardDescription>
                             <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.summary.deworming_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
-                                    ({data.trends.deworming_percentage}%)
-                                </span>
+                                {data.trends.deworming_doses}
                             </CardTitle>
                         </CardHeader>
                     </Card>
