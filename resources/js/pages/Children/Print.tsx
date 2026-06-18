@@ -47,6 +47,7 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
     }, []);
 
     useEffect(() => {
@@ -54,15 +55,18 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
 
         const handleBeforePrint = () => {
             const html = document.documentElement;
             html.classList.remove('dark');
             html.style.colorScheme = 'light';
             html.setAttribute('data-theme', 'light');
+            html.dataset.printMode = 'true';
         };
 
         const handleAfterPrint = () => {
+            delete html.dataset.printMode;
             initializeTheme();
         };
 
@@ -70,6 +74,7 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
         window.addEventListener('afterprint', handleAfterPrint);
 
         return () => {
+            delete html.dataset.printMode;
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
