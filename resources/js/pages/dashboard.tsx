@@ -29,6 +29,7 @@ type Stats = {
         underweight: number;
         overweight: number;
         stunted: number;
+        wasted: number;
     };
     vitamin_a: {
         given: number;
@@ -61,6 +62,7 @@ type TrendData = {
         underweight: number;
         overweight: number;
         stunted: number;
+        wasted: number;
     };
 };
 
@@ -144,7 +146,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
     };
 
     const doughnutData = {
-        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted'],
+        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted', 'Wasted'],
         datasets: [
             {
                 data: [
@@ -152,9 +154,16 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                     trends.status_distribution.underweight,
                     trends.status_distribution.overweight,
                     trends.status_distribution.stunted,
+                    trends.status_distribution.wasted,
                 ],
-                backgroundColor: ['rgba(5, 150, 105, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
-                borderColor: ['rgb(5, 150, 105)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
+                backgroundColor: [
+                    'rgba(5, 150, 105, 0.8)',
+                    'rgba(234, 179, 8, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(249, 115, 22, 0.8)',
+                    'rgba(168, 85, 247, 0.8)',
+                ],
+                borderColor: ['rgb(5, 150, 105)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'],
                 borderWidth: 1,
             },
         ],
@@ -607,6 +616,12 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                     <CardTitle className="text-3xl text-orange-600 dark:text-orange-400">{stats.nutrition_status.stunted}</CardTitle>
                                 </CardHeader>
                             </Card>
+                            <Card className="min-h-[44px] cursor-pointer border-purple-200 bg-purple-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 dark:border-purple-800 dark:bg-purple-900/20">
+                                <CardHeader>
+                                    <CardDescription className="text-purple-600 dark:text-purple-400">Wasted</CardDescription>
+                                    <CardTitle className="text-3xl text-purple-600 dark:text-purple-400">{stats.nutrition_status.wasted}</CardTitle>
+                                </CardHeader>
+                            </Card>
                         </div>
                     </div>
 
@@ -717,7 +732,8 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                     {trends.status_distribution.normal +
                                         trends.status_distribution.underweight +
                                         trends.status_distribution.overweight +
-                                        trends.status_distribution.stunted >
+                                        trends.status_distribution.stunted +
+                                        trends.status_distribution.wasted >
                                     0 ? (
                                         <Doughnut
                                             data={doughnutData}

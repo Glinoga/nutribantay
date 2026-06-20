@@ -116,6 +116,7 @@ class RefreshDashboardCache extends Command
             'underweight' => $latestPerChild->filter(fn ($l) => in_array($l->nutrition_status, ['Moderate Malnutrition', 'Severe Malnutrition']) || in_array($l->status_wfa, ['Underweight', 'Severely Underweight']))->count(),
             'overweight' => $latestPerChild->filter(fn ($l) => $l->nutrition_status === 'Overweight/Obese' || in_array($l->status_wfl_wfh, ['Overweight', 'Obese']))->count(),
             'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
+            'wasted' => $latestPerChild->filter(fn ($l) => in_array($l->status_wfl_wfh, ['Wasted', 'Severely Wasted']))->count(),
         ];
 
         $childrenWithLogs = $latestPerChild->count();
