@@ -790,9 +790,9 @@ export default function Index({
                                 return (
                                     <div key={child.id} className="child-card group block" style={{ animationDelay: `${index * 50}ms` }}>
                                         <Card className="h-full overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-xl dark:bg-gray-800">
-                                            <CardContent className="p-0">
-                                                <div className="p-4">
-                                                    <div className="mb-3 flex items-start justify-between">
+                                            <CardContent className="flex flex-col p-0 h-full">
+                                                <div className="flex-1 p-4">
+                                                    <div className="mb-3 flex items-start">
                                                         <div className="flex items-center gap-3">
                                                             <div
                                                                 className={`flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold shadow-sm ${
@@ -803,8 +803,8 @@ export default function Index({
                                                             >
                                                                 {child.fullname.charAt(0).toUpperCase()}
                                                             </div>
-                                                            <div className="min-w-0">
-                                                                <p className="truncate text-sm font-bold text-gray-900 dark:text-gray-100">
+                                                            <div className="min-w-0 overflow-hidden">
+                                                                <p className="line-clamp-2 text-sm font-bold leading-tight text-gray-900 dark:text-gray-100">
                                                                     {child.fullname}
                                                                 </p>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</p>
