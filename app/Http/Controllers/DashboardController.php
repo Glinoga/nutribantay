@@ -187,6 +187,7 @@ class DashboardController extends Controller
                         fputcsv($handle, [
                             'ID', 'Child Name', 'Birthday', 'Age (Months)', 'Sex',
                             'Weight (kg)', 'Height (cm)', 'Nutrition Status',
+                            'WFA', 'LFA', 'WFH',
                             'Vitamin A', 'Deworming', 'MNP', 'Last Visit',
                         ]);
                         $headerWritten = true;
@@ -202,6 +203,9 @@ class DashboardController extends Controller
                             $log->weight ?? '',
                             $log->height ?? '',
                             $log->nutrition_status ?? 'N/A',
+                            $log->status_wfa ?? '-',
+                            $log->status_lfa ?? '-',
+                            $log->status_wfl_wfh ?? '-',
                             $log->vitamin_a ? 'Yes' : 'No',
                             $log->deworming ? 'Yes' : 'No',
                             $log->micronutrient_powder ? 'Yes' : 'No',
@@ -296,6 +300,9 @@ class DashboardController extends Controller
                     'height' => $log->height,
                     'bmi' => $log->bmi,
                     'nutrition_status' => $log->nutrition_status ?? 'N/A',
+                    'status_wfa' => $log->status_wfa ?? '-',
+                    'status_lfa' => $log->status_lfa ?? '-',
+                    'status_wfl_wfh' => $log->status_wfl_wfh ?? '-',
                     'vitamin_a' => $log->vitamin_a ? 'Yes' : 'No',
                     'deworming' => $log->deworming ? 'Yes' : 'No',
                     'micronutrient_powder' => $log->micronutrient_powder ? 'Yes' : 'No',

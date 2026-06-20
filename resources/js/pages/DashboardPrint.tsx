@@ -21,6 +21,9 @@ type PrintData = {
         height: number;
         bmi: number;
         nutrition_status: string;
+        status_wfa: string;
+        status_lfa: string;
+        status_wfl_wfh: string;
         vitamin_a: string;
         deworming: string;
         micronutrient_powder: string;
@@ -386,6 +389,15 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                             Height
                                         </TableHead>
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            WFA
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            LFA
+                                        </TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            WFH
+                                        </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                             Vit. A
                                         </TableHead>
@@ -434,6 +446,9 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                                     {log.nutrition_status}
                                                 </span>
                                             </TableCell>
+                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_wfa}</TableCell>
+                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_lfa}</TableCell>
+                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_wfl_wfh}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
