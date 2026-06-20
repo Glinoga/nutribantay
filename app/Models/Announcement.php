@@ -24,6 +24,8 @@ class Announcement extends Model
         'slug',
     ];
 
+    protected $hidden = ['image'];
+
     protected $appends = ['is_expired', 'image_url'];
 
     protected static function booted(): void

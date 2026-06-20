@@ -91,14 +91,23 @@ class RefreshDashboardCache extends Command
         $monthHealthLogs = (clone $healthLogsBase)->where('created_at', '>=', $month)->count();
         $yearHealthLogs = (clone $healthLogsBase)->where('created_at', '>=', $year)->count();
 
+        $twelveMonthsAgo = $now->copy()->subMonths(12);
+
+        $sub = DB::table('health_logs')
+            ->select('child_id', DB::raw('MAX(created_at) as max_created'))
+            ->where('created_at', '>=', $twelveMonthsAgo)
+            ->groupBy('child_id');
+
         $latestPerChild = DB::table('health_logs as hl')
-            ->join(DB::raw('(SELECT child_id, MAX(created_at) as max_created FROM health_logs GROUP BY child_id) as latest'), function ($j) {
+            ->join(DB::raw('('.$sub->toSql().') as latest'), function ($j) {
                 $j->on('hl.child_id', '=', 'latest.child_id')
                     ->on('hl.created_at', '=', 'latest.max_created');
             })
+            ->mergeBindings($sub)
             ->join('children', 'hl.child_id', '=', 'children.id')
             ->where('children.barangay', $barangay)
             ->where('children.birthdate', '>=', $now->copy()->subMonths(60))
+            ->where('hl.created_at', '>=', $twelveMonthsAgo)
             ->select('hl.nutrition_status', 'hl.vitamin_a', 'hl.deworming', 'hl.status_lfa', 'hl.status_wfa', 'hl.status_wfl_wfh')
             ->get();
 
@@ -109,9 +118,17 @@ class RefreshDashboardCache extends Command
             'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
         ];
 
-        $vitaminAGiven = $latestPerChild->where('vitamin_a', true)->count();
-        $dewormingGiven = $latestPerChild->where('deworming', true)->count();
-        $totalWithLogs = $latestPerChild->count();
+        $childrenWithLogs = $latestPerChild->count();
+
+        $vitaminAGiven = (clone $healthLogsBase)
+            ->where('created_at', '>=', $twelveMonthsAgo)
+            ->where('vitamin_a', true)
+            ->count();
+
+        $dewormingGiven = (clone $healthLogsBase)
+            ->where('created_at', '>=', $twelveMonthsAgo)
+            ->where('deworming', true)
+            ->count();
 
         $monthlyLogs = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -184,7 +201,7 @@ class RefreshDashboardCache extends Command
                 'female_count' => $femaleCount,
                 'vitamin_a_given' => $vitaminAGiven,
                 'deworming_given' => $dewormingGiven,
-                'total_with_logs' => $totalWithLogs,
+                'total_with_logs' => $childrenWithLogs,
             ]
         );
     }

@@ -33,12 +33,10 @@ type Stats = {
     vitamin_a: {
         given: number;
         total: number;
-        percentage: number;
     };
     deworming: {
         given: number;
         total: number;
-        percentage: number;
     };
     daily: {
         children_registered: number;
@@ -314,25 +312,29 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         )}
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <Link href={`${route('children.index')}?vaccine_status=overdue`}>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                                                aria-label="View overdue vaccine follow-ups"
-                                            >
-                                                View Overdue
-                                            </Button>
-                                        </Link>
-                                        <Link href={`${route('children.index')}?vaccine_status=upcoming`}>
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                                                aria-label="View upcoming vaccine follow-ups"
-                                            >
-                                                View Upcoming
-                                            </Button>
-                                        </Link>
+                                        {vaccine_followups.overdue_count > 0 && (
+                                            <Link href={`${route('children.index')}?vaccine_status=overdue`}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                    aria-label="View overdue vaccine follow-ups"
+                                                >
+                                                    View Overdue
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {vaccine_followups.due_this_month_count > 0 && (
+                                            <Link href={`${route('children.index')}?vaccine_status=upcoming`}>
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                    aria-label="View upcoming vaccine follow-ups"
+                                                >
+                                                    View Upcoming
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </div>
 
                                     {vaccine_followups.follow_ups.length > 0 && (
@@ -448,25 +450,29 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         )}
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <Link href={`${route('children.index')}?vitamin_status=overdue`}>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                                                aria-label="View overdue vitamin follow-ups"
-                                            >
-                                                View Overdue
-                                            </Button>
-                                        </Link>
-                                        <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                                                aria-label="View upcoming vitamin follow-ups"
-                                            >
-                                                View Upcoming
-                                            </Button>
-                                        </Link>
+                                        {vitamin_followups.overdue_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=overdue`}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                    aria-label="View overdue vitamin follow-ups"
+                                                >
+                                                    View Overdue
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {vitamin_followups.due_this_month_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                    aria-label="View upcoming vitamin follow-ups"
+                                                >
+                                                    View Upcoming
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </div>
                                     {vitamin_followups.follow_ups.length > 0 && (
                                         <div
@@ -573,7 +579,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
 
                     {/* Nutrition Status */}
                     <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Nutrition Status (This Year)</h2>
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Nutrition Status (Last 12 Months)</h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer border-green-200 bg-green-50 transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:border-green-800 dark:bg-green-900/20">
                                 <CardHeader>
@@ -610,20 +616,14 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardDescription>Vitamin A Given</CardDescription>
+                                    <CardDescription>Vitamin A Doses</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
-                                        ({stats.vitamin_a.percentage}%)
-                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                                 <CardHeader>
-                                    <CardDescription>Deworming Given</CardDescription>
+                                    <CardDescription>Deworming Doses</CardDescription>
                                     <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
-                                    <CardDescription className="text-sm text-cyan-700 dark:text-cyan-300">
-                                        ({stats.deworming.percentage}%)
-                                    </CardDescription>
                                 </CardHeader>
                             </Card>
                             <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">

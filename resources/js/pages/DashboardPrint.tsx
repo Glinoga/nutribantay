@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
@@ -21,9 +22,12 @@ type PrintData = {
         height: number;
         bmi: number;
         nutrition_status: string;
-        vitamin_a: string;
-        deworming: string;
-        micronutrient_powder: string;
+        status_wfa: string;
+        status_lfa: string;
+        status_wfl_wfh: string;
+        vitamin_a: number;
+        deworming: number;
+        micronutrient_powder: number;
         last_visit: string;
     }>;
     summary: {
@@ -40,6 +44,7 @@ type PrintData = {
         deworming_given: number;
     };
     generated_at: string;
+    generated_by: string;
     trends: {
         trend: Array<{ label: string; count: number }>;
         status_distribution: {
@@ -48,8 +53,8 @@ type PrintData = {
             overweight: number;
             stunted: number;
         };
-        vitamin_a_percentage: number;
-        deworming_percentage: number;
+        vitamin_a_doses: number;
+        deworming_doses: number;
     };
 };
 
@@ -64,6 +69,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
     }, []);
 
     useEffect(() => {
@@ -71,15 +77,18 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
 
         const handleBeforePrint = () => {
             const html = document.documentElement;
             html.classList.remove('dark');
             html.style.colorScheme = 'light';
             html.setAttribute('data-theme', 'light');
+            html.dataset.printMode = 'true';
         };
 
         const handleAfterPrint = () => {
+            delete html.dataset.printMode;
             initializeTheme();
         };
 
@@ -87,6 +96,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
         window.addEventListener('afterprint', handleAfterPrint);
 
         return () => {
+            delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
@@ -151,7 +162,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -159,17 +170,17 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                     
                     .compact-badge {
@@ -206,6 +217,15 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                 <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400">{period} Report</p>
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     {data.summary.period_start} to {data.summary.period_end}
+                </p>
+            </div>
+            {/* Legend */}
+            <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
                 </p>
             </div>
 
@@ -256,24 +276,14 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
-                            <CardDescription>Vitamin A Given</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.summary.vitamin_a_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
-                                    ({data.trends.vitamin_a_percentage}%)
-                                </span>
-                            </CardTitle>
+                            <CardDescription>Vitamin A Doses</CardDescription>
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">{data.trends.vitamin_a_doses}</CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
-                            <CardDescription>Deworming Given</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.summary.deworming_given}
-                                <span className="ml-2 text-sm font-normal text-cyan-700 dark:text-cyan-300">
-                                    ({data.trends.deworming_percentage}%)
-                                </span>
-                            </CardTitle>
+                            <CardDescription>Deworming Doses</CardDescription>
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">{data.trends.deworming_doses}</CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
@@ -375,21 +385,22 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                     <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Birthday
+                                            DOB
                                         </TableHead>
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">
-                                            Age (months)
-                                        </TableHead>
+                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                             Sex
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Weight
+                                            Wt
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Height
+                                            Ht
                                         </TableHead>
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
+                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                            Ind
+                                        </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                             Vit. A
                                         </TableHead>
@@ -438,6 +449,9 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                                     {log.nutrition_status}
                                                 </span>
                                             </TableCell>
+                                            <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                                {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
+                                            </TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
@@ -450,10 +464,11 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </CardContent>
                 </Card>
             </div>
-
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {data.generated_at}</p>
+                <p>
+                    Generated on {data.generated_at} by {data.generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System

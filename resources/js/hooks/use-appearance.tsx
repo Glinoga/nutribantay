@@ -18,6 +18,8 @@ const setCookie = (name: string, value: string, days = 365) => {
 };
 
 export const applyTheme = (appearance: Appearance) => {
+    if (document.documentElement.dataset.printMode) return;
+
     const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
 
     document.documentElement.classList.toggle('dark', isDark);

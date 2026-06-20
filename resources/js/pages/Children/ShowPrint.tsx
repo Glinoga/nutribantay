@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
@@ -46,6 +47,7 @@ type Child = {
 type ShowPrintProps = {
     child: Child;
     generated_at: string;
+    generated_by: string;
 };
 
 const getStatusColor = (status: string | null) => {
@@ -55,12 +57,13 @@ const getStatusColor = (status: string | null) => {
     return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
 };
 
-export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
+export default function ShowPrint({ child, generated_at, generated_by }: ShowPrintProps) {
     useLayoutEffect(() => {
         const html = document.documentElement;
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
     }, []);
 
     useEffect(() => {
@@ -68,15 +71,18 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
 
         const handleBeforePrint = () => {
             const html = document.documentElement;
             html.classList.remove('dark');
             html.style.colorScheme = 'light';
             html.setAttribute('data-theme', 'light');
+            html.dataset.printMode = 'true';
         };
 
         const handleAfterPrint = () => {
+            delete html.dataset.printMode;
             initializeTheme();
         };
 
@@ -84,6 +90,8 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
         window.addEventListener('afterprint', handleAfterPrint);
 
         return () => {
+            delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
@@ -161,7 +169,7 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -169,17 +177,17 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                     
                     .compact-badge {
@@ -209,7 +217,17 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                 <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
                 <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Child Profile</h2>
                 <p className="mt-2 text-base text-cyan-700 sm:text-lg dark:text-cyan-300">{child.fullname}</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
+                    Generated on {generated_at} by {generated_by}
+                </p>
+            </div>
+            <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
+                </p>
             </div>
 
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -346,12 +364,15 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                             <TableHeader>
                                 <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Date</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Wt</TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        Height
+                                        Ht
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        Nutrition Status
+                                        Status
+                                    </TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                        Ind
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                         Vit A
@@ -384,6 +405,9 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                                                 {log.nutrition_status ?? '-'}
                                             </span>
                                         </TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                            {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
+                                        </TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.deworming ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder ?? '-'}</TableCell>
@@ -394,9 +418,10 @@ export default function ShowPrint({ child, generated_at }: ShowPrintProps) {
                     </div>
                 </div>
             )}
-
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {generated_at}</p>
+                <p>
+                    Generated on {generated_at} by {generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
 import { useEffect, useLayoutEffect } from 'react';
@@ -15,6 +16,9 @@ type Child = {
     weight: number | null;
     height: number | null;
     nutrition_status: string | null;
+    status_wfa: string;
+    status_lfa: string;
+    status_wfl_wfh: string;
     address: string | null;
     contact_number: string | null;
 };
@@ -29,6 +33,7 @@ type ChildrenPrintProps = {
     children: Child[];
     filters: Filters;
     generated_at: string;
+    generated_by: string;
     type?: string;
 };
 
@@ -40,12 +45,13 @@ const getFilterSummary = (filters: Filters) => {
     return parts.length > 0 ? parts.join(', ') : 'All children';
 };
 
-export default function ChildrenPrint({ children, filters, generated_at, type }: ChildrenPrintProps) {
+export default function ChildrenPrint({ children, filters, generated_at, generated_by, type }: ChildrenPrintProps) {
     useLayoutEffect(() => {
         const html = document.documentElement;
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
     }, []);
 
     useEffect(() => {
@@ -53,15 +59,18 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
         html.classList.remove('dark');
         html.style.colorScheme = 'light';
         html.setAttribute('data-theme', 'light');
+        html.dataset.printMode = 'true';
 
         const handleBeforePrint = () => {
             const html = document.documentElement;
             html.classList.remove('dark');
             html.style.colorScheme = 'light';
             html.setAttribute('data-theme', 'light');
+            html.dataset.printMode = 'true';
         };
 
         const handleAfterPrint = () => {
+            delete html.dataset.printMode;
             initializeTheme();
         };
 
@@ -69,6 +78,8 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
         window.addEventListener('afterprint', handleAfterPrint);
 
         return () => {
+            delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
@@ -92,7 +103,7 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -100,17 +111,17 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                 }
             `}</style>
@@ -135,7 +146,17 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                 <h1 className="mb-4 text-2xl font-bold text-cyan-900 sm:text-3xl dark:text-cyan-100">Nutribantay</h1>
                 <h2 className="text-xl font-bold text-cyan-900 sm:text-2xl dark:text-cyan-100">Children Records</h2>
                 <p className="mt-2 text-base text-cyan-700 capitalize sm:text-lg dark:text-cyan-300">{getFilterSummary(filters)}</p>
-                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">Generated on {generated_at}</p>
+                <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
+                    Generated on {generated_at} by {generated_by}
+                </p>
+            </div>
+            <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
+                </p>
             </div>
 
             <div className="mb-8">
@@ -148,14 +169,17 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age (months)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Sex</TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Birthdate
+                                    DOB
                                 </TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Wt</TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Height
+                                    Ht
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Nutrition Status
+                                    Status
+                                </TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    Ind
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                     Contact
@@ -179,6 +203,9 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                                     <TableCell className="px-4 py-2">{child.weight ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.height ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.nutrition_status ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                        {shortStatus(child.status_wfa)}/{shortStatus(child.status_lfa)}/{shortStatus(child.status_wfl_wfh)}
+                                    </TableCell>
                                     <TableCell className="hidden px-4 py-2 md:table-cell">{child.contact_number ?? '-'}</TableCell>
                                 </TableRow>
                             ))}
@@ -186,9 +213,10 @@ export default function ChildrenPrint({ children, filters, generated_at, type }:
                     </Table>
                 </div>
             </div>
-
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
-                <p>Generated on {generated_at}</p>
+                <p>
+                    Generated on {generated_at} by {generated_by}
+                </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                     Nutribantay - Nutrition Monitoring System

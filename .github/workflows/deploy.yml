@@ -42,8 +42,9 @@ jobs:
           php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
           PHP_BIN=$(command -v php)
           SCHED_LOG='${{ secrets.VPS_DEPLOY_PATH }}/storage/logs/scheduler.log'
-          (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab -
-          sudo supervisorctl reread
-          sudo supervisorctl update
-          sudo supervisorctl restart nutribantay-queue-default:*
-          sudo supervisorctl restart nutribantay-queue-dashboard:*
+          (crontab -l 2>/dev/null | grep -v "artisan schedule:run"; echo "* * * * * cd '${{ secrets.VPS_DEPLOY_PATH }}' && $PHP_BIN artisan schedule:run --no-interaction >> \"$SCHED_LOG\" 2>&1") | crontab - || true
+          sudo supervisorctl reread || true
+          sudo supervisorctl update || true
+          sudo supervisorctl restart nutribantay-ssr:* || true
+          sudo supervisorctl restart nutribantay-queue-default:* || true
+          sudo supervisorctl restart nutribantay-queue-dashboard:* || true

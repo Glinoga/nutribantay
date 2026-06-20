@@ -296,7 +296,7 @@ class HealthlogController extends Controller
 
         $childId = $healthlog->child_id;
         $barangay = $healthlog->child->barangay;
-        $healthlog->forceDelete();
+        $healthlog->delete();
 
         RefreshDashboardForBarangay::dispatch($barangay)
             ->delay(now()->addSeconds(10));
