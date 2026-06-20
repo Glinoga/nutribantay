@@ -162,7 +162,6 @@ class UserController extends Controller
 
                 return [
                     'code' => null,
-                    'password' => $request->password,
                 ];
             }
 
@@ -181,14 +180,12 @@ class UserController extends Controller
 
             return [
                 'code' => $code,
-                'password' => $request->password,
             ];
         });
 
         return response()->json([
             'message' => 'User created successfully',
             'code' => $result['code'],
-            'password' => $result['password'],
         ]);
     }
 
@@ -292,17 +289,20 @@ class UserController extends Controller
         return to_route('users.index')->with('success', 'User permanently deleted.');
     }
 
-    public function resetPassword(string $id)
+    public function resetPassword(Request $request, string $id)
     {
+        $validated = $request->validate([
+            'password' => 'required|string|min:10',
+        ]);
+
         $user = User::where('barangay', auth()->user()->barangay)->findOrFail($id);
-        $password = Str::random(12);
-        $user->password = Hash::make($password);
+        $user->password = Hash::make($validated['password']);
         $user->save();
 
         $admin = auth()->user();
         Log::info("Password reset for user #{$user->id} ({$user->name}) by admin #{$admin->id} ({$admin->name})");
 
-        return response()->json(['password' => $password]);
+        return response()->json(['success' => true]);
     }
 
     public function approve(string $id)

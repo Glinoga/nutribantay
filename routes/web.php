@@ -80,7 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | HEALTHLOG ROUTES (Child-centric only - Healthworker only)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+    Route::middleware(['role:Admin|Healthworker', 'throttle:30,1'])->group(function () {
         Route::get('/children/{child}/healthlogs/create', [HealthlogController::class, 'createForChild'])->name('children.healthlogs.create');
         Route::post('/children/{child}/healthlogs', [HealthlogController::class, 'storeForChild'])->name('children.healthlogs.store');
     });
@@ -90,7 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     | HEALTHLOG EDIT/UPDATE/DELETE (Admin + Healthworker)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:Admin|Healthworker'])->group(function () {
+    Route::middleware(['role:Admin|Healthworker', 'throttle:30,1'])->group(function () {
         Route::get('/healthlogs/{healthlog}/edit', [HealthlogController::class, 'edit'])->name('healthlogs.edit');
         Route::put('/healthlogs/{healthlog}', [HealthlogController::class, 'update'])->name('healthlogs.update');
         Route::delete('/healthlogs/{healthlog}', [HealthlogController::class, 'destroy'])->name('healthlogs.destroy');

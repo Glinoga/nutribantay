@@ -65,7 +65,6 @@ class RecommendationController extends Controller
         $prompt = $this->buildPrompt(
             ageFormatted: $ageFormatted,
             months: $totalMonths,
-            birthdate: $child->birthdate,
             sex: $child->sex,
             bmi: $bmi,
             nutritionStatus: $nutritionStatus,
@@ -116,7 +115,6 @@ class RecommendationController extends Controller
     private function buildPrompt(
         string $ageFormatted,
         int $months,
-        string $birthdate,
         string $sex,
         float $bmi,
         string $nutritionStatus,
@@ -132,7 +130,6 @@ Sagutin sa simpleng Tagalog. Huwag lalampas sa 500 tokens.
 
 IMPORMASYON NG BATA:
 - Edad: {$ageFormatted} ({$months} buwan)
-- Petsa ng kapanganakan: {$birthdate}
 - Kasarian: {$sex}
 - BMI: {$bmi}
 - Nutrition Status: {$nutritionStatus}

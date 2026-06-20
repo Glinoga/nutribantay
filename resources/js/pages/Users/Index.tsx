@@ -138,7 +138,7 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
             });
 
             setGeneratedCode(res.data.code || '');
-            setGeneratedPassword(res.data.password || '');
+            setGeneratedPassword(newUser.password || '');
             setCreateSuccess('User created successfully!');
             setCreateLoading(false);
 
@@ -346,8 +346,13 @@ export default function Index({ users, pagination, stats, filters, isSeededAdmin
     const handleResetPassword = async (userId: number) => {
         setResetLoading(true);
         try {
-            const res = await axios.post(route('users.reset-password', { id: userId }));
-            setResetPasswordResult(res.data.password);
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let newPassword = '';
+            for (let i = 0; i < 12; i++) {
+                newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            await axios.post(route('users.reset-password', { id: userId }), { password: newPassword });
+            setResetPasswordResult(newPassword);
             smartToast.success('Password reset successfully!');
         } catch (err) {
             smartToast.error('Failed to reset password.');

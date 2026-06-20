@@ -263,17 +263,13 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Vitamin A Doses</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.trends.vitamin_a_doses}
-                            </CardTitle>
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">{data.trends.vitamin_a_doses}</CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Deworming Doses</CardDescription>
-                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">
-                                {data.trends.deworming_doses}
-                            </CardTitle>
+                            <CardTitle className="text-2xl text-cyan-900 sm:text-3xl dark:text-cyan-100">{data.trends.deworming_doses}</CardTitle>
                         </CardHeader>
                     </Card>
                 </div>
