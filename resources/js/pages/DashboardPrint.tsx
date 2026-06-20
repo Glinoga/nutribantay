@@ -25,9 +25,9 @@ type PrintData = {
         status_wfa: string;
         status_lfa: string;
         status_wfl_wfh: string;
-        vitamin_a: string;
-        deworming: string;
-        micronutrient_powder: string;
+        vitamin_a: number;
+        deworming: number;
+        micronutrient_powder: number;
         last_visit: string;
     }>;
     summary: {
