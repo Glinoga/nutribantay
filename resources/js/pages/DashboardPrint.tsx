@@ -317,7 +317,16 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <div className="chart-container grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <Card className="print:bg-white">
                             <CardHeader>
-                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
+                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">
+                                    Health Logs{' '}
+                                    {period === 'daily'
+                                        ? 'Today'
+                                        : period === 'weekly'
+                                          ? 'This Week'
+                                          : period === 'monthly'
+                                            ? 'This Month'
+                                            : 'This Year'}
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Line
@@ -335,7 +344,15 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
                         <Card className="print:bg-white">
                             <CardHeader>
-                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
+                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">
+                                    {period === 'daily'
+                                        ? 'Hourly Breakdown'
+                                        : period === 'weekly'
+                                          ? 'Daily Breakdown'
+                                          : period === 'monthly'
+                                            ? 'Weekly Comparison'
+                                            : 'Monthly Comparison'}
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Bar
