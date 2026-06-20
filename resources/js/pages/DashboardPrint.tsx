@@ -218,9 +218,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     {data.summary.period_start} to {data.summary.period_end}
                 </p>
             </div>
-
             {/* Legend */}
-            <div className="mb-4 text-xs text-cyan-700 dark:text-cyan-300">
+            <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
                 <p className="mb-1 font-semibold">Legend:</p>
                 <p>
                     WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
@@ -411,7 +410,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                             MNP
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Last
+                                            Last Visit
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>

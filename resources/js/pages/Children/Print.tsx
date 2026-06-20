@@ -149,8 +149,7 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                     Generated on {generated_at} by {generated_by}
                 </p>
             </div>
-
-            <div className="mb-4 text-xs text-cyan-700 dark:text-cyan-300">
+            <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
                 <p className="mb-1 font-semibold">Legend:</p>
                 <p>
                     WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
