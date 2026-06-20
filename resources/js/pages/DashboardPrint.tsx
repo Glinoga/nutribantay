@@ -39,6 +39,7 @@ type PrintData = {
             underweight: number;
             overweight: number;
             stunted: number;
+            wasted: number;
         };
         vitamin_a_given: number;
         deworming_given: number;
@@ -52,6 +53,7 @@ type PrintData = {
             underweight: number;
             overweight: number;
             stunted: number;
+            wasted: number;
         };
         vitamin_a_doses: number;
         deworming_doses: number;
@@ -128,7 +130,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
     };
 
     const doughnutData = {
-        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted'],
+        labels: ['Normal', 'Underweight', 'Overweight', 'Stunted', 'Wasted'],
         datasets: [
             {
                 data: [
@@ -136,9 +138,16 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     data.trends.status_distribution.underweight,
                     data.trends.status_distribution.overweight,
                     data.trends.status_distribution.stunted,
+                    data.trends.status_distribution.wasted,
                 ],
-                backgroundColor: ['rgba(5, 150, 105, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(249, 115, 22, 0.8)'],
-                borderColor: ['rgb(5, 150, 105)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)'],
+                backgroundColor: [
+                    'rgba(5, 150, 105, 0.8)',
+                    'rgba(234, 179, 8, 0.8)',
+                    'rgba(239, 68, 68, 0.8)',
+                    'rgba(249, 115, 22, 0.8)',
+                    'rgba(168, 85, 247, 0.8)',
+                ],
+                borderColor: ['rgb(5, 150, 105)', 'rgb(234, 179, 8)', 'rgb(239, 68, 68)', 'rgb(249, 115, 22)', 'rgb(168, 85, 247)'],
                 borderWidth: 1,
             },
         ],
@@ -274,6 +283,14 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                             </CardTitle>
                         </CardHeader>
                     </Card>
+                    <Card className="border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-900/20 print:bg-white">
+                        <CardHeader>
+                            <CardDescription className="text-purple-600 dark:text-purple-400">Wasted</CardDescription>
+                            <CardTitle className="text-2xl text-purple-600 sm:text-3xl dark:text-purple-400">
+                                {data.summary.nutrition_status.wasted}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
                     <Card className="print:bg-white">
                         <CardHeader>
                             <CardDescription>Vitamin A Doses</CardDescription>
@@ -300,7 +317,16 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <div className="chart-container grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <Card className="print:bg-white">
                             <CardHeader>
-                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Health Logs Over Time</CardTitle>
+                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">
+                                    Health Logs{' '}
+                                    {period === 'daily'
+                                        ? 'Today'
+                                        : period === 'weekly'
+                                          ? 'This Week'
+                                          : period === 'monthly'
+                                            ? 'This Month'
+                                            : 'This Year'}
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Line
@@ -318,7 +344,15 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
                         <Card className="print:bg-white">
                             <CardHeader>
-                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">Monthly Comparison</CardTitle>
+                                <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">
+                                    {period === 'daily'
+                                        ? 'Hourly Breakdown'
+                                        : period === 'weekly'
+                                          ? 'Daily Breakdown'
+                                          : period === 'monthly'
+                                            ? 'Weekly Comparison'
+                                            : 'Monthly Comparison'}
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Bar
@@ -347,7 +381,8 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                 {data.trends.status_distribution.normal +
                                     data.trends.status_distribution.underweight +
                                     data.trends.status_distribution.overweight +
-                                    data.trends.status_distribution.stunted >
+                                    data.trends.status_distribution.stunted +
+                                    data.trends.status_distribution.wasted >
                                 0 ? (
                                     <Doughnut
                                         data={doughnutData}
