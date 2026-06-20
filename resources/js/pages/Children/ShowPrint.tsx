@@ -91,6 +91,7 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
 
         return () => {
             delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };

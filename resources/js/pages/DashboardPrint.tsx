@@ -97,6 +97,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
 
         return () => {
             delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };

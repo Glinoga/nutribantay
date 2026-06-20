@@ -79,6 +79,7 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
 
         return () => {
             delete html.dataset.printMode;
+            initializeTheme();
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
