@@ -410,7 +410,7 @@ class ChildController extends Controller
             $query->where('birthdate', '>', now()->subMonths(60));
         }
 
-        return $this->exportCSV($query->cursor(), $user->name);
+        return $this->exportCSV($query->with('latestHealthlog')->cursor(), $user->name);
     }
 
     public function create()
@@ -557,11 +557,15 @@ class ChildController extends Controller
                 'Weight (kg)',
                 'Height (cm)',
                 'Nutrition Status',
+                'WFA',
+                'LFA',
+                'WFH',
                 'Address',
                 'Contact Number',
             ]);
 
             foreach ($children as $child) {
+                $hl = $child->latestHealthlog;
                 fputcsv($file, [
                     $child->id,
                     $child->fullname,
@@ -571,6 +575,9 @@ class ChildController extends Controller
                     $child->weight,
                     $child->height,
                     $child->nutrition_status,
+                    $hl?->status_wfa ?? '-',
+                    $hl?->status_lfa ?? '-',
+                    $hl?->status_wfl_wfh ?? '-',
                     $child->address,
                     $child->contact_number,
                 ]);
@@ -1043,7 +1050,7 @@ class ChildController extends Controller
             $query->where('birthdate', '>', now()->subMonths(60));
         }
 
-        $children = $query->cursor()->map(fn ($child) => [
+        $children = $query->with('latestHealthlog')->cursor()->map(fn ($child) => [
             'id' => $child->id,
             'fullname' => $child->fullname,
             'first_name' => $child->first_name,
@@ -1054,6 +1061,9 @@ class ChildController extends Controller
             'weight' => $child->weight,
             'height' => $child->height,
             'nutrition_status' => $child->nutrition_status,
+            'status_wfa' => $child->latestHealthlog?->status_wfa ?? '-',
+            'status_lfa' => $child->latestHealthlog?->status_lfa ?? '-',
+            'status_wfl_wfh' => $child->latestHealthlog?->status_wfl_wfh ?? '-',
             'address' => $child->address,
             'contact_number' => $child->contact_number,
         ]);

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Baby, Printer } from 'lucide-react';
 import { useEffect, useLayoutEffect } from 'react';
@@ -15,6 +16,9 @@ type Child = {
     weight: number | null;
     height: number | null;
     nutrition_status: string | null;
+    status_wfa: string;
+    status_lfa: string;
+    status_wfl_wfh: string;
     address: string | null;
     contact_number: string | null;
 };
@@ -98,7 +102,7 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -106,17 +110,17 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                 }
             `}</style>
@@ -146,6 +150,15 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                 </p>
             </div>
 
+            <div className="mb-4 text-xs text-cyan-700 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
+                </p>
+            </div>
+
             <div className="mb-8">
                 <div className="overflow-x-auto">
                     <Table>
@@ -156,14 +169,17 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age (months)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Sex</TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Birthdate
+                                    DOB
                                 </TableHead>
-                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Wt</TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Height
+                                    Ht
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                    Nutrition Status
+                                    Status
+                                </TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    Ind
                                 </TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                     Contact
@@ -187,6 +203,9 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                                     <TableCell className="px-4 py-2">{child.weight ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.height ?? '-'}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.nutrition_status ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                        {shortStatus(child.status_wfa)}/{shortStatus(child.status_lfa)}/{shortStatus(child.status_wfl_wfh)}
+                                    </TableCell>
                                     <TableCell className="hidden px-4 py-2 md:table-cell">{child.contact_number ?? '-'}</TableCell>
                                 </TableRow>
                             ))}
@@ -194,7 +213,6 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                     </Table>
                 </div>
             </div>
-
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>
                     Generated on {generated_at} by {generated_by}

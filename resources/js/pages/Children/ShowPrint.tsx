@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, Printer, TrendingUp } from 'lucide-react';
@@ -167,7 +168,7 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -175,17 +176,17 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                     
                     .compact-badge {
@@ -217,6 +218,15 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                 <p className="mt-2 text-base text-cyan-700 sm:text-lg dark:text-cyan-300">{child.fullname}</p>
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     Generated on {generated_at} by {generated_by}
+                </p>
+            </div>
+
+            <div className="mb-4 text-xs text-cyan-700 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
                 </p>
             </div>
 
@@ -354,12 +364,15 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                             <TableHeader>
                                 <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                     <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Date</TableHead>
-                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Weight</TableHead>
+                                    <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Wt</TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        Height
+                                        Ht
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        Nutrition Status
+                                        Status
+                                    </TableHead>
+                                    <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                        Ind
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                         Vit A
@@ -392,6 +405,9 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                                                 {log.nutrition_status ?? '-'}
                                             </span>
                                         </TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                            {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
+                                        </TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.deworming ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder ?? '-'}</TableCell>
@@ -402,7 +418,6 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                     </div>
                 </div>
             )}
-
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>
                     Generated on {generated_at} by {generated_by}

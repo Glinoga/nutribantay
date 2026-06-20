@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { route } from '@/lib/routes';
+import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
@@ -160,7 +161,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     table { 
                         break-inside: auto; 
                         width: 100%;
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                         border-collapse: collapse;
                     }
                     thead { display: table-header-group; }
@@ -168,17 +169,17 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     tr { break-inside: avoid; page-break-inside: avoid; }
                     
                     th, td {
-                        padding: 4px 6px !important;
+                        padding: 2px 3px !important;
                         white-space: nowrap;
                     }
                     
                     th {
-                        font-size: 8.5pt !important;
+                        font-size: 6.5pt !important;
                         font-weight: 600 !important;
                     }
                     
                     td {
-                        font-size: 9pt !important;
+                        font-size: 7pt !important;
                     }
                     
                     .compact-badge {
@@ -215,6 +216,16 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                 <p className="mt-2 text-lg text-cyan-600 capitalize dark:text-cyan-400">{period} Report</p>
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     {data.summary.period_start} to {data.summary.period_end}
+                </p>
+            </div>
+
+            {/* Legend */}
+            <div className="mb-4 text-xs text-cyan-700 dark:text-cyan-300">
+                <p className="mb-1 font-semibold">Legend:</p>
+                <p>
+                    WFA=Weight-for-Age · LFA=Length/Height-for-Age · WFH=Weight-for-Height · Ind=WFA/LFA/WFH combined&nbsp; SU=Sev.Underweight ·
+                    UW=Underweight · N=Normal · OW=Overweight · OB=Obese&nbsp; SS=Sev.Stunted · ST=Stunted · T=Tall · SW=Sev.Wasted · WS=Wasted&nbsp;
+                    MM=Mod.Malnutrition · SM=Sev.Malnutrition
                 </p>
             </div>
 
@@ -374,29 +385,21 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                     <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Birthday
+                                            DOB
                                         </TableHead>
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">
-                                            Age (months)
-                                        </TableHead>
+                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                             Sex
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Weight
+                                            Wt
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Height
+                                            Ht
                                         </TableHead>
                                         <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            WFA
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            LFA
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            WFH
+                                            Ind
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                             Vit. A
@@ -408,7 +411,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                             MNP
                                         </TableHead>
                                         <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Last Visit
+                                            Last
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -446,9 +449,9 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                                     {log.nutrition_status}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_wfa}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_lfa}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.status_wfl_wfh}</TableCell>
+                                            <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                                {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
+                                            </TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
                                             <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
@@ -461,7 +464,6 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     </CardContent>
                 </Card>
             </div>
-
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>
