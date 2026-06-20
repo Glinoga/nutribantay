@@ -16,79 +16,97 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                 <style>{`
                     html, body, #app {
                         font-family: 'Montserrat', sans-serif !important;
-                        scroll-behavior: smooth;
                     }
                     * {
                         font-family: inherit;
                     }
 
-                    @theme {
-                        --inset-shadow-sm: inset 0 0 7px 0 hsla(178 100% 95% 1);
-                    }
-
-                    /* CSS Variables */
                     :root {
-                        --bg-dark: hsl(178 36% 87%);
-                        --bg: hsl(178 61% 92%);
-                        --bg-light: hsl(178 100% 98%);
-                        --text: hsl(181 100% 2%);
-                        --text-muted: hsl(179 40% 22%);
-                        --highlight: hsl(178 100% 95%);
-                        --border: hsl(179 20% 45%);
-                        --border-muted: hsl(178 21% 57%);
-                        --primary: hsl(180 100% 8%);
-                        --secondary: hsl(351 44% 31%);
-                        --danger: hsl(9 21% 41%);
-                        --warning: hsl(52 23% 34%);
-                        --success: hsl(147 19% 36%);
-                        --info: hsl(217 22% 41%);
+                        --bg: #ECFEFF;
+                        --bg-dark: #164E63;
+                        --bg-light: #F0FDFA;
+                        --bg-card: #ffffff;
+                        --text: #164E63;
+                        --text-muted: #475569;
+                        --primary: #0891B2;
+                        --secondary: #be185d;
+                        --success: #059669;
+                        --danger: #dc2626;
+                        --warning: #d97706;
+                        --info: #0284c7;
+                        --border: #E2E8F0;
+                        --border-muted: #CBD5E1;
 
-                        --radius-xs: .625rem;
-                        --radius-sm: .938rem;
-                        --radius-md: 1.25rem;
-                        --radius-lg: 100%;
-
-                        /* Additional modern design variables */
-                        --box-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-                        --box-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-                        --box-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-                        --transition-standard: all 0.3s ease;
+                        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+                        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+                        --transition-standard: all 0.2s ease;
                     }
 
-                    /* Additional global styles */
-                    .card-hover {
-                        transition: var(--transition-standard);
+                    .dark {
+                        --bg: #0f172a;
+                        --bg-dark: #020617;
+                        --bg-light: #1e293b;
+                        --bg-card: #1e293b;
+                        --text: #F1F5F9;
+                        --text-muted: #94A3B8;
+                        --primary: #22D3EE;
+                        --secondary: #fb7185;
+                        --success: #34d399;
+                        --danger: #f87171;
+                        --warning: #fbbf24;
+                        --info: #38bdf8;
+                        --border: #334155;
+                        --border-muted: #475569;
                     }
-                    .card-hover:hover {
-                        transform: translateY(-5px);
-                        box-shadow: var(--box-shadow-md);
+
+                    @media (prefers-reduced-motion: no-preference) {
+                        html, body, #app {
+                            scroll-behavior: smooth;
+                        }
                     }
-                    .gradient-text {
-                        background: linear-gradient(90deg, var(--primary), var(--secondary));
-                        -webkit-background-clip: text;
-                        background-clip: text;
-                        color: transparent;
+
+                    @media (prefers-reduced-motion: reduce) {
+                        * {
+                            animation-duration: 0.01ms !important;
+                            animation-iteration-count: 1 !important;
+                            transition-duration: 0.01ms !important;
+                        }
                     }
-                    .section-divider {
-                        height: 4px;
-                        width: 60px;
-                        background: linear-gradient(90deg, var(--primary), var(--secondary));
-                        margin: 0.5rem 0 1.5rem;
-                        border-radius: 2px;
+
+                    .skip-link {
+                        position: absolute;
+                        top: -100%;
+                        left: 8px;
+                        z-index: 9999;
+                        padding: 8px 16px;
+                        background: #0891B2;
+                        color: white;
+                        border-radius: 0 0 8px 8px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        transition: top 0.2s;
+                    }
+                    .skip-link:focus {
+                        top: 0;
                     }
                 `}</style>
             </Head>
+
+            <a href="#main-content" className="skip-link">
+                Skip to main content
+            </a>
+
             <div
                 className="flex min-h-screen flex-col bg-[var(--bg)] text-[var(--text)] dark:bg-[var(--bg-dark)]"
                 style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
                 {showHeader && (
-                    <header className="fixed top-0 z-50 z-[1001] w-full border-b border-white/30 bg-white/70 shadow-sm backdrop-blur-xl dark:border-b dark:border-[var(--border)] dark:bg-[var(--bg)]/70">
+                    <header className="fixed top-0 z-50 w-full border-b border-[var(--border)] bg-white shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg)]">
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
                                 <Link href="/" className="flex items-center gap-2">
                                     <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
-                                    <span className="gradient-text text-xl font-bold md:text-2xl">NutriBantay</span>
+                                    <span className="text-xl font-bold text-[var(--primary)] md:text-2xl">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
                                     <Link
@@ -117,6 +135,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     className="flex items-center justify-center rounded-lg p-2 text-[var(--primary)] md:hidden"
                                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                                     aria-label="Toggle navigation menu"
+                                    aria-expanded={mobileMenuOpen}
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -146,9 +165,8 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                             </div>
                         </div>
 
-                        {/* Mobile navigation dropdown */}
                         {mobileMenuOpen && (
-                            <div className="border-t border-[var(--border-muted)] bg-[var(--bg-light)] px-6 py-4 md:hidden">
+                            <div className="border-t border-[var(--border-muted)] bg-white px-6 py-4 md:hidden dark:bg-[var(--bg)]">
                                 <nav className="flex flex-col space-y-3">
                                     <Link
                                         href="/"
@@ -177,17 +195,18 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                     </header>
                 )}
 
-                <main className="mt-16 w-full flex-1">{children}</main>
+                <main id="main-content" className="mt-16 w-full flex-1">
+                    {children}
+                </main>
 
-                <footer className="w-full bg-[var(--bg-light)] py-16 dark:bg-[var(--bg-light)]">
+                <footer className="w-full border-t border-[var(--border)] bg-white py-16 dark:bg-[var(--bg-light)]">
                     <div className="mx-auto max-w-7xl px-6">
                         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-3">
                             <div>
                                 <div className="mb-3 flex items-center gap-3">
                                     <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-10 w-auto" />
-                                    <h3 className="gradient-text text-2xl font-bold">NutriBantay</h3>
+                                    <h3 className="text-2xl font-bold text-[var(--primary)]">NutriBantay</h3>
                                 </div>
-                                <div className="section-divider"></div>
                                 <p className="mb-4 text-[var(--text-muted)]">
                                     Empowering our community with nutrition monitoring and health services.
                                 </p>
@@ -197,7 +216,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Follow NutriBantay on Facebook"
-                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-all hover:scale-110 hover:bg-gradient-to-r hover:from-teal-600 hover:to-cyan-500 hover:shadow-md"
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary)] text-white transition-all hover:scale-110 hover:bg-[#0a6e8a] hover:shadow-md"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -216,8 +235,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 </div>
                             </div>
                             <div>
-                                <h3 className="mb-3 text-xl font-bold">Quick Links</h3>
-                                <div className="section-divider"></div>
+                                <h3 className="mb-3 text-xl font-bold text-[var(--text)]">Quick Links</h3>
                                 <ul className="space-y-3">
                                     <li>
                                         <Link
@@ -282,13 +300,12 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                 </ul>
                             </div>
                             <div>
-                                <h3 className="mb-3 text-xl font-bold">Contact Info</h3>
-                                <div className="section-divider"></div>
+                                <h3 className="mb-3 text-xl font-bold text-[var(--text)]">Contact Info</h3>
                                 <address className="not-italic">
                                     <p className="mb-3 flex items-center text-[var(--text-muted)]">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            className="mr-3 h-5 w-5 text-[var(--primary)]"
+                                            className="mr-3 h-5 w-5 shrink-0 text-[var(--primary)]"
                                             viewBox="0 0 24 24"
                                             fill="none"
                                             stroke="currentColor"
@@ -304,7 +321,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     <p className="mb-3 flex items-center text-[var(--text-muted)]">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            className="mr-3 h-5 w-5 text-[var(--primary)]"
+                                            className="mr-3 h-5 w-5 shrink-0 text-[var(--primary)]"
                                             viewBox="0 0 24 24"
                                             fill="none"
                                             stroke="currentColor"
@@ -319,7 +336,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     <p className="flex items-center text-[var(--text-muted)]">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
-                                            className="mr-3 h-5 w-5 text-[var(--primary)]"
+                                            className="mr-3 h-5 w-5 shrink-0 text-[var(--primary)]"
                                             viewBox="0 0 24 24"
                                             fill="none"
                                             stroke="currentColor"

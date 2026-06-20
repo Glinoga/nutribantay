@@ -1,8 +1,7 @@
-import { Button } from '@/components/ui/button';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Link } from '@inertiajs/react';
-import { Activity, ArrowRight, Baby, Check, Share2, Users } from 'lucide-react';
+import { ArrowRight, CalendarCheck, Check, Heart, Share2, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
 interface Category {
@@ -78,11 +77,32 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 .animate-fade-in-up {
                     animation: fadeInUp 0.6s ease-out forwards;
                 }
-                .glass-card {
-                    background: color-mix(in srgb, var(--bg-light) 70%, transparent);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+                .stat-card {
+                    border-top: 4px solid transparent;
+                }
+                .stat-card:nth-child(1) { border-top-color: var(--primary); }
+                .stat-card:nth-child(2) { border-top-color: var(--secondary); }
+                .stat-card:nth-child(3) { border-top-color: #d97706; }
+
+                .card-clickable {
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+                }
+                .card-clickable:hover {
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+                }
+                .card-clickable:hover h3 {
+                    color: #0891b2;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .animate-fade-in-up {
+                        animation: none;
+                        opacity: 1;
+                    }
+                    .card-clickable:hover {
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+                    }
                 }
             `}</style>
 
@@ -103,59 +123,82 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                     </div>
                 </div>
             )}
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-20 md:pt-32 md:pb-24">
-                <div className="absolute top-0 right-0 -z-10 h-full w-1/2 opacity-20 md:opacity-30">
-                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            fill="var(--primary)"
-                            d="M39.9,-68.5C51.1,-62.8,59.5,-51.2,65.7,-38.7C71.9,-26.3,75.8,-13.2,76.7,0.5C77.6,14.2,75.4,28.3,69.2,41C63,53.7,52.8,64.9,40.2,70.2C27.5,75.6,13.8,75,0.5,74.1C-12.8,73.2,-25.5,72.1,-37.7,67.4C-49.9,62.8,-61.6,54.6,-69.2,43.2C-76.9,31.8,-80.5,15.9,-79.7,0.5C-78.9,-14.9,-73.7,-29.8,-65.2,-42.2C-56.7,-54.7,-44.8,-64.6,-32,-69.2C-19.2,-73.8,-5.4,-73.1,7.4,-70.7C20.2,-68.3,28.6,-74.3,39.9,-68.5Z"
-                            transform="translate(100 100)"
-                        />
-                    </svg>
-                </div>
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] pt-24 pb-20 md:pt-32 md:pb-28">
+                <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-[var(--primary)] opacity-[0.06]" />
+                <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[var(--secondary)] opacity-[0.06]" />
 
-                <div className="container mx-auto px-6 text-center lg:px-8">
-                    <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
-                        <div className="flex items-center justify-center gap-4">
-                            <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="64" height="64" className="h-10 w-auto md:h-14 lg:h-16" />
-                            <span className="gradient-text">NutriBantay</span>
+                <div className="container mx-auto px-6 lg:px-8">
+                    <div className="grid items-center gap-12 md:grid-cols-5">
+                        <div className="md:col-span-3">
+                            <div className="mb-4 flex items-center gap-3">
+                                <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
+                                <span className="text-lg font-bold text-[var(--primary)] md:text-xl">NutriBantay</span>
+                            </div>
+
+                            <h1 className="mb-6 text-4xl leading-tight font-bold text-[var(--text)] md:text-5xl lg:text-6xl">
+                                Every Child Deserves a Healthy Start
+                            </h1>
+
+                            <p className="mb-8 max-w-xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
+                                NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a healthier future.
+                            </p>
+
+                            <div className="flex flex-col gap-4 sm:flex-row">
+                                <a
+                                    href="#announcements"
+                                    className="inline-flex items-center justify-center rounded-md bg-[#008080] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#006666] hover:shadow-md"
+                                >
+                                    <span>View Announcements</span>
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </a>
+                                <Link
+                                    href={route('guest.contact')}
+                                    className="inline-flex items-center justify-center rounded-md border-2 border-[var(--primary)] px-6 py-3 text-sm font-semibold text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white"
+                                >
+                                    <span>Contact the Health Center</span>
+                                </Link>
+                            </div>
                         </div>
-                    </h1>
-                    <p className="mx-auto mb-10 max-w-2xl text-lg text-[var(--text-muted)] md:text-xl">
-                        Empowering our community with nutrition monitoring and health services for a healthier future
-                    </p>
-                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-                        <a
-                            href="#announcements"
-                            className="group flex w-48 items-center justify-center rounded-full border-2 border-[var(--primary)] px-6 py-3 font-medium text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white hover:shadow-lg"
-                        >
-                            <span>Latest Updates</span>
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </a>
+
+                        <div className="relative hidden md:col-span-2 md:block">
+                            <div className="relative mx-auto h-80 w-80 lg:h-96 lg:w-96">
+                                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-100/60 to-cyan-100/60 dark:from-[var(--bg)] dark:to-[var(--bg-dark)]" />
+                                <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-[var(--primary)]/10 to-teal-400/10 lg:h-56 lg:w-56" />
+                                <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 shadow-inner dark:bg-[var(--bg-light)]/80">
+                                    <img src="/NutriBantayLogo.svg" alt="" width="48" height="48" className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2" />
+                                </div>
+                                <div className="absolute top-8 right-4 h-3 w-3 rounded-full bg-[var(--primary)]/30" />
+                                <div className="absolute bottom-12 left-6 h-4 w-4 rounded-full bg-[var(--secondary)]/30" />
+                                <div className="absolute top-1/2 -right-2 h-2 w-2 rounded-full bg-amber-400/40" />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="relative mx-auto mt-16 max-w-5xl">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
-                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
-                                    <Baby className="h-6 w-6 text-[var(--primary)]" />
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                            <div className="stat-card rounded-xl bg-white p-6 shadow-sm dark:bg-[var(--bg-card)]">
+                                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary)]/10">
+                                    <TrendingUp className="h-5 w-5 text-[var(--primary)]" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--primary)]">500+</h3>
-                                <p className="mt-1 text-sm text-[var(--text-muted)]">Children Monitored</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">500+</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Children Monitored</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">Since 2022</p>
                             </div>
-                            <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
-                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
-                                    <Activity className="h-6 w-6 text-[var(--primary)]" />
+                            <div className="stat-card rounded-xl bg-white p-6 shadow-sm dark:bg-[var(--bg-card)]">
+                                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--secondary)]/10">
+                                    <CalendarCheck className="h-5 w-5 text-[var(--secondary)]" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--primary)]">50+</h3>
-                                <p className="mt-1 text-sm text-[var(--text-muted)]">Health Programs</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">50+</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Health Programs</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">As of June 2026</p>
                             </div>
-                            <div className="card-hover glass-card rounded-2xl p-6 shadow-md">
-                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary)]/10">
-                                    <Users className="h-6 w-6 text-[var(--primary)]" />
+                            <div className="stat-card rounded-xl bg-white p-6 shadow-sm dark:bg-[var(--bg-card)]">
+                                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-900/20">
+                                    <Heart className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--primary)]">200+</h3>
-                                <p className="mt-1 text-sm text-[var(--text-muted)]">Families Assisted</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">200+</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Families Assisted</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">Since 2022</p>
                             </div>
                         </div>
                     </div>
@@ -183,34 +226,33 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                         {announcements.length > 0 ? (
                             announcements.map((announcement) => (
-                                <div
+                                <Link
                                     key={announcement.id}
-                                    className="card-hover group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm dark:bg-[var(--bg-light)]/80"
+                                    href={route('guest.announcements.show', { announcement: announcement.slug })}
+                                    className="card-clickable group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg-card)]"
                                 >
                                     <div className="relative h-48 shrink-0 overflow-hidden">
                                         {announcement.image_url && !erroredImages.has(announcement.id) ? (
                                             <img
                                                 src={announcement.image_url}
                                                 alt={announcement.title}
-                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                className="h-full w-full object-cover"
                                                 loading="lazy"
                                                 onError={() => handleImageError(announcement.id)}
                                             />
                                         ) : (
                                             <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
                                         )}
-                                        <div className="absolute top-0 left-0 z-10 p-6">
-                                            <span
-                                                className={`inline-block rounded-full ${getCategoryColorClass(announcement.category.color)} px-3 py-1 text-xs font-medium text-white shadow-sm`}
-                                            >
-                                                {announcement.category.name}
-                                            </span>
-                                        </div>
                                     </div>
-                                    <div className="flex h-full flex-col p-6">
-                                        <h3 className="mb-3 text-xl font-semibold group-hover:text-[var(--info)]">{announcement.title}</h3>
+                                    <div className="flex h-full flex-col p-6 pt-5">
+                                        <span
+                                            className={`mb-2 inline-flex w-fit rounded-full ${getCategoryColorClass(announcement.category.color)} px-2.5 py-0.5 text-[11px] font-medium text-white`}
+                                        >
+                                            {announcement.category.name}
+                                        </span>
+                                        <h3 className="mb-2 text-lg font-semibold leading-snug text-[var(--text)]">{announcement.title}</h3>
                                         <p
-                                            className="mb-4 flex-1 text-[var(--text-muted)]"
+                                            className="mb-4 flex-1 text-sm leading-relaxed text-[var(--text-muted)]"
                                             style={{
                                                 display: '-webkit-box',
                                                 WebkitLineClamp: 3,
@@ -220,34 +262,27 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                         >
                                             {announcement.summary}
                                         </p>
-                                        <div className="relative z-30 mt-auto flex items-center justify-between gap-2 pt-4">
-                                            <div className="flex items-center gap-3">
-                                                <span className="text-sm text-[var(--text-muted)]">{announcement.date}</span>
-                                                <button
-                                                    onClick={() => shareAnnouncement(announcement)}
-                                                    className="flex cursor-pointer items-center gap-1 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
-                                                >
-                                                    {sharedId === announcement.id ? (
-                                                        <Check className="h-4 w-4 text-green-500 dark:text-green-400" />
-                                                    ) : (
-                                                        <Share2 className="h-4 w-4" />
-                                                    )}
-                                                    <span className={sharedId === announcement.id ? 'text-green-500 dark:text-green-400' : ''}>
-                                                        {sharedId === announcement.id ? 'Copied!' : 'Share'}
-                                                    </span>
-                                                </button>
-                                            </div>
-                                            <Link href={route('guest.announcements.show', { announcement: announcement.slug })}>
-                                                <Button
-                                                    className="rounded-full border border-[var(--border-muted)] bg-[var(--bg-light)] px-4 py-2 text-sm font-medium text-[var(--primary)] transition-colors hover:border-[var(--bg-light)] hover:bg-[var(--primary)] hover:text-white"
-                                                    size="sm"
-                                                >
-                                                    Read More
-                                                </Button>
-                                            </Link>
+                                        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+                                            <span className="text-xs text-[var(--text-muted)]">{announcement.date}</span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    shareAnnouncement(announcement);
+                                                }}
+                                                className="flex cursor-pointer items-center gap-1 text-xs text-[var(--text-muted)] transition-colors hover:text-[var(--primary)]"
+                                            >
+                                                {sharedId === announcement.id ? (
+                                                    <Check className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
+                                                ) : (
+                                                    <Share2 className="h-3.5 w-3.5" />
+                                                )}
+                                                <span className={sharedId === announcement.id ? 'text-green-500 dark:text-green-400' : ''}>
+                                                    {sharedId === announcement.id ? 'Copied!' : 'Share'}
+                                                </span>
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))
                         ) : (
                             <div className="col-span-full py-12 text-center">
@@ -258,21 +293,18 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 </div>
             </section>
 
-            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 dark:to-gray-900">
-                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20 dark:bg-teal-400 dark:opacity-30" />
-                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20 dark:bg-cyan-400 dark:opacity-30" />
-                <div className="relative container mx-auto px-6 text-center lg:px-8">
-                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Making a Difference in Our Community</h2>
+            <section className="bg-[#006666] py-16">
+                <div className="container mx-auto px-6 text-center lg:px-8">
+                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Have questions about your child's nutrition?</h2>
                     <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
-                        Be part of our mission to improve nutrition and health outcomes for children in our community. Register today to access our
-                        services.
+                        Our team at the barangay health center is ready to help. Reach out to learn about our monitoring program, vaccine schedules, and how we can support your family.
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
                         <Link
                             href={route('guest.contact')}
-                            className="inline-flex items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
+                            className="inline-flex items-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-[#006666] shadow-sm transition-all hover:bg-gray-100 hover:shadow-md"
                         >
-                            Contact Us
+                            Contact the Health Center
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </div>

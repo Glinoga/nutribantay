@@ -6,8 +6,8 @@ import { route } from '@/lib/routes';
 import { useForm } from '@inertiajs/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { CheckCircle, ChevronDown, Clock, Mail, MapPin, MessageSquare, Phone, Send, User } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, CheckCircle, ChevronDown, Clock, Mail, MapPin, Phone, Send, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 
 // Fix for default markers in react-leaflet
@@ -39,6 +39,16 @@ const FAQs = [
         question: 'How often should my child be monitored?',
         answer: " We recommend monthly monitoring for children under 2 years old and quarterly monitoring for children aged 2-5 years. However, this may vary based on your child's specific health needs. Our healthcare professionals will provide personalized recommendations for your child's monitoring schedule.",
     },
+    {
+        id: 5,
+        question: 'What age group does NutriBantay monitor?',
+        answer: 'NutriBantay primarily monitors children from birth to 5 years old (under 5). This is the critical window for growth and development where proper nutrition has the greatest lifelong impact. We also provide guidance to parents and caregivers on nutrition for older children and family members.',
+    },
+    {
+        id: 6,
+        question: 'How do I enroll my child?',
+        answer: "To enroll your child, visit the Bagong Silang Phase 3 Health Center during office hours with your child's birth certificate and proof of residency. Our staff will register your child, explain the monitoring process, and schedule the first health assessment. There is no cost for enrollment.",
+    },
 ];
 
 export default function Contact() {
@@ -47,22 +57,38 @@ export default function Contact() {
         last_name: '',
         email: '',
         phone: '',
-        subject: '',
+        subject: 'Contact Form Submission',
         message: '',
-        privacy: false,
+        privacy: '1' as string | boolean,
     });
 
+    const [fullName, setFullName] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [mapReady, setMapReady] = useState(false);
+
+    const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setFullName(value);
+        const parts = value.trim().split(' ');
+        setData('first_name', parts[0] || '');
+        setData('last_name', parts.slice(1).join(' ') || '');
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('guest.contact.send'), {
             onSuccess: () => {
                 reset();
+                setFullName('');
                 setSubmitted(true);
             },
         });
     };
+
+    useEffect(() => {
+        const timer = setTimeout(() => setMapReady(true), 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     return (
         <GuestLayout title="Contact Us">
@@ -74,22 +100,17 @@ export default function Contact() {
                 .animate-fade-in-up {
                     animation: fadeInUp 0.6s ease-out forwards;
                 }
-                .glass-card {
-                    background: color-mix(in srgb, var(--bg-light) 70%, transparent);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+                @media (prefers-reduced-motion: reduce) {
+                    .animate-fade-in-up {
+                        animation: none;
+                        opacity: 1;
+                    }
                 }
             `}</style>
+
             {/* Hero Section */}
-            <section
-                className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28"
-                style={{ animationDelay: '0.1s' }}
-            >
-                <div className="absolute top-20 right-20 -z-10 h-64 w-64 rounded-full bg-[var(--primary)] opacity-10 blur-3xl"></div>
-                <div className="absolute bottom-10 left-10 -z-10 h-48 w-48 rounded-full bg-[var(--secondary)] opacity-10 blur-3xl"></div>
-                <div className="absolute -top-10 -left-10 -z-10 h-40 w-40 rounded-full border border-[var(--primary)] opacity-20"></div>
-                <div className="absolute -right-10 -bottom-10 -z-10 h-60 w-60 rounded-full border border-[var(--secondary)] opacity-20"></div>
+            <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] to-[var(--bg)] py-24 md:py-28">
+                <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-[var(--primary)] opacity-[0.04]" />
 
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="grid items-center gap-12 md:grid-cols-2">
@@ -99,10 +120,8 @@ export default function Contact() {
                                 <span className="mr-2 flex h-2 w-2 rounded-full bg-[var(--primary)]"></span>
                                 GET IN TOUCH WITH US
                             </div>
-                            <h1 className="mt-6 text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
-                                <span className="gradient-text">We'd Love to</span>
-                                <br />
-                                <span className="text-[var(--text)]">Hear From You</span>
+                            <h1 className="mt-6 text-4xl leading-tight font-bold text-[var(--text)] md:text-5xl lg:text-6xl">
+                                We'd Love to Hear From You
                             </h1>
                             <p className="mt-6 text-lg text-[var(--text-muted)]">
                                 Have questions about our nutrition programs or want to get involved? Our team is ready to assist you with any
@@ -111,16 +130,16 @@ export default function Contact() {
                             <div className="mt-8 flex flex-wrap gap-4 md:justify-start">
                                 <a
                                     href="#contact-form"
-                                    className="group flex cursor-pointer items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:shadow-lg"
+                                    className="group flex cursor-pointer items-center justify-center rounded-md bg-[var(--primary)] px-6 py-3 text-white transition-all hover:opacity-90 hover:shadow-md"
                                 >
                                     <Send className="mr-2 h-5 w-5" />
                                     <span>Send a Message</span>
                                 </a>
                                 <a
                                     href="#faq"
-                                    className="group flex cursor-pointer items-center justify-center rounded-full border-2 border-[var(--secondary)] px-6 py-3 text-[var(--secondary)] transition-all hover:bg-[var(--secondary)] hover:text-white hover:shadow-lg"
+                                    className="group flex cursor-pointer items-center justify-center rounded-md border-2 border-[var(--secondary)] px-6 py-3 text-[var(--secondary)] transition-all hover:bg-[var(--secondary)] hover:text-white hover:shadow-md"
                                 >
-                                    <MessageSquare className="mr-2 h-5 w-5" />
+                                    <ChevronDown className="mr-2 h-5 w-5" />
                                     <span>View FAQs</span>
                                 </a>
                             </div>
@@ -128,64 +147,60 @@ export default function Contact() {
 
                         {/* Contact Cards */}
                         <div className="relative">
-                            <div className="relative z-10 overflow-hidden rounded-2xl bg-white/70 p-1 shadow-xl backdrop-blur-sm dark:bg-[var(--bg)]/70">
-                                <div className="grid gap-px rounded-xl bg-[var(--border)] sm:grid-cols-2">
+                            <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg-card)]">
+                                <div className="grid sm:grid-cols-2">
                                     {/* Call Us Card */}
-                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
-                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
+                                    <div className="cursor-pointer border-l-4 border-teal-600 bg-white p-6 transition-all hover:bg-gray-50 dark:bg-[var(--bg-card)] dark:hover:bg-[var(--bg-light)]">
+                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
                                             <Phone className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Call Us</h3>
-                                        <p className="mb-3 text-[var(--text-muted)]">Mon-Fri, 8am-5pm</p>
-                                        <a href="tel:+09123456789" className="inline-block text-lg font-medium text-[var(--text)]">
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">Mon-Fri, 8am-5pm</p>
+                                        <a href="tel:+639668221878" className="inline-block text-lg font-medium text-[var(--text)]">
                                             0966 822 1878
                                         </a>
                                     </div>
 
                                     {/* Email Us Card */}
-                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
-                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--secondary)] text-[var(--secondary)]">
+                                    <div className="cursor-pointer border-l-4 border-rose-500 bg-white p-6 transition-all hover:bg-gray-50 dark:bg-[var(--bg-card)] dark:hover:bg-[var(--bg-light)]">
+                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--secondary)]/10 text-[var(--secondary)]">
                                             <Mail className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Email Us</h3>
-                                        <p className="mb-3 text-[var(--text-muted)]">We'll respond within 24h</p>
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">We'll respond within 24h</p>
                                         <a href="mailto:barangay176b@gmail.com" className="inline-block text-lg font-medium text-[var(--text)]">
                                             barangay176b@gmail.com
                                         </a>
                                     </div>
 
                                     {/* Visit Us Card */}
-                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
-                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--success)]">
+                                    <div className="cursor-pointer border-l-4 border-emerald-500 bg-white p-6 transition-all hover:bg-gray-50 dark:bg-[var(--bg-card)] dark:hover:bg-[var(--bg-light)]">
+                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
                                             <MapPin className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Visit Us</h3>
-                                        <p className="mb-3 text-[var(--text-muted)]">Bagong Silang Phase 3 Health Center</p>
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">Bagong Silang Phase 3 Health Center</p>
                                         <span className="inline-block text-lg font-medium text-[var(--text)]">Q29X+VJC, Caloocan, Metro Manila</span>
                                     </div>
 
                                     {/* Office Hours Card */}
-                                    <div className="cursor-pointer bg-white p-6 transition-all hover:bg-[var(--bg-light)] dark:bg-[var(--bg-light)] dark:hover:bg-[var(--bg)]">
-                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--info)]">
+                                    <div className="cursor-pointer border-l-4 border-sky-500 bg-white p-6 transition-all hover:bg-gray-50 dark:bg-[var(--bg-card)] dark:hover:bg-[var(--bg-light)]">
+                                        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400">
                                             <Clock className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Office Hours</h3>
-                                        <p className="mb-3 text-[var(--text-muted)]">We are only available on:</p>
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">We are only available on:</p>
                                         <span className="inline-block text-lg font-medium text-[var(--text)]">Mon-Fri: 8AM - 5PM</span>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Decorative elements */}
-                            <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[var(--primary)] opacity-20 blur-xl"></div>
-                            <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-[var(--secondary)] opacity-20 blur-xl"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Contact Form Section */}
-            <section id="contact-form" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]" style={{ animationDelay: '0.2s' }}>
+            <section id="contact-form" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-6xl">
                         <div className="grid gap-16 md:grid-cols-5">
@@ -195,44 +210,43 @@ export default function Contact() {
                                     <span className="inline-flex items-center rounded-full bg-[var(--primary)]/10 px-3 py-1 text-xs font-medium text-[var(--primary)]">
                                         CONTACT FORM
                                     </span>
-                                    <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Send us a Message!</h2>
+                                    <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Send us a Message</h2>
                                     <p className="mt-4 text-[var(--text-muted)]">
-                                        Fill out the form and our team will get back to you as soon as possible. We're looking forward to hearing from
-                                        you!
+                                        Fill out the form and our team will get back to you as soon as possible.
                                     </p>
 
                                     <div className="mt-8 space-y-6">
                                         <div className="flex">
-                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
+                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
                                                 <Phone className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">Phone Support</h3>
-                                                <p className="mt-1 text-[var(--text-muted)]">
-                                                    Our support team is available during office hours to assist you with any questions.
+                                                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                                                    Available during office hours to assist you with any questions.
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex">
-                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
+                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
                                                 <Mail className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">Email Response</h3>
-                                                <p className="mt-1 text-[var(--text-muted)]">
-                                                    We typically respond to emails within 24 hours on business days.
+                                                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                                                    We typically respond within 24 hours on business days.
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex">
-                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--primary)] text-[var(--primary)]">
+                                            <div className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
                                                 <User className="h-5 w-5" />
                                             </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-[var(--text)]">In-Person Support</h3>
-                                                <p className="mt-1 text-[var(--text-muted)]">
+                                                <p className="mt-1 text-sm text-[var(--text-muted)]">
                                                     Visit our office during business hours for face-to-face assistance.
                                                 </p>
                                             </div>
@@ -243,44 +257,42 @@ export default function Contact() {
 
                             {/* Form */}
                             <div className="md:col-span-3">
-                                <div className="glass-card overflow-hidden rounded-2xl p-8 shadow-sm">
+                                <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg-card)]">
                                     {submitted && (
-                                        <div className="mb-6 rounded-xl bg-green-50 p-6 text-center animate-in slide-in-from-top-2 dark:bg-green-900/30">
+                                        <div className="mb-6 rounded-xl bg-green-50 p-6 text-center dark:bg-green-900/30">
                                             <CheckCircle className="mx-auto mb-3 h-12 w-12 text-green-500" />
                                             <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">Message Sent!</h3>
                                             <p className="mt-1 text-green-700 dark:text-green-300">
-                                                Thank you for reaching out. We will get back to you soon.
+                                                Thank you for reaching out. We will get back to you within 24 hours.
                                             </p>
+                                            <button
+                                                onClick={() => setSubmitted(false)}
+                                                className="mt-4 cursor-pointer rounded-md bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white transition-all hover:bg-[var(--primary)]/90"
+                                            >
+                                                Send another message
+                                            </button>
                                         </div>
                                     )}
                                     <form className="space-y-5" onSubmit={handleSubmit}>
-                                        <div className="grid gap-5 md:grid-cols-2">
-                                            <div>
-                                                <label htmlFor="first_name" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
-                                                    First Name <span className="text-[var(--danger)]">*</span>
-                                                </label>
-                                                <Input
-                                                    type="text"
-                                                    id="first_name"
-                                                    maxLength={50}
-                                                    value={data.first_name}
-                                                    onChange={(e) => setData('first_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="last_name" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
-                                                    Last Name <span className="text-[var(--danger)]">*</span>
-                                                </label>
-                                                <Input
-                                                    type="text"
-                                                    id="last_name"
-                                                    maxLength={50}
-                                                    value={data.last_name}
-                                                    onChange={(e) => setData('last_name', e.target.value.replace(/[^a-zA-ZñÑ\s'-.]/g, ''))}
-                                                    required
-                                                />
-                                            </div>
+                                        <div>
+                                            <label htmlFor="full_name" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
+                                                Full Name <span className="text-[var(--danger)]">*</span>
+                                            </label>
+                                            <Input
+                                                type="text"
+                                                id="full_name"
+                                                maxLength={50}
+                                                value={fullName}
+                                                onChange={handleFullNameChange}
+                                                className={`dark:border-[var(--border)] dark:bg-[var(--bg)] ${errors.first_name || errors.last_name ? 'border-red-500 focus:ring-red-500' : ''}`}
+                                                required
+                                            />
+                                            {(errors.first_name || errors.last_name) && (
+                                                <p className="mt-1 flex items-center gap-1 text-sm text-red-500">
+                                                    <AlertTriangle size={14} />
+                                                    {errors.first_name || errors.last_name}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div className="grid gap-5 md:grid-cols-2">
@@ -294,12 +306,19 @@ export default function Contact() {
                                                     maxLength={50}
                                                     value={data.email}
                                                     onChange={(e) => setData('email', e.target.value)}
+                                                    className={`dark:border-[var(--border)] dark:bg-[var(--bg)] ${errors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
                                                     required
                                                 />
+                                                {errors.email && (
+                                                    <p className="mt-1 flex items-center gap-1 text-sm text-red-500">
+                                                        <AlertTriangle size={14} />
+                                                        {errors.email}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
-                                                    Phone Number
+                                                    Phone Number <span className="text-[var(--text-muted)]">(optional)</span>
                                                 </label>
                                                 <Input
                                                     type="tel"
@@ -307,22 +326,15 @@ export default function Contact() {
                                                     maxLength={15}
                                                     value={data.phone}
                                                     onChange={(e) => setData('phone', e.target.value.replace(/\D/g, ''))}
+                                                    className={`dark:border-[var(--border)] dark:bg-[var(--bg)] ${errors.phone ? 'border-red-500 focus:ring-red-500' : ''}`}
                                                 />
+                                                {errors.phone && (
+                                                    <p className="mt-1 flex items-center gap-1 text-sm text-red-500">
+                                                        <AlertTriangle size={14} />
+                                                        {errors.phone}
+                                                    </p>
+                                                )}
                                             </div>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="subject" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
-                                                Subject <span className="text-[var(--danger)]">*</span>
-                                            </label>
-                                            <Input
-                                                type="text"
-                                                id="subject"
-                                                maxLength={100}
-                                                value={data.subject}
-                                                onChange={(e) => setData('subject', e.target.value)}
-                                                required
-                                            />
                                         </div>
 
                                         <div>
@@ -335,113 +347,104 @@ export default function Contact() {
                                                 minLength={20}
                                                 value={data.message}
                                                 onChange={(e) => setData('message', e.target.value)}
+                                                className={`dark:border-[var(--border)] dark:bg-[var(--bg)] ${errors.message ? 'border-red-500 focus:ring-red-500' : ''}`}
                                                 required
-                                                className="bg-transparent"
+                                                placeholder="Write your message here. Include any relevant details about your inquiry."
                                             />
+                                            {errors.message && (
+                                                <p className="mt-1 flex items-center gap-1 text-sm text-red-500">
+                                                    <AlertTriangle size={14} />
+                                                    {errors.message}
+                                                </p>
+                                            )}
                                         </div>
 
-                                        <div className="flex items-start">
-                                            <div className="flex h-5 items-center">
-                                                <input
-                                                    id="privacy"
-                                                    name="privacy"
-                                                    type="checkbox"
-                                                    checked={data.privacy}
-                                                    onChange={(e) => setData('privacy', e.target.checked)}
-                                                    className="h-4 w-4 rounded-xs border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)]"
-                                                    required
-                                                />
-                                            </div>
-                                            <div className="ml-3 text-sm">
-                                                <label htmlFor="privacy" className="text-[var(--text-muted)]">
-                                                    I agree to the{' '}
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <button type="button" className="cursor-pointer text-[var(--primary)] hover:underline">
-                                                                privacy policy
-                                                            </button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl dark:bg-gray-800">
-                                                            <DialogHeader>
-                                                                <DialogTitle className="text-xl font-bold text-teal-800 dark:text-teal-300">
-                                                                    Privacy Policy
-                                                                </DialogTitle>
-                                                            </DialogHeader>
-                                                            <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                                                                    1. Information We Collect
-                                                                </h3>
-                                                                <p>
-                                                                    We collect personal information that you voluntarily provide to us when you use
-                                                                    the NutriBantay contact form, including your name, email address, phone number,
-                                                                    and the content of your message. We also collect information about your child's
-                                                                    nutrition and health data if you register for our monitoring program.
-                                                                </p>
+                                        <p className="text-sm text-[var(--text-muted)]">
+                                            By submitting, you agree to our{' '}
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <button type="button" className="cursor-pointer text-[var(--primary)] hover:underline">
+                                                        Privacy Policy
+                                                    </button>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl dark:bg-[var(--bg-card)]">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="text-xl font-bold text-[var(--text)]">
+                                                            Privacy Policy
+                                                        </DialogTitle>
+                                                    </DialogHeader>
+                                                    <div className="space-y-4 text-sm text-[var(--text-muted)]">
+                                                        <h3 className="font-semibold text-[var(--text)]">
+                                                            1. Information We Collect
+                                                        </h3>
+                                                        <p>
+                                                            We collect personal information that you voluntarily provide to us when you use
+                                                            the NutriBantay contact form, including your name, email address, phone number,
+                                                            and the content of your message. We also collect information about your child's
+                                                            nutrition and health data if you register for our monitoring program.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                                                                    2. How We Use Your Information
-                                                                </h3>
-                                                                <p>
-                                                                    The information we collect is used to respond to your inquiries, provide nutrition
-                                                                    monitoring services, improve our community health programs, and comply with legal
-                                                                    obligations. Your data is used solely for the intended purpose of barangay health
-                                                                    tracking and community wellness initiatives.
-                                                                </p>
+                                                        <h3 className="font-semibold text-[var(--text)]">
+                                                            2. How We Use Your Information
+                                                        </h3>
+                                                        <p>
+                                                            The information we collect is used to respond to your inquiries, provide nutrition
+                                                            monitoring services, improve our community health programs, and comply with legal
+                                                            obligations. Your data is used solely for the intended purpose of barangay health
+                                                            tracking and community wellness initiatives.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">3. Data Protection</h3>
-                                                                <p>
-                                                                    We implement appropriate technical and organizational measures to protect your
-                                                                    personal data against unauthorized access, alteration, disclosure, or destruction.
-                                                                    Access to personal data is restricted to authorized personnel only and is
-                                                                    protected under applicable data privacy laws.
-                                                                </p>
+                                                        <h3 className="font-semibold text-[var(--text)]">3. Data Protection</h3>
+                                                        <p>
+                                                            We implement appropriate technical and organizational measures to protect your
+                                                            personal data against unauthorized access, alteration, disclosure, or destruction.
+                                                            Access to personal data is restricted to authorized personnel only and is
+                                                            protected under applicable data privacy laws.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">4. Data Sharing</h3>
-                                                                <p>
-                                                                    We do not sell, trade, or rent your personal information to third parties. We may
-                                                                    share information with authorized barangay health personnel and government
-                                                                    agencies as required by law or with your explicit consent.
-                                                                </p>
+                                                        <h3 className="font-semibold text-[var(--text)]">4. Data Sharing</h3>
+                                                        <p>
+                                                            We do not sell, trade, or rent your personal information to third parties. We may
+                                                            share information with authorized barangay health personnel and government
+                                                            agencies as required by law or with your explicit consent.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">5. Data Retention</h3>
-                                                                <p>
-                                                                    We retain your personal data only for as long as necessary to fulfill the purposes
-                                                                    for which it was collected, or as required by applicable laws and regulations.
-                                                                    When data is no longer needed, it is securely disposed of.
-                                                                </p>
+                                                        <h3 className="font-semibold text-[var(--text)]">5. Data Retention</h3>
+                                                        <p>
+                                                            We retain your personal data only for as long as necessary to fulfill the purposes
+                                                            for which it was collected, or as required by applicable laws and regulations.
+                                                            When data is no longer needed, it is securely disposed of.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">6. Your Rights</h3>
-                                                                <p>
-                                                                    You have the right to access, correct, update, or request deletion of your
-                                                                    personal data. You may also withdraw your consent to data processing at any time.
-                                                                    To exercise these rights, please contact our data protection officer through the
-                                                                    barangay health center.
-                                                                </p>
+                                                        <h3 className="font-semibold text-[var(--text)]">6. Your Rights</h3>
+                                                        <p>
+                                                            You have the right to access, correct, update, or request deletion of your
+                                                            personal data. You may also withdraw your consent to data processing at any time.
+                                                            To exercise these rights, please contact our data protection officer through the
+                                                            barangay health center.
+                                                        </p>
 
-                                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                                                                    7. Updates to This Policy
-                                                                </h3>
-                                                                <p>
-                                                                    We may update this Privacy Policy from time to time. Any changes will be posted on
-                                                                    this page, and we encourage you to review this policy periodically for any
-                                                                    updates.
-                                                                </p>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>{' '}
-                                                    and consent to the processing of my personal data.
-                                                </label>
-                                                {errors.privacy && <p className="mt-1 text-sm text-[var(--danger)]">{errors.privacy}</p>}
-                                            </div>
-                                        </div>
+                                                        <h3 className="font-semibold text-[var(--text)]">
+                                                            7. Updates to This Policy
+                                                        </h3>
+                                                        <p>
+                                                            We may update this Privacy Policy from time to time. Any changes will be posted on
+                                                            this page, and we encourage you to review this policy periodically for any
+                                                            updates.
+                                                        </p>
+                                                    </div>
+                                                </DialogContent>
+                                            </Dialog>
+                                            .
+                                        </p>
 
                                         <div>
                                             <button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="group inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-[var(--primary)] px-6 py-3 text-white transition-all hover:opacity-90 focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:outline-none sm:w-auto"
+                                                className="group inline-flex w-full cursor-pointer items-center justify-center rounded-md bg-[var(--primary)] px-6 py-3 text-white transition-all hover:opacity-90 focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:outline-none sm:w-auto"
                                             >
-                                                <span className="mr-2">{processing ? 'Sending...' : 'Send Message'}</span>
+                                                <span className="mr-2">{processing ? 'Sending...' : 'Send Message to Health Center'}</span>
                                                 <Send className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                                             </button>
                                         </div>
@@ -450,11 +453,11 @@ export default function Contact() {
                             </div>
                         </div>
                     </div>
-                </div>
+    </div>
             </section>
 
             {/* Map Section */}
-            <section className="animate-fade-in-up bg-[var(--bg-light)] py-16 dark:bg-[var(--bg)]" style={{ animationDelay: '0.3s' }}>
+            <section className="animate-fade-in-up bg-[var(--bg-light)] py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
                         <span className="inline-flex items-center rounded-full bg-[var(--success)]/10 px-3 py-1 text-xs font-medium text-[var(--success)]">
@@ -462,19 +465,23 @@ export default function Contact() {
                         </span>
                         <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Visit Us Today</h2>
                         <p className="mt-4 text-[var(--text-muted)]">
-                            Our health center is located at Bagong Silang, Caloocan City. Feel free to visit us during our business hours.
+                            Bagong Silang Phase 3 Health Center — we are located at Bagong Silang, Caloocan City.
                         </p>
                     </div>
 
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-[var(--bg-light)]">
+                    <div className="relative overflow-hidden rounded-xl bg-white shadow-sm dark:bg-[var(--bg-light)]">
                         {/* Leaflet Map */}
                         <div className="relative h-[36rem] w-full">
+                            {!mapReady && (
+                                <div className="absolute inset-0 z-[999] animate-pulse rounded-xl bg-gray-100 dark:bg-[var(--bg-card)]" />
+                            )}
                             <MapContainer
                                 center={[14.7695106, 121.0489927]}
                                 zoom={16}
                                 style={{ height: '100%', width: '100%' }}
                                 scrollWheelZoom={true}
-                                className="rounded-2xl"
+                                className="rounded-xl"
+                                whenReady={() => setMapReady(true)}
                             >
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -483,15 +490,15 @@ export default function Contact() {
                                 <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
-                                            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                                            <h3 className="text-lg font-bold text-[var(--text)]">
                                                 Bagong Silang Phase 3 Health Center
                                             </h3>
-                                            <p className="mt-1 text-sm text-gray-600">
+                                            <p className="mt-1 text-sm text-[var(--text-muted)]">
                                                 Q29X+VJC, Caloocan
                                                 <br />
                                                 Metro Manila, Philippines
                                             </p>
-                                            <p className="mt-2 text-sm text-gray-600">
+                                            <p className="mt-2 text-sm text-[var(--text-muted)]">
                                                 <strong>Hours:</strong> Mon-Fri: 8AM - 5PM
                                             </p>
                                         </div>
@@ -500,7 +507,7 @@ export default function Contact() {
                             </MapContainer>
 
                             {/* Location information overlay */}
-                            <div className="pointer-events-auto absolute right-6 bottom-6 left-6 z-[1000] rounded-xl bg-white/90 p-5 shadow-lg backdrop-blur-sm dark:bg-[var(--bg-light)]/90">
+                            <div className="pointer-events-auto absolute right-6 bottom-6 left-6 z-[1000] rounded-xl bg-white/90 p-5 shadow-md backdrop-blur-sm dark:bg-[var(--bg-light)]/90">
                                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                                     <div className="flex items-start gap-3">
                                         <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[var(--primary)]" />
@@ -513,7 +520,7 @@ export default function Contact() {
                                         href="https://maps.google.com/maps?q=14.7695106,121.0489927"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex shrink-0 cursor-pointer items-center rounded-full bg-gradient-to-r from-teal-700 to-cyan-600 px-4 py-2 text-sm text-white transition-all hover:opacity-90 hover:shadow-lg"
+                                        className="inline-flex shrink-0 cursor-pointer items-center rounded-md bg-[#006666] px-4 py-2 text-sm text-white transition-all hover:bg-[#005555] hover:shadow-md"
                                     >
                                         <MapPin className="mr-2 h-4 w-4" />
                                         <span>Get Directions</span>
@@ -526,7 +533,7 @@ export default function Contact() {
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]" style={{ animationDelay: '0.4s' }}>
+            <section id="faq" className="animate-fade-in-up bg-white py-20 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto mb-12 max-w-3xl text-center">
                         <span className="inline-flex items-center rounded-full bg-[var(--secondary)]/10 px-3 py-1 text-xs font-medium text-[var(--secondary)]">
@@ -540,17 +547,22 @@ export default function Contact() {
                         {FAQs.map((faq) => (
                             <div
                                 key={faq.id}
-                                className="overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-sm transition-all hover:shadow-md dark:bg-[var(--bg-light)]"
+                                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-[var(--border)] dark:bg-[var(--bg-light)]"
                             >
                                 <details className="group">
                                     <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-semibold text-[var(--text)] outline-none">
-                                        <span>{faq.question}</span>
-                                        <span className="ml-6 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-700 transition-transform duration-500 ease-in-out group-open:rotate-180 dark:from-[var(--bg)] dark:to-[var(--bg)] dark:text-[var(--primary)]">
+                                        <span className="flex items-center gap-3">
+                                            <span className="inline-flex h-6 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--primary)]/10 text-xs font-bold text-[var(--primary)]">
+                                                {String(faq.id).padStart(2, '0')}
+                                            </span>
+                                            {faq.question}
+                                        </span>
+                                        <span className="ml-6 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-100 text-teal-700 transition-transform duration-300 group-open:rotate-180 dark:bg-[var(--bg)] dark:text-[var(--primary)]">
                                             <ChevronDown className="h-5 w-5" />
                                         </span>
                                     </summary>
-                                    <div className="overflow-hidden transition-all duration-500 ease-in-out">
-                                        <div className="border-t border-[var(--border)] px-6 pt-4 pb-6">
+                                    <div className="overflow-hidden transition-all duration-300 ease-in-out">
+                                        <div className="border-t border-gray-200 px-6 pt-4 pb-6 dark:border-[var(--border)]">
                                             <p className="text-[var(--text-muted)]">{faq.answer}</p>
                                         </div>
                                     </div>
@@ -567,31 +579,6 @@ export default function Contact() {
                             </a>{' '}
                             for more information.
                         </p>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section
-                className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--primary)] to-teal-900 py-16 text-white"
-                style={{ animationDelay: '0.5s' }}
-            >
-                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-teal-600 opacity-20" />
-                <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-cyan-600 opacity-20" />
-
-                <div className="relative z-10 container mx-auto px-6 text-center lg:px-8">
-                    <h2 className="mb-4 text-3xl font-bold md:text-4xl">Join Our Mission for a Healthier Community</h2>
-                    <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
-                        Help us make a difference in the lives of children and families in our barangay.
-                    </p>
-                    <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-                        <a
-                            href="#contact-form"
-                            className="inline-flex cursor-pointer items-center rounded-full border-2 border-white/60 px-8 py-3 font-medium text-white transition-all hover:border-white hover:bg-white/10"
-                        >
-                            <Send className="mr-2 h-5 w-5" />
-                            Send a Message
-                        </a>
                     </div>
                 </div>
             </section>
