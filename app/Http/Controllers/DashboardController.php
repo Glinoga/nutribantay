@@ -270,8 +270,8 @@ class DashboardController extends Controller
             'status_distribution' => [
                 'normal' => $latestPerChild->where('nutrition_status', 'Normal')->count(),
                 'underweight' => $latestPerChild->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-                'overweight' => $latestPerChild->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-                'stunted' => $latestPerChild->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+                'overweight' => $latestPerChild->filter(fn ($l) => $l->nutrition_status === 'Overweight/Obese' || in_array($l->status_wfl_wfh, ['Overweight', 'Obese']))->count(),
+                'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
             ],
             'vitamin_a_doses' => $allLogs->where('vitamin_a', true)->count(),
             'deworming_doses' => $allLogs->where('deworming', true)->count(),
@@ -309,8 +309,8 @@ class DashboardController extends Controller
                     'nutrition_status' => [
                         'normal' => $latestPerChild->where('nutrition_status', 'Normal')->count(),
                         'underweight' => $latestPerChild->whereIn('nutrition_status', ['Underweight', 'Moderate Malnutrition', 'Severe Malnutrition'])->count(),
-                        'overweight' => $latestPerChild->whereIn('nutrition_status', ['Overweight', 'Obese'])->count(),
-                        'stunted' => $latestPerChild->whereIn('nutrition_status', ['Stunted', 'Severely Stunted'])->count(),
+                        'overweight' => $latestPerChild->filter(fn ($l) => $l->nutrition_status === 'Overweight/Obese' || in_array($l->status_wfl_wfh, ['Overweight', 'Obese']))->count(),
+                        'stunted' => $latestPerChild->filter(fn ($l) => in_array($l->status_lfa, ['Stunted', 'Severely Stunted']))->count(),
                     ],
                     'vitamin_a_given' => $allLogs->where('vitamin_a', true)->count(),
                     'deworming_given' => $allLogs->where('deworming', true)->count(),
