@@ -312,25 +312,29 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         )}
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <Link href={`${route('children.index')}?vaccine_status=overdue`}>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                                                aria-label="View overdue vaccine follow-ups"
-                                            >
-                                                View Overdue
-                                            </Button>
-                                        </Link>
-                                        <Link href={`${route('children.index')}?vaccine_status=upcoming`}>
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                                                aria-label="View upcoming vaccine follow-ups"
-                                            >
-                                                View Upcoming
-                                            </Button>
-                                        </Link>
+                                        {vaccine_followups.overdue_count > 0 && (
+                                            <Link href={`${route('children.index')}?vaccine_status=overdue`}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                    aria-label="View overdue vaccine follow-ups"
+                                                >
+                                                    View Overdue
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {vaccine_followups.due_this_month_count > 0 && (
+                                            <Link href={`${route('children.index')}?vaccine_status=upcoming`}>
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                    aria-label="View upcoming vaccine follow-ups"
+                                                >
+                                                    View Upcoming
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </div>
 
                                     {vaccine_followups.follow_ups.length > 0 && (
@@ -446,25 +450,29 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         )}
                                     </div>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <Link href={`${route('children.index')}?vitamin_status=overdue`}>
-                                            <Button
-                                                size="sm"
-                                                variant="destructive"
-                                                className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                                                aria-label="View overdue vitamin follow-ups"
-                                            >
-                                                View Overdue
-                                            </Button>
-                                        </Link>
-                                        <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
-                                            <Button
-                                                size="sm"
-                                                className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                                                aria-label="View upcoming vitamin follow-ups"
-                                            >
-                                                View Upcoming
-                                            </Button>
-                                        </Link>
+                                        {vitamin_followups.overdue_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=overdue`}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    className="cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                                                    aria-label="View overdue vitamin follow-ups"
+                                                >
+                                                    View Overdue
+                                                </Button>
+                                            </Link>
+                                        )}
+                                        {vitamin_followups.due_this_month_count > 0 && (
+                                            <Link href={`${route('children.index')}?vitamin_status=upcoming`}>
+                                                <Button
+                                                    size="sm"
+                                                    className="cursor-pointer bg-amber-600 text-white transition-all duration-200 hover:bg-amber-700 focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                                                    aria-label="View upcoming vitamin follow-ups"
+                                                >
+                                                    View Upcoming
+                                                </Button>
+                                            </Link>
+                                        )}
                                     </div>
                                     {vitamin_followups.follow_ups.length > 0 && (
                                         <div
