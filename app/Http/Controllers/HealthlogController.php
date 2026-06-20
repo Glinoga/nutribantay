@@ -284,7 +284,7 @@ class HealthlogController extends Controller
             ->with('success', 'Health log updated successfully.');
     }
 
-    public function destroy(HealthLog $healthlog)
+    public function destroy(HealthLog $healthlog, Request $request)
     {
         $user = auth()->user();
 
@@ -301,7 +301,11 @@ class HealthlogController extends Controller
         RefreshDashboardForBarangay::dispatch($barangay)
             ->delay(now()->addSeconds(10));
 
-        return redirect()->route('children.show', $childId)
-            ->with('success', 'Health log deleted.');
+        $page = $request->query('page', 1);
+
+        return redirect()->route('children.show', [
+            'child' => $childId,
+            'page' => $page,
+        ])->with('success', 'Health log deleted.');
     }
 }

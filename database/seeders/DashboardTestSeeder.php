@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
-use App\Models\HealthLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -72,36 +71,9 @@ class DashboardTestSeeder extends Seeder
         ];
 
         foreach ($children as $childData) {
-            $child = Child::create($childData);
-
-            // Create healthlogs for different periods
-            $periods = [
-                ['days_ago' => 0, 'period' => 'daily'],
-                ['days_ago' => 3, 'period' => 'daily'],
-                ['days_ago' => 5, 'period' => 'weekly'],
-                ['days_ago' => 15, 'period' => 'monthly'],
-                ['days_ago' => 60, 'period' => 'monthly'],
-                ['days_ago' => 120, 'period' => 'yearly'],
-            ];
-
-            foreach ($periods as $period) {
-                HealthLog::create([
-                    'child_id' => $child->id,
-                    'user_id' => $admin->id,
-                    'weight' => rand(5, 15) + (rand(0, 100) / 100),
-                    'height' => rand(50, 90) + (rand(0, 100) / 100),
-                    'bmi' => rand(14, 22),
-                    'status_wfa' => 'Normal',
-                    'status_lfa' => 'Normal',
-                    'status_wfl_wfh' => 'Normal',
-                    'nutrition_status' => ['Normal', 'Underweight', 'Overweight', 'Stunted'][array_rand(['Normal', 'Underweight', 'Overweight', 'Stunted'])],
-                    'vitamin_a' => rand(0, 1),
-                    'deworming' => rand(0, 1),
-                    'created_at' => Carbon::now()->subDays($period['days_ago']),
-                ]);
-            }
+            Child::create($childData);
         }
 
-        $this->command->info('Created '.count($children).' children with healthlogs.');
+        $this->command->info('Created '.count($children).' children.');
     }
 }

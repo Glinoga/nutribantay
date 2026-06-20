@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Child;
-use App\Models\HealthLog;
 use App\Models\User;
 use Carbon\Carbon;
 use Faker\Factory;
@@ -210,8 +209,6 @@ class ChildSeeder extends Seeder
 
             $child = Child::create($childData);
 
-            $this->createHealthLogs($child, $admin->id);
-
             if ($deleted) {
                 $child->delete();
             }
@@ -219,34 +216,6 @@ class ChildSeeder extends Seeder
             $created++;
         }
 
-        $this->command->info("Created {$created} children with health logs.");
-    }
-
-    private function createHealthLogs(Child $child, int $userId): void
-    {
-        $periods = [
-            ['days_ago' => 0, 'period' => 'daily'],
-            ['days_ago' => 30, 'period' => 'monthly'],
-            ['days_ago' => 90, 'period' => 'monthly'],
-        ];
-
-        foreach ($periods as $period) {
-            $variation = fn (float $base, float $range) => round($base + (rand(0, 100) / 100) * $range - $range / 2, 2);
-
-            HealthLog::create([
-                'child_id' => $child->id,
-                'user_id' => $userId,
-                'weight' => $variation($child->weight ?? 10, 2),
-                'height' => $variation($child->height ?? 80, 5),
-                'bmi' => rand(14, 22),
-                'status_wfa' => ['Normal', 'Underweight', 'Overweight'][array_rand(['Normal', 'Underweight', 'Overweight'])],
-                'status_lfa' => ['Normal', 'Stunted', 'Severely Stunted'][array_rand(['Normal', 'Stunted', 'Severely Stunted'])],
-                'status_wfl_wfh' => ['Normal', 'Wasted', 'Severely Wasted'][array_rand(['Normal', 'Wasted', 'Severely Wasted'])],
-                'nutrition_status' => $child->nutrition_status ?? 'Normal',
-                'vitamin_a' => rand(0, 1),
-                'deworming' => rand(0, 1),
-                'created_at' => Carbon::now()->subDays($period['days_ago']),
-            ]);
-        }
+        $this->command->info("Created {$created} children.");
     }
 }

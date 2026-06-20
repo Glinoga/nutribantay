@@ -697,6 +697,33 @@ class ChildController extends Controller
 
         $child->load(['notes.author', 'creator', 'updater']);
 
+        $selectColumns = [
+            'id', 'weight', 'height', 'bmi', 'nutrition_status',
+            'status_wfa', 'status_lfa', 'status_wfl_wfh',
+            'vitamin_a', 'deworming',
+            'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
+            'created_at', 'user_id',
+        ];
+
+        $logMapper = fn ($log) => [
+            'id' => $log->id,
+            'weight' => $log->weight,
+            'height' => $log->height,
+            'bmi' => $log->bmi,
+            'nutrition_status' => $log->nutrition_status,
+            'status_wfa' => $log->status_wfa,
+            'status_lfa' => $log->status_lfa,
+            'status_wfl_wfh' => $log->status_wfl_wfh,
+            'vitamin_a' => $log->vitamin_a,
+            'deworming' => $log->deworming,
+            'micronutrient_powder' => $log->micronutrient_powder,
+            'rutf' => $log->ruf,
+            'rusf' => $log->rusf,
+            'complementary_food' => $log->complementary_food,
+            'created_at' => $log->created_at,
+            'user' => ['name' => $log->user?->name],
+        ];
+
         return Inertia::render('Children/Show', [
             'child' => [
                 'id' => $child->id,
@@ -723,35 +750,17 @@ class ChildController extends Controller
                     'author' => ['name' => $note->author?->name],
                     'created_at' => $note->created_at,
                 ]),
-                'healthlogs' => $child->healthlogs()
-                    ->with('user:id,name')
-                    ->orderBy('created_at', 'asc')
-                    ->get([
-                        'id', 'weight', 'height', 'bmi', 'nutrition_status',
-                        'status_wfa', 'status_lfa', 'status_wfl_wfh',
-                        'vitamin_a', 'deworming',
-                        'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
-                        'created_at', 'user_id',
-                    ])
-                    ->map(fn ($log) => [
-                        'id' => $log->id,
-                        'weight' => $log->weight,
-                        'height' => $log->height,
-                        'bmi' => $log->bmi,
-                        'nutrition_status' => $log->nutrition_status,
-                        'status_wfa' => $log->status_wfa,
-                        'status_lfa' => $log->status_lfa,
-                        'status_wfl_wfh' => $log->status_wfl_wfh,
-                        'vitamin_a' => $log->vitamin_a,
-                        'deworming' => $log->deworming,
-                        'micronutrient_powder' => $log->micronutrient_powder,
-                        'rutf' => $log->ruf,
-                        'rusf' => $log->rusf,
-                        'complementary_food' => $log->complementary_food,
-                        'created_at' => $log->created_at,
-                        'user' => ['name' => $log->user?->name],
-                    ]),
             ],
+            'chartHealthLogs' => $child->healthlogs()
+                ->orderBy('created_at', 'asc')
+                ->take(12)
+                ->get($selectColumns)
+                ->map($logMapper),
+            'healthlogs' => $child->healthlogs()
+                ->with('user:id,name')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10, $selectColumns)
+                ->through($logMapper),
         ]);
     }
 
