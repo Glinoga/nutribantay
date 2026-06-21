@@ -287,6 +287,37 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                         </Card>
                     </div>
 
+                    {/* Coverage Stats */}
+                    <div className="mb-8">
+                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Coverage</h2>
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Vitamin A Doses</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Deworming Doses</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Children with Records</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.total}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                                <CardHeader>
+                                    <CardDescription>Health Logs This Year</CardDescription>
+                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.yearly.healthlogs}</CardTitle>
+                                </CardHeader>
+                            </Card>
+                        </div>
+                    </div>
+
                     {/* Total Children Card */}
                     <div className="mb-8">
                         <Card className="border-0 bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-lg">
@@ -620,37 +651,6 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                 <CardHeader>
                                     <CardDescription className="text-purple-600 dark:text-purple-400">Wasted</CardDescription>
                                     <CardTitle className="text-3xl text-purple-600 dark:text-purple-400">{stats.nutrition_status.wasted}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                        </div>
-                    </div>
-
-                    {/* Coverage Stats */}
-                    <div className="mb-8">
-                        <h2 className="mb-4 text-xl font-bold text-cyan-900 dark:text-cyan-100">Coverage</h2>
-                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
-                                <CardHeader>
-                                    <CardDescription>Vitamin A Doses</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.given}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
-                                <CardHeader>
-                                    <CardDescription>Deworming Doses</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.deworming.given}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
-                                <CardHeader>
-                                    <CardDescription>Total Measured</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.vitamin_a.total}</CardTitle>
-                                </CardHeader>
-                            </Card>
-                            <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
-                                <CardHeader>
-                                    <CardDescription>Health Logs This Year</CardDescription>
-                                    <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.yearly.healthlogs}</CardTitle>
                                 </CardHeader>
                             </Card>
                         </div>

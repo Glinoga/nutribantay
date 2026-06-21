@@ -471,7 +471,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                                             <TableCell className="hidden px-4 py-2 sm:table-cell">{log.height}</TableCell>
                                             <TableCell className="px-4 py-2">
                                                 <span
-                                                    className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap ${
+                                                    className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap print:!bg-transparent print:!p-0 print:!font-semibold ${
                                                         log.nutrition_status === 'Normal'
                                                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                                             : log.nutrition_status === 'Underweight'

@@ -51,7 +51,7 @@ class DashboardController extends Controller
                 'stats' => [
                     'total_children' => 0,
                     'age_breakdown' => ['0to5' => 0, '6to11' => 0, '12to23' => 0, '24to56' => 0],
-                    'nutrition_status' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0],
+                    'nutrition_status' => ['normal' => 0, 'underweight' => 0, 'overweight' => 0, 'stunted' => 0, 'wasted' => 0],
                     'vitamin_a' => ['given' => 0, 'total' => 0],
                     'deworming' => ['given' => 0, 'total' => 0],
                     'daily' => ['children_registered' => 0, 'healthlogs' => 0],
