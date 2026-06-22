@@ -88,7 +88,7 @@ class RecommendationController extends Controller
     private function getNCSGuidelinesSection(int $months): string
     {
         if ($months < 6) {
-            return "0-5 BUWAN (Gatas lamang):\n- Dalas: 8-12 beses isang araw (on-demand)\n- Pagkain: Gatas lamang (breastmilk o formula) - WALANG SOLID FOOD";
+            return "0-5 BUWAN (Gatas lamang):\n- Dalas: 8-12 beses isang araw (on-demand)\n- Pagkain: Gatas lamang (breastmilk) - WALANG SOLID FOOD";
         }
 
         if ($months === 6) {
@@ -145,7 +145,7 @@ NATIONAL NUTRITION COUNCIL FEEDING GUIDELINES (STRICT - PARA SA EDAD LANG NG BAT
 VITAMINS AND NUTRIENTS REFERENCE (AYON SA NUTRITION STATUS):
 =====================================================================
 Gamitin ang reference na ito para sa 3. Mga Vitamin, Supplements, at Nutrients section.
-**Para sa 0-5 buwan: WALANG vitamins o supplements — sapat na ang breastmilk o formula.**
+**Para sa 0-5 buwan: WALANG vitamins o supplements — sapat na ang breastmilk.**
 
 LAHAT NG BATA (6-59 months):
 - Vitamin A: Tuwing 6 na buwan (6-11mo: 100,000 IU, 12-59mo: 200,000 IU)
@@ -186,33 +186,14 @@ OUTPUT FORMAT:
 5. Disclaimer
 6. Pinagkuhanan ng Datos: National Nutrition Council
 
-**EXAMPLE OUTPUT PARA SA 0-5 BUWAN (i-angkop ang tips sa Nutrition Status ng bata):**
-1. Mga Nutrition Tips:
-   1. Magpasuso tuwing 2-3 oras o ayon sa pangangailangan ng sanggol.
-   2. Ang breastmilk o formula ay sapat na pagkain at inumin — walang kailangang tubig.
-   3. Dalhin sa health center para sa regular na check-up at growth monitoring.
-   [Kung ang Nutrition Status ay hindi Normal, magdagdag ng karagdagang tip na angkop sa kondisyon ng bata]
+**HALIMBAWA NG FORMAT (HUWAG KOPYAHIN - gumawa ng sariling tips at meal plan):**
+1. Mga Nutrition Tips: [3-4 tips na angkop sa edad at Nutrition Status ng bata]
 2. Meal Plan:
-   - Umaga: Gatas lamang (breastmilk o formula)
-   - Tanghali: Gatas lamang (breastmilk o formula)
-   - Gabi: Gatas lamang (breastmilk o formula)
-3. Mga Vitamin, Supplements, at Nutrients: Wala — sapat na ang gatas.
-4. Food Restrictions: WALANG solid food, tubig, o anumang pagkain maliban sa gatas.
-5. Disclaimer: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines.
-6. Pinagkuhanan ng Datos: National Nutrition Council
-
-**EXAMPLE OUTPUT PARA SA 6+ BUWAN (i-angkop ang tips sa Nutrition Status ng bata):**
-1. Mga Nutrition Tips:
-   1. Patuloy ang pagpapasuso habang nagpapakain ng solid food.
-   2. Siguraduhing malapot at masustansya ang lugaw o pagkain.
-   3. Dalhin sa health center para sa regular na check-up at growth monitoring.
-   [Kung ang Nutrition Status ay hindi Normal, magdagdag ng karagdagang tip na angkop sa kondisyon ng bata]
-2. Meal Plan:
-   - Umaga: [isang pagkain sa listahan]
-   - Tanghali: [isang pagkain sa listahan - DI IULIT]
-   - Gabi: [isang pagkain sa listahan - DI IULIT]
-3. Mga Vitamin, Supplements, at Nutrients: [ayon sa health assessment ng bata]
-4. Food Restrictions: Bawal ang processed foods, matatamis na pagkain, at soft drinks.
+   - Umaga: [isang pagkain mula sa listahan ayon sa edad]
+   - Tanghali: [isang pagkain mula sa listahan - DI IULIT]
+   - Gabi: [isang pagkain mula sa listahan - DI IULIT]
+3. Mga Vitamin, Supplements, at Nutrients: [ayon sa Nutrition Status at edad ng bata]
+4. Food Restrictions: [ayon sa edad — 0-5 months: walang solid food; 6+ months: bawal processed]
 5. Disclaimer: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines.
 6. Pinagkuhanan ng Datos: National Nutrition Council
 
