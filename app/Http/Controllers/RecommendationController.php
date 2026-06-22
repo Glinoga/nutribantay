@@ -167,7 +167,7 @@ c) Banggitin ang PAGKUKUNAN (dietary sources) kung maaari
 STRICT RULES:
 1. **Bawat meal AY ISANG PAGKAIN LAMANG** sa listahan - HUWAG COMBINE
 2. **HUWAG UMIULIT NG PAGKAIN SA SAME DAY** - iba dapat bawat meal (Umaga/Tanghali/Gabi)
-3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD, WALANG VITAMINS O SUPPLEMENTS**
+3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD, WALANG VITAMINS O SUPPLEMENTS, WALANG FORMULA** — breastmilk LANG, huwag banggitin ang formula
 4. **6 months pataas: PATULOY ANG PAGPAPASUSO kasama ng solid food** - breastmilk pa rin ang main na gatas hanggang 2 taon
 5. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
 6. **Bawal ang pagkain na wala sa listahan**
@@ -388,7 +388,7 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
         if ($ageInMonths < 6) {
             foreach ($lines as $line) {
                 if (preg_match('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):/i', $line)) {
-                    $fixed[] = trim(preg_replace('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk/formula)', $line));
+                    $fixed[] = trim(preg_replace('/^\s*(?:[-*]\s*)?(Umaga|Tanghali|Gabi):.*$/i', '$1: Gatas lamang (breastmilk)', $line));
 
                     continue;
                 }
