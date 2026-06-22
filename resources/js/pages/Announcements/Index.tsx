@@ -191,7 +191,7 @@ export default function Index(props: IndexProps) {
             if (result.isConfirmed) {
                 setDeletingId(announcement.id);
 
-                router.delete(route('announcements.destroy', { announcement: announcement.slug }), {
+                router.delete(route('announcements.destroy', { announcement: announcement.slug ?? announcement.id }), {
                     preserveScroll: true,
                     onSuccess: () => {
                         setDeletingId(null);

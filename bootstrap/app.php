@@ -67,7 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->respond(function ($response, $e, Request $request) {
             if ($e instanceof HttpException && $request->header('X-Inertia')) {
                 $status = $e->getStatusCode();
-                $errorPages = [400, 401, 403, 404, 419, 429, 500, 503];
+                $errorPages = [400, 401, 403, 404, 405, 419, 429, 500, 503];
                 if (in_array($status, $errorPages)) {
                     return Inertia::render("errors/{$status}", [
                         'status' => $status,
