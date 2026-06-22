@@ -92,21 +92,21 @@ class RecommendationController extends Controller
         }
 
         if ($months === 6) {
-            return "6 NA BUWAN:\n- Dalas: 2 beses isang araw\n- Pagkain: Malapot na Lugaw (2-3 kutsara)";
+            return "6 NA BUWAN:\n- Dalas: 2 beses isang araw + patuloy ang pagpapasuso\n- Pagkain: Malapot na Lugaw (2-3 kutsara) + breastmilk";
         }
 
         if ($months <= 8) {
-            return "6-8 BUWAN:\n- Dalas: 2-3 beses isang araw\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na may kalabasa (1/2 tasa)\n  - Lugaw na may malunggay (1/2 tasa)\n  - Lugaw na may pritong isda (1/2 tasa)";
+            return "6-8 BUWAN:\n- Dalas: 2-3 beses isang araw + patuloy ang pagpapasuso\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na may kalabasa (1/2 tasa)\n  - Lugaw na may malunggay (1/2 tasa)\n  - Lugaw na may pritong isda (1/2 tasa)";
         }
 
         if ($months <= 11) {
-            return "9-11 BUWAN:\n- Dalas: 3-4 beses isang araw + 2 meryenda\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na monggo, sayote, at saluyot (1/2 tasa)\n  - Papaya na minasa (1/2 tasa)\n  - Lugaw na may kalabasa at pritong isda (1/2 tasa)\n  - Kalabasa at repolyong sopas (1/2 tasa)";
+            return "9-11 BUWAN:\n- Dalas: 3-4 beses isang araw + 2 meryenda + patuloy ang pagpapasuso\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Lugaw na monggo, sayote, at saluyot (1/2 tasa)\n  - Papaya na minasa (1/2 tasa)\n  - Lugaw na may kalabasa at pritong isda (1/2 tasa)\n  - Kalabasa at repolyong sopas (1/2 tasa)";
         }
 
-        $section = "12-23 BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang saging (1 tasa)\n  - Ginataang kadyos na may kalabasa (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang itlog (1 tasa)\n  - Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)";
+        $section = "12-23 BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda + patuloy ang pagpapasuso\n- Pagkain (PUMILI NG ISA PER MEAL - HUWAG UMIULIT):\n  - Ginisang gulay (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang saging (1 tasa)\n  - Ginataang kadyos na may kalabasa (1 tasa kanin + 1/2 tasa ulam)\n  - Hiniwang itlog (1 tasa)\n  - Sinampalukang manok (1 tasa kanin + 1/2 tasa ulam)";
 
         if ($months >= 24) {
-            $section .= "\n\n24+ BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda\n- Pagkain: Regular solid foods - sundin ang 12-23 months guidelines";
+            $section .= "\n\n24+ BUWAN:\n- Dalas: 4-5 beses isang araw + 2 meryenda\n- Pagkain: Regular solid foods - sundin ang 12-23 months guidelines\n- Tandaan: Maaari pa ring magpasuso hanggang 2 taon at higit pa";
         }
 
         return $section;
@@ -168,11 +168,12 @@ STRICT RULES:
 1. **Bawat meal AY ISANG PAGKAIN LAMANG** sa listahan - HUWAG COMBINE
 2. **HUWAG UMIULIT NG PAGKAIN SA SAME DAY** - iba dapat bawat meal (Umaga/Tanghali/Gabi)
 3. **0-5 months: GATAS LAMANG - WALANG SOLID FOOD, WALANG VITAMINS O SUPPLEMENTS**
-4. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
-5. **Bawal ang pagkain na wala sa listahan**
-6. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
-7. **Vitamins/nutrients ay dapat naaayon sa Nutrition Status ng bata** - hindi lahat ay pare-pareho ang kailangan
-8. **Ang Nutrition Tips ay dapat naka-angkop sa Nutrition Status ng bata** - halimbawa, kung Underweight ang bata, bigyang-diin ang iron at zinc; kung Overweight, focus sa fiber at limitahan ang asukal
+4. **6 months pataas: PATULOY ANG PAGPAPASUSO kasama ng solid food** - breastmilk pa rin ang main na gatas hanggang 2 taon
+5. **Bawal ang processed foods**: instant noodles, de-lata, soft drinks, packaged snacks
+6. **Bawal ang pagkain na wala sa listahan**
+7. **Deworming**: sundin ang NEEDS DEWORMING field - magbigay kung Yes, huwag kung No
+8. **Vitamins/nutrients ay dapat naaayon sa Nutrition Status ng bata** - hindi lahat ay pare-pareho ang kailangan
+9. **Ang Nutrition Tips ay dapat naka-angkop sa Nutrition Status ng bata** - halimbawa, kung Underweight ang bata, bigyang-diin ang iron at zinc; kung Overweight, focus sa fiber at limitahan ang asukal
 
 OUTPUT FORMAT:
 1. Mga Nutrition Tips (3-4 items, i-angkop sa Nutrition Status ng bata)
@@ -197,6 +198,21 @@ OUTPUT FORMAT:
    - Gabi: Gatas lamang (breastmilk o formula)
 3. Mga Vitamin, Supplements, at Nutrients: Wala — sapat na ang gatas.
 4. Food Restrictions: WALANG solid food, tubig, o anumang pagkain maliban sa gatas.
+5. Disclaimer: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines.
+6. Pinagkuhanan ng Datos: National Nutrition Council
+
+**EXAMPLE OUTPUT PARA SA 6+ BUWAN (i-angkop ang tips sa Nutrition Status ng bata):**
+1. Mga Nutrition Tips:
+   1. Patuloy ang pagpapasuso habang nagpapakain ng solid food.
+   2. Siguraduhing malapot at masustansya ang lugaw o pagkain.
+   3. Dalhin sa health center para sa regular na check-up at growth monitoring.
+   [Kung ang Nutrition Status ay hindi Normal, magdagdag ng karagdagang tip na angkop sa kondisyon ng bata]
+2. Meal Plan:
+   - Umaga: [isang pagkain sa listahan]
+   - Tanghali: [isang pagkain sa listahan - DI IULIT]
+   - Gabi: [isang pagkain sa listahan - DI IULIT]
+3. Mga Vitamin, Supplements, at Nutrients: [ayon sa health assessment ng bata]
+4. Food Restrictions: Bawal ang processed foods, matatamis na pagkain, at soft drinks.
 5. Disclaimer: Ang rekomendasyong ito ay batay sa National Nutrition Council guidelines.
 6. Pinagkuhanan ng Datos: National Nutrition Council
 
