@@ -418,7 +418,11 @@ IMPORTANT: Huwag gamitin ang pangalan ng bata sa output. Suriin ang validity bag
                 $fixed[] = $line;
             }
 
-            return implode("\n", $fixed);
+            $recommendation = implode("\n", $fixed);
+        }
+
+        if ($ageInMonths >= 6 && ! preg_match('/pagpapasuso|breastmilk|breastfeeding/i', $recommendation)) {
+            $recommendation .= "\n\n🍼 Patuloy ang pagpapasuso: Kahit may solid food na, ipagpatuloy ang pagpapasuso. Ang breastmilk ay mahalaga pa rin para sa kalusugan at paglaki ng bata.";
         }
 
         return $recommendation;
