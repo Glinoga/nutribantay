@@ -323,7 +323,7 @@ export default function Contact() {
                                                 <Input
                                                     type="tel"
                                                     id="phone"
-                                                    maxLength={15}
+                                                    maxLength={11}
                                                     value={data.phone}
                                                     onChange={(e) => setData('phone', e.target.value.replace(/\D/g, ''))}
                                                     className={`dark:border-[var(--border)] dark:bg-[var(--bg)] ${errors.phone ? 'border-red-500 focus:ring-red-500' : ''}`}

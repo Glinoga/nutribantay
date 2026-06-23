@@ -273,6 +273,7 @@ export default function Create({ categories }: CreateProps) {
                                 rows={3}
                                 className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             />
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{data.summary.length} characters</p>
                         </div>
 
                         <div
@@ -289,6 +290,7 @@ export default function Create({ categories }: CreateProps) {
                                 rows={6}
                                 className="rounded-md border-teal-200 text-sm transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                             />
+                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{data.content.length} characters</p>
                         </div>
 
                         <div
