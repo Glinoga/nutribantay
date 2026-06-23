@@ -28,10 +28,6 @@ trait AuditableModel
             static::restored(function ($model) {
                 $model->auditRestored();
             });
-
-            static::forceDeleted(function ($model) {
-                $model->auditForceDeleted();
-            });
         }
     }
 
