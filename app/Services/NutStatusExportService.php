@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use SVG\SVG;
 
 class NutStatusExportService
 {
@@ -139,7 +140,20 @@ class NutStatusExportService
         ]);
 
         // ── NNC Logo (upper right, cell N2) ──
-        $logoPath = public_path('National_Nutrition_Council_(NNC).svg');
+        $logoPng = public_path('National_Nutrition_Council_(NNC).png');
+        $logoSvg = public_path('National_Nutrition_Council_(NNC).svg');
+
+        if (! file_exists($logoPng) && file_exists($logoSvg) && function_exists('imagecreatetruecolor')) {
+            try {
+                $svg = SVG::fromFile($logoSvg);
+                $raster = $svg->toRasterImage(120, 120);
+                imagepng($raster, $logoPng);
+                imagedestroy($raster);
+            } catch (\Throwable) {
+            }
+        }
+
+        $logoPath = file_exists($logoPng) ? $logoPng : $logoSvg;
         if (file_exists($logoPath)) {
             $drawing = new Drawing;
             $drawing->setName('National Nutrition Council Logo');
