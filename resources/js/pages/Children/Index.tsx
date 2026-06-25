@@ -258,7 +258,8 @@ export default function Index({
         }).then((result) => {
             if (result.isConfirmed) {
                 setArchiving(true);
-                router.delete(route('children.destroy', { child: child.slug }), {
+                const deleteUrl = `${route('children.destroy', { child: child.slug })}?page=${pagination?.current_page || 1}`;
+                router.delete(deleteUrl, {
                     preserveScroll: true,
                     onSuccess: () => {
                         smartToast.success(`${child.fullname}'s record archived successfully!`);

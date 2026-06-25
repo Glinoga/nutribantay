@@ -698,7 +698,7 @@ class ChildController extends Controller
         return redirect()->route('children.show', $child->id)->with('success', 'Child updated successfully!');
     }
 
-    public function destroy(Child $child)
+    public function destroy(Request $request, Child $child)
     {
         $user = auth()->user();
 
@@ -712,7 +712,15 @@ class ChildController extends Controller
         RefreshDashboardForBarangay::dispatch($barangay)
             ->delay(now()->addSeconds(10));
 
-        return redirect()->route('children.index')->with('success', 'Child deleted successfully!');
+        $perPage = 25;
+        $page = $request->integer('page', 1);
+        $remaining = Child::where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60))
+            ->count();
+        $lastPage = max(1, (int) ceil($remaining / $perPage));
+
+        return redirect()->route('children.index', ['page' => min($page, $lastPage)])
+            ->with('success', 'Child deleted successfully!');
     }
 
     /**
