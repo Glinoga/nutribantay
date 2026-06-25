@@ -2,9 +2,12 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
@@ -113,7 +116,37 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard({ stats, trends, vaccine_followups, vitamin_followups }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
+    const [dateMode, setDateMode] = useState<'preset' | 'custom'>('preset');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [filterStatus, setFilterStatus] = useState<string[]>([]);
+    const [filterSex, setFilterSex] = useState<string[]>([]);
+    const [filterAgeGroup, setFilterAgeGroup] = useState<string[]>([]);
+    const [filterIp, setFilterIp] = useState('all');
     const [trendRange, setTrendRange] = useState<'6months' | '1year'>('6months');
+
+    const toggleFilter = (arr: string[], value: string, setter: (v: string[]) => void) => {
+        setter(arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value]);
+    };
+
+    const buildExportUrl = () => {
+        const params = new URLSearchParams();
+
+        if (dateMode === 'custom' && startDate && endDate) {
+            params.set('start_date', startDate);
+            params.set('end_date', endDate);
+            params.set('period', `${startDate}_to_${endDate}`);
+        } else {
+            params.set('period', printPeriod);
+        }
+
+        if (filterStatus.length > 0) params.set('status', filterStatus.join(','));
+        if (filterSex.length > 0) params.set('sex', filterSex.join(','));
+        if (filterAgeGroup.length > 0) params.set('age_group', filterAgeGroup.join(','));
+        if (filterIp !== 'all') params.set('belongs_to_ip', filterIp);
+
+        return `${route('dashboard.export')}?${params.toString()}`;
+    };
 
     const handlePrint = () => {
         window.open(`${route('dashboard.print')}?period=${printPeriod}`, '_blank');
@@ -188,56 +221,145 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         Export / Print
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="sm:max-w-md">
+                                <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Export / Print Report</DialogTitle>
                                     </DialogHeader>
-                                    <p className="mb-4 text-cyan-700 dark:text-cyan-300">Select time period for export:</p>
 
-                                    <RadioGroup value={printPeriod} onValueChange={setPrintPeriod} className="mb-6 space-y-3">
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="daily" id="daily" />
-                                            <Label htmlFor="daily" className="cursor-pointer">
-                                                Daily
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="weekly" id="weekly" />
-                                            <Label htmlFor="weekly" className="cursor-pointer">
-                                                Weekly
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="monthly" id="monthly" />
-                                            <Label htmlFor="monthly" className="cursor-pointer">
-                                                Monthly
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="yearly" id="yearly" />
-                                            <Label htmlFor="yearly" className="cursor-pointer">
-                                                Yearly
-                                            </Label>
-                                        </div>
-                                    </RadioGroup>
+                                    <div className="space-y-4">
+                                        {/* Date Range Mode */}
+                                        <div>
+                                            <Label className="mb-2 block text-sm font-medium text-cyan-700 dark:text-cyan-300">Date Range</Label>
+                                            <RadioGroup value={dateMode} onValueChange={(v) => setDateMode(v as 'preset' | 'custom')} className="mb-3 flex gap-4">
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="preset" id="dm-preset" />
+                                                    <Label htmlFor="dm-preset" className="cursor-pointer text-sm">Preset</Label>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="custom" id="dm-custom" />
+                                                    <Label htmlFor="dm-custom" className="cursor-pointer text-sm">Custom Range</Label>
+                                                </div>
+                                            </RadioGroup>
 
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button
-                                            onClick={handlePrint}
-                                            className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2"
-                                        >
-                                            <Printer className="mr-2 h-4 w-4" />
-                                            Print View
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                window.location.href = `${route('dashboard.export')}?period=${printPeriod}`;
-                                            }}
-                                            className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white transition-all duration-200 hover:from-emerald-700 hover:to-emerald-600 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-                                        >
-                                            <Download className="mr-2 h-4 w-4" />
-                                            Export CSV
-                                        </Button>
+                                            {dateMode === 'preset' ? (
+                                                <RadioGroup value={printPeriod} onValueChange={setPrintPeriod} className="space-y-2">
+                                                    {['daily', 'weekly', 'monthly', 'yearly'].map((p) => (
+                                                        <div key={p} className="flex items-center space-x-2">
+                                                            <RadioGroupItem value={p} id={p} />
+                                                            <Label htmlFor={p} className="cursor-pointer text-sm capitalize">{p}</Label>
+                                                        </div>
+                                                    ))}
+                                                </RadioGroup>
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex-1">
+                                                        <Label className="mb-1 block text-xs text-gray-500">Start Date</Label>
+                                                        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="text-sm" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <Label className="mb-1 block text-xs text-gray-500">End Date</Label>
+                                                        <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="text-sm" />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Filters */}
+                                        <div className="rounded-md border border-cyan-100 bg-cyan-50/50 p-3 dark:border-cyan-800 dark:bg-cyan-900/20">
+                                            <p className="mb-2 text-sm font-semibold text-cyan-800 dark:text-cyan-200">Content Filters (optional)</p>
+
+                                            <div className="mb-2">
+                                                <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Nutrition Status</p>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {[
+                                                        { value: 'Normal', label: 'Normal' },
+                                                        { value: 'Moderate Malnutrition', label: 'Moderate' },
+                                                        { value: 'Severe Malnutrition', label: 'Severe' },
+                                                        { value: 'Overweight/Obese', label: 'Overweight/Obese' },
+                                                    ].map((s) => (
+                                                        <label key={s.value} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                            <Checkbox
+                                                                checked={filterStatus.includes(s.value)}
+                                                                onCheckedChange={() => toggleFilter(filterStatus, s.value, setFilterStatus)}
+                                                            />
+                                                            {s.label}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-2">
+                                                <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Sex</p>
+                                                <div className="flex gap-3">
+                                                    {['Male', 'Female'].map((s) => (
+                                                        <label key={s} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                            <Checkbox
+                                                                checked={filterSex.includes(s)}
+                                                                onCheckedChange={() => toggleFilter(filterSex, s, setFilterSex)}
+                                                            />
+                                                            {s}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-2">
+                                                <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Age Group</p>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {[
+                                                        { value: '0to5', label: '0–5 mo' },
+                                                        { value: '6to11', label: '6–11 mo' },
+                                                        { value: '12to23', label: '12–23 mo' },
+                                                        { value: '24to59', label: '24–59 mo' },
+                                                    ].map((a) => (
+                                                        <label key={a.value} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                            <Checkbox
+                                                                checked={filterAgeGroup.includes(a.value)}
+                                                                onCheckedChange={() => toggleFilter(filterAgeGroup, a.value, setFilterAgeGroup)}
+                                                            />
+                                                            {a.label}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">IP Group</p>
+                                                <Select value={filterIp} onValueChange={setFilterIp}>
+                                                    <SelectTrigger className="h-8 w-32 text-xs">
+                                                        <SelectValue placeholder="All" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="all" className="text-xs">All</SelectItem>
+                                                        <SelectItem value="1" className="text-xs">Yes</SelectItem>
+                                                        <SelectItem value="0" className="text-xs">No</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-2">
+                                            <Button
+                                                onClick={handlePrint}
+                                                className="flex-1 cursor-pointer bg-gradient-to-r from-cyan-600 to-cyan-400 text-white transition-all duration-200 hover:from-cyan-700 hover:to-cyan-500"
+                                            >
+                                                <Printer className="mr-2 h-4 w-4" />
+                                                Print View
+                                            </Button>
+                                            <Button
+                                                onClick={() => {
+                                                    const missingDates = dateMode === 'custom' && (!startDate || !endDate);
+                                                    if (missingDates) {
+                                                        return;
+                                                    }
+                                                    window.location.href = buildExportUrl();
+                                                }}
+                                                className="flex-1 cursor-pointer bg-gradient-to-r from-emerald-600 to-emerald-500 text-white transition-all duration-200 hover:from-emerald-700 hover:to-emerald-600"
+                                            >
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Export XLSX
+                                            </Button>
+                                        </div>
                                     </div>
                                 </DialogContent>
                             </Dialog>
