@@ -149,7 +149,22 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
     };
 
     const handlePrint = () => {
-        window.open(`${route('dashboard.print')}?period=${printPeriod}`, '_blank');
+        const params = new URLSearchParams();
+
+        if (dateMode === 'custom' && startDate && endDate) {
+            params.set('start_date', startDate);
+            params.set('end_date', endDate);
+            params.set('period', `${startDate}_to_${endDate}`);
+        } else {
+            params.set('period', printPeriod);
+        }
+
+        if (filterStatus.length > 0) params.set('status', filterStatus.join(','));
+        if (filterSex.length > 0) params.set('sex', filterSex.join(','));
+        if (filterAgeGroup.length > 0) params.set('age_group', filterAgeGroup.join(','));
+        if (filterIp !== 'all') params.set('belongs_to_ip', filterIp);
+
+        window.open(`${route('dashboard.print')}?${params.toString()}`, '_blank');
     };
 
     const trendData = trendRange === '6months' ? trends.monthly_6months : trends.monthly_1year;
@@ -230,14 +245,22 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                         {/* Date Range Mode */}
                                         <div>
                                             <Label className="mb-2 block text-sm font-medium text-cyan-700 dark:text-cyan-300">Date Range</Label>
-                                            <RadioGroup value={dateMode} onValueChange={(v) => setDateMode(v as 'preset' | 'custom')} className="mb-3 flex gap-4">
+                                            <RadioGroup
+                                                value={dateMode}
+                                                onValueChange={(v) => setDateMode(v as 'preset' | 'custom')}
+                                                className="mb-3 flex gap-4"
+                                            >
                                                 <div className="flex items-center space-x-2">
                                                     <RadioGroupItem value="preset" id="dm-preset" />
-                                                    <Label htmlFor="dm-preset" className="cursor-pointer text-sm">Preset</Label>
+                                                    <Label htmlFor="dm-preset" className="cursor-pointer text-sm">
+                                                        Preset
+                                                    </Label>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
                                                     <RadioGroupItem value="custom" id="dm-custom" />
-                                                    <Label htmlFor="dm-custom" className="cursor-pointer text-sm">Custom Range</Label>
+                                                    <Label htmlFor="dm-custom" className="cursor-pointer text-sm">
+                                                        Custom Range
+                                                    </Label>
                                                 </div>
                                             </RadioGroup>
 
@@ -246,7 +269,9 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                     {['daily', 'weekly', 'monthly', 'yearly'].map((p) => (
                                                         <div key={p} className="flex items-center space-x-2">
                                                             <RadioGroupItem value={p} id={p} />
-                                                            <Label htmlFor={p} className="cursor-pointer text-sm capitalize">{p}</Label>
+                                                            <Label htmlFor={p} className="cursor-pointer text-sm capitalize">
+                                                                {p}
+                                                            </Label>
                                                         </div>
                                                     ))}
                                                 </RadioGroup>
@@ -254,11 +279,21 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex-1">
                                                         <Label className="mb-1 block text-xs text-gray-500">Start Date</Label>
-                                                        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="text-sm" />
+                                                        <Input
+                                                            type="date"
+                                                            value={startDate}
+                                                            onChange={(e) => setStartDate(e.target.value)}
+                                                            className="text-sm"
+                                                        />
                                                     </div>
                                                     <div className="flex-1">
                                                         <Label className="mb-1 block text-xs text-gray-500">End Date</Label>
-                                                        <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="text-sm" />
+                                                        <Input
+                                                            type="date"
+                                                            value={endDate}
+                                                            onChange={(e) => setEndDate(e.target.value)}
+                                                            className="text-sm"
+                                                        />
                                                     </div>
                                                 </div>
                                             )}
@@ -277,7 +312,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                         { value: 'Severe Malnutrition', label: 'Severe' },
                                                         { value: 'Overweight/Obese', label: 'Overweight/Obese' },
                                                     ].map((s) => (
-                                                        <label key={s.value} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                        <label key={s.value} className="flex cursor-pointer items-center gap-1.5 text-xs">
                                                             <Checkbox
                                                                 checked={filterStatus.includes(s.value)}
                                                                 onCheckedChange={() => toggleFilter(filterStatus, s.value, setFilterStatus)}
@@ -292,7 +327,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                 <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Sex</p>
                                                 <div className="flex gap-3">
                                                     {['Male', 'Female'].map((s) => (
-                                                        <label key={s} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                        <label key={s} className="flex cursor-pointer items-center gap-1.5 text-xs">
                                                             <Checkbox
                                                                 checked={filterSex.includes(s)}
                                                                 onCheckedChange={() => toggleFilter(filterSex, s, setFilterSex)}
@@ -312,7 +347,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                         { value: '12to23', label: '12–23 mo' },
                                                         { value: '24to59', label: '24–59 mo' },
                                                     ].map((a) => (
-                                                        <label key={a.value} className="flex items-center gap-1.5 text-xs cursor-pointer">
+                                                        <label key={a.value} className="flex cursor-pointer items-center gap-1.5 text-xs">
                                                             <Checkbox
                                                                 checked={filterAgeGroup.includes(a.value)}
                                                                 onCheckedChange={() => toggleFilter(filterAgeGroup, a.value, setFilterAgeGroup)}
@@ -330,9 +365,15 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                         <SelectValue placeholder="All" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="all" className="text-xs">All</SelectItem>
-                                                        <SelectItem value="1" className="text-xs">Yes</SelectItem>
-                                                        <SelectItem value="0" className="text-xs">No</SelectItem>
+                                                        <SelectItem value="all" className="text-xs">
+                                                            All
+                                                        </SelectItem>
+                                                        <SelectItem value="1" className="text-xs">
+                                                            Yes
+                                                        </SelectItem>
+                                                        <SelectItem value="0" className="text-xs">
+                                                            No
+                                                        </SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>

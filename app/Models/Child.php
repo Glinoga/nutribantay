@@ -43,6 +43,8 @@ class Child extends Model
     protected static function booted(): void
     {
         static::creating(function (Child $child) {
+            $child->normalizeNames();
+
             if (! $child->slug) {
                 $base = Str::slug($child->first_name.' '.$child->last_name);
                 $slug = $base;
@@ -55,6 +57,37 @@ class Child extends Model
                 $child->slug = $slug;
             }
         });
+
+        static::updating(function (Child $child) {
+            $child->normalizeNames();
+        });
+    }
+
+    protected function normalizeNames(): void
+    {
+        $this->first_name = $this->normalizeName($this->first_name);
+        $this->last_name = $this->normalizeName($this->last_name);
+        $this->mother_name = $this->mother_name ? $this->normalizeName($this->mother_name) : null;
+
+        if ($this->middle_initial) {
+            $this->middle_initial = strtoupper(trim($this->middle_initial));
+        }
+    }
+
+    protected function normalizeName(string $name): string
+    {
+        $name = trim(preg_replace('/\s+/', ' ', $name));
+
+        // Handle hyphenated names (e.g., "Maria-Jose" → "Maria-Jose")
+        $name = implode('-', array_map(
+            fn ($part) => implode(' ', array_map(
+                fn ($word) => mb_convert_case($word, MB_CASE_TITLE, 'UTF-8'),
+                explode(' ', $part)
+            )),
+            explode('-', $name)
+        ));
+
+        return $name;
     }
 
     /*

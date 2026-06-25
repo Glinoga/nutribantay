@@ -15,6 +15,8 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 type PrintData = {
     healthlogs: Array<{
         child_name: string;
+        mother_name: string;
+        belongs_to_ip: string;
         birthdate: string;
         age: number;
         sex: string;
@@ -62,10 +64,11 @@ type PrintData = {
 
 type DashboardPrintProps = {
     period: string;
+    filters: string[];
     data: PrintData;
 };
 
-export default function DashboardPrint({ period, data }: DashboardPrintProps) {
+export default function DashboardPrint({ period, filters, data }: DashboardPrintProps) {
     useLayoutEffect(() => {
         const html = document.documentElement;
         html.classList.remove('dark');
@@ -161,6 +164,12 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                 @page {
                     size: A4 landscape;
                     margin: 1.0cm;
+                    @bottom-right {
+                        content: "Page " counter(page);
+                        font-size: 8pt;
+                        font-family: Calibri, sans-serif;
+                        color: #666;
+                    }
                 }
                 @media print {
                     body { orphans: 3; widows: 3; }
@@ -227,6 +236,7 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                 <p className="mt-1 text-sm text-cyan-700 dark:text-cyan-300">
                     {data.summary.period_start} to {data.summary.period_end}
                 </p>
+                {filters.length > 0 && <p className="mt-2 text-xs text-cyan-600 dark:text-cyan-400">Filters: {filters.join(' · ')}</p>}
             </div>
             {/* Legend */}
             <div className="mb-4 rounded border border-cyan-200 bg-cyan-50/50 p-2 text-xs text-cyan-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-cyan-300">
@@ -409,95 +419,116 @@ export default function DashboardPrint({ period, data }: DashboardPrintProps) {
                     <Baby className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
                     Children Details
                 </h3>
-                <Card className="print:bg-white">
-                    <CardContent className="p-0">
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableCaption className="text-cyan-700 dark:text-cyan-300">
-                                    List of children registered for the selected period.
-                                </TableCaption>
-                                <TableHeader>
-                                    <TableRow className="bg-cyan-50 dark:bg-gray-800">
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            DOB
-                                        </TableHead>
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Sex
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Wt
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Ht
-                                        </TableHead>
-                                        <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Status</TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Ind
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
-                                            Vit. A
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
-                                            Deworm
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
-                                            MNP
-                                        </TableHead>
-                                        <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                            Last Visit
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {data.healthlogs.map((log, index) => (
-                                        <TableRow
-                                            key={index}
-                                            className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs"
-                                        >
-                                            <TableCell className="px-4 py-2">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span>{log.child_name}</span>
-                                                    <span className="text-xs text-cyan-700 sm:hidden dark:text-cyan-300">
-                                                        {log.age}mo · {log.nutrition_status}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.birthdate}</TableCell>
-                                            <TableCell className="px-4 py-2">{log.age}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.sex}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.weight}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.height}</TableCell>
-                                            <TableCell className="px-4 py-2">
-                                                <span
-                                                    className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap print:!bg-transparent print:!p-0 print:!font-semibold ${
-                                                        log.nutrition_status === 'Normal'
-                                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                            : log.nutrition_status === 'Underweight'
-                                                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                                              : log.nutrition_status === 'Overweight'
-                                                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                                : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
-                                                    }`}
-                                                >
-                                                    {log.nutrition_status}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">
-                                                {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
-                                            </TableCell>
-                                            <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
-                                            <TableCell className="hidden px-4 py-2 sm:table-cell">{log.last_visit}</TableCell>
+                {data.healthlogs.length === 0 ? (
+                    <Card className="print:bg-white">
+                        <CardContent className="flex flex-col items-center justify-center py-12">
+                            <p className="text-lg font-medium text-cyan-700 dark:text-cyan-300">
+                                No children match the selected filters for this period.
+                            </p>
+                            <p className="mt-1 text-sm text-cyan-500 dark:text-cyan-400">Try adjusting the date range or clearing some filters.</p>
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <Card className="print:bg-white">
+                        <CardContent className="p-0">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableCaption className="text-cyan-700 dark:text-cyan-300">
+                                        List of children registered for the selected period.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow className="bg-cyan-50 dark:bg-gray-800">
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Mother
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                IP
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                DOB
+                                            </TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age</TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Sex
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Wt
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Ht
+                                            </TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">
+                                                Status
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Ind
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                                Vit. A
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                                Deworm
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                                MNP
+                                            </TableHead>
+                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                                Last Visit
+                                            </TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </CardContent>
-                </Card>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {data.healthlogs.map((log, index) => (
+                                            <TableRow
+                                                key={index}
+                                                className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs"
+                                            >
+                                                <TableCell className="px-4 py-2">
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span>{log.child_name}</span>
+                                                        <span className="text-xs text-cyan-700 sm:hidden dark:text-cyan-300">
+                                                            {log.age}mo · {log.nutrition_status}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.mother_name}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.belongs_to_ip}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.birthdate}</TableCell>
+                                                <TableCell className="px-4 py-2">{log.age}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.sex}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.weight}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.height}</TableCell>
+                                                <TableCell className="px-4 py-2">
+                                                    <span
+                                                        className={`rounded px-2 py-1 text-xs font-medium whitespace-nowrap print:!bg-transparent print:!p-0 print:!font-semibold ${
+                                                            log.nutrition_status === 'Normal'
+                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                                                : log.nutrition_status === 'Underweight'
+                                                                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                                  : log.nutrition_status === 'Overweight'
+                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                                                    : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                                        }`}
+                                                    >
+                                                        {log.nutrition_status}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                                    {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
+                                                </TableCell>
+                                                <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.last_visit}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">

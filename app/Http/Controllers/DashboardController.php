@@ -9,6 +9,7 @@ use App\Models\DashboardCache;
 use App\Models\HealthLog;
 use App\Services\NutStatusExportService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -149,31 +150,9 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function export(Request $request)
+    private function buildFilteredChildQuery(Request $request, string $barangay, array $range, bool $withLatest = true): Builder
     {
-        $user = auth()->user();
-        $barangay = $user->barangay;
-
-        // ── Date Range ──
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-            $period = $request->start_date.'_to_'.$request->end_date;
-            $range = ['start' => $startDate, 'end' => $endDate];
-        } else {
-            $period = $request->period ?? 'monthly';
-            $range = $this->getDateRange($period);
-        }
-
-        AuditLog::logAction([
-            'action' => 'exported',
-            'model_type' => 'Dashboard',
-            'description' => "Dashboard {$period} report exported by {$user->name}",
-            'barangay' => $barangay,
-        ]);
-
-        // ── Build query ──
-        $query = Child::with('latestHealthlog')
+        $query = Child::when($withLatest, fn ($q) => $q->with('latestHealthlog'))
             ->where('barangay', $barangay)
             ->where('birthdate', '>=', now()->subMonths(60));
 
@@ -185,7 +164,7 @@ class DashboardController extends Controller
 
         // IP Group filter
         if ($request->filled('belongs_to_ip')) {
-            $query->where('belongs_to_ip', $request->belongs_to_ip);
+            $query->where('belongs_to_ip', filter_var($request->belongs_to_ip, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
         }
 
         // Age group filter
@@ -244,13 +223,41 @@ class DashboardController extends Controller
             $q->whereBetween('created_at', [$range['start'], $range['end']]);
         });
 
-        $children = $query->get();
+        return $query;
+    }
+
+    public function export(Request $request)
+    {
+        $user = auth()->user();
+        $barangay = $user->barangay;
+
+        // ── Date Range ──
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $period = $request->start_date.'_to_'.$request->end_date;
+            $range = ['start' => $startDate, 'end' => $endDate];
+        } else {
+            $period = $request->period ?? 'monthly';
+            $range = $this->getDateRange($period);
+        }
+
+        AuditLog::logAction([
+            'action' => 'exported',
+            'model_type' => 'Dashboard',
+            'description' => "Dashboard {$period} report exported by {$user->name}",
+            'barangay' => $barangay,
+        ]);
+
+        $children = $this->buildFilteredChildQuery($request, $barangay, $range)->get();
 
         // ── Generate xlsx ──
         $service = new NutStatusExportService;
         $spreadsheet = $service->generate($children, [
             'barangay' => $barangay,
             'city' => config('app.city', 'Caloocan'),
+            'period_start' => $range['start']->format('Y-m-d'),
+            'period_end' => $range['end']->format('Y-m-d'),
             'generated_by' => $user->name,
             'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
@@ -271,11 +278,19 @@ class DashboardController extends Controller
 
     public function printView(Request $request)
     {
-        $period = $request->period ?? 'monthly';
-        $range = $this->getDateRange($period);
-
         $user = auth()->user();
         $barangay = $user->barangay;
+
+        // ── Date Range ──
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+            $period = $request->start_date.'_to_'.$request->end_date;
+            $range = ['start' => $startDate, 'end' => $endDate];
+        } else {
+            $period = $request->period ?? 'monthly';
+            $range = $this->getDateRange($period);
+        }
 
         AuditLog::logAction([
             'action' => 'printed',
@@ -284,12 +299,11 @@ class DashboardController extends Controller
             'barangay' => $barangay,
         ]);
 
+        $childIds = $this->buildFilteredChildQuery($request, $barangay, $range, false)->pluck('id');
+
         $allLogs = HealthLog::with(['child', 'user'])
-            ->whereHas('child', fn ($q) => $q
-                ->where('barangay', $barangay)
-                ->where('birthdate', '>=', now()->subMonths(60)))
-            ->where('created_at', '>=', $range['start'])
-            ->where('created_at', '<=', $range['end'])
+            ->whereIn('child_id', $childIds)
+            ->whereBetween('created_at', [$range['start'], $range['end']])
             ->get();
 
         $groupedByChild = $allLogs->groupBy('child_id');
@@ -331,8 +345,24 @@ class DashboardController extends Controller
             'deworming_doses' => $allLogs->where('deworming', true)->count(),
         ];
 
+        // ── Build filter summary ──
+        $activeFilters = [];
+        if ($request->filled('sex')) {
+            $activeFilters[] = 'Sex: '.$request->sex;
+        }
+        if ($request->filled('status')) {
+            $activeFilters[] = 'Status: '.$request->status;
+        }
+        if ($request->filled('age_group')) {
+            $activeFilters[] = 'Age: '.$request->age_group;
+        }
+        if ($request->filled('belongs_to_ip')) {
+            $activeFilters[] = 'IP: '.($request->belongs_to_ip === '1' ? 'Yes' : 'No');
+        }
+
         return Inertia::render('DashboardPrint', [
             'period' => $period,
+            'filters' => $activeFilters,
             'data' => [
                 'healthlogs' => $groupedByChild->map(function ($logs, $childId) {
                     $latest = $logs->sortByDesc('created_at')->first();
@@ -340,6 +370,8 @@ class DashboardController extends Controller
 
                     return [
                         'child_name' => $child->fullname ?? '',
+                        'mother_name' => $child->mother_name ?? '',
+                        'belongs_to_ip' => $child->belongs_to_ip ? 'YES' : 'NO',
                         'birthdate' => $child->birthdate ? Carbon::parse($child->birthdate)->format('Y-m-d') : '',
                         'age' => $latest->age_in_months ?? ($child->birthdate ? floor(Carbon::parse($child->birthdate)->diffInMonths(Carbon::now())) : ''),
                         'sex' => $child->sex ?? '',

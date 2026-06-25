@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class NutStatusExportService
@@ -15,8 +16,11 @@ class NutStatusExportService
 
     private Worksheet $sheet;
 
+    private array $meta;
+
     public function generate(Collection $children, array $meta): Spreadsheet
     {
+        $this->meta = $meta;
         $this->spreadsheet = new Spreadsheet;
         $this->sheet = $this->spreadsheet->getActiveSheet();
         $this->sheet->setTitle('Nut_StatusTool');
@@ -55,7 +59,7 @@ class NutStatusExportService
     private function buildHeaderSection(array $meta): void
     {
         // Row heights
-        $rowHeights = [1 => 36, 2 => 20.25, 3 => 28, 4 => 17.15, 5 => 17.15, 6 => 52, 7 => 30, 8 => 30, 9 => 28];
+        $rowHeights = [1 => 36, 2 => 60, 3 => 28, 4 => 17.15, 5 => 17.15, 6 => 52, 7 => 30, 8 => 30, 9 => 28];
         foreach ($rowHeights as $row => $height) {
             $this->sheet->getRowDimension($row)->setRowHeight($height);
         }
@@ -133,6 +137,20 @@ class NutStatusExportService
             'font' => ['name' => 'Calibri', 'size' => 12, 'color' => ['rgb' => 'FF0000']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_TOP],
         ]);
+
+        // ── NNC Logo (upper right, cell N2) ──
+        $logoPath = public_path('National_Nutrition_Council_(NNC).svg');
+        if (file_exists($logoPath)) {
+            $drawing = new Drawing;
+            $drawing->setName('National Nutrition Council Logo');
+            $drawing->setDescription('NNC Logo');
+            $drawing->setPath($logoPath);
+            $drawing->setCoordinates('N2');
+            $drawing->setWidth(60);
+            $drawing->setOffsetX(10);
+            $drawing->setOffsetY(5);
+            $drawing->setWorksheet($this->sheet);
+        }
 
         // ── Row 3: Barangay & Title ──
         $this->sheet->mergeCells('A3:B3');
@@ -331,6 +349,41 @@ class NutStatusExportService
             $this->sheet->getRowDimension($row)->setRowHeight(34);
             $row++;
         }
+
+        $this->buildMetaFooter($row);
+    }
+
+    private function buildMetaFooter(int $row): void
+    {
+        $row += 2;
+        $this->sheet->mergeCells("A{$row}:N{$row}");
+        $periodText = 'Period: ';
+
+        if (isset($this->meta['period_start']) && isset($this->meta['period_end'])) {
+            $periodText .= $this->meta['period_start'].' to '.$this->meta['period_end'];
+        } else {
+            $periodText .= date('Y-m-d');
+        }
+
+        $this->sheet->setCellValue("A{$row}", $periodText);
+        $this->sheet->getStyle("A{$row}")->getFont()->setName('Calibri')->setSize(10)->setItalic(true);
+
+        $row++;
+        $this->sheet->mergeCells("A{$row}:N{$row}");
+        $generatedText = 'Generated on: ';
+
+        if (isset($this->meta['generated_at'])) {
+            $generatedText .= $this->meta['generated_at'];
+        } else {
+            $generatedText .= date('Y-m-d H:i:s');
+        }
+
+        if (isset($this->meta['generated_by'])) {
+            $generatedText .= ' by '.$this->meta['generated_by'];
+        }
+
+        $this->sheet->setCellValue("A{$row}", $generatedText);
+        $this->sheet->getStyle("A{$row}")->getFont()->setName('Calibri')->setSize(10)->setItalic(true);
 
         // Freeze pane at row 10 (data start)
         $this->sheet->freezePane('A10');

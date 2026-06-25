@@ -887,18 +887,48 @@ class ChildController extends Controller
         $skipped = 0;
         $withoutHealthLog = 0;
         $failures = 0;
+        $errors = [];
 
         $existingMap = Child::where('barangay', $user->barangay)
             ->get()
             ->keyBy(fn ($c) => strtolower($c->first_name).'|'.strtolower($c->last_name).'|'.($c->birthdate ? $c->birthdate->format('Y-m-d') : ''));
 
-        foreach ($rows as $row) {
+        foreach ($rows as $index => $row) {
+            $rowNum = $index + 2;
+
+            // Trim all string fields
+            $row = array_map(fn ($val) => is_string($val) ? trim($val) : $val, $row);
+
             if (empty($row['first_name']) || empty($row['last_name']) || empty($row['sex'])) {
                 continue;
             }
 
-            $normalizedSex = strtoupper(trim($row['sex']));
+            // Validate birthdate
+            $birthdateValid = ! empty($row['birthdate']) && Carbon::canBeCreatedFromFormat($row['birthdate'], 'Y-m-d');
+            if (! empty($row['birthdate']) && ! $birthdateValid) {
+                $errors[] = "Row {$rowNum}: Invalid birthdate format '{$row['birthdate']}' (expected Y-m-d). Skipped.";
+                $skipped++;
+
+                continue;
+            }
+            if ($birthdateValid && Carbon::parse($row['birthdate'])->isFuture()) {
+                $errors[] = "Row {$rowNum}: Birthdate '{$row['birthdate']}' is in the future. Skipped.";
+                $skipped++;
+
+                continue;
+            }
+
+            // Validate name length
+            if (strlen($row['first_name']) > 255 || strlen($row['last_name']) > 255) {
+                $errors[] = "Row {$rowNum}: Name exceeds 255 characters. Skipped.";
+                $skipped++;
+
+                continue;
+            }
+
+            $normalizedSex = strtoupper($row['sex']);
             if (! in_array($normalizedSex, ['M', 'MALE', 'F', 'FEMALE'], true)) {
+                $errors[] = "Row {$rowNum}: Invalid sex '{$row['sex']}'. Skipped.";
                 $skipped++;
 
                 continue;
@@ -915,13 +945,13 @@ class ChildController extends Controller
 
             $weight = isset($row['weight']) && is_numeric($row['weight']) ? floatval($row['weight']) : 0;
             $height = isset($row['height']) && is_numeric($row['height']) ? floatval($row['height']) : 0;
-            $hasAnthropometricData = $weight > 0 && $height > 0 && ! empty($row['birthdate']);
+            $hasAnthropometricData = $weight > 0 && $height > 0 && $birthdateValid;
 
             try {
                 DB::transaction(function () use ($row, $user, $sex, $weight, $height, $hasAnthropometricData, &$imported, &$withoutHealthLog) {
                     $child = Child::create([
                         'first_name' => $row['first_name'],
-                        'middle_initial' => $row['middle_initial'] ?? null,
+                        'middle_initial' => ! empty($row['middle_initial']) ? substr(trim($row['middle_initial']), 0, 5) : null,
                         'last_name' => $row['last_name'],
                         'sex' => $sex,
                         'weight' => $weight ?: 0,
@@ -1003,7 +1033,11 @@ class ChildController extends Controller
             $message .= " {$failures} row(s) failed and were rolled back.";
         }
         if ($skipped > 0) {
-            $message .= " {$skipped} duplicates skipped.";
+            $message .= " {$skipped} row(s) skipped.";
+        }
+
+        if (! empty($errors)) {
+            return redirect('/children')->with('warning', $message)->with('import_errors', $errors);
         }
 
         return redirect('/children')->with('success', $message);
