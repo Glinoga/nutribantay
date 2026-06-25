@@ -323,7 +323,7 @@ export default function Create({ categories }: CreateProps) {
                             {previews.length > 0 && (
                                 <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                                     {previews.map((p, index) => (
-                                        <div key={index} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
+                                        <div key={index} className="group relative aspect-[4/3] overflow-hidden rounded-md border border-teal-100 shadow-sm dark:border-gray-600">
                                             <img src={p} alt={`Preview ${index + 1}`} className="h-full w-full object-cover" />
                                             <button
                                                 type="button"
@@ -340,7 +340,7 @@ export default function Create({ categories }: CreateProps) {
                                 </div>
                             )}
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                {previews.length} file{previews.length !== 1 ? 's' : ''} selected
+                                {previews.length} file{previews.length !== 1 ? 's' : ''} selected &middot; Recommended: 1920&times;960px (2:1 ratio) &middot; Max 5MB each
                             </p>
                         </div>
 

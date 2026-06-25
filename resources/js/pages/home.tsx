@@ -251,6 +251,8 @@ export default function Home({ announcements = [], maintenance = null, siteConte
                                                 <img
                                                     src={src}
                                                     alt={announcement.title}
+                                                    width="400"
+                                                    height="192"
                                                     className="h-full w-full object-cover"
                                                     loading="lazy"
                                                     onError={() => handleImageError(announcement.id)}

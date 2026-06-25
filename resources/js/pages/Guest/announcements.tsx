@@ -253,6 +253,8 @@ export default function Announcements({ announcements, pagination, categories }:
                                             <img
                                                 src={src}
                                                 alt={announcement.title}
+                                                width="400"
+                                                height="192"
                                                 className="h-full w-full object-cover"
                                                 loading="lazy"
                                                 onError={() => handleImageError(announcement.id)}

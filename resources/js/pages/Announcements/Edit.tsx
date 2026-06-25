@@ -360,7 +360,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                                 <p className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">Current Images</p>
                                                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                                                     {existingImages.map((img) => (
-                                                        <div key={img.id} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
+                                                        <div key={img.id} className="group relative aspect-[4/3] overflow-hidden rounded-sm border border-teal-100 shadow-sm dark:border-gray-600">
                                                             <img src={img.image_url} alt="" className="h-full w-full object-cover" />
                                                             <button
                                                                 type="button"
@@ -417,7 +417,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                             className="hidden"
                                         />
                                         <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                            Max 5MB each (JPG, PNG, GIF)
+                                            Recommended: 1920&times;960px (2:1 ratio) &middot; Max 5MB each (JPG, PNG, GIF)
                                         </p>
                                     </div>
 

@@ -229,13 +229,15 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                     {(() => {
                                         const current = allImages[activeGalleryIndex];
                                         return current && !imgError ? (
-                                            <img
-                                                key={current.id}
-                                                src={current.image_url}
-                                                alt={announcement.title}
-                                                className="h-[400px] w-full object-cover transition-opacity duration-300"
-                                                onError={() => setImgError(true)}
-                                            />
+                                        <img
+                                            key={current.id}
+                                            src={current.image_url}
+                                            alt={announcement.title}
+                                            width="896"
+                                            height="400"
+                                            className="h-[400px] w-full object-cover transition-opacity duration-300"
+                                            onError={() => setImgError(true)}
+                                        />
                                         ) : (
                                             <div className="h-[400px]">
                                                 <AnnouncementPlaceholder />
@@ -323,13 +325,15 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                                 {(() => {
                                                     const src = related.first_image_url ?? related.image_url;
                                                     return src && !relatedErrored.has(related.id) ? (
-                                                        <img
-                                                            src={src}
-                                                            alt={related.title}
-                                                            className="h-full w-full object-cover"
-                                                            loading="lazy"
-                                                            onError={() => setRelatedErrored((prev) => new Set([...prev, related.id]))}
-                                                        />
+                                                    <img
+                                                        src={src}
+                                                        alt={related.title}
+                                                        width="320"
+                                                        height="160"
+                                                        className="h-full w-full object-cover"
+                                                        loading="lazy"
+                                                        onError={() => setRelatedErrored((prev) => new Set([...prev, related.id]))}
+                                                    />
                                                     ) : (
                                                         <AnnouncementPlaceholder />
                                                     );
