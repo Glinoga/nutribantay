@@ -20,6 +20,8 @@ type Child = {
     status_lfa: string;
     status_wfl_wfh: string;
     address: string | null;
+    mother_name: string | null;
+    belongs_to_ip: boolean | null;
     contact_number: string | null;
 };
 
@@ -166,6 +168,12 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                         <TableHeader>
                             <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    Mother
+                                </TableHead>
+                                <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
+                                    IP
+                                </TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Age (months)</TableHead>
                                 <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Sex</TableHead>
                                 <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
@@ -197,6 +205,8 @@ export default function ChildrenPrint({ children, filters, generated_at, generat
                                             </span>
                                         </div>
                                     </TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.mother_name ?? '-'}</TableCell>
+                                    <TableCell className="hidden px-4 py-2 sm:table-cell">{child.belongs_to_ip ? 'YES' : 'NO'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.age ?? '-'}</TableCell>
                                     <TableCell className="px-4 py-2">{child.sex}</TableCell>
                                     <TableCell className="hidden px-4 py-2 sm:table-cell">{child.birthdate ?? '-'}</TableCell>

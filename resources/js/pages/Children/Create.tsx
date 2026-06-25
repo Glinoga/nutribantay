@@ -20,6 +20,8 @@ export default function ChildrenCreate() {
         last_name: '',
         sex: 'Male',
         birthdate: '',
+        mother_name: '',
+        belongs_to_ip: false,
         weight: '',
         height: '',
         contact_number: '',
@@ -247,6 +249,44 @@ export default function ChildrenCreate() {
                                             </div>
                                         </div>
                                     )}
+
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                <User className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                                Mother/Caregiver Name
+                                            </Label>
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter mother/caregiver name"
+                                                value={data.mother_name}
+                                                onChange={(e) => setData('mother_name', e.target.value)}
+                                                className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                            />
+                                        </div>
+
+                                        <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                            <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                                Belongs to IP Group?
+                                            </Label>
+                                            <Select
+                                                value={data.belongs_to_ip ? 'yes' : 'no'}
+                                                onValueChange={(value) => setData('belongs_to_ip', value === 'yes')}
+                                            >
+                                                <SelectTrigger className="w-full rounded-md border-teal-200 bg-white text-sm font-bold transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100">
+                                                    <SelectValue placeholder="Select" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="yes" className="font-bold">
+                                                        Yes
+                                                    </SelectItem>
+                                                    <SelectItem value="no" className="font-bold">
+                                                        No
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
                                         <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">

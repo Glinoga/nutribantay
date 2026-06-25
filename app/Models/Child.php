@@ -18,12 +18,14 @@ class Child extends Model
         'middle_initial',
         'last_name',
         'sex',
+        'belongs_to_ip',
         'weight',
         'height',
         'nutrition_status',
         'birthdate',
         'barangay',
         'address',
+        'mother_name',
         'contact_number',
         'created_by',
         'updated_by',
@@ -32,6 +34,7 @@ class Child extends Model
 
     protected $casts = [
         'birthdate' => 'date',
+        'belongs_to_ip' => 'boolean',
     ];
 
     // 🔥 This exposes computed attributes (fullname, formatted_name) to JSON/API

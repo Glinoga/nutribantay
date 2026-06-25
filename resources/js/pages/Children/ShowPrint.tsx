@@ -38,6 +38,8 @@ type Child = {
     height: number | null;
     nutrition_status: string | null;
     address: string | null;
+    mother_name: string | null;
+    belongs_to_ip: boolean | null;
     contact_number: string | null;
     created_at: string | null;
     birthdate: string | null;
@@ -256,6 +258,14 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                         <div className="flex justify-between gap-2">
                             <span className="text-cyan-700 dark:text-cyan-300">Address:</span>
                             <span className="font-medium">{child.address ?? '-'}</span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Mother/Caregiver:</span>
+                            <span className="font-medium">{child.mother_name ?? '-'}</span>
+                        </div>
+                        <div className="flex justify-between gap-2">
+                            <span className="text-cyan-700 dark:text-cyan-300">Belongs to IP Group:</span>
+                            <span className="font-medium">{child.belongs_to_ip ? 'YES' : 'NO'}</span>
                         </div>
                         <div className="flex justify-between gap-2">
                             <span className="text-cyan-700 dark:text-cyan-300">Contact:</span>

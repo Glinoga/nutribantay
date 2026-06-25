@@ -790,7 +790,7 @@ export default function Index({
                                 return (
                                     <div key={child.id} className="child-card group block" style={{ animationDelay: `${index * 50}ms` }}>
                                         <Card className="h-full overflow-hidden rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-xl dark:bg-gray-800">
-                                            <CardContent className="flex flex-col p-0 h-full">
+                                            <CardContent className="flex h-full flex-col p-0">
                                                 <div className="flex-1 p-4">
                                                     <div className="mb-3 flex items-start">
                                                         <div className="flex items-center gap-3">
@@ -804,7 +804,7 @@ export default function Index({
                                                                 {child.fullname.charAt(0).toUpperCase()}
                                                             </div>
                                                             <div className="min-w-0 overflow-hidden">
-                                                                <p className="line-clamp-2 text-sm font-bold leading-tight text-gray-900 dark:text-gray-100">
+                                                                <p className="line-clamp-2 text-sm leading-tight font-bold text-gray-900 dark:text-gray-100">
                                                                     {child.fullname}
                                                                 </p>
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400">ID: {child.id}</p>
@@ -1241,7 +1241,19 @@ export default function Index({
                                                                 Name
                                                             </th>
                                                             <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Mother
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                IP
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
                                                                 Gender
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                DOB
+                                                            </th>
+                                                            <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
+                                                                Date Measured
                                                             </th>
                                                             <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
                                                                 Weight
@@ -1258,7 +1270,19 @@ export default function Index({
                                                                     {row.first_name} {row.last_name}
                                                                 </td>
                                                                 <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.mother_name || '-'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.belongs_to_ip ? 'YES' : 'NO'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
                                                                     {row.sex || '-'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.birthdate || '-'}
+                                                                </td>
+                                                                <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
+                                                                    {row.date_measured || '-'}
                                                                 </td>
                                                                 <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
                                                                     {row.weight || '-'}

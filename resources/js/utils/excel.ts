@@ -40,9 +40,12 @@ export const readExcel = async (file: File) => {
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number | null)[][];
 
     const addressIdx = 1;
+    const motherNameIdx = 2;
     const fullNameIdx = 3;
+    const ipIdx = 4;
     const sexIdx = 5;
     const birthdateIdx = 6;
+    const dateMeasuredIdx = 7;
     const weightIdx = 8;
     const heightIdx = 9;
 
@@ -84,6 +87,11 @@ export const readExcel = async (file: File) => {
             const sexNormalized = sex.toUpperCase().startsWith('M') ? 'M' : 'F';
             const birthdateRaw = row[birthdateIdx];
             const birthdate = typeof birthdateRaw === 'number' ? excelDateToJSDate(birthdateRaw) : birthdateRaw;
+            const dateMeasuredRaw = row[dateMeasuredIdx];
+            const dateMeasured = typeof dateMeasuredRaw === 'number' ? excelDateToJSDate(dateMeasuredRaw) : dateMeasuredRaw;
+
+            const ipRaw = row[ipIdx]?.toString().trim().toUpperCase() || '';
+            const belongsToIp = ipRaw === 'YES' || ipRaw === 'Y';
 
             return {
                 fullName: fullName,
@@ -91,10 +99,13 @@ export const readExcel = async (file: File) => {
                 middle_initial: middleInitial,
                 last_name: lastName,
                 sex: sexNormalized,
+                belongs_to_ip: belongsToIp,
                 birthdate: birthdate,
+                date_measured: dateMeasured,
                 weight: row[weightIdx] || null,
                 height: row[heightIdx] || null,
                 address: row[addressIdx]?.toString().trim() || null,
+                mother_name: row[motherNameIdx]?.toString().trim() || null,
             };
         });
 

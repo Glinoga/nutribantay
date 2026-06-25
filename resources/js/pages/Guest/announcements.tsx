@@ -164,9 +164,7 @@ export default function Announcements({ announcements, pagination, categories }:
                     <span className="mb-2 inline-block rounded-full bg-white/80 px-4 py-1 text-sm font-medium text-[var(--primary)] shadow-sm dark:bg-[var(--bg-light)]/80">
                         COMMUNITY UPDATES
                     </span>
-                    <h1 className="mb-6 text-4xl leading-tight font-bold text-[var(--text)] md:text-5xl lg:text-6xl">
-                        Latest Announcements
-                    </h1>
+                    <h1 className="mb-6 text-4xl leading-tight font-bold text-[var(--text)] md:text-5xl lg:text-6xl">Latest Announcements</h1>
                     <p className="mx-auto mb-10 max-w-2xl text-lg text-[var(--text-muted)] md:text-xl">
                         Stay informed about upcoming events, programs, and initiatives in our community
                     </p>
@@ -177,7 +175,7 @@ export default function Announcements({ announcements, pagination, categories }:
                             id="announcement-search"
                             type="text"
                             placeholder="Search announcements..."
-                            className="w-full rounded-md bg-transparent px-4 py-3 text-[var(--text)] focus:ring-2 focus:ring-teal-500/50 dark:focus:ring-[var(--primary)]/50 focus:outline-none"
+                            className="w-full rounded-md bg-transparent px-4 py-3 text-[var(--text)] focus:ring-2 focus:ring-teal-500/50 focus:outline-none dark:focus:ring-[var(--primary)]/50"
                             value={searchQuery}
                             onChange={handleSearchChange}
                         />
@@ -206,7 +204,7 @@ export default function Announcements({ announcements, pagination, categories }:
 
                         <div className="mt-4 flex items-center gap-2 overflow-x-auto md:mt-0 md:flex-wrap md:overflow-visible">
                             <button
-                                className={`cursor-pointer shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                                className={`shrink-0 cursor-pointer rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                                     activeFilter === null
                                         ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md'
                                         : 'border-gray-200 bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-[var(--border)] dark:bg-[var(--bg-light)]'
@@ -222,7 +220,7 @@ export default function Announcements({ announcements, pagination, categories }:
                                 return (
                                     <button
                                         key={category.id}
-                                        className={`inline-flex cursor-pointer shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                                        className={`inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                                             isActive
                                                 ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-md'
                                                 : 'border-gray-200 bg-white text-[var(--text-muted)] hover:border-[var(--primary)] hover:text-[var(--primary)] dark:border-[var(--border)] dark:bg-[var(--bg-light)]'
@@ -264,9 +262,7 @@ export default function Announcements({ announcements, pagination, categories }:
                                     >
                                         {announcement.category.name}
                                     </span>
-                                    <h3 className="mb-2 text-lg font-semibold leading-snug text-[var(--text)]">
-                                        {announcement.title}
-                                    </h3>
+                                    <h3 className="mb-2 text-lg leading-snug font-semibold text-[var(--text)]">{announcement.title}</h3>
                                     <p
                                         className="mb-4 flex-1 text-sm leading-relaxed text-[var(--text-muted)]"
                                         style={{

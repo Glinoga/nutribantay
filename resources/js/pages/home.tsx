@@ -140,7 +140,8 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             </h1>
 
                             <p className="mb-8 max-w-xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
-                                NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a healthier future.
+                                NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a
+                                healthier future.
                             </p>
 
                             <div className="flex flex-col gap-4 sm:flex-row">
@@ -163,9 +164,15 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                         <div className="relative hidden md:col-span-2 md:block">
                             <div className="relative mx-auto h-80 w-80 lg:h-96 lg:w-96">
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-100/60 to-cyan-100/60 dark:from-[var(--bg)] dark:to-[var(--bg-dark)]" />
-                                <div className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-[var(--primary)]/10 to-teal-400/10 lg:h-56 lg:w-56" />
-                                <div className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 shadow-inner dark:bg-[var(--bg-light)]/80">
-                                    <img src="/NutriBantayLogo.svg" alt="" width="48" height="48" className="absolute left-1/2 top-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2" />
+                                <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-[var(--primary)]/10 to-teal-400/10 lg:h-56 lg:w-56" />
+                                <div className="absolute top-1/2 left-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 shadow-inner dark:bg-[var(--bg-light)]/80">
+                                    <img
+                                        src="/NutriBantayLogo.svg"
+                                        alt=""
+                                        width="48"
+                                        height="48"
+                                        className="absolute top-1/2 left-1/2 h-12 w-12 -translate-x-1/2 -translate-y-1/2"
+                                    />
                                 </div>
                                 <div className="absolute top-8 right-4 h-3 w-3 rounded-full bg-[var(--primary)]/30" />
                                 <div className="absolute bottom-12 left-6 h-4 w-4 rounded-full bg-[var(--secondary)]/30" />
@@ -250,7 +257,7 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                         >
                                             {announcement.category.name}
                                         </span>
-                                        <h3 className="mb-2 text-lg font-semibold leading-snug text-[var(--text)]">{announcement.title}</h3>
+                                        <h3 className="mb-2 text-lg leading-snug font-semibold text-[var(--text)]">{announcement.title}</h3>
                                         <p
                                             className="mb-4 flex-1 text-sm leading-relaxed text-[var(--text-muted)]"
                                             style={{
@@ -297,7 +304,8 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                 <div className="container mx-auto px-6 text-center lg:px-8">
                     <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Have questions about your child's nutrition?</h2>
                     <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
-                        Our team at the barangay health center is ready to help. Reach out to learn about our monitoring program, vaccine schedules, and how we can support your family.
+                        Our team at the barangay health center is ready to help. Reach out to learn about our monitoring program, vaccine schedules,
+                        and how we can support your family.
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
                         <Link

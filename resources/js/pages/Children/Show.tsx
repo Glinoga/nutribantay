@@ -209,9 +209,7 @@ export default function Show({
                 const currentPage = new URL(window.location.href).searchParams.get('page') || '1';
                 const itemsOnPage = healthlogs.data.length;
 
-                const targetPage = itemsOnPage <= 1 && parseInt(currentPage) > 1
-                    ? String(parseInt(currentPage) - 1)
-                    : currentPage;
+                const targetPage = itemsOnPage <= 1 && parseInt(currentPage) > 1 ? String(parseInt(currentPage) - 1) : currentPage;
 
                 router.delete(route('healthlogs.destroy', { healthlog: logId, page: targetPage }));
             }
@@ -725,20 +723,24 @@ export default function Show({
                                         </span>
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => router.reload({
-                                                    only: ['healthlogs', 'chartHealthLogs'],
-                                                    data: { page: healthlogs.current_page - 1 },
-                                                })}
+                                                onClick={() =>
+                                                    router.reload({
+                                                        only: ['healthlogs', 'chartHealthLogs'],
+                                                        data: { page: healthlogs.current_page - 1 },
+                                                    })
+                                                }
                                                 disabled={healthlogs.current_page === 1}
                                                 className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                             >
                                                 Previous
                                             </button>
                                             <button
-                                                onClick={() => router.reload({
-                                                    only: ['healthlogs', 'chartHealthLogs'],
-                                                    data: { page: healthlogs.current_page + 1 },
-                                                })}
+                                                onClick={() =>
+                                                    router.reload({
+                                                        only: ['healthlogs', 'chartHealthLogs'],
+                                                        data: { page: healthlogs.current_page + 1 },
+                                                    })
+                                                }
                                                 disabled={healthlogs.current_page === healthlogs.last_page}
                                                 className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                                             >

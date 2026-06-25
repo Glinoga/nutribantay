@@ -369,68 +369,58 @@ export default function Contact() {
                                                 </DialogTrigger>
                                                 <DialogContent className="max-h-[80vh] overflow-y-auto rounded-xl bg-white p-6 sm:max-w-lg lg:max-w-xl dark:bg-[var(--bg-card)]">
                                                     <DialogHeader>
-                                                        <DialogTitle className="text-xl font-bold text-[var(--text)]">
-                                                            Privacy Policy
-                                                        </DialogTitle>
+                                                        <DialogTitle className="text-xl font-bold text-[var(--text)]">Privacy Policy</DialogTitle>
                                                     </DialogHeader>
                                                     <div className="space-y-4 text-sm text-[var(--text-muted)]">
-                                                        <h3 className="font-semibold text-[var(--text)]">
-                                                            1. Information We Collect
-                                                        </h3>
+                                                        <h3 className="font-semibold text-[var(--text)]">1. Information We Collect</h3>
                                                         <p>
-                                                            We collect personal information that you voluntarily provide to us when you use
-                                                            the NutriBantay contact form, including your name, email address, phone number,
-                                                            and the content of your message. We also collect information about your child's
-                                                            nutrition and health data if you register for our monitoring program.
+                                                            We collect personal information that you voluntarily provide to us when you use the
+                                                            NutriBantay contact form, including your name, email address, phone number, and the
+                                                            content of your message. We also collect information about your child's nutrition and
+                                                            health data if you register for our monitoring program.
                                                         </p>
 
-                                                        <h3 className="font-semibold text-[var(--text)]">
-                                                            2. How We Use Your Information
-                                                        </h3>
+                                                        <h3 className="font-semibold text-[var(--text)]">2. How We Use Your Information</h3>
                                                         <p>
                                                             The information we collect is used to respond to your inquiries, provide nutrition
                                                             monitoring services, improve our community health programs, and comply with legal
-                                                            obligations. Your data is used solely for the intended purpose of barangay health
-                                                            tracking and community wellness initiatives.
+                                                            obligations. Your data is used solely for the intended purpose of barangay health tracking
+                                                            and community wellness initiatives.
                                                         </p>
 
                                                         <h3 className="font-semibold text-[var(--text)]">3. Data Protection</h3>
                                                         <p>
-                                                            We implement appropriate technical and organizational measures to protect your
-                                                            personal data against unauthorized access, alteration, disclosure, or destruction.
-                                                            Access to personal data is restricted to authorized personnel only and is
-                                                            protected under applicable data privacy laws.
+                                                            We implement appropriate technical and organizational measures to protect your personal
+                                                            data against unauthorized access, alteration, disclosure, or destruction. Access to
+                                                            personal data is restricted to authorized personnel only and is protected under applicable
+                                                            data privacy laws.
                                                         </p>
 
                                                         <h3 className="font-semibold text-[var(--text)]">4. Data Sharing</h3>
                                                         <p>
-                                                            We do not sell, trade, or rent your personal information to third parties. We may
-                                                            share information with authorized barangay health personnel and government
-                                                            agencies as required by law or with your explicit consent.
+                                                            We do not sell, trade, or rent your personal information to third parties. We may share
+                                                            information with authorized barangay health personnel and government agencies as required
+                                                            by law or with your explicit consent.
                                                         </p>
 
                                                         <h3 className="font-semibold text-[var(--text)]">5. Data Retention</h3>
                                                         <p>
-                                                            We retain your personal data only for as long as necessary to fulfill the purposes
-                                                            for which it was collected, or as required by applicable laws and regulations.
-                                                            When data is no longer needed, it is securely disposed of.
+                                                            We retain your personal data only for as long as necessary to fulfill the purposes for
+                                                            which it was collected, or as required by applicable laws and regulations. When data is no
+                                                            longer needed, it is securely disposed of.
                                                         </p>
 
                                                         <h3 className="font-semibold text-[var(--text)]">6. Your Rights</h3>
                                                         <p>
-                                                            You have the right to access, correct, update, or request deletion of your
-                                                            personal data. You may also withdraw your consent to data processing at any time.
-                                                            To exercise these rights, please contact our data protection officer through the
-                                                            barangay health center.
+                                                            You have the right to access, correct, update, or request deletion of your personal data.
+                                                            You may also withdraw your consent to data processing at any time. To exercise these
+                                                            rights, please contact our data protection officer through the barangay health center.
                                                         </p>
 
-                                                        <h3 className="font-semibold text-[var(--text)]">
-                                                            7. Updates to This Policy
-                                                        </h3>
+                                                        <h3 className="font-semibold text-[var(--text)]">7. Updates to This Policy</h3>
                                                         <p>
-                                                            We may update this Privacy Policy from time to time. Any changes will be posted on
-                                                            this page, and we encourage you to review this policy periodically for any
-                                                            updates.
+                                                            We may update this Privacy Policy from time to time. Any changes will be posted on this
+                                                            page, and we encourage you to review this policy periodically for any updates.
                                                         </p>
                                                     </div>
                                                 </DialogContent>
@@ -453,7 +443,7 @@ export default function Contact() {
                             </div>
                         </div>
                     </div>
-    </div>
+                </div>
             </section>
 
             {/* Map Section */}
@@ -472,9 +462,7 @@ export default function Contact() {
                     <div className="relative overflow-hidden rounded-xl bg-white shadow-sm dark:bg-[var(--bg-light)]">
                         {/* Leaflet Map */}
                         <div className="relative h-[36rem] w-full">
-                            {!mapReady && (
-                                <div className="absolute inset-0 z-[999] animate-pulse rounded-xl bg-gray-100 dark:bg-[var(--bg-card)]" />
-                            )}
+                            {!mapReady && <div className="absolute inset-0 z-[999] animate-pulse rounded-xl bg-gray-100 dark:bg-[var(--bg-card)]" />}
                             <MapContainer
                                 center={[14.7695106, 121.0489927]}
                                 zoom={16}
@@ -490,9 +478,7 @@ export default function Contact() {
                                 <Marker position={[14.7695106, 121.0489927]}>
                                     <Popup>
                                         <div className="p-2 text-center">
-                                            <h3 className="text-lg font-bold text-[var(--text)]">
-                                                Bagong Silang Phase 3 Health Center
-                                            </h3>
+                                            <h3 className="text-lg font-bold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
                                             <p className="mt-1 text-sm text-[var(--text-muted)]">
                                                 Q29X+VJC, Caloocan
                                                 <br />

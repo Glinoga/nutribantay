@@ -142,9 +142,13 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
             <section className="animate-fade-in-up relative overflow-hidden bg-gradient-to-br from-[var(--bg-light)] via-white to-[var(--bg)] pt-24 pb-12 dark:via-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <nav className="mb-8 flex items-center gap-2 text-sm text-[var(--text-muted)]">
-                        <Link href="/" className="transition-colors hover:text-[var(--primary)]">Home</Link>
+                        <Link href="/" className="transition-colors hover:text-[var(--primary)]">
+                            Home
+                        </Link>
                         <ChevronRight size={14} />
-                        <Link href={route('guest.announcements')} className="transition-colors hover:text-[var(--primary)]">Announcements</Link>
+                        <Link href={route('guest.announcements')} className="transition-colors hover:text-[var(--primary)]">
+                            Announcements
+                        </Link>
                         <ChevronRight size={14} />
                         <span className="max-w-[200px] truncate text-[var(--text)] lg:max-w-[400px]">{announcement.title}</span>
                     </nav>
@@ -207,9 +211,7 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                         onError={() => setImgError(true)}
                                     />
                                 </div>
-                                <figcaption className="mt-3 text-center text-sm text-[var(--text-muted)] italic">
-                                    {announcement.title}
-                                </figcaption>
+                                <figcaption className="mt-3 text-center text-sm text-[var(--text-muted)] italic">{announcement.title}</figcaption>
                             </figure>
                         ) : announcement.image_url && imgError ? (
                             <div className="mb-12 h-[400px] overflow-hidden rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md dark:from-[var(--bg)] dark:to-[var(--bg)]" />
@@ -220,13 +222,11 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                 className="prose prose-lg max-w-none leading-relaxed text-[var(--text)]"
                                 style={{ fontSize: '1.125rem', lineHeight: '1.85' }}
                             >
-                                <div className="space-y-6 whitespace-pre-line">
-                                    {announcement.content}
-                                </div>
+                                <div className="space-y-6 whitespace-pre-line">{announcement.content}</div>
                             </div>
 
                             {announcement.end_date && (
-                                <div className="mt-12 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-6 dark:bg-amber-900/20 dark:border-amber-600">
+                                <div className="mt-12 rounded-xl border-l-4 border-amber-500 bg-amber-50 p-6 dark:border-amber-600 dark:bg-amber-900/20">
                                     <h3 className="mb-2 font-semibold text-amber-800 dark:text-amber-300">Event Duration</h3>
                                     <p className="text-amber-700 dark:text-amber-400">
                                         This announcement is valid until {formatDate(announcement.end_date)}
@@ -241,12 +241,12 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                     <h2 className="text-2xl font-bold text-[var(--text)]">Related Announcements</h2>
                                     <p className="mt-2 text-[var(--text-muted)]">You might also be interested in</p>
                                 </div>
-                                <div className="flex gap-6 overflow-x-auto pb-4 scrollable-cards md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
+                                <div className="scrollable-cards flex gap-6 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:overflow-visible lg:grid-cols-3">
                                     {relatedAnnouncements.slice(0, 3).map((related) => (
                                         <Link
                                             key={related.id}
                                             href={route('guest.announcements.show', { announcement: related.slug })}
-                                            className="card-clickable group flex h-full min-w-[280px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg-card)] md:min-w-0"
+                                            className="card-clickable group flex h-full min-w-[280px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm md:min-w-0 dark:border-[var(--border)] dark:bg-[var(--bg-card)]"
                                         >
                                             <div className="relative h-40 shrink-0 overflow-hidden">
                                                 {related.image_url && !relatedErrored.has(related.id) ? (
@@ -267,9 +267,7 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                                 >
                                                     {related.category.name}
                                                 </span>
-                                                <h3 className="mb-2 text-base font-semibold leading-snug text-[var(--text)]">
-                                                    {related.title}
-                                                </h3>
+                                                <h3 className="mb-2 text-base leading-snug font-semibold text-[var(--text)]">{related.title}</h3>
                                                 <p
                                                     className="mb-3 flex-1 text-sm leading-relaxed text-[var(--text-muted)]"
                                                     style={{
