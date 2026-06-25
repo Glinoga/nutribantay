@@ -11,6 +11,7 @@ class SiteContentSeeder extends Seeder
     {
         $contents = [
             // ========== HOMEPAGE ==========
+            ['page' => 'home', 'section' => 'branding', 'key' => 'logo_url', 'label' => 'Site Logo', 'description' => 'The logo displayed on all public pages. Upload a new image to replace it.', 'value' => '/NutriBantayLogo.svg', 'type' => 'image'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'hero_title', 'label' => 'Homepage Main Heading', 'description' => 'This text appears at the top of the homepage as the main headline.', 'value' => 'Every Child Deserves a Healthy Start', 'type' => 'text'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'hero_description', 'label' => 'Homepage Description', 'description' => 'This paragraph appears below the main heading on the homepage.', 'value' => 'NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a healthier future.', 'type' => 'textarea'],
             ['page' => 'home', 'section' => 'hero', 'key' => 'cta_primary_label', 'label' => 'Primary Button Text', 'description' => 'The text for the main call-to-action button on the homepage.', 'value' => 'View Announcements', 'type' => 'text'],

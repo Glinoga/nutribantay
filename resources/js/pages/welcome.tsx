@@ -3,7 +3,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
+    const { auth, logoUrl } = usePage<SharedData & { logoUrl: string }>().props;
 
     return (
         <>
@@ -95,7 +95,7 @@ export default function Welcome() {
                     </span>
                     <h1 className="mb-2 text-3xl font-bold md:text-4xl">
                         <div className="flex items-center justify-center gap-3">
-                            <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="56" height="56" className="h-10 w-auto md:h-14" />
+                            <img src={logoUrl} alt="NutriBantay" width="56" height="56" className="h-10 w-auto md:h-14" />
                             <span className="gradient-text">NutriBantay</span>
                         </div>
                     </h1>

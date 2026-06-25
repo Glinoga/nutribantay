@@ -199,6 +199,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('admin.website.index');
         Route::put('/admin/website-management', [WebsiteManagementController::class, 'update'])
             ->name('admin.website.update');
+        Route::post('/admin/website-management/upload-logo', [WebsiteManagementController::class, 'uploadLogo'])
+            ->name('admin.website.upload-logo');
     });
 
     /*

@@ -1,6 +1,6 @@
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CalendarCheck, Check, Heart, Share2, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 
@@ -48,6 +48,7 @@ function getCategoryColorClass(categoryColor: string) {
 }
 
 export default function Home({ announcements = [], maintenance = null, siteContent = {} }: HomeProps) {
+    const { logoUrl } = usePage<{ logoUrl: string }>().props;
     const [sharedId, setSharedId] = useState<number | null>(null);
     const [erroredImages, setErroredImages] = useState<Set<number>>(new Set());
 
@@ -134,7 +135,7 @@ export default function Home({ announcements = [], maintenance = null, siteConte
                     <div className="grid items-center gap-12 md:grid-cols-5">
                         <div className="md:col-span-3">
                             <div className="mb-4 flex items-center gap-3">
-                                <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
+                                <img src={logoUrl} alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
                                 <span className="text-lg font-bold text-[var(--primary)] md:text-xl">NutriBantay</span>
                             </div>
 
@@ -169,7 +170,7 @@ export default function Home({ announcements = [], maintenance = null, siteConte
                                 <div className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-[var(--primary)]/10 to-teal-400/10 lg:h-56 lg:w-56" />
                                 <div className="absolute top-1/2 left-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 shadow-inner dark:bg-[var(--bg-light)]/80">
                                     <img
-                                        src="/NutriBantayLogo.svg"
+                                        src={logoUrl}
                                         alt=""
                                         width="48"
                                         height="48"

@@ -26,6 +26,7 @@ import {
     Save,
     Smartphone,
     TrendingUp,
+    Upload,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -65,6 +66,7 @@ const pageMeta: Record<string, { icon: LucideIcon; title: string; description: s
 };
 
 const sectionLabels: Record<string, { icon: LucideIcon; label: string }> = {
+    branding: { icon: Upload, label: 'Branding' },
     hero: { icon: Home, label: 'Hero Section' },
     stats: { icon: TrendingUp, label: 'Statistics' },
     cta: { icon: MessageSquare, label: 'Call to Action' },
@@ -179,6 +181,8 @@ function SectionCard({
 function HomePreview({ data, previewMode }: { data: Record<string, string>; previewMode: 'desktop' | 'mobile' }) {
     const c = (key: string, fb = '') => data[key]?.trim() || fb;
 
+    const logoUrl = c('logo_url') || '/NutriBantayLogo.svg';
+
     const stats = [
         { value: c('stat_1_value'), label: c('stat_1_label'), subtitle: c('stat_1_subtitle'), icon: TrendingUp, borderColor: 'var(--p)', iconBg: 'rgba(8,145,178,0.1)', iconColor: '#0891B2' },
         { value: c('stat_2_value'), label: c('stat_2_label'), subtitle: c('stat_2_subtitle'), icon: CalendarCheck, borderColor: 'var(--s)', iconBg: 'rgba(190,24,93,0.1)', iconColor: '#be185d' },
@@ -188,7 +192,7 @@ function HomePreview({ data, previewMode }: { data: Record<string, string>; prev
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <img src="/NutriBantayLogo.svg" alt="" className="h-8 w-8" />
+                <img src={logoUrl} alt="" className="h-8 w-8" />
                 <span className="text-lg font-bold" style={{ color: 'var(--p)' }}>NutriBantay</span>
             </div>
 
@@ -237,6 +241,7 @@ function HomePreview({ data, previewMode }: { data: Record<string, string>; prev
 
 function ContactPreview({ data, previewMode }: { data: Record<string, string>; previewMode: 'desktop' | 'mobile' }) {
     const c = (key: string, fb = '') => data[key]?.trim() || fb;
+    const logoUrl = c('logo_url') || '/NutriBantayLogo.svg';
 
     const contactCards = [
         { icon: Phone, label: 'Call Us', sub: c('hours_subtext'), value: c('phone'), border: 'border-l-4 border-teal-600', iconBg: 'bg-[var(--p)]/10 text-[var(--p)]' },
@@ -257,7 +262,7 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <img src="/NutriBantayLogo.svg" alt="" className="h-8 w-8" />
+                <img src={logoUrl} alt="" className="h-8 w-8" />
                 <span className="text-lg font-bold" style={{ color: 'var(--p)' }}>NutriBantay</span>
             </div>
 
@@ -341,11 +346,12 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
 
 function FooterPreview({ data }: { data: Record<string, string> }) {
     const c = (key: string, fb = '') => data[key]?.trim() || fb;
+    const logoUrl = c('logo_url') || '/NutriBantayLogo.svg';
 
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-3">
-                <img src="/NutriBantayLogo.svg" alt="" className="h-8 w-8" />
+                <img src={logoUrl} alt="" className="h-8 w-8" />
                 <span className="text-lg font-bold" style={{ color: 'var(--p)' }}>NutriBantay</span>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: 'var(--tm)' }}>
@@ -614,6 +620,52 @@ export default function WebsiteManagement() {
                                             </div>
                                         </CardHeader>
                                         <CardContent className="space-y-8 p-5">
+                                            {/* Branding Section — Logo Upload */}
+                                            {activeTab === 'home' && (
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm dark:bg-gray-800">
+                                                            <Upload className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                                                        </div>
+                                                        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">Branding</h3>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 rounded-md border border-dashed p-4" style={{ borderColor: 'var(--b)' }}>
+                                                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white" style={{ borderColor: 'var(--b)' }}>
+                                                            <img
+                                                                src={data.logo_url || '/NutriBantayLogo.svg'}
+                                                                alt="Logo preview"
+                                                                className="h-full w-full object-contain p-1"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="mb-1 text-xs font-medium text-gray-700 dark:text-gray-200">Upload a new logo</p>
+                                                            <p className="mb-2 text-[10px] text-gray-500">Accepts JPG, PNG, GIF, SVG (max 2MB)</p>
+                                                            <div className="flex gap-2">
+                                                                <label className="flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700">
+                                                                    <Upload className="h-3.5 w-3.5" />
+                                                                    Choose File
+                                                                    <input
+                                                                        type="file"
+                                                                        accept="image/jpeg,image/png,image/gif,image/svg+xml"
+                                                                        className="hidden"
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files?.[0];
+                                                                            if (!file) return;
+                                                                            const formData = new FormData();
+                                                                            formData.append('logo', file);
+                                                                            router.post(route('admin.website.upload-logo'), formData, {
+                                                                                onSuccess: () => {
+                                                                                    router.reload({ only: ['contents'] });
+                                                                                },
+                                                                            });
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                             {Object.entries(groupedBySection).map(([sectionKey, sectionItems]) => (
                                                 <SectionCard
                                                     key={sectionKey}

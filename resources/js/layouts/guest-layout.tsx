@@ -10,7 +10,7 @@ type GuestLayoutProps = {
 };
 
 export default function GuestLayout({ children, title, showHeader = true }: PropsWithChildren<GuestLayoutProps>) {
-    const { footerContent } = usePage<{ footerContent: Record<string, SiteContentValue> }>().props;
+    const { footerContent, logoUrl } = usePage<{ footerContent: Record<string, SiteContentValue>; logoUrl: string }>().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const getFooter = (key: string, fallback: string) => footerContent?.[key]?.value ?? fallback;
@@ -110,7 +110,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
                             <div className="flex items-center gap-8 md:gap-12">
                                 <Link href="/" className="flex items-center gap-2">
-                                    <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
+                                    <img src={logoUrl} alt="NutriBantay" width="40" height="40" className="h-8 w-auto md:h-10" />
                                     <span className="text-xl font-bold text-[var(--primary)] md:text-2xl">NutriBantay</span>
                                 </Link>
                                 <nav className="hidden space-x-8 md:flex">
@@ -209,7 +209,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                         <div className="mb-12 grid grid-cols-1 gap-12 md:grid-cols-3">
                             <div>
                                 <div className="mb-3 flex items-center gap-3">
-                                    <img src="/NutriBantayLogo.svg" alt="NutriBantay" width="40" height="40" className="h-10 w-auto" />
+                                    <img src={logoUrl} alt="NutriBantay" width="40" height="40" className="h-10 w-auto" />
                                     <h3 className="text-2xl font-bold text-[var(--primary)]">NutriBantay</h3>
                                 </div>
                                 <p className="mb-4 text-[var(--text-muted)]">

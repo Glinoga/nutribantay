@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SiteContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class WebsiteManagementController extends Controller
@@ -33,5 +34,22 @@ class WebsiteManagementController extends Controller
         }
 
         return redirect()->back()->with('success', 'Website content updated successfully.');
+    }
+
+    public function uploadLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
+        ]);
+
+        $path = $request->file('logo')->store('logos', 'public');
+
+        SiteContent::where('key', 'logo_url')->update([
+            'value' => '/storage/'.$path,
+        ]);
+
+        return response()->json([
+            'url' => '/storage/'.$path,
+        ]);
     }
 }

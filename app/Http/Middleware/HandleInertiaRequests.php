@@ -55,6 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
             ],
             'footerContent' => fn () => SiteContent::getByPage('footer'),
+            'logoUrl' => fn () => SiteContent::getContent('logo_url', '/NutriBantayLogo.svg'),
         ]);
     }
 }
