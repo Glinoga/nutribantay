@@ -75,24 +75,12 @@ class NutStatusExportService
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ]);
 
-        $this->sheet->mergeCells('B1:C1');
-        $this->sheet->setCellValue('B1', 'TO START, PRESS CTRL+F1 OR CTRL+Fn+F1');
-        $this->sheet->getStyle('B1')->applyFromArray([
-            'font' => ['name' => 'Calibri', 'size' => 15, 'bold' => true, 'color' => ['rgb' => 'FF0000']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ]);
-
         $this->sheet->mergeCells('D1:G1');
         $this->sheet->setCellValue('D1', 'Community Level e-OPT PLUS Tool');
         $this->sheet->getStyle('D1')->applyFromArray([
             'font' => ['name' => 'Calibri', 'size' => 20, 'bold' => true],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
         ]);
-
-        $this->sheet->mergeCells('H1:I1');
-        $this->sheet->setCellValue('H1', 'PLS READ THIS FIRST');
-        $this->sheet->getStyle('H1')->getFont()->setName('Calibri')->setSize(10)->getColor()->setRGB('4472C4');
-        $this->sheet->getStyle('H1')->getFont()->setUnderline(true);
 
         $this->sheet->setCellValue('J1', 'Date:');
         $this->sheet->getStyle('J1')->applyFromArray([
@@ -130,12 +118,6 @@ class NutStatusExportService
         $this->sheet->getStyle('C2')->applyFromArray([
             'font' => ['name' => 'Calibri', 'size' => 11, 'color' => ['rgb' => '336600']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT, 'wrapText' => true],
-        ]);
-
-        $this->sheet->setCellValue('M2', 'Begin here');
-        $this->sheet->getStyle('M2')->applyFromArray([
-            'font' => ['name' => 'Calibri', 'size' => 12, 'color' => ['rgb' => 'FF0000']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_TOP],
         ]);
 
         // ── NNC Logo (upper right, cell N2) ──
@@ -260,10 +242,8 @@ class NutStatusExportService
         $this->sheet->setCellValue('F9', 'M/F');
         $this->setHeaderCell('F9', 'M/F', false, 10);
 
-        // G7: yellow background warning
         $this->sheet->mergeCells('G8:G9');
         $this->sheet->setCellValue('G7', '');
-        $this->sheet->getStyle('G7')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFF00');
         $this->sheet->setCellValue('G8', 'Date of Birth');
         $this->setHeaderCell('G8', 'Date of Birth', true, 11);
         $this->sheet->getStyle('G8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -281,11 +261,6 @@ class NutStatusExportService
         $this->setHeaderCell('J7', 'Height', true, 11);
         $this->sheet->setCellValue('J9', '(cm)');
         $this->setHeaderCell('J9', '(cm)', false, 10);
-
-        // K7: auto-fill notice
-        $this->sheet->setCellValue('K7', 'NO DATA ENTRY REQUIRED — RESULTS WILL BE AUTO-FILLED');
-        $this->sheet->getStyle('K7')->getFont()->setName('Calibri')->setSize(11)->setBold(true)->getColor()->setRGB('003300');
-        $this->sheet->getStyle('K7')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setWrapText(true);
 
         $this->sheet->mergeCells('K8:K9');
         $this->sheet->setCellValue('K8', 'Age in Months');
