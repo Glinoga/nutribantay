@@ -465,6 +465,7 @@ export default function Index(props: IndexProps) {
                         <span className="text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">Show:</span>
                         {[
                             { key: 'active', label: 'Active', icon: Activity },
+                            { key: 'upcoming', label: 'Upcoming', icon: Calendar },
                             { key: 'expired', label: 'Expired', icon: Megaphone },
                             { key: 'all', label: 'All', icon: List },
                         ].map(({ key, label, icon: Icon }) => (

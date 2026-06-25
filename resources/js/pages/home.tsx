@@ -1,3 +1,4 @@
+import AnnouncementPlaceholder from '@/components/announcement-placeholder';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Link, usePage } from '@inertiajs/react';
@@ -25,6 +26,8 @@ interface Announcement {
     content: string;
     image?: string;
     image_url?: string | null;
+    first_image_url?: string | null;
+    gallery_images?: Array<{ id: number; image_url: string }>;
 }
 
 type SiteContentMap = Record<string, { key: string; value: string | null }>;
@@ -242,17 +245,20 @@ export default function Home({ announcements = [], maintenance = null, siteConte
                                     className="card-clickable group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-[var(--border)] dark:bg-[var(--bg-card)]"
                                 >
                                     <div className="relative h-48 shrink-0 overflow-hidden">
-                                        {announcement.image_url && !erroredImages.has(announcement.id) ? (
-                                            <img
-                                                src={announcement.image_url}
-                                                alt={announcement.title}
-                                                className="h-full w-full object-cover"
-                                                loading="lazy"
-                                                onError={() => handleImageError(announcement.id)}
-                                            />
-                                        ) : (
-                                            <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
-                                        )}
+                                        {(() => {
+                                            const src = announcement.first_image_url ?? announcement.image_url;
+                                            return src && !erroredImages.has(announcement.id) ? (
+                                                <img
+                                                    src={src}
+                                                    alt={announcement.title}
+                                                    className="h-full w-full object-cover"
+                                                    loading="lazy"
+                                                    onError={() => handleImageError(announcement.id)}
+                                                />
+                                            ) : (
+                                                <AnnouncementPlaceholder />
+                                            );
+                                        })()}
                                     </div>
                                     <div className="flex h-full flex-col p-6 pt-5">
                                         <span

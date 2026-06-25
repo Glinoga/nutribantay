@@ -8,8 +8,8 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, Megaphone, OctagonAlert, Sparkles, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { CheckCircle2, ImagePlus, Megaphone, OctagonAlert, Sparkles, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Announcements', href: route('announcements.index') },
@@ -37,11 +37,12 @@ export default function Create({ categories }: CreateProps) {
         author: '',
         summary: '',
         content: '',
-        image: null as File | null,
+        images: [] as File[],
     });
 
-    const [preview, setPreview] = useState<string | null>(null);
+    const [previews, setPreviews] = useState<string[]>([]);
     const [isDirty, setIsDirty] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const hasChanges =
@@ -52,7 +53,7 @@ export default function Create({ categories }: CreateProps) {
             data.date !== new Date().toISOString().split('T')[0] ||
             data.end_date !== '' ||
             data.author !== '' ||
-            data.image !== null;
+            data.images.length > 0;
 
         setIsDirty(hasChanges);
     }, [data]);
@@ -69,7 +70,7 @@ export default function Create({ categories }: CreateProps) {
                 smartToast.dismiss(loadingToast);
                 smartToast.success('Announcement created successfully!');
                 reset();
-                setPreview(null);
+                setPreviews([]);
             },
             onError: (errors) => {
                 smartToast.dismiss(loadingToast);
@@ -85,19 +86,21 @@ export default function Create({ categories }: CreateProps) {
         });
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setData('image', file);
-            setPreview(URL.createObjectURL(file));
+    const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const newFiles = Array.from(e.target.files);
+            setData('images', [...data.images, ...newFiles]);
+            const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
+            setPreviews([...previews, ...newPreviews]);
         }
     };
 
-    const removeImage = () => {
-        setData('image', null);
-        setPreview(null);
-        const input = document.getElementById('image-upload') as HTMLInputElement;
-        if (input) input.value = '';
+    const removeImage = (index: number) => {
+        const updatedFiles = data.images.filter((_, i) => i !== index);
+        const updatedPreviews = previews.filter((_, i) => i !== index);
+        setData('images', updatedFiles);
+        setPreviews(updatedPreviews);
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const handleCancel = () => {
@@ -107,7 +110,7 @@ export default function Create({ categories }: CreateProps) {
             }
         }
         reset();
-        setPreview(null);
+        setPreviews([]);
         window.history.back();
     };
 
@@ -297,27 +300,48 @@ export default function Create({ categories }: CreateProps) {
                             className="fade-in-up rounded-xl border border-teal-100 bg-white p-5 shadow-sm dark:border-teal-800 dark:bg-gray-800"
                             style={{ animationDelay: '0.3s' }}
                         >
-                            <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Upload Image</Label>
-                            <Input
-                                id="image-upload"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                className="mt-2 rounded-md border-teal-200 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:file:bg-teal-900/30 dark:file:text-teal-400 dark:hover:file:bg-teal-900/50"
-                            />
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Max file size: 5 MB (JPG, PNG, GIF)</p>
-                            {preview && (
-                                <div className="relative mt-4 inline-block">
-                                    <img src={preview} alt="Preview" className="max-h-64 rounded-md border" />
-                                    <button
-                                        type="button"
-                                        onClick={removeImage}
-                                        className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                                    >
-                                        <X size={16} />
-                                    </button>
+                            <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Upload Images</Label>
+                            <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Add one or more images for your announcement gallery</p>
+                            <div className="mt-2">
+                                <label
+                                    htmlFor="images-upload"
+                                    className="flex cursor-pointer items-center gap-2 rounded-md border-2 border-dashed border-teal-200 bg-teal-50/30 px-4 py-6 text-sm font-medium text-teal-700 transition-colors hover:border-teal-400 hover:bg-teal-50 dark:border-gray-600 dark:bg-gray-800 dark:text-teal-400 dark:hover:border-teal-500 dark:hover:bg-gray-700"
+                                >
+                                    <ImagePlus className="h-5 w-5" />
+                                    <span>Click to select images (JPG, PNG, GIF, max 5MB each)</span>
+                                </label>
+                                <input
+                                    id="images-upload"
+                                    ref={fileInputRef}
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleImagesChange}
+                                    className="hidden"
+                                />
+                            </div>
+                            {previews.length > 0 && (
+                                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                    {previews.map((p, index) => (
+                                        <div key={index} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
+                                            <img src={p} alt={`Preview ${index + 1}`} className="h-full w-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(index)}
+                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                            <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+                                                {index + 1}
+                                            </span>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
+                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                {previews.length} file{previews.length !== 1 ? 's' : ''} selected
+                            </p>
                         </div>
 
                         <div

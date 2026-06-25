@@ -26,7 +26,7 @@ class Announcement extends Model
 
     protected $hidden = ['image'];
 
-    protected $appends = ['is_expired', 'image_url'];
+    protected $appends = ['is_expired', 'image_url', 'gallery_images', 'first_image_url'];
 
     protected static function booted(): void
     {
@@ -48,12 +48,39 @@ class Announcement extends Model
             if ($announcement->image) {
                 Storage::disk('public')->delete($announcement->image);
             }
+            $announcement->images()->each(function (AnnouncementImage $img) {
+                Storage::disk('public')->delete($img->image_path);
+                $img->delete();
+            });
         });
     }
 
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(AnnouncementImage::class)->orderBy('sort_order');
+    }
+
+    public function getGalleryImagesAttribute(): array
+    {
+        return $this->images->map(fn (AnnouncementImage $img) => [
+            'id' => $img->id,
+            'image_url' => $img->image_url,
+        ])->toArray();
+    }
+
+    public function getFirstImageUrlAttribute(): ?string
+    {
+        $first = $this->images->first();
+        if ($first) {
+            return $first->image_url;
+        }
+
+        return $this->image_url;
     }
 
     public function getImageUrlAttribute(): ?string

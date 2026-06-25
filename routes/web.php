@@ -229,6 +229,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/announcements/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcements.edit');
         Route::put('/admin/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('announcements.update');
         Route::delete('/admin/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+        Route::delete('/admin/announcements/{announcement}/images/{image}', [AnnouncementController::class, 'destroyImage'])->name('announcements.images.destroy');
 
         // Archived announcements
         Route::get('/admin/announcements-archived', [AnnouncementController::class, 'archived'])->name('announcements.archived');

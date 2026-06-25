@@ -1,7 +1,8 @@
+import AnnouncementPlaceholder from '@/components/announcement-placeholder';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, Check, ChevronRight, Share2, User } from 'lucide-react';
+import { Calendar, Check, ChevronLeft, ChevronRight, Share2, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface Category {
@@ -10,6 +11,11 @@ interface Category {
     slug: string;
     color: string;
     description?: string;
+}
+
+interface GalleryImage {
+    id: number;
+    image_url: string;
 }
 
 interface Announcement {
@@ -25,6 +31,8 @@ interface Announcement {
     content: string;
     image?: string;
     image_url?: string | null;
+    first_image_url?: string | null;
+    gallery_images?: GalleryImage[];
 }
 
 interface ShowAnnouncementProps {
@@ -61,6 +69,20 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
     const [imgError, setImgError] = useState(false);
     const [relatedSharedId, setRelatedSharedId] = useState<number | null>(null);
     const [relatedErrored, setRelatedErrored] = useState<Set<number>>(new Set());
+    const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+
+    const galleryImages = announcement.gallery_images ?? [];
+    const allImages = galleryImages.length > 0
+        ? galleryImages
+        : (announcement.image_url ? [{ id: 0, image_url: announcement.image_url }] : []);
+
+    const prevImage = () => {
+        setActiveGalleryIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
+    };
+
+    const nextImage = () => {
+        setActiveGalleryIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
+    };
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -201,21 +223,70 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
             <section className="animate-fade-in-up bg-white py-16 dark:bg-[var(--bg)]">
                 <div className="container mx-auto px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
-                        {announcement.image_url && !imgError ? (
+                        {allImages.length > 0 ? (
                             <figure className="mb-12">
-                                <div className="overflow-hidden rounded-xl shadow-md">
-                                    <img
-                                        src={announcement.image_url}
-                                        alt={announcement.title}
-                                        className="h-[400px] w-full object-cover"
-                                        onError={() => setImgError(true)}
-                                    />
+                                <div className="group relative overflow-hidden rounded-xl shadow-md">
+                                    {(() => {
+                                        const current = allImages[activeGalleryIndex];
+                                        return current && !imgError ? (
+                                            <img
+                                                key={current.id}
+                                                src={current.image_url}
+                                                alt={announcement.title}
+                                                className="h-[400px] w-full object-cover transition-opacity duration-300"
+                                                onError={() => setImgError(true)}
+                                            />
+                                        ) : (
+                                            <div className="h-[400px]">
+                                                <AnnouncementPlaceholder />
+                                            </div>
+                                        );
+                                    })()}
+
+                                    {allImages.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={prevImage}
+                                                className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                                                aria-label="Previous image"
+                                            >
+                                                <ChevronLeft size={20} />
+                                            </button>
+                                            <button
+                                                onClick={nextImage}
+                                                className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 hover:bg-black/60"
+                                                aria-label="Next image"
+                                            >
+                                                <ChevronRight size={20} />
+                                            </button>
+                                            <div className="absolute right-3 bottom-3 z-10 rounded-full bg-black/50 px-2.5 py-1 text-xs text-white backdrop-blur-sm">
+                                                {activeGalleryIndex + 1} / {allImages.length}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                                <figcaption className="mt-3 text-center text-sm text-[var(--text-muted)] italic">{announcement.title}</figcaption>
+                                {allImages.length > 1 && (
+                                    <div className="mt-3 flex justify-center gap-2">
+                                        {allImages.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setActiveGalleryIndex(index)}
+                                                className={`h-2 w-2 rounded-full transition-all ${
+                                                    index === activeGalleryIndex
+                                                        ? 'w-6 bg-[var(--primary)]'
+                                                        : 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500'
+                                                }`}
+                                                aria-label={`Go to image ${index + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </figure>
-                        ) : announcement.image_url && imgError ? (
-                            <div className="mb-12 h-[400px] overflow-hidden rounded-xl bg-gradient-to-br from-teal-50 to-cyan-50 shadow-md dark:from-[var(--bg)] dark:to-[var(--bg)]" />
-                        ) : null}
+                        ) : (
+                            <div className="mb-12 h-[400px] overflow-hidden rounded-xl shadow-md">
+                                <AnnouncementPlaceholder />
+                            </div>
+                        )}
 
                         <div className="mx-auto max-w-2xl">
                             <div
@@ -249,17 +320,20 @@ export default function ShowAnnouncement({ announcement, relatedAnnouncements = 
                                             className="card-clickable group flex h-full min-w-[280px] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm md:min-w-0 dark:border-[var(--border)] dark:bg-[var(--bg-card)]"
                                         >
                                             <div className="relative h-40 shrink-0 overflow-hidden">
-                                                {related.image_url && !relatedErrored.has(related.id) ? (
-                                                    <img
-                                                        src={related.image_url}
-                                                        alt={related.title}
-                                                        className="h-full w-full object-cover"
-                                                        loading="lazy"
-                                                        onError={() => setRelatedErrored((prev) => new Set([...prev, related.id]))}
-                                                    />
-                                                ) : (
-                                                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
-                                                )}
+                                                {(() => {
+                                                    const src = related.first_image_url ?? related.image_url;
+                                                    return src && !relatedErrored.has(related.id) ? (
+                                                        <img
+                                                            src={src}
+                                                            alt={related.title}
+                                                            className="h-full w-full object-cover"
+                                                            loading="lazy"
+                                                            onError={() => setRelatedErrored((prev) => new Set([...prev, related.id]))}
+                                                        />
+                                                    ) : (
+                                                        <AnnouncementPlaceholder />
+                                                    );
+                                                })()}
                                             </div>
                                             <div className="flex flex-1 flex-col p-5">
                                                 <span

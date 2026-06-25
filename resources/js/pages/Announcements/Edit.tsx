@@ -9,8 +9,8 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, useForm } from '@inertiajs/react';
-import { Loader2, Megaphone, OctagonAlert, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ImagePlus, Loader2, Megaphone, OctagonAlert, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Category {
     id: number;
@@ -18,6 +18,11 @@ interface Category {
     slug: string;
     color: string;
     description?: string;
+}
+
+interface GalleryImage {
+    id: number;
+    image_url: string;
 }
 
 interface Announcement {
@@ -32,6 +37,7 @@ interface Announcement {
     content: string;
     image?: string | null;
     image_url?: string | null;
+    gallery_images?: GalleryImage[];
 }
 
 interface EditProps {
@@ -49,13 +55,16 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         author: announcement.author || '',
         summary: announcement.summary || '',
         content: announcement.content || '',
-        image: null as File | null,
+        images: [] as File[],
     });
 
-    const [preview, setPreview] = useState<string | null>(announcement.image_url ?? null);
+    const existingImages = announcement.gallery_images ?? [];
+    const [newPreviews, setNewPreviews] = useState<string[]>([]);
     const [isDirty, setIsDirty] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showModal, setShowModal] = useState(true);
+    const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const hasChanges =
@@ -66,22 +75,41 @@ export default function Edit({ announcement, categories, page }: EditProps) {
             data.author !== (announcement.author || '') ||
             data.summary !== (announcement.summary || '') ||
             data.content !== (announcement.content || '') ||
-            data.image !== null;
+            data.images.length > 0;
 
         setIsDirty(hasChanges);
     }, [data, announcement]);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setData('image', file);
-            setPreview(URL.createObjectURL(file));
+    const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const newFiles = Array.from(e.target.files);
+            setData('images', [...data.images, ...newFiles]);
+            const previews = newFiles.map((f) => URL.createObjectURL(f));
+            setNewPreviews([...newPreviews, ...previews]);
         }
     };
 
-    const removeExistingImage = () => {
-        setPreview(null);
-        setData('image', null);
+    const removeNewImage = (index: number) => {
+        const updatedFiles = data.images.filter((_, i) => i !== index);
+        const updatedPreviews = newPreviews.filter((_, i) => i !== index);
+        setData('images', updatedFiles);
+        setNewPreviews(updatedPreviews);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const handleDeleteExistingImage = (image: GalleryImage) => {
+        setDeletingImageId(image.id);
+        router.delete(route('announcements.images.destroy', { announcement: announcement.slug, image: image.id }), {
+            preserveScroll: true,
+            onSuccess: () => {
+                smartToast.success('Image deleted successfully');
+                setDeletingImageId(null);
+            },
+            onError: () => {
+                smartToast.error('Failed to delete image');
+                setDeletingImageId(null);
+            },
+        });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -97,9 +125,9 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         formData.append('author', data.author || '');
         formData.append('summary', data.summary);
         formData.append('content', data.content);
-        if (data.image) {
-            formData.append('image', data.image);
-        }
+        data.images.forEach((file) => {
+            formData.append('images', file);
+        });
 
         formData.append('_method', 'PUT');
         formData.append('page', page || '1');
@@ -324,31 +352,73 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/30">
-                                        <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Upload Image</Label>
-                                        {preview && (
-                                            <div className="relative mb-4 inline-block">
-                                                <img src={preview} alt="Preview" className="max-h-64 rounded-md border" />
-                                                <button
-                                                    type="button"
-                                                    onClick={removeExistingImage}
-                                                    className="absolute -top-2 -right-2 rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                                                >
-                                                    <X size={16} />
-                                                </button>
+                                        <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Images</Label>
+                                        <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Manage the announcement image gallery</p>
+
+                                        {existingImages.length > 0 && (
+                                            <div className="mb-4">
+                                                <p className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">Current Images</p>
+                                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                                    {existingImages.map((img) => (
+                                                        <div key={img.id} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
+                                                            <img src={img.image_url} alt="" className="h-full w-full object-cover" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleDeleteExistingImage(img)}
+                                                                disabled={deletingImageId === img.id}
+                                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600 disabled:opacity-100"
+                                                            >
+                                                                {deletingImageId === img.id ? (
+                                                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                                ) : (
+                                                                    <Trash2 size={14} />
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
-                                        <Input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="rounded-md border-teal-200 text-sm transition-colors file:rounded-md file:border-0 file:bg-teal-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-teal-700 hover:file:bg-teal-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:file:bg-teal-900/30 dark:file:text-teal-400 dark:hover:file:bg-teal-900/50"
-                                        />
-                                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Max file size: 5 MB (JPG, PNG, GIF)</p>
-                                        {preview && data.image === null && (
-                                            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                                Upload a new image to replace the existing one
-                                            </p>
+
+                                        {newPreviews.length > 0 && (
+                                            <div className="mb-4">
+                                                <p className="mb-2 text-xs font-semibold text-teal-600 dark:text-teal-400">New Images</p>
+                                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                                                    {newPreviews.map((p, index) => (
+                                                        <div key={`new-${index}`} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
+                                                            <img src={p} alt={`New ${index + 1}`} className="h-full w-full object-cover" />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeNewImage(index)}
+                                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         )}
+
+                                        <label
+                                            htmlFor="edit-images-upload"
+                                            className="flex cursor-pointer items-center gap-2 rounded-md border-2 border-dashed border-teal-200 bg-teal-50/30 px-4 py-4 text-sm font-medium text-teal-700 transition-colors hover:border-teal-400 hover:bg-teal-50 dark:border-gray-600 dark:bg-gray-800 dark:text-teal-400 dark:hover:border-teal-500 dark:hover:bg-gray-700"
+                                        >
+                                            <ImagePlus className="h-5 w-5" />
+                                            <span>Add more images</span>
+                                        </label>
+                                        <input
+                                            id="edit-images-upload"
+                                            ref={fileInputRef}
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleImagesChange}
+                                            className="hidden"
+                                        />
+                                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                            Max 5MB each (JPG, PNG, GIF)
+                                        </p>
                                     </div>
 
                                     <div className="flex flex-wrap justify-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-700">

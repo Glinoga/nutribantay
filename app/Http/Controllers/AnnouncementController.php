@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\AnnouncementImage;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,13 +17,16 @@ class AnnouncementController extends Controller
         $filter = $request->query('filter', 'active');
         $search = $request->query('search');
 
-        $query = Announcement::with('category');
+        $query = Announcement::with('category', 'images');
 
         if ($filter === 'active') {
-            $query->where(function ($q) {
-                $q->whereNull('end_date')
-                    ->orWhereDate('end_date', '>=', now()->toDateString());
-            });
+            $query->whereDate('date', '<=', now()->toDateString())
+                ->where(function ($q) {
+                    $q->whereNull('end_date')
+                        ->orWhereDate('end_date', '>=', now()->toDateString());
+                });
+        } elseif ($filter === 'upcoming') {
+            $query->whereDate('date', '>', now()->toDateString());
         } elseif ($filter === 'expired') {
             $query->whereDate('end_date', '<', now()->toDateString());
         }
@@ -68,7 +72,7 @@ class AnnouncementController extends Controller
     {
         // Only show announcements where the publication date has arrived (today or in the past)
         // and if they have an end_date, make sure it hasn't passed yet
-        $announcements = Announcement::with('category')
+        $announcements = Announcement::with('category', 'images')
             ->whereDate('date', '<=', now())
             ->where(function ($query) {
                 $query->whereNull('end_date')
@@ -99,9 +103,9 @@ class AnnouncementController extends Controller
             abort(404);
         }
 
-        $announcement->load('category');
+        $announcement->load('category', 'images');
 
-        $relatedAnnouncements = Announcement::with('category')
+        $relatedAnnouncements = Announcement::with('category', 'images')
             ->where('category_id', $announcement->category_id)
             ->where('id', '!=', $announcement->id)
             ->where('date', '<=', now())
@@ -143,20 +147,29 @@ class AnnouncementController extends Controller
             'end_date' => 'nullable|date|after_or_equal:date',
             'summary' => 'required|string',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('announcements', 'public');
-        }
+        $announcement = Announcement::create($validated);
 
-        Announcement::create($validated);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('announcements', 'public');
+                $announcement->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $index,
+                ]);
+            }
+        }
 
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
     }
 
     public function edit(Request $request, Announcement $announcement)
     {
+        $announcement->load('images');
+
         return Inertia::render('Announcements/Edit', [
             'announcement' => $announcement,
             'categories' => Category::all(),
@@ -174,17 +187,24 @@ class AnnouncementController extends Controller
             'category_id' => 'sometimes|exists:categories,id',
             'summary' => 'sometimes|string',
             'content' => 'sometimes|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
-        if ($request->hasFile('image')) {
-            if ($announcement->image) {
-                Storage::disk('public')->delete($announcement->image);
-            }
-            $validated['image'] = $request->file('image')->store('announcements', 'public');
-        }
+        unset($validated['images']);
 
         $announcement->update($validated);
+
+        if ($request->hasFile('images')) {
+            $maxOrder = $announcement->images()->max('sort_order') ?? 0;
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('announcements', 'public');
+                $announcement->images()->create([
+                    'image_path' => $path,
+                    'sort_order' => $maxOrder + $index + 1,
+                ]);
+            }
+        }
 
         $page = $request->input('page', 1);
 
@@ -200,6 +220,14 @@ class AnnouncementController extends Controller
 
     //     return redirect()->route('announcements.index')->with('success', 'Announcement archived successfully.');
     // }
+
+    public function destroyImage(Announcement $announcement, AnnouncementImage $image)
+    {
+        Storage::disk('public')->delete($image->image_path);
+        $image->delete();
+
+        return redirect()->back()->with('success', 'Image deleted successfully.');
+    }
 
     public function destroy(Announcement $announcement)
     {

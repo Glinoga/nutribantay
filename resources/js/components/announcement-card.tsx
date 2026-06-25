@@ -1,3 +1,4 @@
+import AnnouncementPlaceholder from '@/components/announcement-placeholder';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Check, Share2, User } from 'lucide-react';
 import { useState } from 'react';
@@ -23,6 +24,8 @@ export interface AnnouncementData {
     content: string;
     image?: string;
     image_url?: string | null;
+    first_image_url?: string | null;
+    gallery_images?: Array<{ id: number; image_url: string }>;
     is_expired?: boolean;
 }
 
@@ -74,19 +77,22 @@ export default function AnnouncementCard({
             />
 
             <div className="relative h-48 shrink-0 overflow-hidden">
-                {announcement.image_url && !imgError ? (
-                    <img
-                        src={announcement.image_url}
-                        alt={announcement.title}
-                        width="400"
-                        height="192"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-[var(--bg)] dark:to-[var(--bg)]" />
-                )}
+                {(() => {
+                    const src = announcement.first_image_url ?? announcement.image_url;
+                    return src && !imgError ? (
+                        <img
+                            src={src}
+                            alt={announcement.title}
+                            width="400"
+                            height="192"
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <AnnouncementPlaceholder />
+                    );
+                })()}
             </div>
 
             <div className="flex flex-1 flex-col p-5">
