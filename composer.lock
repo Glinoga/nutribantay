@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79d7c0b2797221f8d6a69822f3b147cd",
+    "content-hash": "739553d610384dd4677a7a3b9f61847b",
     "packages": [
         {
             "name": "brick/math",
@@ -2416,60 +2416,6 @@
                 "source": "https://github.com/MarkBaker/PHPMatrix/tree/3.0.1"
             },
             "time": "2022-12-02T22:17:43+00:00"
-        },
-        {
-            "name": "meyfa/php-svg",
-            "version": "v0.16.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/meyfa/php-svg.git",
-                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/meyfa/php-svg/zipball/a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
-                "reference": "a62c2b9842826e83ea51f9b9e6ed28d2bdb1033c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.4.0"
-            },
-            "require-dev": {
-                "meyfa/phpunit-assert-gd": "^v3.0.0",
-                "phpmd/phpmd": "^2.15.0",
-                "phpunit/phpunit": "^9.6.16",
-                "rector/rector": "^1.0"
-            },
-            "suggest": {
-                "ext-gd": "Needed to rasterize images",
-                "ext-simplexml": "Needed to read SVG strings and files"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "SVG\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabian Meyer",
-                    "homepage": "https://meyfa.net"
-                }
-            ],
-            "description": "Read, edit, write, and render SVG files with PHP",
-            "homepage": "https://github.com/meyfa/php-svg",
-            "keywords": [
-                "svg"
-            ],
-            "support": {
-                "issues": "https://github.com/meyfa/php-svg/issues",
-                "source": "https://github.com/meyfa/php-svg/tree/v0.16.1"
-            },
-            "time": "2025-03-10T22:28:37+00:00"
         },
         {
             "name": "monolog/monolog",
