@@ -1,6 +1,8 @@
 import { route } from '@/lib/routes';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
+
+type SiteContentValue = { key: string; value: string | null };
 
 type GuestLayoutProps = {
     title: string;
@@ -8,7 +10,10 @@ type GuestLayoutProps = {
 };
 
 export default function GuestLayout({ children, title, showHeader = true }: PropsWithChildren<GuestLayoutProps>) {
+    const { footerContent } = usePage<{ footerContent: Record<string, SiteContentValue> }>().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const getFooter = (key: string, fallback: string) => footerContent?.[key]?.value ?? fallback;
 
     return (
         <>
@@ -208,11 +213,11 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                     <h3 className="text-2xl font-bold text-[var(--primary)]">NutriBantay</h3>
                                 </div>
                                 <p className="mb-4 text-[var(--text-muted)]">
-                                    Empowering our community with nutrition monitoring and health services.
+                                    {getFooter('tagline', 'Empowering our community with nutrition monitoring and health services.')}
                                 </p>
                                 <div className="mt-6">
                                     <a
-                                        href="https://web.facebook.com/profile.php?id=61572504453595"
+                                        href={getFooter('facebook_url', 'https://web.facebook.com/profile.php?id=61572504453595')}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         aria-label="Follow NutriBantay on Facebook"
@@ -316,7 +321,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                             <circle cx="12" cy="10" r="3"></circle>
                                         </svg>
-                                        Bagong Silang Phase 3 Health Center, Caloocan City, Philippines
+                                        {getFooter('address', 'Bagong Silang Phase 3 Health Center, Caloocan City, Philippines')}
                                     </p>
                                     <p className="mb-3 flex items-center text-[var(--text-muted)]">
                                         <svg
@@ -331,7 +336,7 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                         >
                                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                                         </svg>
-                                        0966 822 1878
+                                        {getFooter('phone', '0966 822 1878')}
                                     </p>
                                     <p className="flex items-center text-[var(--text-muted)]">
                                         <svg
@@ -347,13 +352,13 @@ export default function GuestLayout({ children, title, showHeader = true }: Prop
                                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                                             <polyline points="22,6 12,13 2,6"></polyline>
                                         </svg>
-                                        nutribantay@gmail.com
+                                        {getFooter('email', 'nutribantay@gmail.com')}
                                     </p>
                                 </address>
                             </div>
                         </div>
                         <div className="border-t border-[var(--border-muted)] pt-8 text-center">
-                            <p className="text-sm text-[var(--text-muted)]">&copy; {new Date().getFullYear()} NutriBantay. All rights reserved.</p>
+                            <p className="text-sm text-[var(--text-muted)]">&copy; {new Date().getFullYear()} {getFooter('copyright_text', 'NutriBantay. All rights reserved.')}</p>
                         </div>
                     </div>
                 </footer>

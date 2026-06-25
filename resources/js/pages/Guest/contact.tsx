@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import GuestLayout from '@/layouts/guest-layout';
 import { route } from '@/lib/routes';
-import { useForm } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AlertTriangle, CheckCircle, ChevronDown, Clock, Mail, MapPin, Phone, Send, User } from 'lucide-react';
@@ -18,7 +18,9 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const FAQs = [
+type SiteContentValue = { key: string; value: string | null };
+
+const defaultFAQs = [
     {
         id: 1,
         question: 'What services does NutriBantay offer?',
@@ -52,6 +54,28 @@ const FAQs = [
 ];
 
 export default function Contact() {
+    const { siteContent } = usePage<{
+        siteContent: Record<string, SiteContentValue>;
+    }>().props;
+
+    const getContent = (key: string, fallback: string) => siteContent?.[key]?.value ?? fallback;
+
+    const phone = getContent('phone', '0966 822 1878');
+    const email = getContent('email', 'barangay176b@gmail.com');
+    const address = getContent('address', 'Q29X+VJC, Caloocan, Metro Manila');
+    const locationName = getContent('location_name', 'Bagong Silang Phase 3 Health Center');
+    const officeHours = getContent('office_hours', 'Mon-Fri: 8AM - 5PM');
+    const hoursSubtext = getContent('hours_subtext', 'Mon-Fri, 8am-5pm');
+    const latitude = parseFloat(getContent('latitude', '14.7695106'));
+    const longitude = parseFloat(getContent('longitude', '121.0489927'));
+
+
+    const FAQs = Array.from({ length: 6 }, (_, i) => ({
+        id: i + 1,
+        question: getContent(`faq_${i + 1}_question`, defaultFAQs[i]?.question ?? ''),
+        answer: getContent(`faq_${i + 1}_answer`, defaultFAQs[i]?.answer ?? ''),
+    }));
+
     const { data, setData, post, processing, errors, reset } = useForm({
         first_name: '',
         last_name: '',
@@ -155,9 +179,9 @@ export default function Contact() {
                                             <Phone className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Call Us</h3>
-                                        <p className="mb-3 text-sm text-[var(--text-muted)]">Mon-Fri, 8am-5pm</p>
-                                        <a href="tel:+639668221878" className="inline-block text-lg font-medium text-[var(--text)]">
-                                            0966 822 1878
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">{hoursSubtext}</p>
+                                        <a href={`tel:+63${phone.replace(/\D/g, '')}`} className="inline-block text-lg font-medium text-[var(--text)]">
+                                            {phone}
                                         </a>
                                     </div>
 
@@ -168,8 +192,8 @@ export default function Contact() {
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Email Us</h3>
                                         <p className="mb-3 text-sm text-[var(--text-muted)]">We'll respond within 24h</p>
-                                        <a href="mailto:barangay176b@gmail.com" className="inline-block text-lg font-medium text-[var(--text)]">
-                                            barangay176b@gmail.com
+                                        <a href={`mailto:${email}`} className="inline-block text-lg font-medium text-[var(--text)]">
+                                            {email}
                                         </a>
                                     </div>
 
@@ -179,8 +203,8 @@ export default function Contact() {
                                             <MapPin className="h-6 w-6" />
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Visit Us</h3>
-                                        <p className="mb-3 text-sm text-[var(--text-muted)]">Bagong Silang Phase 3 Health Center</p>
-                                        <span className="inline-block text-lg font-medium text-[var(--text)]">Q29X+VJC, Caloocan, Metro Manila</span>
+                                        <p className="mb-3 text-sm text-[var(--text-muted)]">{locationName}</p>
+                                        <span className="inline-block text-lg font-medium text-[var(--text)]">{address}</span>
                                     </div>
 
                                     {/* Office Hours Card */}
@@ -190,7 +214,7 @@ export default function Contact() {
                                         </div>
                                         <h3 className="mb-1 text-lg font-semibold text-[var(--text)]">Office Hours</h3>
                                         <p className="mb-3 text-sm text-[var(--text-muted)]">We are only available on:</p>
-                                        <span className="inline-block text-lg font-medium text-[var(--text)]">Mon-Fri: 8AM - 5PM</span>
+                                        <span className="inline-block text-lg font-medium text-[var(--text)]">{officeHours}</span>
                                     </div>
                                 </div>
                             </div>
@@ -455,7 +479,7 @@ export default function Contact() {
                         </span>
                         <h2 className="mt-4 text-3xl font-bold text-[var(--text)]">Visit Us Today</h2>
                         <p className="mt-4 text-[var(--text-muted)]">
-                            Bagong Silang Phase 3 Health Center — we are located at Bagong Silang, Caloocan City.
+                            {locationName} — we are located at Bagong Silang, Caloocan City.
                         </p>
                     </div>
 
@@ -464,7 +488,7 @@ export default function Contact() {
                         <div className="relative h-[36rem] w-full">
                             {!mapReady && <div className="absolute inset-0 z-[999] animate-pulse rounded-xl bg-gray-100 dark:bg-[var(--bg-card)]" />}
                             <MapContainer
-                                center={[14.7695106, 121.0489927]}
+                                center={[latitude, longitude]}
                                 zoom={16}
                                 style={{ height: '100%', width: '100%' }}
                                 scrollWheelZoom={true}
@@ -475,17 +499,15 @@ export default function Contact() {
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <Marker position={[14.7695106, 121.0489927]}>
+                                <Marker position={[latitude, longitude]}>
                                     <Popup>
                                         <div className="p-2 text-center">
-                                            <h3 className="text-lg font-bold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
+                                            <h3 className="text-lg font-bold text-[var(--text)]">{locationName}</h3>
                                             <p className="mt-1 text-sm text-[var(--text-muted)]">
-                                                Q29X+VJC, Caloocan
-                                                <br />
-                                                Metro Manila, Philippines
+                                                {address}
                                             </p>
                                             <p className="mt-2 text-sm text-[var(--text-muted)]">
-                                                <strong>Hours:</strong> Mon-Fri: 8AM - 5PM
+                                                <strong>Hours:</strong> {officeHours}
                                             </p>
                                         </div>
                                     </Popup>
@@ -498,12 +520,12 @@ export default function Contact() {
                                     <div className="flex items-start gap-3">
                                         <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[var(--primary)]" />
                                         <div>
-                                            <h3 className="text-lg font-semibold text-[var(--text)]">Bagong Silang Phase 3 Health Center</h3>
+                                            <h3 className="text-lg font-semibold text-[var(--text)]">{locationName}</h3>
                                             <p className="mt-0.5 text-sm text-[var(--text-muted)]">Bagong Silang Phase 3, Caloocan, Metro Manila</p>
                                         </div>
                                     </div>
                                     <a
-                                        href="https://maps.google.com/maps?q=14.7695106,121.0489927"
+                                        href={`https://maps.google.com/maps?q=${latitude},${longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex shrink-0 cursor-pointer items-center rounded-md bg-[#006666] px-4 py-2 text-sm text-white transition-all hover:bg-[#005555] hover:shadow-md"

@@ -115,6 +115,10 @@ export function route(name: string, params?: Record<string, string | number | nu
         'audit-logs.export': '/audit-logs/export',
         'audit-logs.show': '/audit-logs/{auditLog}',
 
+        // Website Management
+        'admin.website.index': '/admin/website-management',
+        'admin.website.update': '/admin/website-management',
+
         // Categories
         'categories.index': '/categories',
         'categories.create': '/categories/create',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\WebsiteManagementController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CategoryController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VaccineController;
 use App\Http\Controllers\VitaminController;
 use App\Models\Announcement;
+use App\Models\SiteContent;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -35,6 +37,7 @@ Route::get('/', function () {
 
     return Inertia::render('home', [
         'announcements' => $announcements,
+        'siteContent' => SiteContent::getByPage('home'),
     ]);
 })->name('home');
 
@@ -190,6 +193,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('categories', CategoryController::class);
 
         Route::resource('users', UserController::class);
+
+        // Website Management
+        Route::get('/admin/website-management', [WebsiteManagementController::class, 'index'])
+            ->name('admin.website.index');
+        Route::put('/admin/website-management', [WebsiteManagementController::class, 'update'])
+            ->name('admin.website.update');
     });
 
     /*

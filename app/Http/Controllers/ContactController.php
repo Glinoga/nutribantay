@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ContactFormMail;
+use App\Models\SiteContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -18,7 +19,10 @@ class ContactController extends Controller
 
     public function showContactForm()
     {
-        return Inertia::render('Guest/contact');
+        return Inertia::render('Guest/contact', [
+            'siteContent' => SiteContent::getByPage('contact'),
+            'footerContent' => SiteContent::getByPage('footer'),
+        ]);
     }
 
     public function sendContactForm(Request $request)

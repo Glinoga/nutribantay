@@ -15,7 +15,7 @@ import {
 import { route } from '@/lib/routes';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Database, FileTextIcon, LayoutGrid, Megaphone, MessageSquare, Pill, ShieldCheck, UserCog, UserPen } from 'lucide-react';
+import { Database, FileTextIcon, Globe, LayoutGrid, Megaphone, MessageSquare, Pill, ShieldCheck, UserCog, UserPen } from 'lucide-react';
 import AppLogo from './app-logo';
 
 // Expanded type definition to catch roles wherever they might be attached
@@ -62,6 +62,7 @@ export function AppSidebar() {
     // Admin-only menu items
     const adminNavItems: NavItem[] = isAdmin
         ? [
+              { title: 'Website Management', href: route('admin.website.index'), icon: Globe },
               { title: 'User Management', href: route('users.index'), icon: UserCog },
               { title: 'Data Management', href: route('admin.database.index'), icon: Database },
               { title: 'Audit Logs', href: route('audit-logs.index'), icon: FileTextIcon },

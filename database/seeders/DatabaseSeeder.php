@@ -44,5 +44,6 @@ class DatabaseSeeder extends Seeder
         $this->call(VitaminSeeder::class);
         $this->call(AddPhoneNumbersSeeder::class);
         $this->call(HealthLogSeeder::class);
+        $this->call(SiteContentSeeder::class);
     }
 }

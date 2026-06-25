@@ -27,9 +27,12 @@ interface Announcement {
     image_url?: string | null;
 }
 
+type SiteContentMap = Record<string, { key: string; value: string | null }>;
+
 interface HomeProps {
     announcements: Announcement[];
     maintenance?: string | null;
+    siteContent?: SiteContentMap;
 }
 
 function getCategoryColorClass(categoryColor: string) {
@@ -44,7 +47,7 @@ function getCategoryColorClass(categoryColor: string) {
     return colorMap[categoryColor] || 'bg-[var(--primary)]';
 }
 
-export default function Home({ announcements = [], maintenance = null }: HomeProps) {
+export default function Home({ announcements = [], maintenance = null, siteContent = {} }: HomeProps) {
     const [sharedId, setSharedId] = useState<number | null>(null);
     const [erroredImages, setErroredImages] = useState<Set<number>>(new Set());
 
@@ -136,12 +139,11 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                             </div>
 
                             <h1 className="mb-6 text-4xl leading-tight font-bold text-[var(--text)] md:text-5xl lg:text-6xl">
-                                Every Child Deserves a Healthy Start
+                                {siteContent.hero_title?.value ?? 'Every Child Deserves a Healthy Start'}
                             </h1>
 
                             <p className="mb-8 max-w-xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
-                                NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a
-                                healthier future.
+                                {siteContent.hero_description?.value ?? 'NutriBantay monitors nutrition, vaccines, and growth for children under 5 in your barangay. We help families build a healthier future.'}
                             </p>
 
                             <div className="flex flex-col gap-4 sm:flex-row">
@@ -149,14 +151,14 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                     href="#announcements"
                                     className="inline-flex items-center justify-center rounded-md bg-[#008080] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#006666] hover:shadow-md"
                                 >
-                                    <span>View Announcements</span>
+                                    <span>{siteContent.cta_primary_label?.value ?? 'View Announcements'}</span>
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </a>
                                 <Link
                                     href={route('guest.contact')}
                                     className="inline-flex items-center justify-center rounded-md border-2 border-[var(--primary)] px-6 py-3 text-sm font-semibold text-[var(--primary)] transition-all hover:bg-[var(--primary)] hover:text-white"
                                 >
-                                    <span>Contact the Health Center</span>
+                                    <span>{siteContent.cta_secondary_label?.value ?? 'Contact the Health Center'}</span>
                                 </Link>
                             </div>
                         </div>
@@ -187,25 +189,25 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
                                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--primary)]/10">
                                     <TrendingUp className="h-5 w-5 text-[var(--primary)]" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--text)]">500+</h3>
-                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Children Monitored</p>
-                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">Since 2022</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">{siteContent.stat_1_value?.value ?? '500+'}</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">{siteContent.stat_1_label?.value ?? 'Children Monitored'}</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">{siteContent.stat_1_subtitle?.value ?? 'Since 2022'}</p>
                             </div>
                             <div className="stat-card rounded-xl bg-white p-6 shadow-sm dark:bg-[var(--bg-card)]">
                                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--secondary)]/10">
                                     <CalendarCheck className="h-5 w-5 text-[var(--secondary)]" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--text)]">50+</h3>
-                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Health Programs</p>
-                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">As of June 2026</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">{siteContent.stat_2_value?.value ?? '50+'}</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">{siteContent.stat_2_label?.value ?? 'Health Programs'}</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">{siteContent.stat_2_subtitle?.value ?? 'As of June 2026'}</p>
                             </div>
                             <div className="stat-card rounded-xl bg-white p-6 shadow-sm dark:bg-[var(--bg-card)]">
                                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-900/20">
                                     <Heart className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                                 </div>
-                                <h3 className="text-3xl font-bold text-[var(--text)]">200+</h3>
-                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">Families Assisted</p>
-                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">Since 2022</p>
+                                <h3 className="text-3xl font-bold text-[var(--text)]">{siteContent.stat_3_value?.value ?? '200+'}</h3>
+                                <p className="mt-1 text-sm font-medium text-[var(--text-muted)]">{siteContent.stat_3_label?.value ?? 'Families Assisted'}</p>
+                                <p className="mt-0.5 text-xs text-[var(--text-muted)]/70">{siteContent.stat_3_subtitle?.value ?? 'Since 2022'}</p>
                             </div>
                         </div>
                     </div>
@@ -302,17 +304,16 @@ export default function Home({ announcements = [], maintenance = null }: HomePro
 
             <section className="bg-[#006666] py-16">
                 <div className="container mx-auto px-6 text-center lg:px-8">
-                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Have questions about your child's nutrition?</h2>
+                    <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">{siteContent.cta_heading?.value ?? "Have questions about your child's nutrition?"}</h2>
                     <p className="mx-auto mb-8 max-w-2xl text-lg text-white/80">
-                        Our team at the barangay health center is ready to help. Reach out to learn about our monitoring program, vaccine schedules,
-                        and how we can support your family.
+                        {siteContent.cta_text?.value ?? 'Our team at the barangay health center is ready to help. Reach out to learn about our monitoring program, vaccine schedules, and how we can support your family.'}
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
                         <Link
                             href={route('guest.contact')}
                             className="inline-flex items-center rounded-md bg-white px-6 py-3 text-sm font-semibold text-[#006666] shadow-sm transition-all hover:bg-gray-100 hover:shadow-md"
                         >
-                            Contact the Health Center
+                            {siteContent.cta_button_label?.value ?? 'Contact the Health Center'}
                             <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
                     </div>
