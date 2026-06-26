@@ -30,7 +30,6 @@ class HealthLog extends Model
         'rusf',
         'complementary_food',
 
-        'vitamin_a',
         'deworming',
 
         'recommendation',
@@ -61,5 +60,10 @@ class HealthLog extends Model
     public function vitaminDoses(): HasMany
     {
         return $this->hasMany(ChildVitaminDose::class, 'healthlog_id');
+    }
+
+    public function vaccineDoses(): HasMany
+    {
+        return $this->hasMany(ChildVaccineDose::class, 'healthlog_id');
     }
 }
