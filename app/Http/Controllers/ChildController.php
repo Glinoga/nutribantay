@@ -739,7 +739,7 @@ class ChildController extends Controller
         $selectColumns = [
             'id', 'weight', 'height', 'bmi', 'nutrition_status',
             'status_wfa', 'status_lfa', 'status_wfl_wfh',
-            'vitamin_a', 'deworming',
+            'deworming',
             'micronutrient_powder', 'ruf', 'rusf', 'complementary_food',
             'created_at', 'user_id',
         ];
@@ -753,7 +753,6 @@ class ChildController extends Controller
             'status_wfa' => $log->status_wfa,
             'status_lfa' => $log->status_lfa,
             'status_wfl_wfh' => $log->status_wfl_wfh,
-            'vitamin_a' => $log->vitamin_a,
             'deworming' => $log->deworming,
             'micronutrient_powder' => $log->micronutrient_powder,
             'rutf' => $log->ruf,
@@ -761,6 +760,14 @@ class ChildController extends Controller
             'complementary_food' => $log->complementary_food,
             'created_at' => $log->created_at,
             'user' => ['name' => $log->user?->name],
+            'vaccine_doses' => $log->vaccineDoses->map(fn ($dose) => [
+                'name' => $dose->childVaccine?->vaccine?->name,
+                'dose_number' => $dose->dose_number,
+            ])->values(),
+            'vitamin_doses' => $log->vitaminDoses->map(fn ($dose) => [
+                'name' => $dose->childVitamin?->vitamin?->name,
+                'dose_number' => $dose->dose_number,
+            ])->values(),
         ];
 
         return Inertia::render('Children/Show', [
@@ -793,12 +800,20 @@ class ChildController extends Controller
                 ]),
             ],
             'chartHealthLogs' => $child->healthlogs()
+                ->with([
+                    'vaccineDoses.childVaccine.vaccine:id,name',
+                    'vitaminDoses.childVitamin.vitamin:id,name',
+                ])
                 ->orderBy('created_at', 'asc')
                 ->take(12)
                 ->get($selectColumns)
                 ->map($logMapper),
             'healthlogs' => $child->healthlogs()
-                ->with('user:id,name')
+                ->with([
+                    'user:id,name',
+                    'vaccineDoses.childVaccine.vaccine:id,name',
+                    'vitaminDoses.childVitamin.vitamin:id,name',
+                ])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10, $selectColumns)
                 ->through($logMapper),
@@ -1172,7 +1187,13 @@ class ChildController extends Controller
             'barangay' => $user->barangay,
         ]);
 
-        $child->load(['healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')]);
+        $child->load([
+            'healthlogs' => fn ($q) => $q->orderBy('created_at', 'asc')
+                ->with([
+                    'vaccineDoses.childVaccine.vaccine:id,name',
+                    'vitaminDoses.childVitamin.vitamin:id,name',
+                ]),
+        ]);
 
         return Inertia::render('Children/ShowPrint', [
             'child' => [
@@ -1199,7 +1220,6 @@ class ChildController extends Controller
                     'height' => $log->height,
                     'bmi' => $log->bmi,
                     'nutrition_status' => $log->nutrition_status,
-                    'vitamin_a' => $log->vitamin_a,
                     'deworming' => $log->deworming,
                     'micronutrient_powder' => $log->micronutrient_powder,
                     'rutf' => $log->rutf,
@@ -1209,6 +1229,14 @@ class ChildController extends Controller
                     'status_lfa' => $log->status_lfa,
                     'status_wfl_wfh' => $log->status_wfl_wfh,
                     'created_at' => $log->created_at?->format('Y-m-d'),
+                    'vaccine_doses' => $log->vaccineDoses->map(fn ($dose) => [
+                        'name' => $dose->childVaccine?->vaccine?->name,
+                        'dose_number' => $dose->dose_number,
+                    ])->values(),
+                    'vitamin_doses' => $log->vitaminDoses->map(fn ($dose) => [
+                        'name' => $dose->childVitamin?->vitamin?->name,
+                        'dose_number' => $dose->dose_number,
+                    ])->values(),
                 ]),
             ],
             'generated_at' => now()->format('Y-m-d H:i:s'),

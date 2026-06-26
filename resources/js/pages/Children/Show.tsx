@@ -42,6 +42,11 @@ type Note = {
     author?: { name: string | null };
 };
 
+type DoseItem = {
+    name: string | null;
+    dose_number: number;
+};
+
 type HealthLog = {
     id: number;
     weight: number | null;
@@ -51,7 +56,6 @@ type HealthLog = {
     status_wfa: string | null;
     status_lfa: string | null;
     status_wfl_wfh: string | null;
-    vitamin_a: boolean;
     deworming: boolean;
     micronutrient_powder: string | null;
     ruf: string | null;
@@ -59,6 +63,8 @@ type HealthLog = {
     complementary_food: string | null;
     created_at: string;
     user?: { name: string | null };
+    vaccine_doses: DoseItem[];
+    vitamin_doses: DoseItem[];
 };
 
 type PaginatedData<T> = {
@@ -169,6 +175,25 @@ export default function Show({
         if (s.includes('Overweight') || s.includes('Obese')) return 'bg-orange-100 text-orange-800';
         if (s.includes('Tall')) return 'bg-blue-100 text-blue-800';
         return 'bg-gray-100 text-gray-800';
+    };
+
+    const renderGivenItems = (vaccineDoses: DoseItem[], vitaminDoses: DoseItem[]) => {
+        const vaccineNames = vaccineDoses.map((d) => d.name).filter(Boolean);
+        const vitaminNames = vitaminDoses.map((d) => d.name).filter(Boolean);
+        const all = [...vaccineNames, ...vitaminNames];
+        if (all.length === 0) return <X className="mx-auto h-4 w-4 text-red-600" />;
+        return (
+            <div className="flex flex-wrap items-center justify-center gap-1">
+                {all.map((name, i) => (
+                    <span
+                        key={i}
+                        className="inline-block max-w-[100px] truncate rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-medium text-teal-700 dark:bg-teal-900/40 dark:text-teal-300"
+                    >
+                        {name}
+                    </span>
+                ))}
+            </div>
+        );
     };
 
     const submitNote = (e: React.FormEvent) => {
@@ -612,7 +637,7 @@ export default function Show({
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
                                                 Status WFL
                                             </th>
-                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Vit A</th>
+                                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">Given</th>
                                             <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
                                                 Deworming
                                             </th>
@@ -671,11 +696,7 @@ export default function Show({
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
-                                                    {log.vitamin_a ? (
-                                                        <Check className="mx-auto h-4 w-4 text-green-600" />
-                                                    ) : (
-                                                        <X className="mx-auto h-4 w-4 text-red-600" />
-                                                    )}
+                                                    {renderGivenItems(log.vaccine_doses, log.vitamin_doses)}
                                                 </td>
                                                 <td className="px-4 py-3 text-center">
                                                     {log.deworming ? (
@@ -886,30 +907,68 @@ export default function Show({
                                     {/* Supplements */}
                                     <div>
                                         <h3 className="mb-2 font-semibold text-gray-700 dark:text-gray-300">Supplements & Programs</h3>
-                                        <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-2 dark:bg-gray-700">
-                                            {[
-                                                { label: 'Vitamin A', value: selectedLog.vitamin_a },
-                                                { label: 'Deworming', value: selectedLog.deworming },
-                                                { label: 'Micronutrient Powder (MNP)', value: selectedLog.micronutrient_powder },
-                                                { label: 'Complementary Food', value: selectedLog.complementary_food },
-                                                { label: 'RUTF (Severely Wasted)', value: selectedLog.ruf },
-                                                { label: 'RUSF (Moderately Wasted)', value: selectedLog.rusf },
-                                            ].map((item, idx) => (
-                                                <div key={idx} className="flex items-center gap-2">
-                                                    <span className="font-medium text-gray-700 dark:text-gray-300">{item.label}:</span>
-                                                    {typeof item.value === 'boolean' ? (
-                                                        item.value ? (
-                                                            <Check className="h-4 w-4 text-green-600" />
-                                                        ) : (
-                                                            <X className="h-4 w-4 text-red-600" />
-                                                        )
-                                                    ) : (
-                                                        <span className="text-gray-900 dark:text-gray-200">
-                                                            {item.value || <X className="inline h-4 w-4 text-red-600" />}
-                                                        </span>
-                                                    )}
+                                        <div className="space-y-3 rounded-md bg-gray-50 p-4 dark:bg-gray-700">
+                                            {/* Vaccines */}
+                                            {selectedLog.vaccine_doses.length > 0 && (
+                                                <div>
+                                                    <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">Vaccines Given</p>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {selectedLog.vaccine_doses.map((dose, i) => (
+                                                            <span
+                                                                key={i}
+                                                                className="inline-flex items-center gap-1 rounded bg-teal-100 px-2 py-1 text-xs font-medium text-teal-700 dark:bg-teal-900/40 dark:text-teal-300"
+                                                            >
+                                                                <Syringe className="h-3 w-3" />
+                                                                {dose.name}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            ))}
+                                            )}
+
+                                            {/* Vitamins */}
+                                            {selectedLog.vitamin_doses.length > 0 && (
+                                                <div>
+                                                    <p className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">Vitamins Given</p>
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {selectedLog.vitamin_doses.map((dose, i) => (
+                                                            <span
+                                                                key={i}
+                                                                className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                                                            >
+                                                                <Pill className="h-3 w-3" />
+                                                                {dose.name}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Programs (boolean/text items) */}
+                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                {[
+                                                    { label: 'Deworming', value: selectedLog.deworming },
+                                                    { label: 'Micronutrient Powder (MNP)', value: selectedLog.micronutrient_powder },
+                                                    { label: 'Complementary Food', value: selectedLog.complementary_food },
+                                                    { label: 'RUTF (Severely Wasted)', value: selectedLog.ruf },
+                                                    { label: 'RUSF (Moderately Wasted)', value: selectedLog.rusf },
+                                                ].map((item, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2">
+                                                        <span className="font-medium text-gray-700 dark:text-gray-300">{item.label}:</span>
+                                                        {typeof item.value === 'boolean' ? (
+                                                            item.value ? (
+                                                                <Check className="h-4 w-4 text-green-600" />
+                                                            ) : (
+                                                                <X className="h-4 w-4 text-red-600" />
+                                                            )
+                                                        ) : (
+                                                            <span className="text-gray-900 dark:text-gray-200">
+                                                                {item.value || <X className="inline h-4 w-4 text-red-600" />}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
 
