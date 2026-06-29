@@ -6,9 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
+import SortableImageGrid, { type SortableImageItem } from '@/components/sortable-image-grid';
 import { smartToast } from '@/utils/smartToast';
 import { Head, useForm } from '@inertiajs/react';
-import { CheckCircle2, ImagePlus, Megaphone, OctagonAlert, Sparkles, X } from 'lucide-react';
+import { CheckCircle2, ImagePlus, Megaphone, OctagonAlert, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -40,7 +41,8 @@ export default function Create({ categories }: CreateProps) {
         images: [] as File[],
     });
 
-    const [previews, setPreviews] = useState<string[]>([]);
+    const [previewItems, setPreviewItems] = useState<SortableImageItem[]>([]);
+    const fileMap = useRef<Map<string, File>>(new Map());
     const [isDirty, setIsDirty] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,9 +70,9 @@ export default function Create({ categories }: CreateProps) {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.dismiss(loadingToast);
-                smartToast.success('Announcement created successfully!');
                 reset();
-                setPreviews([]);
+                previewItems.forEach((i) => URL.revokeObjectURL(i.url));
+                setPreviewItems([]);
             },
             onError: (errors) => {
                 smartToast.dismiss(loadingToast);
@@ -89,18 +91,30 @@ export default function Create({ categories }: CreateProps) {
     const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files);
-            setData('images', [...data.images, ...newFiles]);
-            const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
-            setPreviews([...previews, ...newPreviews]);
+            const newItems: SortableImageItem[] = newFiles.map((f) => ({
+                id: crypto.randomUUID(),
+                url: URL.createObjectURL(f),
+            }));
+            newFiles.forEach((f, i) => fileMap.current.set(newItems[i].id, f));
+            const updated = [...previewItems, ...newItems];
+            setPreviewItems(updated);
+            setData('images', updated.map((item) => fileMap.current.get(item.id)!).filter(Boolean) as File[]);
         }
     };
 
-    const removeImage = (index: number) => {
-        const updatedFiles = data.images.filter((_, i) => i !== index);
-        const updatedPreviews = previews.filter((_, i) => i !== index);
-        setData('images', updatedFiles);
-        setPreviews(updatedPreviews);
+    const removeImage = (id: string) => {
+        const item = previewItems.find((i) => i.id === id);
+        if (item) URL.revokeObjectURL(item.url);
+        fileMap.current.delete(id);
+        const updated = previewItems.filter((i) => i.id !== id);
+        setPreviewItems(updated);
+        setData('images', updated.map((i) => fileMap.current.get(i.id)).filter(Boolean) as File[]);
         if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const handleReorder = (items: SortableImageItem[]) => {
+        setPreviewItems(items);
+        setData('images', items.map((item) => fileMap.current.get(item.id)).filter(Boolean) as File[]);
     };
 
     const handleCancel = () => {
@@ -109,8 +123,10 @@ export default function Create({ categories }: CreateProps) {
                 return;
             }
         }
+        previewItems.forEach((i) => URL.revokeObjectURL(i.url));
         reset();
-        setPreviews([]);
+        setPreviewItems([]);
+        fileMap.current.clear();
         window.history.back();
     };
 
@@ -320,27 +336,18 @@ export default function Create({ categories }: CreateProps) {
                                     className="hidden"
                                 />
                             </div>
-                            {previews.length > 0 && (
-                                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                                    {previews.map((p, index) => (
-                                        <div key={index} className="group relative aspect-[4/3] overflow-hidden rounded-md border border-teal-100 shadow-sm dark:border-gray-600">
-                                            <img src={p} alt={`Preview ${index + 1}`} className="h-full w-full object-cover" />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                            <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
-                                                {index + 1}
-                                            </span>
-                                        </div>
-                                    ))}
+                            {previewItems.length > 0 && (
+                                <div className="mt-4">
+                                    <SortableImageGrid
+                                        items={previewItems}
+                                        onReorder={handleReorder}
+                                        onRemove={removeImage}
+                                        deletable={true}
+                                    />
                                 </div>
                             )}
                             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                {previews.length} file{previews.length !== 1 ? 's' : ''} selected &middot; Recommended: 1920&times;960px (2:1 ratio) &middot; Max 5MB each
+                                {previewItems.length} file{previewItems.length !== 1 ? 's' : ''} selected &middot; Recommended: 1920&times;960px (2:1 ratio) &middot; Max 5MB each
                             </p>
                         </div>
 

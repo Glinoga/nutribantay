@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
+import SortableImageGrid, { type SortableImageItem } from '@/components/sortable-image-grid';
 import { smartToast } from '@/utils/smartToast';
 import { Head, router, useForm } from '@inertiajs/react';
-import { ImagePlus, Loader2, Megaphone, OctagonAlert, Trash2, X } from 'lucide-react';
+import { ImagePlus, Loader2, Megaphone, OctagonAlert } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 interface Category {
@@ -59,12 +60,22 @@ export default function Edit({ announcement, categories, page }: EditProps) {
     });
 
     const existingImages = announcement.gallery_images ?? [];
-    const [newPreviews, setNewPreviews] = useState<string[]>([]);
+    const [existingItems, setExistingItems] = useState<SortableImageItem[]>(
+        () => existingImages.map((img) => ({ id: String(img.id), url: img.image_url })),
+    );
+    const newFileMap = useRef<Map<string, File>>(new Map());
+    const [newItems, setNewItems] = useState<SortableImageItem[]>([]);
     const [isDirty, setIsDirty] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [showModal, setShowModal] = useState(true);
     const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        setExistingItems(
+            (announcement.gallery_images ?? []).map((img) => ({ id: String(img.id), url: img.image_url })),
+        );
+    }, [announcement.gallery_images]);
 
     useEffect(() => {
         const hasChanges =
@@ -80,21 +91,46 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         setIsDirty(hasChanges);
     }, [data, announcement]);
 
+    const handleDeleteExistingDnD = (id: string) => {
+        const img = existingImages.find((i) => String(i.id) === id);
+        if (img) handleDeleteExistingImage(img);
+    };
+
     const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files);
+            const items: SortableImageItem[] = newFiles.map((f) => ({
+                id: crypto.randomUUID(),
+                url: URL.createObjectURL(f),
+            }));
+            newFiles.forEach((f, i) => newFileMap.current.set(items[i].id, f));
+            setNewItems([...newItems, ...items]);
             setData('images', [...data.images, ...newFiles]);
-            const previews = newFiles.map((f) => URL.createObjectURL(f));
-            setNewPreviews([...newPreviews, ...previews]);
         }
     };
 
-    const removeNewImage = (index: number) => {
-        const updatedFiles = data.images.filter((_, i) => i !== index);
-        const updatedPreviews = newPreviews.filter((_, i) => i !== index);
-        setData('images', updatedFiles);
-        setNewPreviews(updatedPreviews);
+    const removeNewImage = (id: string) => {
+        const item = newItems.find((i) => i.id === id);
+        if (item) URL.revokeObjectURL(item.url);
+        newFileMap.current.delete(id);
+        const updated = newItems.filter((i) => i.id !== id);
+        setNewItems(updated);
+        setData('images', updated.map((i) => newFileMap.current.get(i.id)).filter(Boolean) as File[]);
         if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    const handleReorderNew = (items: SortableImageItem[]) => {
+        setNewItems(items);
+        setData('images', items.map((item) => newFileMap.current.get(item.id)).filter(Boolean) as File[]);
+    };
+
+    const handleReorderExisting = (items: SortableImageItem[]) => {
+        setExistingItems(items);
+        const payload = items.map((item, i) => ({ id: Number(item.id), sort_order: i }));
+        router.post(route('announcements.images.reorder', { announcement: announcement.slug }), { images: payload }, {
+            preserveScroll: true,
+            onSuccess: () => smartToast.success('Images reordered'),
+        });
     };
 
     const handleDeleteExistingImage = (image: GalleryImage) => {
@@ -126,7 +162,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
         formData.append('summary', data.summary);
         formData.append('content', data.content);
         data.images.forEach((file) => {
-            formData.append('images', file);
+            formData.append('images[]', file);
         });
 
         formData.append('_method', 'PUT');
@@ -137,9 +173,7 @@ export default function Edit({ announcement, categories, page }: EditProps) {
             preserveScroll: true,
             onSuccess: () => {
                 smartToast.dismiss(loadingToast);
-                smartToast.success('Announcement updated successfully!');
                 setIsDirty(false);
-                router.visit(route('announcements.index'));
             },
             onError: (errors) => {
                 smartToast.dismiss(loadingToast);
@@ -355,48 +389,28 @@ export default function Edit({ announcement, categories, page }: EditProps) {
                                         <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Images</Label>
                                         <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Manage the announcement image gallery</p>
 
-                                        {existingImages.length > 0 && (
+                                        {existingItems.length > 0 && (
                                             <div className="mb-4">
                                                 <p className="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">Current Images</p>
-                                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                                                    {existingImages.map((img) => (
-                                                        <div key={img.id} className="group relative aspect-[4/3] overflow-hidden rounded-sm border border-teal-100 shadow-sm dark:border-gray-600">
-                                                            <img src={img.image_url} alt="" className="h-full w-full object-cover" />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleDeleteExistingImage(img)}
-                                                                disabled={deletingImageId === img.id}
-                                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1.5 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600 disabled:opacity-100"
-                                                            >
-                                                                {deletingImageId === img.id ? (
-                                                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                                                ) : (
-                                                                    <Trash2 size={14} />
-                                                                )}
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                                <SortableImageGrid
+                                                    items={existingItems}
+                                                    onReorder={handleReorderExisting}
+                                                    onRemove={handleDeleteExistingDnD}
+                                                    deletingId={deletingImageId?.toString() ?? null}
+                                                    deletable={true}
+                                                />
                                             </div>
                                         )}
 
-                                        {newPreviews.length > 0 && (
+                                        {newItems.length > 0 && (
                                             <div className="mb-4">
                                                 <p className="mb-2 text-xs font-semibold text-teal-600 dark:text-teal-400">New Images</p>
-                                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                                                    {newPreviews.map((p, index) => (
-                                                        <div key={`new-${index}`} className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-teal-100 shadow-sm dark:border-gray-600">
-                                                            <img src={p} alt={`New ${index + 1}`} className="h-full w-full object-cover" />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeNewImage(index)}
-                                                                className="absolute top-1 right-1 rounded-full bg-red-500/90 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                                                            >
-                                                                <X size={14} />
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
+                                                <SortableImageGrid
+                                                    items={newItems}
+                                                    onReorder={handleReorderNew}
+                                                    onRemove={removeNewImage}
+                                                    deletable={true}
+                                                />
                                             </div>
                                         )}
 

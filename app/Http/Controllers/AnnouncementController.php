@@ -221,6 +221,23 @@ class AnnouncementController extends Controller
     //     return redirect()->route('announcements.index')->with('success', 'Announcement archived successfully.');
     // }
 
+    public function reorderImages(Request $request, Announcement $announcement)
+    {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*.id' => 'required|exists:announcement_images,id',
+            'images.*.sort_order' => 'required|integer|min:0',
+        ]);
+
+        foreach ($request->images as $item) {
+            AnnouncementImage::where('id', $item['id'])
+                ->where('announcement_id', $announcement->id)
+                ->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return redirect()->back()->with('success', 'Images reordered successfully.');
+    }
+
     public function destroyImage(Announcement $announcement, AnnouncementImage $image)
     {
         Storage::disk('public')->delete($image->image_path);
