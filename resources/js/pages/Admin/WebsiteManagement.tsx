@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { smartToast } from '@/utils/smartToast';
+import { useAppearance } from '@/hooks/use-appearance';
 import { router, useForm, usePage } from '@inertiajs/react';
 import {
     CalendarCheck,
@@ -246,8 +247,8 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
     const contactCards = [
         { icon: Phone, label: 'Call Us', sub: c('hours_subtext'), value: c('phone'), border: 'border-l-4 border-teal-600', iconBg: 'bg-[var(--p)]/10 text-[var(--p)]' },
         { icon: Mail, label: 'Email Us', sub: "We'll respond within 24h", value: c('email'), border: 'border-l-4 border-rose-500', iconBg: 'bg-[var(--s)]/10 text-[var(--s)]' },
-        { icon: MapPin, label: 'Visit Us', sub: c('location_name'), value: c('address'), border: 'border-l-4 border-emerald-500', iconBg: 'bg-emerald-50 text-emerald-600' },
-        { icon: Clock, label: 'Office Hours', sub: 'We are only available on:', value: c('office_hours'), border: 'border-l-4 border-sky-500', iconBg: 'bg-sky-50 text-sky-600' },
+        { icon: MapPin, label: 'Visit Us', sub: c('location_name'), value: c('address'), border: 'border-l-4 border-emerald-500', iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' },
+        { icon: Clock, label: 'Office Hours', sub: 'We are only available on:', value: c('office_hours'), border: 'border-l-4 border-sky-500', iconBg: 'bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400' },
     ];
 
     const faqs = Array.from({ length: FAQ_COUNT }, (_, i) => ({
@@ -270,7 +271,7 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
                 {contactCards.map((card, i) => {
                     const CardIcon = card.icon;
                     return (
-                        <div key={i} className={`rounded-md bg-white p-4 shadow-sm ${card.border}`} style={{ borderColor: 'var(--b)' }}>
+                        <div key={i} className={`rounded-md bg-[var(--bgc)] p-4 shadow-sm ${card.border}`} style={{ borderColor: 'var(--b)' }}>
                             <div className={`mb-2 flex h-10 w-10 items-center justify-center rounded-xl ${card.iconBg}`}>
                                 <CardIcon className="h-5 w-5" />
                             </div>
@@ -297,7 +298,7 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
                                 title="Location Map"
                             />
                         </div>
-                        <div className="mt-2 flex items-center justify-between rounded-md bg-white/50 px-3 py-2" style={{ border: '1px solid var(--b)' }}>
+                        <div className="mt-2 flex items-center justify-between rounded-md bg-[var(--bgc)]/50 px-3 py-2" style={{ border: '1px solid var(--b)' }}>
                             <span className="text-xs" style={{ color: 'var(--tm)' }}>{c('location_name') || 'Health Center'}</span>
                             <a
                                 href={`https://maps.google.com/maps?q=${lat},${lng}`}
@@ -311,7 +312,7 @@ function ContactPreview({ data, previewMode }: { data: Record<string, string>; p
                         </div>
                     </>
                 ) : (
-                    <div className="flex items-center justify-center rounded-md border border-dashed p-6" style={{ borderColor: 'var(--b)' }}>
+                    <div className="flex items-center justify-center rounded-md border border-dashed bg-[var(--bgc)] p-6" style={{ borderColor: 'var(--b)' }}>
                         <p className="text-xs" style={{ color: 'var(--tm)' }}>Enter latitude and longitude to see the map</p>
                     </div>
                 )}
@@ -390,18 +391,8 @@ function PreviewPanel({
 }) {
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
 
-    const [systemDark, setSystemDark] = useState(() =>
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
-
-    useEffect(() => {
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        const handler = (e: MediaQueryListEvent) => setSystemDark(e.matches);
-        mq.addEventListener('change', handler);
-        return () => mq.removeEventListener('change', handler);
-    }, []);
-
-    const vars = guestVars[systemDark ? 'dark' : 'light'];
+    const { isDark } = useAppearance();
+    const vars = guestVars[isDark ? 'dark' : 'light'];
 
     const PreviewComponent = useMemo(() => {
         switch (activeTab) {
