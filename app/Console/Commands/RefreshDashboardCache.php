@@ -51,6 +51,7 @@ class RefreshDashboardCache extends Command
         $totalChildren = $childrenQuery->count();
         $maleCount = (clone $childrenQuery)->where('sex', 'Male')->count();
         $femaleCount = (clone $childrenQuery)->where('sex', 'Female')->count();
+        $ipGroupCount = (clone $childrenQuery)->where('belongs_to_ip', true)->count();
 
         $todayChildren = (clone $childrenQuery)->whereDate('created_at', $today)->count();
 
@@ -203,6 +204,7 @@ class RefreshDashboardCache extends Command
                 'vitamin_a_given' => $vitaminAGiven,
                 'deworming_given' => $dewormingGiven,
                 'total_with_logs' => $childrenWithLogs,
+                'ip_group_count' => $ipGroupCount,
             ]
         );
     }

@@ -62,6 +62,7 @@ class DashboardController extends Controller
                     'weekly' => ['healthlogs' => 0],
                     'monthly' => ['healthlogs' => 0],
                     'yearly' => ['healthlogs' => 0],
+                    'ip_group_count' => 0,
                 ],
                 'trends' => [
                     'monthly_6months' => [],
@@ -128,6 +129,7 @@ class DashboardController extends Controller
                 'yearly' => [
                     'healthlogs' => $cache->year_health_logs,
                 ],
+                'ip_group_count' => $cache->ip_group_count ?? 0,
             ],
             'trends' => [
                 'monthly_6months' => $months6,

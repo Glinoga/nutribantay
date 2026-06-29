@@ -30,6 +30,7 @@ class DashboardCache extends Model
         'vitamin_a_given',
         'deworming_given',
         'total_with_logs',
+        'ip_group_count',
     ];
 
     protected function casts(): array

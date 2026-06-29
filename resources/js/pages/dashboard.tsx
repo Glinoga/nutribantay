@@ -13,7 +13,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, TrendingUp } from 'lucide-react';
+import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, TrendingUp, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
@@ -55,6 +55,7 @@ type Stats = {
     yearly: {
         healthlogs: number;
     };
+    ip_group_count: number;
 };
 
 type TrendData = {
@@ -408,7 +409,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-5">
                         <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
                             <CardHeader className="pb-2">
                                 <CardDescription className="flex items-center gap-2">
@@ -446,6 +447,16 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                     This Month
                                 </CardDescription>
                                 <CardTitle className="text-3xl text-cyan-900 dark:text-cyan-100">{stats.monthly.healthlogs}</CardTitle>
+                            </CardHeader>
+                        </Card>
+
+                        <Card className="min-h-[44px] cursor-pointer transition-all duration-200 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2">
+                            <CardHeader className="pb-2">
+                                <CardDescription className="flex items-center gap-2">
+                                    <Users className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
+                                    IP Groups
+                                </CardDescription>
+                                <CardTitle className="text-3xl text-indigo-600 dark:text-indigo-400">{stats.ip_group_count}</CardTitle>
                             </CardHeader>
                         </Card>
                     </div>

@@ -58,6 +58,11 @@ class ChildController extends Controller
             $query->where('sex', $request->sex);
         }
 
+        // Nutrition status filter
+        if ($request->nutrition_status) {
+            $query->where('nutrition_status', $request->nutrition_status);
+        }
+
         // Vaccine status filter - database level using subqueries
         $vaccineStatus = $request->vaccine_status;
 
@@ -190,6 +195,14 @@ class ChildController extends Controller
             ->selectRaw('AVG(CASE WHEN height > 0 THEN weight * 10000.0 / (height * height) ELSE NULL END) as avg_bmi')
             ->value('avg_bmi');
 
+        $nutritionStatusCounts = Child::where('barangay', $user->barangay)
+            ->where('birthdate', '>=', now()->subMonths(60))
+            ->whereNotNull('nutrition_status')
+            ->select('nutrition_status', DB::raw('count(*) as count'))
+            ->groupBy('nutrition_status')
+            ->pluck('count', 'nutrition_status')
+            ->toArray();
+
         $stats = [
             'total' => Child::where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60))->count(),
             'male' => Child::where('barangay', $user->barangay)->where('birthdate', '>=', now()->subMonths(60))->where('sex', 'Male')->count(),
@@ -200,6 +213,7 @@ class ChildController extends Controller
             'vaccine_mixed' => $mixedCount,
             'vitamin_overdue' => $vitaminOverdueCount,
             'vitamin_upcoming' => $vitaminUpcomingCount,
+            'nutrition_statuses' => $nutritionStatusCounts,
         ];
 
         return Inertia::render('Children/Index', [
@@ -246,6 +260,7 @@ class ChildController extends Controller
             'stats' => $stats,
             'search' => $request->search,
             'sex' => $request->sex,
+            'nutrition_status' => $request->nutrition_status,
             'vaccine_status' => $vaccineStatus,
             'vitamin_status' => $vitaminStatus,
             'view' => $request->query('view', 'card'),

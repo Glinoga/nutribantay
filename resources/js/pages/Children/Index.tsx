@@ -80,6 +80,7 @@ type Stats = {
     vaccine_mixed: number;
     vitamin_overdue: number;
     vitamin_upcoming: number;
+    nutrition_statuses?: Record<string, number>;
 };
 
 type IndexProps = {
@@ -87,6 +88,7 @@ type IndexProps = {
     pagination?: Pagination;
     search?: string;
     sex?: string;
+    nutrition_status?: string | null;
     flash?: { success?: string };
     stats: Stats;
     vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
@@ -108,6 +110,7 @@ export default function Index({
     pagination,
     search = '',
     sex = '',
+    nutrition_status = null,
     flash,
     stats,
     vaccine_status = null,
@@ -122,6 +125,7 @@ export default function Index({
     }, [search]);
 
     const activeSex = sex || '';
+    const activeNutrition = nutrition_status || '';
     const activeVaccine = vaccine_status || '';
     const activeVitamin = vitamin_status || '';
 
@@ -150,6 +154,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
+        if (activeNutrition) params.set('nutrition_status', activeNutrition);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
         if (activeVitamin) params.set('vitamin_status', activeVitamin);
         window.location.href = `${route('children.print')}?${params.toString()}`;
@@ -159,6 +164,7 @@ export default function Index({
         const params = new URLSearchParams();
         if (searchQuery) params.set('search', searchQuery);
         if (activeSex) params.set('sex', activeSex);
+        if (activeNutrition) params.set('nutrition_status', activeNutrition);
         if (activeVaccine) params.set('vaccine_status', activeVaccine);
         if (activeVitamin) params.set('vitamin_status', activeVitamin);
         window.location.href = `${route('children.export')}?${params.toString()}`;
@@ -297,6 +303,7 @@ export default function Index({
     const triggerSearch = () => {
         const params: Record<string, string> = { search: searchQuery };
         if (activeSex) params.sex = activeSex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
         if (view) params.view = view;
@@ -312,6 +319,7 @@ export default function Index({
         const params: Record<string, string> = {};
         if (searchQuery) params.search = searchQuery;
         if (sex) params.sex = sex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (vaccine) params.vaccine_status = vaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
         router.get(route('children.index'), params, { replace: true });
@@ -321,6 +329,7 @@ export default function Index({
         const params: Record<string, string> = {};
         if (sexValue !== 'all') params.sex = sexValue;
         if (searchQuery) params.search = searchQuery;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
         if (view) params.view = view;
@@ -332,6 +341,18 @@ export default function Index({
         if (vaccineValue !== activeVaccine) params.vaccine_status = vaccineValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
+        if (view) params.view = view;
+        router.get(route('children.index'), params, { replace: true });
+    };
+
+    const handleNutritionFilter = (nutritionValue: string) => {
+        const params: Record<string, string> = {};
+        if (nutritionValue !== activeNutrition) params.nutrition_status = nutritionValue;
+        if (searchQuery) params.search = searchQuery;
+        if (activeSex) params.sex = activeSex;
+        if (activeVaccine) params.vaccine_status = activeVaccine;
+        if (activeVitamin) params.vitamin_status = activeVitamin;
         if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
@@ -341,6 +362,7 @@ export default function Index({
         if (vitaminValue !== activeVitamin) params.vitamin_status = vitaminValue;
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (view) params.view = view;
         router.get(route('children.index'), params, { replace: true });
     };
@@ -350,6 +372,7 @@ export default function Index({
         const params: Record<string, string> = { view: newView };
         if (searchQuery) params.search = searchQuery;
         if (activeSex) params.sex = activeSex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
         router.get(route('children.index'), params, { replace: true, preserveScroll: true });
@@ -358,6 +381,7 @@ export default function Index({
     const handlePageClick = (page: number) => {
         const params: Record<string, string | number> = { page, search: searchQuery };
         if (activeSex) params.sex = activeSex;
+        if (activeNutrition) params.nutrition_status = activeNutrition;
         if (activeVaccine) params.vaccine_status = activeVaccine;
         if (activeVitamin) params.vitamin_status = activeVitamin;
         if (view) params.view = view;
@@ -663,7 +687,7 @@ export default function Index({
                                 router.get(route('children.index'), params, { replace: true });
                             }}
                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
-                                !activeSex && !activeVaccine && !activeVitamin
+                                !activeSex && !activeNutrition && !activeVaccine && !activeVitamin
                                     ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md'
                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                             }`}
@@ -690,6 +714,28 @@ export default function Index({
                         >
                             Female ({stats.female})
                         </button>
+
+                        {stats.nutrition_statuses && Object.keys(stats.nutrition_statuses).length > 0 && (
+                            <>
+                                <div className="mx-2 h-6 w-px bg-gray-300" aria-hidden="true" />
+                                {Object.entries(stats.nutrition_statuses).map(([status, count]) =>
+                                    count > 0 ? (
+                                        <button
+                                            key={status}
+                                            onClick={() => handleNutritionFilter(status)}
+                                            className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
+                                                activeNutrition === status
+                                                    ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md'
+                                                    : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+                                            }`}
+                                            aria-pressed={activeNutrition === status}
+                                        >
+                                            {status} ({count})
+                                        </button>
+                                    ) : null,
+                                )}
+                            </>
+                        )}
 
                         <div className="mx-2 h-6 w-px bg-gray-300" aria-hidden="true" />
 
