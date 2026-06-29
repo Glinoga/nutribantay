@@ -346,6 +346,18 @@ export default function Index({
         router.get(route('children.index'), params, { replace: true });
     };
 
+    const nutritionGradients: Record<string, string> = {
+        Normal: 'from-emerald-500 to-green-500',
+        Underweight: 'from-yellow-500 to-amber-500',
+        'Overweight/Obese': 'from-orange-500 to-red-500',
+        'Moderate Malnutrition': 'from-amber-500 to-orange-500',
+        'Severe Malnutrition': 'from-red-500 to-rose-600',
+        Stunted: 'from-violet-500 to-purple-500',
+        Wasted: 'from-cyan-500 to-teal-500',
+    };
+
+    const getNutritionGradient = (status: string): string => nutritionGradients[status] ?? 'from-teal-500 to-cyan-500';
+
     const handleNutritionFilter = (nutritionValue: string) => {
         const params: Record<string, string> = {};
         if (nutritionValue !== activeNutrition) params.nutrition_status = nutritionValue;
@@ -725,7 +737,7 @@ export default function Index({
                                             onClick={() => handleNutritionFilter(status)}
                                             className={`filter-pill rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                                                 activeNutrition === status
-                                                    ? 'bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md'
+                                                    ? `bg-gradient-to-r ${getNutritionGradient(status)} text-white shadow-md`
                                                     : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                                             }`}
                                             aria-pressed={activeNutrition === status}
