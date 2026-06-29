@@ -11,12 +11,16 @@ import { Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
+type DoseItem = {
+    name: string | null;
+    dose_number: number;
+};
+
 type HealthLog = {
     weight: number | null;
     height: number | null;
     bmi: number | null;
     nutrition_status: string | null;
-    vitamin_a: boolean | null;
     deworming: boolean | null;
     micronutrient_powder: string | null;
     ruf: string | null;
@@ -26,6 +30,8 @@ type HealthLog = {
     status_lfa: string | null;
     status_wfl_wfh: string | null;
     created_at: string | null;
+    vaccine_doses: DoseItem[];
+    vitamin_doses: DoseItem[];
 };
 
 type Child = {
@@ -385,7 +391,7 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                                         Ind
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                        Vit A
+                                        Given
                                     </TableHead>
                                     <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                         Deworm
@@ -418,7 +424,12 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">
                                             {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
                                         </TableCell>
-                                        <TableCell className="hidden px-4 py-2 sm:table-cell">{log.vitamin_a ? 'Yes' : 'No'}</TableCell>
+                                        <TableCell className="hidden px-4 py-2 sm:table-cell">
+                                            {[...log.vaccine_doses, ...log.vitamin_doses]
+                                                .map((d) => d.name)
+                                                .filter(Boolean)
+                                                .join(', ') || '-'}
+                                        </TableCell>
                                         <TableCell className="hidden px-4 py-2 sm:table-cell">{log.deworming ? 'Yes' : 'No'}</TableCell>
                                         <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder ?? '-'}</TableCell>
                                     </TableRow>

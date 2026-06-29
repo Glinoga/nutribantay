@@ -10,6 +10,11 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Calculator, Check, Eye, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+type CatalogItem = {
+    id: number;
+    name: string;
+};
+
 type Child = {
     id: number;
     slug?: string;
@@ -30,13 +35,7 @@ type HealthLogRecord = {
     ruf?: string;
     rusf?: string;
     complementary_food?: string;
-    vitamin_a?: boolean;
     deworming?: boolean;
-    vaccine_name?: string;
-    dose_number?: number;
-    date_given?: string;
-    next_due_date?: string;
-    vaccine_status?: string;
     created_at?: string;
 };
 
@@ -52,8 +51,9 @@ type HealthLogForm = {
     ruf: string;
     rusf: string;
     complementary_food: string;
-    vitamin_a: boolean;
     deworming: boolean;
+    vaccine_ids: number[];
+    vitamin_ids: number[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Children Records', href: route('children.index') }];
@@ -62,10 +62,14 @@ export default function Create({
     child,
     latestHealthLog,
     allHealthLogs,
+    vaccines,
+    vitamins,
 }: {
     child: Child;
     latestHealthLog?: LatestHealthLog;
     allHealthLogs?: AllHealthLogs;
+    vaccines: CatalogItem[];
+    vitamins: CatalogItem[];
 }) {
     const [showSuccess, setShowSuccess] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState<HealthLogRecord | null>(latestHealthLog || null);
@@ -83,8 +87,9 @@ export default function Create({
         ruf: '',
         rusf: '',
         complementary_food: '',
-        vitamin_a: false,
         deworming: false,
+        vaccine_ids: [],
+        vitamin_ids: [],
     });
 
     // Auto-calc BMI
@@ -384,12 +389,6 @@ export default function Create({
                                                 </div>
                                             )}
                                             <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vitamin A</p>
-                                                <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                                                    {selectedRecord.vitamin_a ? 'Yes' : 'No'}
-                                                </p>
-                                            </div>
-                                            <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Deworming</p>
                                                 <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                                                     {selectedRecord.deworming ? 'Yes' : 'No'}
@@ -397,55 +396,6 @@ export default function Create({
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Vaccination */}
-                                    {selectedRecord.vaccine_name && (
-                                        <div>
-                                            <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Vaccination</h3>
-                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Vaccine Name</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                                                        {selectedRecord.vaccine_name}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Dose Number</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                                                        {selectedRecord.dose_number ?? 'N/A'}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Date Given</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                                                        {selectedRecord.date_given ? new Date(selectedRecord.date_given).toLocaleDateString() : 'N/A'}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Next Due Date</p>
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-gray-100">
-                                                        {selectedRecord.next_due_date
-                                                            ? new Date(selectedRecord.next_due_date).toLocaleDateString()
-                                                            : 'N/A'}
-                                                    </p>
-                                                </div>
-                                                <div className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
-                                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Status</p>
-                                                    <span
-                                                        className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                                            selectedRecord.vaccine_status === 'Completed'
-                                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                                                : selectedRecord.vaccine_status === 'Overdue'
-                                                                  ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                                                                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                                        }`}
-                                                    >
-                                                        {selectedRecord.vaccine_status || 'Pending'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         )}
@@ -594,26 +544,82 @@ export default function Create({
 
                             {/* Checkboxes */}
                             <div className="border-t border-gray-100 bg-gradient-to-r from-teal-50/50 to-cyan-50/50 px-6 py-4 dark:border-gray-700 dark:from-gray-800 dark:to-gray-800">
-                                <div className="flex flex-wrap gap-6">
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
-                                        <Checkbox
-                                            id="vitamin_a"
-                                            checked={data.vitamin_a}
-                                            onCheckedChange={(checked) => setData('vitamin_a', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
-                                        />
-                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Vitamin A Supplementation</span>
-                                    </label>
+                                <div className="space-y-4">
+                                    {/* Vaccines */}
+                                    {vaccines.length > 0 && (
+                                        <div>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Vaccines</h3>
+                                            <div className="flex flex-wrap gap-6">
+                                                {vaccines.map((vaccine) => (
+                                                    <label
+                                                        key={vaccine.id}
+                                                        className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700"
+                                                    >
+                                                        <Checkbox
+                                                            id={`vaccine_${vaccine.id}`}
+                                                            checked={data.vaccine_ids.includes(vaccine.id)}
+                                                            onCheckedChange={(checked) => {
+                                                                setData(
+                                                                    'vaccine_ids',
+                                                                    checked
+                                                                        ? [...data.vaccine_ids, vaccine.id]
+                                                                        : data.vaccine_ids.filter((id) => id !== vaccine.id),
+                                                                );
+                                                            }}
+                                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
+                                                        />
+                                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{vaccine.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                                    <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
-                                        <Checkbox
-                                            id="deworming"
-                                            checked={data.deworming}
-                                            onCheckedChange={(checked) => setData('deworming', checked as boolean)}
-                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
-                                        />
-                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Deworming</span>
-                                    </label>
+                                    {/* Vitamins */}
+                                    {vitamins.length > 0 && (
+                                        <div>
+                                            <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Vitamins</h3>
+                                            <div className="flex flex-wrap gap-6">
+                                                {vitamins.map((vitamin) => (
+                                                    <label
+                                                        key={vitamin.id}
+                                                        className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700"
+                                                    >
+                                                        <Checkbox
+                                                            id={`vitamin_${vitamin.id}`}
+                                                            checked={data.vitamin_ids.includes(vitamin.id)}
+                                                            onCheckedChange={(checked) => {
+                                                                setData(
+                                                                    'vitamin_ids',
+                                                                    checked
+                                                                        ? [...data.vitamin_ids, vitamin.id]
+                                                                        : data.vitamin_ids.filter((id) => id !== vitamin.id),
+                                                                );
+                                                            }}
+                                                            className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
+                                                        />
+                                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{vitamin.name}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Deworming */}
+                                    <div>
+                                        <h3 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">Other</h3>
+                                        <div className="flex flex-wrap gap-6">
+                                            <label className="flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors hover:bg-white dark:hover:bg-gray-700">
+                                                <Checkbox
+                                                    id="deworming"
+                                                    checked={data.deworming}
+                                                    onCheckedChange={(checked) => setData('deworming', checked as boolean)}
+                                                    className="border-teal-300 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600 dark:border-teal-600 dark:data-[state=checked]:border-teal-400 dark:data-[state=checked]:bg-teal-500"
+                                                />
+                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Deworming</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -17,6 +17,7 @@ class ChildVaccineDose extends Model
         'next_due_date',
         'remarks',
         'administered_by',
+        'healthlog_id',
     ];
 
     protected $casts = [
@@ -33,6 +34,11 @@ class ChildVaccineDose extends Model
     public function administeredBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'administered_by');
+    }
+
+    public function healthLog(): BelongsTo
+    {
+        return $this->belongsTo(HealthLog::class, 'healthlog_id');
     }
 
     public function getDoseStatusAttribute(): string
