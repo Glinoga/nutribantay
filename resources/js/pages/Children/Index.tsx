@@ -89,7 +89,13 @@ type IndexProps = {
     search?: string;
     sex?: string;
     nutrition_status?: string | null;
-    flash?: { success?: string };
+    flash?: {
+        success?: string;
+        warning?: string;
+        error?: string;
+        import_errors?: string[];
+        imported_count?: number;
+    };
     stats: Stats;
     vaccine_status?: 'overdue' | 'upcoming' | 'mixed' | null;
     vitamin_status?: 'overdue' | 'upcoming' | null;
@@ -200,29 +206,83 @@ export default function Index({
             route('children.import'),
             { data: importData },
             {
-                onSuccess: () => {
+                onSuccess: (page) => {
                     setIsImporting(false);
                     closeModal();
-                    const importCount = importData.length;
-                    MySwal.fire({
-                        ...swalTheme(),
-                        title: 'Import Complete!',
-                        html: `
-                            <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
-                                <p style="font-size: 1.125rem; color: hsl(142 76% 36%); margin-bottom: 0.5rem;">
-                                    ${importCount} child(ren) imported successfully.
-                                </p>
-                                <p style="font-size: 0.875rem; color: hsl(215 4% 27%);">
-                                    The page will reload to show the new records.
-                                </p>
-                            </div>
-                        `,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: 'hsl(142 76% 36%)',
-                    }).then(() => {
+
+                    const flash = (page.props.flash as Record<string, unknown>) || {};
+
+                    if (flash.warning) {
+                        const errors = (flash.import_errors as string[]) || [];
+                        const MAX_VISIBLE = 5;
+                        const visibleErrors = errors.slice(0, MAX_VISIBLE);
+                        const hiddenCount = errors.length - MAX_VISIBLE;
+                        const errorList = errors.length > 0
+                            ? `<ul style="text-align: left; margin-top: 0.75rem; padding-left: 1.25rem; list-style: disc; font-size: 0.8125rem; color: hsl(38 92% 50%); line-height: 1.6;">${visibleErrors.map(e => `<li>${e}</li>`).join('')}${hiddenCount > 0 ? `<li style="list-style: none; font-style: italic; margin-top: 0.25rem; color: hsl(215 4% 27%);">…and ${hiddenCount} more</li>` : ''}</ul>`
+                            : '';
+                        const importedCount = flash.imported_count as number;
+                        const title = importedCount === 0 ? 'No New Records Imported' : 'Import Completed with Warnings';
+
+                        MySwal.fire({
+                            ...swalTheme(),
+                            title,
+                            html: `
+                                <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
+                                    <p style="font-size: 1rem; color: hsl(38 92% 50%); margin-bottom: 0.5rem;">
+                                        ${flash.warning as string}
+                                    </p>
+                                    ${errorList}
+                                    <p style="font-size: 0.875rem; color: hsl(215 4% 27%); margin-top: 0.75rem;">
+                                        The page will reload to show the changes.
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'warning',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: 'hsl(38 92% 50%)',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else if (flash.success) {
+                        MySwal.fire({
+                            ...swalTheme(),
+                            title: 'Import Complete!',
+                            html: `
+                                <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
+                                    <p style="font-size: 1.125rem; color: hsl(142 76% 36%); margin-bottom: 0.5rem;">
+                                        ${flash.success as string}
+                                    </p>
+                                    <p style="font-size: 0.875rem; color: hsl(215 4% 27%);">
+                                        The page will reload to show the new records.
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: 'hsl(142 76% 36%)',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else if (flash.error) {
+                        MySwal.fire({
+                            ...swalTheme(),
+                            title: 'Import Failed',
+                            html: `
+                                <div style="font-family: 'Montserrat', sans-serif; text-align: center; padding: 1rem 0;">
+                                    <p style="font-size: 1rem; color: hsl(0 84% 60%); margin-bottom: 0.5rem;">
+                                        ${flash.error as string}
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: 'hsl(0 84% 60%)',
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
                         window.location.reload();
-                    });
+                    }
                 },
                 onError: () => {
                     setIsImporting(false);

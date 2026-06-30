@@ -44,7 +44,8 @@ class ChildController extends Controller
                         foreach ($words as $word) {
                             $wq->where(function ($xq) use ($word) {
                                 $xq->where('first_name', 'like', "%{$word}%")
-                                    ->orWhere('last_name', 'like', "%{$word}%");
+                                    ->orWhere('last_name', 'like', "%{$word}%")
+                                    ->orWhere('middle_initial', 'like', "%{$word}%");
                             });
                         }
                     })
@@ -346,7 +347,8 @@ class ChildController extends Controller
                         foreach ($words as $word) {
                             $wq->where(function ($xq) use ($word) {
                                 $xq->where('first_name', 'like', "%{$word}%")
-                                    ->orWhere('last_name', 'like', "%{$word}%");
+                                    ->orWhere('last_name', 'like', "%{$word}%")
+                                    ->orWhere('middle_initial', 'like', "%{$word}%");
                             });
                         }
                     })
@@ -966,6 +968,7 @@ class ChildController extends Controller
 
             $dupeKey = strtolower($row['first_name']).'|'.strtolower($row['last_name']).'|'.($row['birthdate'] ?? '');
             if ($existingMap->has($dupeKey)) {
+                $errors[] = "Row {$rowNum}: Duplicate — {$row['first_name']} {$row['last_name']} already exists in your barangay. Skipped.";
                 $skipped++;
 
                 continue;
@@ -1055,22 +1058,27 @@ class ChildController extends Controller
         RefreshDashboardForBarangay::dispatch($user->barangay)
             ->delay(now()->addSeconds(10));
 
-        $message = "Import complete! {$imported} children imported.";
-        if ($withoutHealthLog > 0) {
-            $message .= " {$withoutHealthLog} child(ren) created without health evaluation (missing weight, height, or birthdate).";
-        }
-        if ($failures > 0) {
-            $message .= " {$failures} row(s) failed and were rolled back.";
-        }
-        if ($skipped > 0) {
-            $message .= " {$skipped} row(s) skipped.";
+        if ($imported === 0 && $skipped > 0) {
+            $message = "No new records were imported. {$skipped} row(s) were skipped";
+            $message .= ! empty($errors) ? ' due to the following issues:' : ' (all appear to be duplicates).';
+        } else {
+            $message = "Import complete! {$imported} children imported.";
+            if ($withoutHealthLog > 0) {
+                $message .= " {$withoutHealthLog} child(ren) created without health evaluation (missing weight, height, or birthdate).";
+            }
+            if ($failures > 0) {
+                $message .= " {$failures} row(s) failed and were rolled back.";
+            }
+            if ($skipped > 0) {
+                $message .= " {$skipped} row(s) skipped.";
+            }
         }
 
-        if (! empty($errors)) {
-            return redirect('/children')->with('warning', $message)->with('import_errors', $errors);
+        if ($imported === 0 || ! empty($errors)) {
+            return redirect('/children')->with('warning', $message)->with('import_errors', $errors)->with('imported_count', $imported);
         }
 
-        return redirect('/children')->with('success', $message);
+        return redirect('/children')->with('success', $message)->with('imported_count', $imported);
     }
 
     /**
@@ -1103,7 +1111,8 @@ class ChildController extends Controller
                         foreach ($words as $word) {
                             $wq->where(function ($xq) use ($word) {
                                 $xq->where('first_name', 'like', "%{$word}%")
-                                    ->orWhere('last_name', 'like', "%{$word}%");
+                                    ->orWhere('last_name', 'like', "%{$word}%")
+                                    ->orWhere('middle_initial', 'like', "%{$word}%");
                             });
                         }
                     })

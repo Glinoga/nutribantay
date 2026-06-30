@@ -53,6 +53,9 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                'import_errors' => $request->session()->get('import_errors'),
+                'imported_count' => $request->session()->get('imported_count'),
             ],
             'footerContent' => fn () => SiteContent::getByPage('footer'),
             'logoUrl' => fn () => SiteContent::getContent('logo_url', '/NutriBantayLogo.svg'),
