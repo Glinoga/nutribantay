@@ -33,6 +33,8 @@ class HealthLog extends Model
         'deworming',
 
         'recommendation',
+
+        'created_at',
     ];
 
     protected $casts = [
