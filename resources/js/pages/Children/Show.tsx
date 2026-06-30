@@ -88,6 +88,8 @@ type Child = {
     birthdate: string | null;
     weight: number | null;
     height: number | null;
+    mother_name: string | null;
+    belongs_to_ip: boolean | null;
     address: string | null;
     contact_number: string | null;
     creator?: { name: string | null };
@@ -486,7 +488,9 @@ export default function Show({
                                         { label: 'Weight', value: `${child.weight ?? 'N/A'} kg` },
                                         { label: 'Height', value: `${child.height ?? 'N/A'} cm` },
                                         { label: 'Address', value: child.address ?? 'N/A' },
+                                        { label: 'Parent/Caregiver', value: child.mother_name ?? 'N/A' },
                                         { label: 'Contact Number', value: displayPhoneNumber(child.contact_number) },
+                                        { label: 'IP Group', value: child.belongs_to_ip ? 'Yes' : 'No' },
                                         { label: 'Created by', value: child.creator?.name ?? 'N/A' },
                                         { label: 'Updated by', value: child.updater?.name ?? 'N/A' },
                                     ].map((item, idx) => (
