@@ -358,6 +358,8 @@ export default function Index({
 
     const getNutritionGradient = (status: string): string => nutritionGradients[status] ?? 'from-teal-500 to-cyan-500';
 
+    const nutritionOrder = ['Normal', 'Underweight', 'Overweight/Obese', 'Moderate Malnutrition', 'Severe Malnutrition', 'Stunted', 'Wasted'];
+
     const handleNutritionFilter = (nutritionValue: string) => {
         const params: Record<string, string> = {};
         if (nutritionValue !== activeNutrition) params.nutrition_status = nutritionValue;
@@ -730,8 +732,9 @@ export default function Index({
                         {stats.nutrition_statuses && Object.keys(stats.nutrition_statuses).length > 0 && (
                             <>
                                 <div className="mx-2 h-6 w-px bg-gray-300" aria-hidden="true" />
-                                {Object.entries(stats.nutrition_statuses).map(([status, count]) =>
-                                    count > 0 ? (
+                                {nutritionOrder
+                                    .filter((status) => (stats.nutrition_statuses?.[status] ?? 0) > 0)
+                                    .map((status) => (
                                         <button
                                             key={status}
                                             onClick={() => handleNutritionFilter(status)}
@@ -742,10 +745,9 @@ export default function Index({
                                             }`}
                                             aria-pressed={activeNutrition === status}
                                         >
-                                            {status} ({count})
+                                            {status} ({stats.nutrition_statuses[status]})
                                         </button>
-                                    ) : null,
-                                )}
+                                    ))}
                             </>
                         )}
 

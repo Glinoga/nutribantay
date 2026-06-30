@@ -128,7 +128,7 @@ class ChildController extends Controller
             $query->whereIn('id', $upcomingVitaminChildIds);
         }
 
-        $children = $query->paginate(25, ['*'], 'page', $request->page ?? 1);
+        $children = $query->orderBy('first_name')->orderBy('last_name')->paginate(25, ['*'], 'page', $request->page ?? 1);
 
         // Get all pending vaccine doses for this barangay (for stats and badges)
         $pendingDoses = ChildVaccineDose::whereNull('date_given')
@@ -980,17 +980,17 @@ class ChildController extends Controller
             try {
                 DB::transaction(function () use ($row, $user, $sex, $weight, $height, $hasAnthropometricData, &$imported, &$withoutHealthLog) {
                     $child = Child::create([
-                        'first_name' => $row['first_name'],
-                        'middle_initial' => ! empty($row['middle_initial']) ? substr(trim($row['middle_initial']), 0, 5) : null,
-                        'last_name' => $row['last_name'],
+                        'first_name' => strtoupper($row['first_name']),
+                        'middle_initial' => ! empty($row['middle_initial']) ? strtoupper(substr(trim($row['middle_initial']), 0, 5)) : null,
+                        'last_name' => strtoupper($row['last_name']),
                         'sex' => $sex,
                         'weight' => $weight ?: 0,
                         'height' => $height ?: 0,
                         'birthdate' => $row['birthdate'] ?? null,
                         'barangay' => $user->barangay,
                         'created_by' => $user->id,
-                        'address' => $row['address'] ?? null,
-                        'mother_name' => $row['mother_name'] ?? null,
+                        'address' => $row['address'] ? strtoupper($row['address']) : null,
+                        'mother_name' => $row['mother_name'] ? strtoupper($row['mother_name']) : null,
                         'belongs_to_ip' => filter_var($row['belongs_to_ip'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'contact_number' => null,
                     ]);
