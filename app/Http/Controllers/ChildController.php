@@ -42,6 +42,7 @@ class ChildController extends Controller
                     $q->where(function ($wq) use ($search) {
                         $words = explode(' ', $search);
                         foreach ($words as $word) {
+                            $word = str_replace('.', '', $word); // Remove periods from the word
                             $wq->where(function ($xq) use ($word) {
                                 $xq->where('first_name', 'like', "%{$word}%")
                                     ->orWhere('last_name', 'like', "%{$word}%")
