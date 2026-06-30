@@ -78,10 +78,9 @@ class Child extends Model
     {
         $name = trim(preg_replace('/\s+/', ' ', $name));
 
-        // Handle hyphenated names (e.g., "Maria-Jose" → "Maria-Jose")
         $name = implode('-', array_map(
             fn ($part) => implode(' ', array_map(
-                fn ($word) => mb_convert_case($word, MB_CASE_TITLE, 'UTF-8'),
+                fn ($word) => strtoupper($word),
                 explode(' ', $part)
             )),
             explode('-', $name)
