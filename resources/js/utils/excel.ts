@@ -59,7 +59,7 @@ export const readExcel = async (file: File) => {
             return true;
         })
         .map((row) => {
-            const fullName = row[fullNameIdx]?.toString().trim() || '';
+            const fullName = row[fullNameIdx]?.toString().trim().toUpperCase() || '';
 
             const commaIndex = fullName.indexOf(', ');
             let lastName: string, firstName: string, middleInitial: string | null;
@@ -104,8 +104,8 @@ export const readExcel = async (file: File) => {
                 date_measured: dateMeasured,
                 weight: row[weightIdx] || null,
                 height: row[heightIdx] || null,
-                address: row[addressIdx]?.toString().trim() || null,
-                mother_name: row[motherNameIdx]?.toString().trim() || null,
+                address: (row[addressIdx]?.toString().trim() || '').toUpperCase() || null,
+                mother_name: (row[motherNameIdx]?.toString().trim() || '').toUpperCase() || null,
             };
         });
 
