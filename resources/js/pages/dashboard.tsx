@@ -13,7 +13,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, TrendingUp, Users } from 'lucide-react';
+import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, Syringe, TrendingUp, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
@@ -99,12 +99,21 @@ type VitaminFollowups = {
     }[];
 };
 
+type Dose = {
+    child_name: string;
+    type: 'Vaccine' | 'Vitamin';
+    name: string;
+    dose_number: number;
+    date_given: string;
+};
+
 type DashboardProps = {
     stats: Stats;
     trends: TrendData;
     vaccine_followups: VaccineFollowups;
     vitamin_followups: VitaminFollowups;
     is_admin: boolean;
+    doses: Dose[];
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -114,7 +123,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ stats, trends, vaccine_followups, vitamin_followups }: DashboardProps) {
+export default function Dashboard({ stats, trends, vaccine_followups, vitamin_followups, doses }: DashboardProps) {
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [printPeriod, setPrintPeriod] = useState('monthly');
     const [dateMode, setDateMode] = useState<'preset' | 'custom'>('preset');
@@ -757,6 +766,60 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                     )}
                                 </AlertDescription>
                             </Alert>
+                        </div>
+                    ) : null}
+
+                    {/* All Doses */}
+                    {doses.length > 0 ? (
+                        <div className="mb-8">
+                            <Card className="transition-all duration-200 hover:shadow-lg">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-lg text-cyan-900 dark:text-cyan-100">
+                                        <Syringe className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                                        All Doses
+                                    </CardTitle>
+                                    <CardDescription>Recent vaccine and vitamin doses administered</CardDescription>
+                                </CardHeader>
+                                <CardContent className="p-0">
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead className="bg-cyan-50 dark:bg-gray-800">
+                                                <tr>
+                                                    <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Child</th>
+                                                    <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Type</th>
+                                                    <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Item</th>
+                                                    <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Dose</th>
+                                                    <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Date Given</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {doses.map((dose, index) => (
+                                                    <tr
+                                                        key={index}
+                                                        className="border-t border-cyan-100 transition-colors hover:bg-cyan-50/50 dark:border-cyan-800 dark:hover:bg-cyan-900/20"
+                                                    >
+                                                        <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{dose.child_name}</td>
+                                                        <td className="px-4 py-2">
+                                                            <Badge
+                                                                className={
+                                                                    dose.type === 'Vaccine'
+                                                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                                                                        : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                                                                }
+                                                            >
+                                                                {dose.type}
+                                                            </Badge>
+                                                        </td>
+                                                        <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{dose.name}</td>
+                                                        <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">#{dose.dose_number}</td>
+                                                        <td className="px-4 py-2 text-cyan-700 dark:text-cyan-300">{dose.date_given}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </div>
                     ) : null}
 
