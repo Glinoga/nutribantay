@@ -782,8 +782,9 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                 </CardHeader>
                                 <CardContent className="p-0">
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <thead className="bg-cyan-50 dark:bg-gray-800">
+                                        <div className="max-h-80 overflow-y-auto">
+                                            <table className="w-full text-sm">
+                                            <thead className="sticky top-0 bg-cyan-50 dark:bg-gray-800">
                                                 <tr>
                                                     <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Child</th>
                                                     <th className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Type</th>
@@ -817,6 +818,7 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                                 ))}
                                             </tbody>
                                         </table>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
