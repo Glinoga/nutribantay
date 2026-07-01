@@ -82,6 +82,8 @@ export function route(name: string, params?: Record<string, string | number | nu
         'announcements.archived': '/admin/announcements-archived',
         'announcements.restore': '/admin/announcements/{id}/restore',
         'announcements.force-delete': '/admin/announcements/{id}/force-delete',
+        'announcements.images.destroy': '/admin/announcements/{announcement}/images/{image}',
+        'announcements.images.reorder': '/admin/announcements/{announcement}/images/reorder',
 
         // SMS
         'sms.index': '/admin/sendsms',
