@@ -150,17 +150,33 @@ class HealthlogController extends Controller
                     'child_id' => $child->id,
                     'vaccine_id' => $vaccineId,
                 ]);
-                $nextDoseNumber = ($childVaccine->doses()
+
+                $pendingDose = $childVaccine->doses()
                     ->lockForUpdate()
-                    ->max('dose_number') ?? 0) + 1;
-                ChildVaccineDose::create([
-                    'child_vaccine_id' => $childVaccine->id,
-                    'healthlog_id' => $healthLog->id,
-                    'dose_number' => $nextDoseNumber,
-                    'date_given' => now()->toDateString(),
-                    'administered_by' => auth()->id(),
-                    'remarks' => 'Recorded from health log checkup',
-                ]);
+                    ->whereNull('date_given')
+                    ->latest('dose_number')
+                    ->first();
+
+                if ($pendingDose) {
+                    $pendingDose->update([
+                        'date_given' => now()->toDateString(),
+                        'healthlog_id' => $healthLog->id,
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                } else {
+                    $nextDoseNumber = ($childVaccine->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
+                    ChildVaccineDose::create([
+                        'child_vaccine_id' => $childVaccine->id,
+                        'healthlog_id' => $healthLog->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
             }
 
             // Auto-create dose records for each checked vitamin
@@ -169,17 +185,33 @@ class HealthlogController extends Controller
                     'child_id' => $child->id,
                     'vitamin_id' => $vitaminId,
                 ]);
-                $nextDoseNumber = ($childVitamin->doses()
+
+                $pendingDose = $childVitamin->doses()
                     ->lockForUpdate()
-                    ->max('dose_number') ?? 0) + 1;
-                ChildVitaminDose::create([
-                    'child_vitamin_id' => $childVitamin->id,
-                    'healthlog_id' => $healthLog->id,
-                    'dose_number' => $nextDoseNumber,
-                    'date_given' => now()->toDateString(),
-                    'administered_by' => auth()->id(),
-                    'remarks' => 'Recorded from health log checkup',
-                ]);
+                    ->whereNull('date_given')
+                    ->latest('dose_number')
+                    ->first();
+
+                if ($pendingDose) {
+                    $pendingDose->update([
+                        'date_given' => now()->toDateString(),
+                        'healthlog_id' => $healthLog->id,
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                } else {
+                    $nextDoseNumber = ($childVitamin->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
+                    ChildVitaminDose::create([
+                        'child_vitamin_id' => $childVitamin->id,
+                        'healthlog_id' => $healthLog->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
             }
 
             // Auto-update child's current weight/height/nutrition_status with latest health log
@@ -305,56 +337,108 @@ class HealthlogController extends Controller
         DB::transaction(function () use ($validated, $healthlog, $child, $weight, $height, $vaccineIds, $vitaminIds) {
             $healthlog->update($validated);
 
-            // Additive-only: create dose for newly checked vaccines
+            // Sync vaccine doses: add newly checked, remove unchecked
             $existingVaccineIds = ChildVaccineDose::where('healthlog_id', $healthlog->id)
                 ->with('childVaccine')
                 ->get()
                 ->pluck('childVaccine.vaccine_id')
                 ->toArray();
             $newVaccineIds = array_diff($vaccineIds, $existingVaccineIds);
+            $removedVaccineIds = array_diff($existingVaccineIds, $vaccineIds);
+
+            if ($removedVaccineIds) {
+                $removedChildVaccineIds = ChildVaccine::whereIn('vaccine_id', $removedVaccineIds)
+                    ->where('child_id', $child->id)
+                    ->pluck('id');
+                ChildVaccineDose::where('healthlog_id', $healthlog->id)
+                    ->whereIn('child_vaccine_id', $removedChildVaccineIds)
+                    ->delete();
+            }
 
             foreach ($newVaccineIds as $vaccineId) {
                 $childVaccine = ChildVaccine::firstOrCreate([
                     'child_id' => $child->id,
                     'vaccine_id' => $vaccineId,
                 ]);
-                $nextDoseNumber = ($childVaccine->doses()
+
+                $pendingDose = $childVaccine->doses()
                     ->lockForUpdate()
-                    ->max('dose_number') ?? 0) + 1;
-                ChildVaccineDose::create([
-                    'child_vaccine_id' => $childVaccine->id,
-                    'healthlog_id' => $healthlog->id,
-                    'dose_number' => $nextDoseNumber,
-                    'date_given' => now()->toDateString(),
-                    'administered_by' => auth()->id(),
-                    'remarks' => 'Recorded from health log checkup',
-                ]);
+                    ->whereNull('date_given')
+                    ->latest('dose_number')
+                    ->first();
+
+                if ($pendingDose) {
+                    $pendingDose->update([
+                        'date_given' => now()->toDateString(),
+                        'healthlog_id' => $healthlog->id,
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                } else {
+                    $nextDoseNumber = ($childVaccine->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
+                    ChildVaccineDose::create([
+                        'child_vaccine_id' => $childVaccine->id,
+                        'healthlog_id' => $healthlog->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
             }
 
-            // Additive-only: create dose for newly checked vitamins
+            // Sync vitamin doses: add newly checked, remove unchecked
             $existingVitaminIds = ChildVitaminDose::where('healthlog_id', $healthlog->id)
                 ->with('childVitamin')
                 ->get()
                 ->pluck('childVitamin.vitamin_id')
                 ->toArray();
             $newVitaminIds = array_diff($vitaminIds, $existingVitaminIds);
+            $removedVitaminIds = array_diff($existingVitaminIds, $vitaminIds);
+
+            if ($removedVitaminIds) {
+                $removedChildVitaminIds = ChildVitamin::whereIn('vitamin_id', $removedVitaminIds)
+                    ->where('child_id', $child->id)
+                    ->pluck('id');
+                ChildVitaminDose::where('healthlog_id', $healthlog->id)
+                    ->whereIn('child_vitamin_id', $removedChildVitaminIds)
+                    ->delete();
+            }
 
             foreach ($newVitaminIds as $vitaminId) {
                 $childVitamin = ChildVitamin::firstOrCreate([
                     'child_id' => $child->id,
                     'vitamin_id' => $vitaminId,
                 ]);
-                $nextDoseNumber = ($childVitamin->doses()
+
+                $pendingDose = $childVitamin->doses()
                     ->lockForUpdate()
-                    ->max('dose_number') ?? 0) + 1;
-                ChildVitaminDose::create([
-                    'child_vitamin_id' => $childVitamin->id,
-                    'healthlog_id' => $healthlog->id,
-                    'dose_number' => $nextDoseNumber,
-                    'date_given' => now()->toDateString(),
-                    'administered_by' => auth()->id(),
-                    'remarks' => 'Recorded from health log checkup',
-                ]);
+                    ->whereNull('date_given')
+                    ->latest('dose_number')
+                    ->first();
+
+                if ($pendingDose) {
+                    $pendingDose->update([
+                        'date_given' => now()->toDateString(),
+                        'healthlog_id' => $healthlog->id,
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                } else {
+                    $nextDoseNumber = ($childVitamin->doses()
+                        ->lockForUpdate()
+                        ->max('dose_number') ?? 0) + 1;
+                    ChildVitaminDose::create([
+                        'child_vitamin_id' => $childVitamin->id,
+                        'healthlog_id' => $healthlog->id,
+                        'dose_number' => $nextDoseNumber,
+                        'date_given' => now()->toDateString(),
+                        'administered_by' => auth()->id(),
+                        'remarks' => 'Recorded from health log checkup',
+                    ]);
+                }
             }
 
             // Sync nutrition_status to child if weight/height were updated
