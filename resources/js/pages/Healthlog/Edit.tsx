@@ -422,43 +422,32 @@ export default function Edit({ healthlog, child_id: propChildId, vaccines, vitam
                         </div>
 
                         {/* Buttons */}
-                        <div className="fade-in-up flex flex-wrap gap-3" style={{ animationDelay: '0.3s' }}>
+                        <div className="fade-in-up flex flex-col gap-3 sm:flex-row" style={{ animationDelay: '0.3s' }}>
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-5 text-lg font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50"
+                                size="lg"
+                                className="w-full cursor-pointer bg-primary text-primary-foreground shadow-sm transition-transform hover:bg-primary/90 active:scale-[0.96] disabled:opacity-50 sm:w-auto"
                             >
                                 {processing ? 'Updating...' : 'Update Health Log'}
                             </Button>
 
                             <Button
                                 type="button"
-                                variant="outline"
+                                variant="ghost"
+                                size="lg"
                                 onClick={() => {
-                                    const childId = healthlog.child_id ?? healthlog.child?.id;
-                                    const childSlug = healthlog.child?.slug ?? childId;
                                     if (childId) {
                                         router.visit(route('children.show', { child: childSlug }));
                                     } else {
                                         router.visit(route('children.index'));
                                     }
                                 }}
-                                className="px-8 py-5 text-lg font-bold"
+                                className="w-full cursor-pointer transition-transform active:scale-[0.96] sm:w-auto"
                             >
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                Cancel & Go to Child Profile
+                                <ArrowLeft className="h-4 w-4" />
+                                Cancel
                             </Button>
-
-                            {childId && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => router.visit(route('children.show', { child: childSlug }))}
-                                    className="px-8 py-5 text-lg font-bold"
-                                >
-                                    Cancel & Go to Profile
-                                </Button>
-                            )}
                         </div>
                     </form>
                 </div>

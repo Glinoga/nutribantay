@@ -7,7 +7,7 @@ import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Calculator, Check, Eye, Heart } from 'lucide-react';
+import { ArrowLeft, Calculator, Check, Eye, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type CatalogItem = {
@@ -625,27 +625,20 @@ export default function Create({
                         </div>
 
                         {/* Buttons */}
-                        <div className="fade-in-up flex flex-col gap-3 sm:flex-row sm:flex-wrap" style={{ animationDelay: '0.3s' }}>
+                        <div className="fade-in-up flex flex-col gap-3 sm:flex-row" style={{ animationDelay: '0.3s' }}>
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:opacity-50 sm:w-auto sm:px-8 sm:py-5 sm:text-lg"
+                                size="lg"
+                                className="w-full cursor-pointer bg-primary text-primary-foreground shadow-sm transition-transform hover:bg-primary/90 active:scale-[0.96] disabled:opacity-50 sm:w-auto"
                             >
                                 {processing ? 'Saving...' : 'Save Health Log'}
                             </Button>
 
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => window.history.back()}
-                                className="w-full px-6 py-3 text-base font-bold sm:w-auto sm:px-8 sm:py-5 sm:text-lg"
-                            >
-                                Cancel & Go Back
-                            </Button>
-
                             <Link href={route('children.show', { child: child.slug })} className="w-full sm:w-auto">
-                                <Button type="button" variant="outline" className="w-full px-6 py-3 text-base font-bold sm:px-8 sm:py-5 sm:text-lg">
-                                    Cancel & Go to Profile
+                                <Button type="button" variant="ghost" size="lg" className="w-full cursor-pointer transition-transform active:scale-[0.96]">
+                                    <ArrowLeft className="h-4 w-4" />
+                                    Cancel
                                 </Button>
                             </Link>
                         </div>

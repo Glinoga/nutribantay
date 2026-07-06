@@ -792,31 +792,35 @@ export default function Show({
                                 Generate personalized nutrition recommendations based on the child's latest health log.
                             </p>
 
-                            <button
+                            <Button
                                 onClick={handleRecommendation}
                                 disabled={loading || recommendationGenerated}
-                                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-6 py-2.5 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                                className="cursor-pointer bg-primary text-primary-foreground shadow-sm transition-transform hover:bg-primary/90 active:scale-[0.96]"
                             >
+                                <Lightbulb className="h-4 w-4" />
                                 {loading ? 'Analyzing...' : 'Generate Recommendation'}
-                            </button>
+                            </Button>
 
                             {recommendation && (
                                 <div className="mt-4 rounded-md bg-white p-4 shadow-inner dark:bg-gray-800">
                                     <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Recommendation:</h3>
                                     <p className="text-sm whitespace-pre-line text-gray-700 dark:text-gray-300">{recommendation}</p>
                                     <div className="mt-4 flex flex-wrap gap-2">
-                                        <button
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
                                             onClick={() => {
                                                 navigator.clipboard.writeText(recommendation);
                                                 smartToast.success('Recommendation copied to clipboard');
                                             }}
-                                            className="inline-flex items-center gap-2 rounded-md border border-teal-300 bg-white px-4 py-2 text-sm font-medium text-teal-700 transition-all hover:bg-teal-50 dark:border-teal-600 dark:bg-gray-700 dark:text-teal-300 dark:hover:bg-gray-600"
+                                            className="cursor-pointer transition-transform active:scale-[0.96]"
                                         >
                                             <Copy className="h-4 w-4" />
                                             Copy
-                                        </button>
+                                        </Button>
                                         {child.contact_number && (
-                                            <button
+                                            <Button
+                                                size="sm"
                                                 onClick={() =>
                                                     router.visit(route('sms.index'), {
                                                         data: {
@@ -825,11 +829,11 @@ export default function Show({
                                                         },
                                                     })
                                                 }
-                                                className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-teal-600 hover:to-cyan-600"
+                                                className="cursor-pointer bg-primary text-primary-foreground shadow-sm transition-transform hover:bg-primary/90 active:scale-[0.96]"
                                             >
                                                 <MessageSquare className="h-4 w-4" />
                                                 Send via SMS
-                                            </button>
+                                            </Button>
                                         )}
                                     </div>
                                 </div>
@@ -1015,12 +1019,12 @@ export default function Show({
                     )}
 
                     {/* Floating Notes Button */}
-                    <button
-                        className="fixed top-24 right-4 z-50 cursor-pointer rounded-md bg-gradient-to-r from-teal-500 to-cyan-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:from-teal-600 hover:to-cyan-600 hover:shadow-xl sm:top-36"
+                    <Button
+                        className={`fixed top-24 right-4 z-50 cursor-pointer bg-primary text-primary-foreground shadow-lg transition-transform hover:bg-primary/90 active:scale-[0.96] sm:top-36 ${notesOpen ? 'hidden' : ''}`}
                         onClick={() => setNotesOpen(!notesOpen)}
                     >
                         Notes ({child.notes?.length || 0})
-                    </button>
+                    </Button>
 
                     {/* Sliding Notes Panel */}
                     <div
@@ -1047,10 +1051,10 @@ export default function Show({
                                     rows={3}
                                     placeholder="Add a new note..."
                                 />
-                                <button className="mt-2 inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:from-green-600 hover:to-emerald-600 hover:shadow-lg">
+                                <Button type="submit" size="sm" className="cursor-pointer bg-primary text-primary-foreground shadow-sm transition-transform hover:bg-primary/90 active:scale-[0.96]">
                                     <Plus className="h-4 w-4" />
                                     Add Note
-                                </button>
+                                </Button>
                             </form>
                         )}
 
