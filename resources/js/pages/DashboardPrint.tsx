@@ -6,7 +6,7 @@ import { route } from '@/lib/routes';
 import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
-import { ArrowLeft, Baby, BarChart3, PieChart, Printer, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Baby, BarChart3, PieChart, Printer, Syringe, TrendingUp } from 'lucide-react';
 import { useEffect, useLayoutEffect } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
@@ -60,6 +60,13 @@ type PrintData = {
         vitamin_a_doses: number;
         deworming_doses: number;
     };
+    doses: Array<{
+        child_name: string;
+        type: string;
+        name: string;
+        dose_number: number;
+        date_given: string;
+    }>;
 };
 
 type DashboardPrintProps = {
@@ -464,13 +471,7 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
                                             <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                                 Ind
                                             </TableHead>
-                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
-                                                Vit. A
-                                            </TableHead>
-                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
-                                                Deworm
-                                            </TableHead>
-                                            <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
+                                             <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 md:table-cell dark:text-cyan-100">
                                                 MNP
                                             </TableHead>
                                             <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
@@ -517,8 +518,6 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
                                                 <TableCell className="hidden px-4 py-2 sm:table-cell">
                                                     {shortStatus(log.status_wfa)}/{shortStatus(log.status_lfa)}/{shortStatus(log.status_wfl_wfh)}
                                                 </TableCell>
-                                                <TableCell className="hidden px-4 py-2 md:table-cell">{log.vitamin_a}</TableCell>
-                                                <TableCell className="hidden px-4 py-2 md:table-cell">{log.deworming}</TableCell>
                                                 <TableCell className="hidden px-4 py-2 md:table-cell">{log.micronutrient_powder}</TableCell>
                                                 <TableCell className="hidden px-4 py-2 sm:table-cell">{log.last_visit}</TableCell>
                                             </TableRow>
@@ -530,6 +529,51 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
                     </Card>
                 )}
             </div>
+
+            {/* All Doses */}
+            {data.doses && data.doses.length > 0 && (
+                <div className="mb-8">
+                    <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-cyan-900 sm:text-xl dark:text-cyan-100">
+                        <Syringe className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-400" />
+                        All Doses
+                    </h3>
+                    <Card className="print:bg-white">
+                        <CardContent className="p-0">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableCaption className="text-cyan-700 dark:text-cyan-300">
+                                        Vaccine and vitamin doses administered in this period.
+                                    </TableCaption>
+                                    <TableHeader>
+                                        <TableRow className="bg-cyan-50 dark:bg-gray-800">
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Child</TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Type</TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Item</TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Dose</TableHead>
+                                            <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Date Given</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {data.doses.map((dose, index) => (
+                                            <TableRow
+                                                key={index}
+                                                className="transition-colors hover:bg-cyan-50/50 dark:hover:bg-gray-700/50 print:text-xs"
+                                            >
+                                                <TableCell className="px-4 py-2">{dose.child_name}</TableCell>
+                                                <TableCell className="px-4 py-2">{dose.type}</TableCell>
+                                                <TableCell className="px-4 py-2">{dose.name}</TableCell>
+                                                <TableCell className="px-4 py-2">#{dose.dose_number}</TableCell>
+                                                <TableCell className="px-4 py-2">{dose.date_given}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
+
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>

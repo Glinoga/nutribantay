@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Jobs\RefreshDashboardForBarangay;
 use App\Models\AuditLog;
 use App\Models\Child;
+use App\Models\ChildVaccineDose;
+use App\Models\ChildVitaminDose;
 use App\Models\DashboardCache;
 use App\Models\HealthLog;
 use App\Services\NutStatusExportService;
@@ -82,6 +84,7 @@ class DashboardController extends Controller
                 ],
                 'user_barangay' => $barangay,
                 'is_admin' => $isAdmin,
+                'doses' => $this->getAllDoses($barangay),
             ]);
         }
 
@@ -149,7 +152,52 @@ class DashboardController extends Controller
             ],
             'user_barangay' => $barangay,
             'is_admin' => $isAdmin,
+            'doses' => $this->getAllDoses($barangay),
         ]);
+    }
+
+    private function getAllDoses(string $barangay, ?array $childIds = null, ?array $range = null): array
+    {
+        $vaccineQuery = ChildVaccineDose::whereHas('childVaccine.child', function ($q) use ($barangay, $childIds) {
+            $q->where('barangay', $barangay);
+            if ($childIds !== null) {
+                $q->whereIn('id', $childIds);
+            }
+        })
+            ->whereNotNull('date_given')
+            ->with('childVaccine.child', 'childVaccine.vaccine');
+
+        $vitaminQuery = ChildVitaminDose::whereHas('childVitamin.child', function ($q) use ($barangay, $childIds) {
+            $q->where('barangay', $barangay);
+            if ($childIds !== null) {
+                $q->whereIn('id', $childIds);
+            }
+        })
+            ->whereNotNull('date_given')
+            ->with('childVitamin.child', 'childVitamin.vitamin');
+
+        if ($range !== null) {
+            $vaccineQuery->whereBetween('date_given', [$range['start'], $range['end']]);
+            $vitaminQuery->whereBetween('date_given', [$range['start'], $range['end']]);
+        }
+
+        $vaccineDoses = $vaccineQuery->latest('date_given')->limit(100)->get()->map(fn ($d) => [
+            'child_name' => $d->childVaccine->child->fullname ?? '',
+            'type' => 'Vaccine',
+            'name' => $d->childVaccine->vaccine->name ?? '',
+            'dose_number' => $d->dose_number,
+            'date_given' => $d->date_given ? Carbon::parse($d->date_given)->format('Y-m-d') : '',
+        ]);
+
+        $vitaminDoses = $vitaminQuery->latest('date_given')->limit(100)->get()->map(fn ($d) => [
+            'child_name' => $d->childVitamin->child->fullname ?? '',
+            'type' => 'Vitamin',
+            'name' => $d->childVitamin->vitamin->name ?? '',
+            'dose_number' => $d->dose_number,
+            'date_given' => $d->date_given ? Carbon::parse($d->date_given)->format('Y-m-d') : '',
+        ]);
+
+        return collect($vaccineDoses)->merge($vitaminDoses)->sortByDesc('date_given')->values()->all();
     }
 
     private function buildFilteredChildQuery(Request $request, string $barangay, array $range, bool $withLatest = true): Builder
@@ -408,6 +456,7 @@ class DashboardController extends Controller
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
                 'generated_by' => $user->name,
                 'trends' => $trends,
+                'doses' => $this->getAllDoses($barangay, $childIds->toArray(), $range),
             ],
         ]);
     }
