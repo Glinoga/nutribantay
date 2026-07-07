@@ -1,4 +1,4 @@
-# 🥣 NutriBantay
+# ⛑️ NutriBantay
 
 **Barangay-level child nutrition tracking for the Philippines.**
 
@@ -9,7 +9,8 @@ NutriBantay is a web application built for local health workers to monitor, reco
 ## Features
 
 ### Child Health Management
-- **Full child registry** with barangay-scoped data access
+
+- **Full child registry** with demographic details (name, sex, age, birthdate)
 - **WHO growth standard evaluation** — weight-for-age (WFA), length/height-for-age (LFA), weight-for-length/height (WFL/WFH) via integrated `GrowthHelper`
 - **Health visit logging** with auto-sync to child weight, height, and nutrition status
 - **BMI calculation** and automated nutrition status classification
@@ -17,12 +18,14 @@ NutriBantay is a web application built for local health workers to monitor, reco
 - **Over-age protection** — children 60+ months are read-only
 
 ### Vaccine & Vitamin Tracking
+
 - **Vaccine catalog** with child-level assignment and dose recording
 - **Vitamin A tracking** with dose scheduling (100,000 IU at 6–11 mo, 200,000 IU at 12–59 mo)
 - **Deworming records** (albendazole/mebendazole every 6 months from 12 months)
 - Mirror-structured vaccine and vitamin routes for consistency
 
 ### AI-Powered Recommendations
+
 - OpenAI `gpt-4o-mini` integration producing **Tagalog-language nutrition advice**
 - Age-specific meal plans following National Nutrition Council (NNC) guidelines
 - Validation and retry logic with local fallback
@@ -30,17 +33,20 @@ NutriBantay is a web application built for local health workers to monitor, reco
 - Rate-limited to 10 requests/minute (unlimited for Admin)
 
 ### Communication
+
 - **SMS notifications** via IPROG API with Philippine number normalization (+63)
 - Bulk SMS with individual retry on failure
 - SMS credit checking and delivery status
 
 ### Dashboard & Analytics
+
 - **Pre-computed dashboard cache** (table-backed, no live queries)
 - Five age groups: `0–5`, `6–11`, `12–23`, `24–56` months
 - Chart.js visualizations and Leaflet map integration
 - Auto-refresh every 5 minutes via scheduler
 
 ### Admin Tools
+
 - **User management** with approval workflow (pending → approved/rejected)
 - **Registration code system** — pre-generated codes tied to barangays
 - **Audit logging** on User and Child models
@@ -50,8 +56,8 @@ NutriBantay is a web application built for local health workers to monitor, reco
 - **System toggle** for maintenance mode
 
 ### Security & Access Control
+
 - Role-based access: **Admin** and **Healthworker** (Spatie `laravel-permission`)
-- Barangay-scoped data — no cross-barangay visibility
 - Soft deletes on User, Child, and Announcement models
 - Encrypted sessions (`SESSION_ENCRYPT=true`)
 - 9 custom Inertia error pages (400/401/403/404/405/419/429/500/503)
@@ -63,26 +69,27 @@ NutriBantay is a web application built for local health workers to monitor, reco
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | PHP 8.2+ / Laravel 12 |
-| **Frontend** | React 19 / TypeScript / Inertia.js |
-| **Styling** | Tailwind CSS v4 (`@tailwindcss/vite`) / Shadcn UI (Radix) |
-| **Database** | SQLite (local) / MySQL 8.0 (production) |
-| **Cache & Queue** | `database` driver (local) / Redis (production) |
-| **SSR** | Inertia server-side rendering |
-| **Maps** | Leaflet + react-leaflet |
-| **Charts** | Chart.js + react-chartjs-2 |
-| **AI** | OpenAI `gpt-4o-mini` |
-| **SMS** | IPROG SMS API |
-| **Auth** | Spatie `laravel-permission` |
-| **CI/CD** | GitHub Actions (lint, test, deploy) |
+| Layer             | Technology                                                |
+| ----------------- | --------------------------------------------------------- |
+| **Backend**       | PHP 8.2+ / Laravel 12                                     |
+| **Frontend**      | React 19 / TypeScript / Inertia.js                        |
+| **Styling**       | Tailwind CSS v4 (`@tailwindcss/vite`) / Shadcn UI (Radix) |
+| **Database**      | SQLite (local) / MySQL 8.0 (production)                   |
+| **Cache & Queue** | `database` driver (local) / Redis (production)            |
+| **SSR**           | Inertia server-side rendering                             |
+| **Maps**          | Leaflet + react-leaflet                                   |
+| **Charts**        | Chart.js + react-chartjs-2                                |
+| **AI**            | OpenAI `gpt-4o-mini`                                      |
+| **SMS**           | IPROG SMS API                                             |
+| **Auth**          | Spatie `laravel-permission`                               |
+| **CI/CD**         | GitHub Actions (lint, test, deploy)                       |
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
+
 - PHP 8.2+
 - Node.js 20+
 - Composer
@@ -116,10 +123,10 @@ composer run dev
 
 ### Default Accounts
 
-| Role | Email | Password | Barangay |
-|------|-------|----------|----------|
-| **Admin** | `nutribantay@gmail.com` | `password123` | 176B |
-| **Healthworker** | `health@example.com` | `password123` | 176B |
+| Role             | Email                   | Password      | Barangay |
+| ---------------- | ----------------------- | ------------- | -------- |
+| **Admin**        | `nutribantay@gmail.com` | `password123` | 176B     |
+| **Healthworker** | `health@example.com`    | `password123` | 176B     |
 
 ### Development Commands
 
@@ -209,13 +216,15 @@ composer run dev:ssr         # build:ssr → serve + queue + pail + schedule + s
 ## Deployment
 
 ### CI/CD Pipeline
-| Workflow | Trigger | Actions |
-|----------|---------|---------|
-| **Lint** | Push/PR to `develop` or `main` | PHP Pint → Prettier → ESLint |
-| **Tests** | Push/PR to `develop` or `main` | `npm run build` → `./vendor/bin/pest` |
-| **Deploy** | Push to `merged` | Composer (no-dev) → SSR build → rsync → migrate → seed → cache → restart |
+
+| Workflow   | Trigger                        | Actions                                                                  |
+| ---------- | ------------------------------ | ------------------------------------------------------------------------ |
+| **Lint**   | Push/PR to `develop` or `main` | PHP Pint → Prettier → ESLint                                             |
+| **Tests**  | Push/PR to `develop` or `main` | `npm run build` → `./vendor/bin/pest`                                    |
+| **Deploy** | Push to `merged`               | Composer (no-dev) → SSR build → rsync → migrate → seed → cache → restart |
 
 ### Deploy Script
+
 ```powershell
 .\deploy.ps1              # Build → test → push to origin/merged
 .\deploy.ps1 -SkipBuild   # Skip npm run build
@@ -224,6 +233,7 @@ composer run dev:ssr         # build:ssr → serve + queue + pail + schedule + s
 ```
 
 After pushing to `merged`, the self-hosted GitHub Actions runner handles:
+
 - Composer install (production, no dev dependencies)
 - SSR asset build (`npm run build:ssr`)
 - rsync to target directory
@@ -234,20 +244,20 @@ After pushing to `merged`, the self-hosted GitHub Actions runner handles:
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `APP_NAME` | — | NutriBantay | Application name |
-| `APP_ENV` | — | local | Environment (local/production) |
-| `APP_DEBUG` | — | true | Debug mode |
-| `APP_URL` | — | http://localhost | Application URL |
-| `DB_CONNECTION` | — | sqlite | Database driver (sqlite/mysql) |
-| `SESSION_DRIVER` | — | database | Session storage |
-| `SESSION_ENCRYPT` | — | true | Encrypt session payloads |
-| `QUEUE_CONNECTION` | — | database | Queue driver |
-| `CACHE_STORE` | — | database | Cache driver |
-| `OPENAI_API_KEY` | For AI | — | OpenAI API key |
-| `IPROGSMS_API_TOKEN` | For SMS | — | IPROG SMS API token |
-| `BACKUP_ENCRYPTION_PASSWORD` | For backups | — | AES-256 backup encryption key |
+| Variable                     | Required    | Default          | Description                    |
+| ---------------------------- | ----------- | ---------------- | ------------------------------ |
+| `APP_NAME`                   | —           | NutriBantay      | Application name               |
+| `APP_ENV`                    | —           | local            | Environment (local/production) |
+| `APP_DEBUG`                  | —           | true             | Debug mode                     |
+| `APP_URL`                    | —           | http://localhost | Application URL                |
+| `DB_CONNECTION`              | —           | sqlite           | Database driver (sqlite/mysql) |
+| `SESSION_DRIVER`             | —           | database         | Session storage                |
+| `SESSION_ENCRYPT`            | —           | true             | Encrypt session payloads       |
+| `QUEUE_CONNECTION`           | —           | database         | Queue driver                   |
+| `CACHE_STORE`                | —           | database         | Cache driver                   |
+| `OPENAI_API_KEY`             | For AI      | —                | OpenAI API key                 |
+| `IPROGSMS_API_TOKEN`         | For SMS     | —                | IPROG SMS API token            |
+| `BACKUP_ENCRYPTION_PASSWORD` | For backups | —                | AES-256 backup encryption key  |
 
 ---
 
