@@ -223,7 +223,7 @@ class NutStatusExportService
         $this->setHeaderCell('B9', 'Purok, Block #, Area or Location in the Barangay', false, 10);
 
         $this->sheet->mergeCells('C7:C8');
-        $this->setHeaderCell('C7', 'Name of Mother', true, 11);
+        $this->setHeaderCell('C7', 'Name of Parent/Caregiver', true, 11);
         $this->sheet->setCellValue('C9', '(Surname, First Name)');
         $this->setHeaderCell('C9', '(Surname, First Name)', false, 10);
 
@@ -302,7 +302,7 @@ class NutStatusExportService
             // Data cells
             $this->setDataCell("A{$row}", $seq, 'center');
             $this->setDataCell("B{$row}", $child->address ?? '', 'left', true);
-            $this->setDataCell("C{$row}", $this->formatName($child->mother_name ?? ''), 'left', true);
+            $this->setDataCell("C{$row}", $this->formatName($child->parent_caregiver_name ?? ''), 'left', true);
             $this->setDataCell("D{$row}", $child->formatted_name, 'left', true);
             $this->setDataCell("E{$row}", $child->belongs_to_ip ? 'YES' : 'NO', 'center');
             $this->setDataCell("F{$row}", $child->sex === 'Male' ? 'M' : 'F', 'center');

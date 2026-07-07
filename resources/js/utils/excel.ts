@@ -40,7 +40,7 @@ export const readExcel = async (file: File) => {
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number | null)[][];
 
     const addressIdx = 1;
-    const motherNameIdx = 2;
+    const parentCaregiverNameIdx = 2;
     const fullNameIdx = 3;
     const ipIdx = 4;
     const sexIdx = 5;
@@ -105,7 +105,7 @@ export const readExcel = async (file: File) => {
                 weight: row[weightIdx] || null,
                 height: row[heightIdx] || null,
                 address: (row[addressIdx]?.toString().trim() || '').toUpperCase() || null,
-                mother_name: (row[motherNameIdx]?.toString().trim() || '').toUpperCase() || null,
+                parent_caregiver_name: (row[parentCaregiverNameIdx]?.toString().trim() || '').toUpperCase() || null,
             };
         });
 

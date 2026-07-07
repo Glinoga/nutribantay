@@ -420,7 +420,7 @@ class DashboardController extends Controller
 
                     return [
                         'child_name' => $child->fullname ?? '',
-                        'mother_name' => $child->mother_name ?? '',
+                        'parent_caregiver_name' => $child->parent_caregiver_name ?? '',
                         'belongs_to_ip' => $child->belongs_to_ip ? 'YES' : 'NO',
                         'birthdate' => $child->birthdate ? Carbon::parse($child->birthdate)->format('Y-m-d') : '',
                         'age' => $latest->age_in_months ?? ($child->birthdate ? floor(Carbon::parse($child->birthdate)->diffInMonths(Carbon::now())) : ''),

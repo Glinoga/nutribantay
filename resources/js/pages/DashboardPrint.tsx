@@ -15,7 +15,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 type PrintData = {
     healthlogs: Array<{
         child_name: string;
-        mother_name: string;
+        parent_caregiver_name: string;
         belongs_to_ip: string;
         birthdate: string;
         age: number;
@@ -447,7 +447,7 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
                                         <TableRow className="bg-cyan-50 dark:bg-gray-800">
                                             <TableHead className="px-4 py-2 text-left font-semibold text-cyan-900 dark:text-cyan-100">Name</TableHead>
                                             <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
-                                                Mother
+                                                Parent/Caregiver
                                             </TableHead>
                                             <TableHead className="hidden px-4 py-2 text-left font-semibold text-cyan-900 sm:table-cell dark:text-cyan-100">
                                                 IP
@@ -493,7 +493,7 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
                                                         </span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.mother_name}</TableCell>
+                                                <TableCell className="hidden px-4 py-2 sm:table-cell">{log.parent_caregiver_name}</TableCell>
                                                 <TableCell className="hidden px-4 py-2 sm:table-cell">{log.belongs_to_ip}</TableCell>
                                                 <TableCell className="hidden px-4 py-2 sm:table-cell">{log.birthdate}</TableCell>
                                                 <TableCell className="px-4 py-2">{log.age}</TableCell>

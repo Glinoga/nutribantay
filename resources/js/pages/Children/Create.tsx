@@ -20,7 +20,7 @@ export default function ChildrenCreate() {
         last_name: '',
         sex: 'Male',
         birthdate: '',
-        mother_name: '',
+        parent_caregiver_name: '',
         belongs_to_ip: false,
         weight: '',
         height: '',
@@ -254,13 +254,13 @@ export default function ChildrenCreate() {
                                         <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
                                             <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
                                                 <User className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                                                Mother/Caregiver Name
+                                                Parent/Caregiver Name
                                             </Label>
                                             <Input
                                                 type="text"
-                                                placeholder="Enter mother/caregiver name"
-                                                value={data.mother_name}
-                                                onChange={(e) => setData('mother_name', e.target.value)}
+                                                placeholder="Enter parent/caregiver name"
+                                                value={data.parent_caregiver_name}
+                                                onChange={(e) => setData('parent_caregiver_name', e.target.value)}
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
                                             />
                                         </div>

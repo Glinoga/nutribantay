@@ -102,7 +102,7 @@ class AnnouncementSeeder extends Seeder
                 'date' => '2025-12-15',
                 'end_date' => '2025-12-24',
                 'summary' => 'The annual Christmas hamper distribution for registered families has been completed.',
-                'content' => "The Barangay Nutrition Committee successfully distributed Christmas hampers to 200 registered families on December 20, 2025. Each hamper contained rice, canned goods, cooking oil, fresh vegetables, and a small treat for the children.\n\nThe distribution was made possible through the generous donations of local businesses and the coordinated efforts of barangay volunteers. Priority was given to families with pregnant women, lactating mothers, and children under 5 years old.\n\nWe extend our heartfelt thanks to all donors and volunteers who shared the spirit of giving this holiday season.",
+                'content' => "The Barangay Nutrition Committee successfully distributed Christmas hampers to 200 registered families on December 20, 2025. Each hamper contained rice, canned goods, cooking oil, fresh vegetables, and a small treat for the children.\n\nThe distribution was made possible through the generous donations of local businesses and the coordinated efforts of barangay volunteers. Priority was given to families with pregnant women, lactating parents, and children under 5 years old.\n\nWe extend our heartfelt thanks to all donors and volunteers who shared the spirit of giving this holiday season.",
             ],
             [
                 'title' => 'First Quarter Nutrition Report',
@@ -110,7 +110,7 @@ class AnnouncementSeeder extends Seeder
                 'date' => '2026-01-15',
                 'end_date' => '2026-04-30',
                 'summary' => 'The first quarter 2026 nutrition report is now available for public viewing at the health center.',
-                'content' => "The Barangay Nutrition Office has released its First Quarter 2026 Nutrition Report. The report covers the nutritional assessment of children 0-5 years old, pregnant women, and lactating mothers in the barangay.\n\nKey findings:\n- Prevalence of underweight among children: 8.5% (a decrease from 10.2% in Q4 2025)\n- Prevalence of stunting: 12.3%\n- Percentage of pregnant women attending prenatal checkups: 95%\n- Exclusive breastfeeding rate: 78%\n\nThe full report is available for viewing at the Barangay Health Center. Copies have also been submitted to the City Nutrition Office.",
+                'content' => "The Barangay Nutrition Office has released its First Quarter 2026 Nutrition Report. The report covers the nutritional assessment of children 0-5 years old, pregnant women, and lactating parents in the barangay.\n\nKey findings:\n- Prevalence of underweight among children: 8.5% (a decrease from 10.2% in Q4 2025)\n- Prevalence of stunting: 12.3%\n- Percentage of pregnant women attending prenatal checkups: 95%\n- Exclusive breastfeeding rate: 78%\n\nThe full report is available for viewing at the Barangay Health Center. Copies have also been submitted to the City Nutrition Office.",
             ],
             [
                 'title' => 'COVID-19 Booster Shot Schedule (2025)',
@@ -135,8 +135,8 @@ class AnnouncementSeeder extends Seeder
                 'category_id' => $categories['Workshop'],
                 'date' => '2026-08-15',
                 'end_date' => null,
-                'summary' => 'A hands-on workshop for new and expecting mothers on proper breastfeeding techniques and nutrition.',
-                'content' => "The Barangay Nutrition Office invites all pregnant women and new mothers to a Breastfeeding Awareness and Support Workshop on August 15, 2026 at the Barangay Health Center.\n\nThe workshop will cover proper latching techniques, breast milk storage, common breastfeeding challenges, and maternal nutrition during lactation. A certified lactation counselor will facilitate the session and answer your questions.\n\nFree breast milk storage bags and informational materials will be provided to all attendees. Light refreshments will be served.",
+                'summary' => 'A hands-on workshop for new and expecting parents on proper breastfeeding techniques and nutrition.',
+                'content' => "The Barangay Nutrition Office invites all pregnant women and new parents to a Breastfeeding Awareness and Support Workshop on August 15, 2026 at the Barangay Health Center.\n\nThe workshop will cover proper latching techniques, breast milk storage, common breastfeeding challenges, and maternal nutrition during lactation. A certified lactation counselor will facilitate the session and answer your questions.\n\nFree breast milk storage bags and informational materials will be provided to all attendees. Light refreshments will be served.",
             ],
             [
                 'title' => 'Purok-Level Clean-Up Drive & Nutrition Fair',
@@ -160,7 +160,7 @@ class AnnouncementSeeder extends Seeder
                 'date' => '2026-08-01',
                 'end_date' => null,
                 'summary' => 'The updated schedule for the annual nutrition assessment of children and pregnant women is now available.',
-                'content' => "The annual Operation Timbang (OPT) Plus will commence on August 1, 2026. This year's nutrition assessment will cover all children 0-59 months old, pregnant women, and lactating mothers in the barangay.\n\nSchedule by Purok:\n- Purok 1-2: August 1-5\n- Purok 3-4: August 8-12\n- Purok 5-6: August 15-19\n- Purok 7-8: August 22-26\n\nHealth workers will conduct house-to-house visits for weighing and height measurement. Parents are requested to have their child's health record ready during the visit.",
+                'content' => "The annual Operation Timbang (OPT) Plus will commence on August 1, 2026. This year's nutrition assessment will cover all children 0-59 months old, pregnant women, and lactating parents in the barangay.\n\nSchedule by Purok:\n- Purok 1-2: August 1-5\n- Purok 3-4: August 8-12\n- Purok 5-6: August 15-19\n- Purok 7-8: August 22-26\n\nHealth workers will conduct house-to-house visits for weighing and height measurement. Parents are requested to have their child's health record ready during the visit.",
             ],
             [
                 'title' => 'Barangay Health Workers Training: Infant and Young Child Feeding',
@@ -168,7 +168,7 @@ class AnnouncementSeeder extends Seeder
                 'date' => '2026-10-01',
                 'end_date' => null,
                 'summary' => 'A training program for barangay health workers on proper infant and young child feeding practices.',
-                'content' => "The City Nutrition Office, in coordination with the Barangay Nutrition Committee, will conduct a training on Infant and Young Child Feeding (IYCF) for all barangay health workers on October 1-2, 2026.\n\nThe training will cover recommended breastfeeding practices, appropriate complementary feeding, management of acute malnutrition, and counseling skills for mothers. This is a mandatory training for all active health workers.\n\nCertificates of participation will be provided. Health workers are advised to coordinate with their respective purok leaders for schedule adjustments.",
+                'content' => "The City Nutrition Office, in coordination with the Barangay Nutrition Committee, will conduct a training on Infant and Young Child Feeding (IYCF) for all barangay health workers on October 1-2, 2026.\n\nThe training will cover recommended breastfeeding practices, appropriate complementary feeding, management of acute malnutrition, and counseling skills for parents. This is a mandatory training for all active health workers.\n\nCertificates of participation will be provided. Health workers are advised to coordinate with their respective purok leaders for schedule adjustments.",
             ],
         ];
 

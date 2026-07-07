@@ -44,7 +44,7 @@ type Child = {
     height: number | null;
     nutrition_status: string | null;
     address: string | null;
-    mother_name: string | null;
+    parent_caregiver_name: string | null;
     belongs_to_ip: boolean | null;
     contact_number: string | null;
     created_at: string | null;
@@ -266,8 +266,8 @@ export default function ShowPrint({ child, generated_at, generated_by }: ShowPri
                             <span className="font-medium">{child.address ?? '-'}</span>
                         </div>
                         <div className="flex justify-between gap-2">
-                            <span className="text-cyan-700 dark:text-cyan-300">Mother/Caregiver:</span>
-                            <span className="font-medium">{child.mother_name ?? '-'}</span>
+                            <span className="text-cyan-700 dark:text-cyan-300">Parent/Caregiver:</span>
+                            <span className="font-medium">{child.parent_caregiver_name ?? '-'}</span>
                         </div>
                         <div className="flex justify-between gap-2">
                             <span className="text-cyan-700 dark:text-cyan-300">Belongs to IP Group:</span>

@@ -445,7 +445,7 @@ class ChildController extends Controller
             'sex' => 'required|in:M,F,Male,Female',
             'birthdate' => 'required|date|before:tomorrow',
             'address' => 'nullable|string|max:255',
-            'mother_name' => 'nullable|string|max:255',
+            'parent_caregiver_name' => 'nullable|string|max:255',
             'belongs_to_ip' => 'nullable|boolean',
             'contact_number' => 'nullable|string|max:50',
             'weight' => 'nullable|numeric|min:0.1|max:200',
@@ -484,7 +484,7 @@ class ChildController extends Controller
                 'belongs_to_ip' => $validated['belongs_to_ip'] ?? false,
                 'birthdate' => $validated['birthdate'],
                 'address' => $validated['address'] ?? null,
-                'mother_name' => $validated['mother_name'] ?? null,
+                'parent_caregiver_name' => $validated['parent_caregiver_name'] ?? null,
                 'contact_number' => $validated['contact_number'] ?? null,
                 'weight' => $validated['weight'] ?? null,
                 'height' => $validated['height'] ?? null,
@@ -576,7 +576,7 @@ class ChildController extends Controller
 
             // Header row 1 (matching Nut_StatusTool columns)
             fputcsv($file, [
-                'Child Seq.', 'Address or Location', 'Name of Mother',
+                'Child Seq.', 'Address or Location', 'Name of Parent/Caregiver',
                 'Full Name of Child', 'Belongs to IP Group?', 'Sex',
                 'Date of Birth', 'Date Measured', 'Weight', 'Height',
                 'Age in Months', 'WFA Status', 'HFA Status', 'WFL/H Status',
@@ -591,7 +591,7 @@ class ChildController extends Controller
                 fputcsv($file, [
                     $seq,
                     $child->address ?? '',
-                    $child->mother_name ?? '',
+                    $child->parent_caregiver_name ?? '',
                     $child->formatted_name,
                     $child->belongs_to_ip ? 'YES' : 'NO',
                     $child->sex === 'Male' ? 'M' : 'F',
@@ -635,7 +635,7 @@ class ChildController extends Controller
                 'contact_number' => $child->contact_number,
                 'weight' => $child->weight,
                 'height' => $child->height,
-                'mother_name' => $child->mother_name,
+                'parent_caregiver_name' => $child->parent_caregiver_name,
                 'belongs_to_ip' => $child->belongs_to_ip,
             ],
         ]);
@@ -658,7 +658,7 @@ class ChildController extends Controller
             'sex' => 'required|in:Male,Female',
             'birthdate' => 'required|date|before:tomorrow',
             'contact_number' => 'nullable|string|max:50',
-            'mother_name' => 'nullable|string|max:255',
+            'parent_caregiver_name' => 'nullable|string|max:255',
             'belongs_to_ip' => 'nullable|boolean',
             'weight' => 'nullable|numeric|min:0.1|max:200',
             'height' => 'nullable|numeric|min:0.1|max:250',
@@ -803,7 +803,7 @@ class ChildController extends Controller
                 'height' => $child->height,
                 'birthdate' => $child->birthdate,
                 'address' => $child->address,
-                'mother_name' => $child->mother_name,
+                'parent_caregiver_name' => $child->parent_caregiver_name,
                 'belongs_to_ip' => $child->belongs_to_ip,
                 'contact_number' => $child->contact_number,
                 'created_at' => $child->created_at,
@@ -994,7 +994,7 @@ class ChildController extends Controller
                         'barangay' => $user->barangay,
                         'created_by' => $user->id,
                         'address' => $row['address'] ? strtoupper($row['address']) : null,
-                        'mother_name' => $row['mother_name'] ? strtoupper($row['mother_name']) : null,
+                        'parent_caregiver_name' => $row['parent_caregiver_name'] ? strtoupper($row['parent_caregiver_name']) : null,
                         'belongs_to_ip' => filter_var($row['belongs_to_ip'] ?? false, FILTER_VALIDATE_BOOLEAN),
                         'contact_number' => null,
                     ]);
@@ -1176,7 +1176,7 @@ class ChildController extends Controller
             'status_lfa' => $child->latestHealthlog?->status_lfa ?? '-',
             'status_wfl_wfh' => $child->latestHealthlog?->status_wfl_wfh ?? '-',
             'address' => $child->address,
-            'mother_name' => $child->mother_name,
+            'parent_caregiver_name' => $child->parent_caregiver_name,
             'belongs_to_ip' => $child->belongs_to_ip,
             'contact_number' => $child->contact_number,
         ]);
@@ -1236,7 +1236,7 @@ class ChildController extends Controller
                 'nutrition_status' => $child->nutrition_status,
                 'bmi' => $child->bmi,
                 'address' => $child->address,
-                'mother_name' => $child->mother_name,
+                'parent_caregiver_name' => $child->parent_caregiver_name,
                 'belongs_to_ip' => $child->belongs_to_ip,
                 'contact_number' => $child->contact_number,
                 'created_at' => $child->created_at?->format('Y-m-d H:i:s'),
@@ -1325,7 +1325,7 @@ class ChildController extends Controller
             fputcsv($file, ['Child Information']);
             fputcsv($file, [
                 'ID', 'Full Name', 'Age (months)', 'Sex', 'Birthdate',
-                'Address', 'Mother/Caregiver', 'Belongs to IP Group?',
+                'Address', 'Parent/Caregiver', 'Belongs to IP Group?',
                 'Contact Number',
                 'Weight (kg)', 'Height (cm)', 'Nutrition Status',
             ]);
@@ -1336,7 +1336,7 @@ class ChildController extends Controller
                 $child->sex,
                 $child->birthdate?->format('Y-m-d'),
                 $child->address,
-                $child->mother_name ?? '-',
+                $child->parent_caregiver_name ?? '-',
                 $child->belongs_to_ip ? 'YES' : 'NO',
                 $child->contact_number,
                 $child->weight,

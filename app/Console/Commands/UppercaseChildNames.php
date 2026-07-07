@@ -9,7 +9,7 @@ class UppercaseChildNames extends Command
 {
     protected $signature = 'children:uppercase-names {--barangay= : Barangay to scope to}';
 
-    protected $description = 'Uppercase first_name, last_name, middle_initial, address, mother_name for existing children';
+    protected $description = 'Uppercase first_name, last_name, middle_initial, address, parent_caregiver_name for existing children';
 
     public function handle()
     {
@@ -39,8 +39,8 @@ class UppercaseChildNames extends Command
                     $c->address = strtoupper($c->address);
                     $dirty = true;
                 }
-                if ($c->mother_name && $c->mother_name !== strtoupper($c->mother_name)) {
-                    $c->mother_name = strtoupper($c->mother_name);
+                if ($c->parent_caregiver_name && $c->parent_caregiver_name !== strtoupper($c->parent_caregiver_name)) {
+                    $c->parent_caregiver_name = strtoupper($c->parent_caregiver_name);
                     $dirty = true;
                 }
 

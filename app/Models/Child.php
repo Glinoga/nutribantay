@@ -25,7 +25,7 @@ class Child extends Model
         'birthdate',
         'barangay',
         'address',
-        'mother_name',
+        'parent_caregiver_name',
         'contact_number',
         'created_by',
         'updated_by',
@@ -67,7 +67,7 @@ class Child extends Model
     {
         $this->first_name = $this->normalizeName($this->first_name);
         $this->last_name = $this->normalizeName($this->last_name);
-        $this->mother_name = $this->mother_name ? $this->normalizeName($this->mother_name) : null;
+        $this->parent_caregiver_name = $this->parent_caregiver_name ? $this->normalizeName($this->parent_caregiver_name) : null;
 
         if ($this->middle_initial) {
             $this->middle_initial = strtoupper(trim($this->middle_initial));

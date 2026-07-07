@@ -1362,7 +1362,7 @@ export default function Index({
                                                                 Name
                                                             </th>
                                                             <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
-                                                                Mother
+                                                                Parent/Caregiver
                                                             </th>
                                                             <th className="border border-gray-200 px-3 py-2 text-left font-medium dark:border-gray-600 dark:text-gray-200">
                                                                 IP
@@ -1391,7 +1391,7 @@ export default function Index({
                                                                     {row.first_name} {row.last_name}
                                                                 </td>
                                                                 <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
-                                                                    {row.mother_name || '-'}
+                                                                    {row.parent_caregiver_name || '-'}
                                                                 </td>
                                                                 <td className="border border-gray-200 px-3 py-2 dark:border-gray-600 dark:text-gray-200">
                                                                     {row.belongs_to_ip ? 'YES' : 'NO'}
