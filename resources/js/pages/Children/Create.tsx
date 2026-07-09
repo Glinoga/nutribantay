@@ -22,6 +22,7 @@ export default function ChildrenCreate() {
         birthdate: '',
         parent_caregiver_name: '',
         belongs_to_ip: false,
+        address: '',
         weight: '',
         height: '',
         contact_number: '',
@@ -286,6 +287,20 @@ export default function ChildrenCreate() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                    </div>
+
+                                    <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                        <Label className="mb-2 flex items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
+                                            <User className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                                            Address
+                                        </Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Enter complete address"
+                                            value={data.address}
+                                            onChange={(e) => setData('address', e.target.value)}
+                                            className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                        />
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">

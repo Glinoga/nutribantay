@@ -126,6 +126,9 @@ export default function Show({
         last_name: child.last_name || '',
         sex: child.sex || 'Male',
         birthdate: child.birthdate || '',
+        parent_caregiver_name: child.parent_caregiver_name || '',
+        belongs_to_ip: child.belongs_to_ip ?? false,
+        address: child.address || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
         contact_number: child.contact_number ? formatPhoneNumber(child.contact_number) : '',
@@ -1255,6 +1258,60 @@ export default function Show({
                                         className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Parent/Caregiver & IP Group */}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Parent/Caregiver Name</h3>
+                                </div>
+                                <div className="p-6">
+                                    <Input
+                                        type="text"
+                                        placeholder="Enter parent/caregiver name"
+                                        value={data.parent_caregiver_name}
+                                        onChange={(e) => setData('parent_caregiver_name', e.target.value)}
+                                        className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                                <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Belongs to IP Group?</h3>
+                                </div>
+                                <div className="p-6">
+                                    <Select
+                                        value={data.belongs_to_ip ? 'yes' : 'no'}
+                                        onValueChange={(value) => setData('belongs_to_ip', value === 'yes')}
+                                    >
+                                        <SelectTrigger className="w-full rounded-md border-gray-200 bg-gray-50 text-sm font-medium transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                            <SelectValue placeholder="Select" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="yes" className="font-medium">Yes</SelectItem>
+                                            <SelectItem value="no" className="font-medium">No</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className="rounded-xl border-0 bg-white shadow-md transition-all hover:shadow-lg dark:bg-gray-800">
+                            <div className="border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 dark:border-gray-700 dark:from-teal-900/20 dark:to-cyan-900/20">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">Address</h3>
+                            </div>
+                            <div className="p-6">
+                                <Input
+                                    type="text"
+                                    placeholder="Enter complete address"
+                                    value={data.address}
+                                    onChange={(e) => setData('address', e.target.value)}
+                                    className="rounded-md border-gray-200 bg-gray-50 text-sm font-medium text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                />
                             </div>
                         </div>
 

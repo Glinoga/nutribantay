@@ -22,6 +22,7 @@ interface Child {
     birthdate?: string;
     parent_caregiver_name?: string;
     belongs_to_ip?: boolean;
+    address?: string | null;
     weight?: number;
     height?: number;
     contact_number?: string;
@@ -44,6 +45,7 @@ export default function Edit({ child }: Props) {
         birthdate: child.birthdate || '',
         parent_caregiver_name: child.parent_caregiver_name || '',
         belongs_to_ip: child.belongs_to_ip ?? false,
+        address: child.address || '',
         weight: String(child.weight ?? ''),
         height: String(child.height ?? ''),
         contact_number: child.contact_number ? formatPhoneNumber(child.contact_number) : '',
@@ -279,6 +281,17 @@ export default function Edit({ child }: Props) {
                                                 className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
                                             />
                                         </div>
+                                    </div>
+
+                                    <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+                                        <Label className="mb-2 block text-sm font-bold text-gray-800 dark:text-gray-100">Address</Label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Enter complete address"
+                                            value={data.address}
+                                            onChange={(e) => setData('address', e.target.value)}
+                                            className="rounded-md border-teal-200 bg-white text-sm font-bold text-gray-800 transition-colors focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none dark:border-teal-700 dark:bg-gray-700 dark:text-gray-100"
+                                        />
                                     </div>
 
                                     <div className="rounded-xl border border-teal-100 bg-teal-50/50 p-4 dark:border-teal-800 dark:bg-teal-900/20">

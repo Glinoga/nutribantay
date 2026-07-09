@@ -657,6 +657,7 @@ class ChildController extends Controller
             'last_name' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'birthdate' => 'required|date|before:tomorrow',
+            'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:50',
             'parent_caregiver_name' => 'nullable|string|max:255',
             'belongs_to_ip' => 'nullable|boolean',
