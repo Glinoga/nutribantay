@@ -637,6 +637,7 @@ class ChildController extends Controller
                 'height' => $child->height,
                 'parent_caregiver_name' => $child->parent_caregiver_name,
                 'belongs_to_ip' => $child->belongs_to_ip,
+                'address' => $child->address,
             ],
         ]);
     }
