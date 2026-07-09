@@ -754,7 +754,7 @@ class ChildController extends Controller
             abort(403);
         }
 
-        $child->load(['notes.author', 'creator', 'updater']);
+        $child->load(['notes.author.roles', 'creator.roles', 'updater.roles']);
 
         $selectColumns = [
             'id', 'weight', 'height', 'bmi', 'nutrition_status',
@@ -779,7 +779,7 @@ class ChildController extends Controller
             'rusf' => $log->rusf,
             'complementary_food' => $log->complementary_food,
             'created_at' => $log->created_at,
-            'user' => ['name' => $log->user?->name],
+            'user' => ['name' => $log->user?->name, 'role_abbr' => $log->user?->role_abbreviation],
             'vaccine_doses' => $log->vaccineDoses->map(fn ($dose) => [
                 'name' => $dose->childVaccine?->vaccine?->name,
                 'dose_number' => $dose->dose_number,
@@ -810,12 +810,12 @@ class ChildController extends Controller
                 'contact_number' => $child->contact_number,
                 'created_at' => $child->created_at,
                 'updated_at' => $child->updated_at,
-                'creator' => ['name' => $child->creator?->name],
-                'updater' => ['name' => $child->updater?->name],
+                'creator' => ['name' => $child->creator?->name, 'role_abbr' => $child->creator?->role_abbreviation],
+                'updater' => ['name' => $child->updater?->name, 'role_abbr' => $child->updater?->role_abbreviation],
                 'notes' => $child->notes->map(fn ($note) => [
                     'id' => $note->id,
                     'note' => $note->note,
-                    'author' => ['name' => $note->author?->name],
+                    'author' => ['name' => $note->author?->name, 'role_abbr' => $note->author?->role_abbreviation],
                     'created_at' => $note->created_at,
                 ]),
             ],
@@ -831,6 +831,7 @@ class ChildController extends Controller
             'healthlogs' => $child->healthlogs()
                 ->with([
                     'user:id,name',
+                    'user.roles',
                     'vaccineDoses.childVaccine.vaccine:id,name',
                     'vitaminDoses.childVitamin.vitamin:id,name',
                 ])
@@ -1187,7 +1188,7 @@ class ChildController extends Controller
             'children' => $children,
             'filters' => $request->only(['search', 'sex', 'vaccine_status']),
             'generated_at' => now()->format('Y-m-d H:i:s'),
-            'generated_by' => $user->name,
+            'generated_by' => $user->display_name,
             'type' => $request->type,
         ]);
     }
@@ -1267,7 +1268,7 @@ class ChildController extends Controller
                 ]),
             ],
             'generated_at' => now()->format('Y-m-d H:i:s'),
-            'generated_by' => $user->name,
+            'generated_by' => $user->display_name,
         ]);
     }
 

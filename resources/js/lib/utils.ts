@@ -25,3 +25,8 @@ export function shortStatus(status: string | null | undefined): string {
     if (!status) return '-';
     return STATUS_SHORT[status] ?? status;
 }
+
+export function formatUserName(user?: { name?: string | null; role_abbr?: string | null } | null): string {
+    if (!user?.name) return '-';
+    return user.role_abbr ? `${user.name} | ${user.role_abbr}` : user.name;
+}

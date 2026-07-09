@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Pagination, type PaginationData } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { formatUserName } from '@/lib/utils';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
@@ -23,7 +24,7 @@ type AuditLog = {
     ip_address: string | null;
     barangay: string | null;
     created_at: string;
-    user?: { name: string } | null;
+    user?: { name: string; role_abbr?: string } | null;
 };
 
 type Props = {
@@ -367,7 +368,7 @@ export default function Index({ logs, filters, actions, modelTypes }: Props) {
                                                 {logs.data.map((log) => (
                                                     <TableRow key={log.id}>
                                                         <TableCell className="font-medium">{new Date(log.created_at).toLocaleString()}</TableCell>
-                                                        <TableCell>{log.user?.name || log.user_name || 'System'}</TableCell>
+                                                        <TableCell>{log.user ? formatUserName(log.user) : (log.user_name || 'System')}</TableCell>
                                                         <TableCell>
                                                             <span
                                                                 className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${getActionColor(
