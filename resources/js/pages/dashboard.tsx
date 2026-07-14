@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
+import { smartToast } from '@/utils/smartToast';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { Activity, AlertTriangle, Baby, Calendar, Download, Printer, Syringe, TrendingUp, Users } from 'lucide-react';
@@ -159,9 +160,20 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
     };
 
     const handlePrint = () => {
+        if (dateMode === 'custom') {
+            if (!startDate || !endDate) {
+                smartToast.error('Please select both start and end dates.');
+                return;
+            }
+            if (startDate > endDate) {
+                smartToast.error('Start date must be before end date.');
+                return;
+            }
+        }
+
         const params = new URLSearchParams();
 
-        if (dateMode === 'custom' && startDate && endDate) {
+        if (dateMode === 'custom') {
             params.set('start_date', startDate);
             params.set('end_date', endDate);
             params.set('period', `${startDate}_to_${endDate}`);
@@ -316,6 +328,13 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             <div className="mb-2">
                                                 <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Nutrition Status</p>
                                                 <div className="flex flex-wrap gap-3">
+                                                    <label className="flex cursor-pointer items-center gap-1.5 text-xs">
+                                                        <Checkbox
+                                                            checked={filterStatus.length === 0}
+                                                            onCheckedChange={() => setFilterStatus([])}
+                                                        />
+                                                        All
+                                                    </label>
                                                     {[
                                                         { value: 'Normal', label: 'Normal' },
                                                         { value: 'Moderate Malnutrition', label: 'Moderate' },
@@ -336,6 +355,13 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             <div className="mb-2">
                                                 <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Sex</p>
                                                 <div className="flex gap-3">
+                                                    <label className="flex cursor-pointer items-center gap-1.5 text-xs">
+                                                        <Checkbox
+                                                            checked={filterSex.length === 0}
+                                                            onCheckedChange={() => setFilterSex([])}
+                                                        />
+                                                        All
+                                                    </label>
                                                     {['Male', 'Female'].map((s) => (
                                                         <label key={s} className="flex cursor-pointer items-center gap-1.5 text-xs">
                                                             <Checkbox
@@ -351,6 +377,13 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             <div className="mb-2">
                                                 <p className="mb-1 text-xs font-medium text-cyan-700 dark:text-cyan-300">Age Group</p>
                                                 <div className="flex flex-wrap gap-3">
+                                                    <label className="flex cursor-pointer items-center gap-1.5 text-xs">
+                                                        <Checkbox
+                                                            checked={filterAgeGroup.length === 0}
+                                                            onCheckedChange={() => setFilterAgeGroup([])}
+                                                        />
+                                                        All
+                                                    </label>
                                                     {[
                                                         { value: '0to5', label: '0–5 mo' },
                                                         { value: '6to11', label: '6–11 mo' },
@@ -399,9 +432,15 @@ export default function Dashboard({ stats, trends, vaccine_followups, vitamin_fo
                                             </Button>
                                             <Button
                                                 onClick={() => {
-                                                    const missingDates = dateMode === 'custom' && (!startDate || !endDate);
-                                                    if (missingDates) {
-                                                        return;
+                                                    if (dateMode === 'custom') {
+                                                        if (!startDate || !endDate) {
+                                                            smartToast.error('Please select both start and end dates.');
+                                                            return;
+                                                        }
+                                                        if (startDate > endDate) {
+                                                            smartToast.error('Start date must be before end date.');
+                                                            return;
+                                                        }
                                                     }
                                                     window.location.href = buildExportUrl();
                                                 }}

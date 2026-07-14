@@ -7,7 +7,7 @@ import { shortStatus } from '@/lib/utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from 'chart.js';
 import { ArrowLeft, Baby, BarChart3, PieChart, Printer, Syringe, TrendingUp } from 'lucide-react';
-import { useEffect, useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -113,6 +113,23 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
             window.removeEventListener('beforeprint', handleBeforePrint);
             window.removeEventListener('afterprint', handleAfterPrint);
         };
+    }, []);
+
+    const [totalPages, setTotalPages] = useState(1);
+
+    const calculatePages = () => {
+        const PRINTABLE_HEIGHT_MM = 190;
+        const PX_PER_MM = 96 / 25.4;
+        const printablePx = PRINTABLE_HEIGHT_MM * PX_PER_MM;
+        const pages = Math.max(1, Math.ceil(document.body.scrollHeight / printablePx));
+        setTotalPages(pages);
+    };
+
+    useEffect(() => {
+        calculatePages();
+        const handleBeforePrint = () => calculatePages();
+        window.addEventListener('beforeprint', handleBeforePrint);
+        return () => window.removeEventListener('beforeprint', handleBeforePrint);
     }, []);
 
     const lineChartData = {
@@ -577,7 +594,7 @@ export default function DashboardPrint({ period, filters, data }: DashboardPrint
             {/* Footer */}
             <div className="mt-6 border-t border-cyan-200 pt-3 text-center text-sm text-cyan-700 sm:mt-8 sm:pt-4 dark:border-gray-700 dark:text-cyan-300">
                 <p>
-                    Generated on {data.generated_at} by {data.generated_by}
+                    Page 1 of {totalPages} · Generated on {data.generated_at} by {data.generated_by}
                 </p>
                 <p className="mt-1 flex items-center justify-center gap-2">
                     <Baby className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
