@@ -308,7 +308,7 @@ class DashboardController extends Controller
             'city' => config('app.city', 'Caloocan'),
             'period_start' => $range['start']->format('Y-m-d'),
             'period_end' => $range['end']->format('Y-m-d'),
-            'generated_by' => $user->name,
+            'generated_by' => $user->display_name,
             'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -454,7 +454,7 @@ class DashboardController extends Controller
                 ],
                 'barangay' => $barangay,
                 'generated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'generated_by' => $user->name,
+                'generated_by' => $user->display_name,
                 'trends' => $trends,
                 'doses' => $this->getAllDoses($barangay, $childIds->toArray(), $range),
             ],

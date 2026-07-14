@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { displayPhoneNumber, formatPhoneNumber } from '@/lib/phoneUtils';
+import { formatUserName } from '@/lib/utils';
 import { route } from '@/lib/routes';
 import { type BreadcrumbItem } from '@/types';
 import smartToast from '@/utils/smartToast';
@@ -39,7 +40,7 @@ type Note = {
     id: number;
     note: string;
     created_at: string;
-    author?: { name: string | null };
+    author?: { name: string | null; role_abbr?: string | null };
 };
 
 type DoseItem = {
@@ -62,7 +63,7 @@ type HealthLog = {
     rusf: string | null;
     complementary_food: string | null;
     created_at: string;
-    user?: { name: string | null };
+    user?: { name: string | null; role_abbr?: string | null };
     vaccine_doses: DoseItem[];
     vitamin_doses: DoseItem[];
 };
@@ -92,8 +93,8 @@ type Child = {
     belongs_to_ip: boolean | null;
     address: string | null;
     contact_number: string | null;
-    creator?: { name: string | null };
-    updater?: { name: string | null };
+    creator?: { name: string | null; role_abbr?: string | null };
+    updater?: { name: string | null; role_abbr?: string | null };
     created_at: string;
     updated_at: string;
     notes?: Note[];
@@ -494,8 +495,8 @@ export default function Show({
                                         { label: 'Parent/Caregiver', value: child.parent_caregiver_name ?? 'N/A' },
                                         { label: 'Contact Number', value: displayPhoneNumber(child.contact_number) },
                                         { label: 'IP Group', value: child.belongs_to_ip ? 'Yes' : 'No' },
-                                        { label: 'Created by', value: child.creator?.name ?? 'N/A' },
-                                        { label: 'Updated by', value: child.updater?.name ?? 'N/A' },
+                                        { label: 'Created by', value: child.creator ? formatUserName(child.creator) : 'N/A' },
+                                        { label: 'Updated by', value: child.updater ? formatUserName(child.updater) : 'N/A' },
                                     ].map((item, idx) => (
                                         <div key={idx} className="rounded-md bg-gray-50 p-3 dark:bg-gray-700">
                                             <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
@@ -508,7 +509,7 @@ export default function Show({
                                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Created at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                                             {child.created_at
-                                                ? `by ${child.creator?.name ?? 'Unknown'} on ${new Date(child.created_at).toLocaleString()}`
+                                                ? `by ${child.creator ? formatUserName(child.creator) : 'Unknown'} on ${new Date(child.created_at).toLocaleString()}`
                                                 : 'N/A'}
                                         </p>
                                     </div>
@@ -516,7 +517,7 @@ export default function Show({
                                         <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Last updated at</p>
                                         <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
                                             {child.updated_at
-                                                ? `by ${child.updater?.name ?? 'Unknown'} on ${new Date(child.updated_at).toLocaleString()}`
+                                                ? `by ${child.updater ? formatUserName(child.updater) : 'Unknown'} on ${new Date(child.updated_at).toLocaleString()}`
                                                 : 'N/A'}
                                         </p>
                                     </div>
@@ -719,7 +720,7 @@ export default function Show({
                                                         <X className="mx-auto h-4 w-4 text-red-600" />
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{log.user?.name ?? '-'}</td>
+                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-200">{formatUserName(log.user)}</td>
                                                 {canManageHealthlogs && !isOveraged && (
                                                     <td className="px-4 py-3 text-center">
                                                         <div className="flex items-center justify-center gap-2">
@@ -989,7 +990,7 @@ export default function Show({
                                         <div className="grid grid-cols-1 gap-4 rounded-md bg-gray-50 p-4 sm:grid-cols-2 dark:bg-gray-700">
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Created By</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{selectedLog.user?.name ?? '-'}</p>
+                                                <p className="font-medium text-gray-900 dark:text-gray-100">{formatUserName(selectedLog.user)}</p>
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">Date Logged</p>
@@ -1068,7 +1069,7 @@ export default function Show({
                                         <p className="text-sm break-words text-gray-700 dark:text-gray-200">{note.note}</p>
                                         <small className="mt-1 block text-gray-500 dark:text-gray-400">
                                             {note.created_at
-                                                ? `by ${note.author?.name ?? 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
+                                                ? `by ${note.author ? formatUserName(note.author) : 'Unknown'} on ${new Date(note.created_at).toLocaleString()}`
                                                 : 'N/A'}
                                         </small>
                                         {!isOveraged && (

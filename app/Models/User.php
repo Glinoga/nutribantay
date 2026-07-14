@@ -57,4 +57,20 @@ class User extends Authenticatable
     {
         return $this->belongsTo(RegistrationCode::class);
     }
+
+    public function getRoleAbbreviationAttribute(): ?string
+    {
+        return match ($this->roles->first()?->name) {
+            'Admin' => 'AD',
+            'Healthworker' => 'HW',
+            default => null,
+        };
+    }
+
+    public function getDisplayNameAttribute(): string
+    {
+        $abbr = $this->role_abbreviation;
+
+        return $abbr ? "{$this->name} | {$abbr}" : $this->name;
+    }
 }

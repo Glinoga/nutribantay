@@ -13,7 +13,7 @@ class VaccineController extends Controller
         $vaccines = Vaccine::withCount(['childVaccines' => function ($query) {
             $query->whereHas('child', fn ($q) => $q->where('birthdate', '>=', now()->subMonths(60)));
         }])
-            ->with('creator:id,name')
+            ->with('creator.roles')
             ->orderBy('name')
             ->get();
 
@@ -33,7 +33,7 @@ class VaccineController extends Controller
                 'name' => $v->name,
                 'description' => $v->description,
                 'children_count' => $v->child_vaccines_count,
-                'created_by' => $v->creator?->name,
+                'created_by' => $v->creator?->display_name,
                 'created_at' => $v->created_at ? $v->created_at->format('Y-m-d H:i:s') : null,
             ]),
             'stats' => $stats,
