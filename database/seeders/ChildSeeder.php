@@ -22,7 +22,11 @@ class ChildSeeder extends Seeder
 
         $barangay = $admin->barangay ?? '176B';
 
-        $faker = Factory::create('en_PH');
+        $faker = class_exists(Factory::class) ? Factory::create('en_PH') : null;
+
+        if (! $faker) {
+            $this->command->warn('Skipping fake addresses and contact numbers: fakerphp/faker not installed.');
+        }
 
         $children = [
             // ── Normal children (under 60 months) ──────────────────────────
@@ -202,8 +206,12 @@ class ChildSeeder extends Seeder
             }
 
             $childData['barangay'] = $barangay;
-            $childData['address'] = $faker->address();
-            $childData['contact_number'] = '0917'.$faker->numerify('######');
+
+            if ($faker) {
+                $childData['address'] = $faker->address();
+                $childData['contact_number'] = '0917'.$faker->numerify('######');
+            }
+
             $childData['created_by'] = $admin->id;
             $childData['updated_by'] = $admin->id;
 
