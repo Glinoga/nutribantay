@@ -117,13 +117,27 @@ class DatabaseMaintenanceController extends Controller
         $extractPath = storage_path('app/restore-temp');
 
         try {
+            if (! class_exists(\ZipArchive::class)) {
+                throw new \RuntimeException('ZipArchive class not found — PHP zip extension is not installed.');
+            }
+
+            if (config('database.default') !== 'mysql') {
+                throw new \RuntimeException('Restore is only supported for MySQL connections.');
+            }
+
             $backupFileRel = $request->input('backup_file');
             if (! str_starts_with($backupFileRel, 'NutriBantay/') && ! str_starts_with($backupFileRel, 'private/NutriBantay/')) {
                 return back()->with('error', 'Invalid backup file path.');
             }
-            $fullPath = storage_path('app/'.$backupFileRel);
 
-            if (! file_exists($fullPath)) {
+            $storageAppPath = realpath(storage_path('app'));
+            $fullPath = realpath(storage_path('app/'.$backupFileRel));
+
+            if (! $storageAppPath || ! $fullPath || ! str_starts_with($fullPath, $storageAppPath.DIRECTORY_SEPARATOR)) {
+                return back()->with('error', 'Invalid backup file path.');
+            }
+
+            if (! is_file($fullPath)) {
                 \Log::error("Backup file not found at: {$fullPath}");
 
                 return back()->with('error', 'Backup file not found.');
@@ -136,7 +150,7 @@ class DatabaseMaintenanceController extends Controller
             } catch (\Throwable) {
                 // Best-effort cleanup — ignore permission failures on parent dir
             }
-            @mkdir($extractPath, 0755, true);
+            @mkdir($extractPath, 0775, true);
 
             $zip = new \ZipArchive;
             if ($zip->open($fullPath) !== true) {
@@ -148,7 +162,10 @@ class DatabaseMaintenanceController extends Controller
                 $zip->setPassword($encPassword);
             }
 
-            $zip->extractTo($extractPath);
+            if ($zip->extractTo($extractPath) !== true) {
+                $zip->close();
+                throw new \RuntimeException('Failed to extract backup archive. Check the backup password and archive integrity.');
+            }
             $zip->close();
 
             $sqlFile = $this->findSqlFile($extractPath);
@@ -161,15 +178,15 @@ class DatabaseMaintenanceController extends Controller
 
             \Log::info("Found SQL dump at: {$sqlFile}");
 
-            $sql = file_get_contents($sqlFile);
+            $sqlHeader = file_get_contents($sqlFile, false, null, 0, 8192);
 
-            if (empty($sql)) {
+            if ($sqlHeader === false || trim($sqlHeader) === '') {
                 throw new \RuntimeException('SQL dump file is empty or unreadable.');
             }
 
             if (
-                stripos($sql, 'PRAGMA foreign_keys') !== false ||
-                stripos($sql, 'AUTOINCREMENT') !== false
+                stripos($sqlHeader, 'PRAGMA foreign_keys') !== false ||
+                stripos($sqlHeader, 'AUTOINCREMENT') !== false
             ) {
                 throw new \RuntimeException(
                     'This backup contains SQLite data which is incompatible with MySQL. '.
@@ -180,32 +197,113 @@ class DatabaseMaintenanceController extends Controller
             \Log::info('Executing MySQL restore via DB::unprepared …');
 
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
-            DB::unprepared($sql);
-            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            try {
+                $this->executeSqlFile($sqlFile);
+            } finally {
+                DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            }
 
             \Log::info('MySQL restore completed successfully.');
 
             $this->recursiveDelete($extractPath);
 
-            AuditLog::logAction([
-                'action' => 'database_restored',
-                'model_type' => 'System',
-                'description' => 'Database restored from MySQL backup',
-                'new_values' => [
-                    'backup_file' => basename($backupFileRel),
-                ],
-            ]);
+            try {
+                AuditLog::logAction([
+                    'action' => 'database_restored',
+                    'model_type' => 'System',
+                    'description' => 'Database restored from MySQL backup',
+                    'new_values' => [
+                        'backup_file' => basename($backupFileRel),
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                \Log::warning('Database restore audit log failed: '.$e->getMessage());
+            }
 
             return back()->with('success', '✅ Database restored successfully from MySQL backup.');
 
         } catch (\Throwable $e) {
             \Log::error('Database restore failed: '.$e->getMessage()."\n".$e->getTraceAsString());
 
-            if (file_exists($extractPath)) {
-                $this->recursiveDelete($extractPath);
+            try {
+                if (file_exists($extractPath)) {
+                    $this->recursiveDelete($extractPath);
+                }
+            } catch (\Throwable) {
             }
 
             return back()->with('error', '❌ Database restore failed: '.$e->getMessage());
+        }
+    }
+
+    private function executeSqlFile(string $sqlFile): void
+    {
+        $handle = fopen($sqlFile, 'r');
+
+        if ($handle === false) {
+            throw new \RuntimeException("Cannot open SQL dump for reading: {$sqlFile}");
+        }
+
+        $statement = '';
+        $quote = null;
+        $escaped = false;
+
+        try {
+            while (($line = fgets($handle)) !== false) {
+                if ($statement === '' && (trim($line) === '' || str_starts_with(ltrim($line), '--'))) {
+                    continue;
+                }
+
+                $statement .= $line;
+                $length = strlen($line);
+
+                for ($i = 0; $i < $length; $i++) {
+                    $char = $line[$i];
+
+                    if ($escaped) {
+                        $escaped = false;
+
+                        continue;
+                    }
+
+                    if ($char === '\\') {
+                        $escaped = true;
+
+                        continue;
+                    }
+
+                    if ($quote !== null) {
+                        if ($char === $quote) {
+                            $quote = null;
+                        }
+
+                        continue;
+                    }
+
+                    if ($char === "'" || $char === '"' || $char === '`') {
+                        $quote = $char;
+                    }
+                }
+
+                if ($quote === null && str_ends_with(rtrim($line), ';')) {
+                    $sql = trim($statement);
+
+                    if ($sql !== '') {
+                        DB::unprepared($sql);
+                    }
+
+                    $statement = '';
+                    $escaped = false;
+                }
+            }
+
+            $sql = trim($statement);
+
+            if ($sql !== '') {
+                DB::unprepared($sql);
+            }
+        } finally {
+            fclose($handle);
         }
     }
 

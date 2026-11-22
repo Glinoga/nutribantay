@@ -10,13 +10,6 @@ use Inertia\Inertia;
 
 class ContactController extends Controller
 {
-    private $emailUsername;
-
-    public function __construct()
-    {
-        $this->emailUsername = config('mail.mailers.smtp.username');
-    }
-
     public function showContactForm()
     {
         return Inertia::render('Guest/contact', [
@@ -37,13 +30,21 @@ class ContactController extends Controller
             'privacy' => 'required|accepted',
         ]);
 
-        if (! $this->emailUsername) {
-            \Log::warning('Contact form submitted but mail is not configured (MAIL_MAILER=log or no SMTP username).');
+        $recipient = config('mail.contact_address') ?: config('mail.from.address');
 
-            return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
+        if (app()->isProduction() && (config('mail.default') === 'log' || ! config('mail.contact_address'))) {
+            \Log::warning('Contact form submitted but production mail delivery is not configured.');
+
+            return redirect()->route('guest.contact')->with('error', 'We could not send your message because email delivery is not configured. Please try again later.');
         }
 
-        Mail::to($this->emailUsername)->send(new ContactFormMail($data));
+        try {
+            Mail::to($recipient)->send(new ContactFormMail($data));
+        } catch (\Throwable $e) {
+            \Log::error('Contact form delivery failed: '.$e->getMessage()."\n".$e->getTraceAsString());
+
+            return redirect()->route('guest.contact')->with('error', 'We could not send your message. Please try again later.');
+        }
 
         return redirect()->route('guest.contact')->with('success', 'Thank you for contacting us! We will get back to you soon.');
     }

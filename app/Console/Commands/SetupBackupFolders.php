@@ -30,13 +30,15 @@ class SetupBackupFolders extends Command
             storage_path('app/backup-temp'),
             storage_path('app/restore-temp'),
             storage_path('app/NutriBantay'),
+            storage_path('app/private/NutriBantay'),
         ];
 
         foreach ($folders as $folder) {
             if (! file_exists($folder)) {
-                mkdir($folder, 0755, true);
+                mkdir($folder, 0775, true);
                 $this->info("Created folder: {$folder}");
             } else {
+                @chmod($folder, 0775);
                 $this->info("Folder already exists: {$folder}");
             }
         }

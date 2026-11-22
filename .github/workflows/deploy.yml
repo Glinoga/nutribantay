@@ -36,9 +36,11 @@ jobs:
           php artisan config:cache
           php artisan view:cache
           php artisan queue:restart
-          test -L public/storage || ln -s storage/app/public public/storage
-          php artisan app:setup-backup-folders || true
-          chmod -R 775 storage/app storage/logs bootstrap/cache 2>/dev/null || true
+          php artisan app:setup-backup-folders
+          php artisan storage:link --force
+          sudo chown -R deploy:www-data storage bootstrap/cache
+          sudo chmod -R ug+rwX storage bootstrap/cache
+          find storage bootstrap/cache -type d -exec chmod g+s {} +
           php artisan schedule:run --no-interaction 2>&1 | tee -a storage/logs/scheduler.log || true
           PHP_BIN=$(command -v php)
           SCHED_LOG='${{ secrets.VPS_DEPLOY_PATH }}/storage/logs/scheduler.log'

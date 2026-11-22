@@ -7,6 +7,7 @@ use App\Models\AnnouncementImage;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -151,16 +152,35 @@ class AnnouncementController extends Controller
             'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
-        $announcement = Announcement::create($validated);
+        $imageFiles = $request->file('images', []);
+        $storedPaths = [];
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('announcements', 'public');
-                $announcement->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $index,
-                ]);
-            }
+        unset($validated['images']);
+
+        try {
+            DB::transaction(function () use ($validated, $imageFiles, &$storedPaths) {
+                $announcement = Announcement::create($validated);
+
+                foreach ($imageFiles as $index => $image) {
+                    $path = $image->store('announcements', 'public');
+
+                    if ($path === false) {
+                        throw new \RuntimeException('Failed to store announcement image. Check storage permissions and disk space.');
+                    }
+
+                    $storedPaths[] = $path;
+
+                    $announcement->images()->create([
+                        'image_path' => $path,
+                        'sort_order' => $index,
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($storedPaths);
+            \Log::error('Announcement image upload failed: '.$e->getMessage()."\n".$e->getTraceAsString());
+
+            return back()->withInput()->with('error', 'Announcement could not be saved: '.$e->getMessage());
         }
 
         return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
@@ -191,19 +211,37 @@ class AnnouncementController extends Controller
             'images.*' => 'image|mimes:jpg,jpeg,png,gif|max:5120',
         ]);
 
+        $imageFiles = $request->file('images', []);
+        $storedPaths = [];
+
         unset($validated['images']);
 
-        $announcement->update($validated);
+        try {
+            DB::transaction(function () use ($validated, $imageFiles, $announcement, &$storedPaths) {
+                $announcement->update($validated);
 
-        if ($request->hasFile('images')) {
-            $maxOrder = $announcement->images()->max('sort_order') ?? 0;
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('announcements', 'public');
-                $announcement->images()->create([
-                    'image_path' => $path,
-                    'sort_order' => $maxOrder + $index + 1,
-                ]);
-            }
+                $maxOrder = $announcement->images()->max('sort_order') ?? 0;
+
+                foreach ($imageFiles as $index => $image) {
+                    $path = $image->store('announcements', 'public');
+
+                    if ($path === false) {
+                        throw new \RuntimeException('Failed to store announcement image. Check storage permissions and disk space.');
+                    }
+
+                    $storedPaths[] = $path;
+
+                    $announcement->images()->create([
+                        'image_path' => $path,
+                        'sort_order' => $maxOrder + $index + 1,
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($storedPaths);
+            \Log::error('Announcement image upload failed: '.$e->getMessage()."\n".$e->getTraceAsString());
+
+            return back()->withInput()->with('error', 'Announcement could not be updated: '.$e->getMessage());
         }
 
         $page = $request->input('page', 1);

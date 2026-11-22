@@ -16,15 +16,12 @@ class ContactFormMail extends Mailable
 
     public $data;
 
-    private $emailUsername;
-
     /**
      * Create a new message instance.
      */
     public function __construct($data)
     {
         $this->data = $data;
-        $this->emailUsername = config('mail.mailers.smtp.username');
     }
 
     /**
@@ -33,8 +30,9 @@ class ContactFormMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Message from NutriBantay',
-            from: new Address($this->emailUsername, 'NutriBantay')
+            subject: 'Message from NutriBantay: '.$this->data['subject'],
+            from: new Address(config('mail.from.address'), config('mail.from.name')),
+            replyTo: [new Address($this->data['email'], $this->data['first_name'].' '.$this->data['last_name'])],
         );
     }
 
